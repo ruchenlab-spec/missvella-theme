@@ -1,0 +1,435 @@
+{%- comment -%}
+  Circular collection list carousel. Rounds each collection image into a circle with the
+  collection title below, paged one screen at a time with the theme's slideshow arrows.
+{%- endcomment -%}
+
+{% liquid
+  assign section_collections = section.settings.collection_list
+
+  assign circle_gap = section.settings.circle_gap | default: 16
+  assign columns = section.settings.columns | default: 5
+  assign mobile_columns = section.settings.mobile_columns | default: '2'
+
+  assign slide_count = section_collections.size
+  if slide_count == 0
+    assign slide_count = columns
+  endif
+
+  assign show_arrows = false
+  if section.settings.icons_style != 'none'
+    assign show_arrows = true
+  endif
+
+  if section.settings.background_color != blank
+    render 'contrast-override', background_color: section.settings.background_color, section_id: section.id
+  endif
+-%}
+
+<div
+  class="
+    section
+    section--{{ section.settings.section_width }}
+    circle-collections
+    spacing-style
+    {% if section.settings.background_color != blank %}color-custom-{{ section.id }}{% endif %}
+  "
+  style="
+    {% render 'spacing-style', settings: section.settings %}
+    --circle-columns: {{ columns }};
+    --circle-columns-mobile: {{ mobile_columns }};
+    --circle-gap: {{ circle_gap }}px;
+    --circle-title-size: {{ section.settings.title_font_size | default: 12 }}px;
+    --circle-title-spacing: {{ section.settings.title_letter_spacing | default: 1 }}px;
+    --circle-title-transform: {{ section.settings.title_case | default: 'uppercase' }};
+    {% if section.settings.title_color != blank %}--circle-title-color: {{ section.settings.title_color }};{% endif %}
+  "
+>
+  {%- content_for 'blocks' -%}
+
+  {%- capture slides -%}
+    {%- if section_collections != blank -%}
+      {%- for collection in section_collections -%}
+        {%- capture slide_content -%}
+          <a class="circle-collections__item" href="{{ collection.url }}">
+            <div class="circle-collections__media">
+              {%- if collection.featured_image -%}
+                {{
+                  collection.featured_image
+                  | image_url: width: 600
+                  | image_tag:
+                    loading: 'lazy',
+                    sizes: '(max-width: 749px) 44vw, 20vw',
+                    widths: '150, 300, 450, 600',
+                    class: 'circle-collections__image'
+                }}
+              {%- else -%}
+                {{ 'collection-1' | placeholder_svg_tag: 'circle-collections__image placeholder-svg' }}
+              {%- endif -%}
+            </div>
+            <span class="circle-collections__title">{{ collection.title }}</span>
+          </a>
+        {%- endcapture -%}
+        {%- render 'slideshow-slide',
+          index: forloop.index0,
+          class: 'circle-collections__slide',
+          children: slide_content
+        -%}
+      {%- endfor -%}
+    {%- else -%}
+      {%- for i in (1..columns) -%}
+        {%- capture placeholder_index -%}{% cycle '1', '2', '3', '4', '5', '6' %}{%- endcapture -%}
+        {%- capture slide_content -%}
+          <div class="circle-collections__item">
+            <div class="circle-collections__media">
+              {{ 'collection-' | append: placeholder_index | placeholder_svg_tag: 'circle-collections__image placeholder-svg' }}
+            </div>
+            <span class="circle-collections__title">{{ 'placeholders.collection_title' | t }}</span>
+          </div>
+        {%- endcapture -%}
+        {%- render 'slideshow-slide',
+          index: forloop.index0,
+          class: 'circle-collections__slide',
+          children: slide_content
+        -%}
+      {%- endfor -%}
+    {%- endif -%}
+  {%- endcapture -%}
+
+  {%- render 'slideshow',
+    ref: 'circleCollections',
+    class: 'circle-collections__carousel',
+    slides: slides,
+    slide_count: slide_count,
+    show_arrows: show_arrows,
+    icon_style: section.settings.icons_style,
+    icon_shape: section.settings.icons_shape,
+    infinite: false,
+    initial_slide: 0
+  -%}
+</div>
+
+{% stylesheet %}
+  .circle-collections {
+    container-type: inline-size;
+    container-name: circle-collections;
+  }
+
+  .circle-collections .circle-collections__carousel {
+    position: relative;
+    width: 100%;
+  }
+
+  /* Room for hover scale so shadows/zoom are not clipped */
+  .circle-collections slideshow-slides {
+    gap: var(--circle-gap);
+    margin-block: -12px;
+    padding-block: 12px;
+  }
+
+  .circle-collections__slide {
+    flex: 0 0 auto;
+    min-width: 0;
+    scroll-snap-align: start;
+    width: calc((100% - (var(--circle-gap) * (var(--circle-columns-mobile) - 1))) / var(--circle-columns-mobile));
+  }
+
+  @container circle-collections (min-width: 750px) {
+    .circle-collections__slide {
+      width: calc((100% - (var(--circle-gap) * (var(--circle-columns) - 1))) / var(--circle-columns));
+    }
+  }
+
+  .circle-collections__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: var(--color-foreground);
+  }
+
+  .circle-collections__media {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    border-radius: 50%;
+    overflow: hidden;
+    background-color: var(--color-background);
+    box-shadow: 0 0 0 1px rgb(0 0 0 / 6%);
+  }
+
+  .circle-collections__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: scale var(--hover-transition-duration, 0.25s) var(--hover-transition-timing, ease-out);
+  }
+
+  .circle-collections__item:hover .circle-collections__image {
+    scale: 1.05;
+  }
+
+  .circle-collections__media .placeholder-svg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    padding: 25%;
+    fill: var(--color-foreground);
+    opacity: 0.35;
+  }
+
+  .circle-collections__title {
+    font-family: var(--font-body--family);
+    font-size: var(--circle-title-size);
+    font-weight: 500;
+    letter-spacing: var(--circle-title-spacing);
+    text-align: center;
+    text-transform: var(--circle-title-transform, uppercase);
+    color: var(--circle-title-color, var(--color-foreground));
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "圆形集合轮播",
+  "class": "circle-collections-section",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "blocks": [
+    {
+      "type": "@theme"
+    },
+    {
+      "type": "@app"
+    },
+    {
+      "type": "text"
+    },
+    {
+      "type": "icon"
+    },
+    {
+      "type": "image"
+    },
+    {
+      "type": "button"
+    },
+    {
+      "type": "group"
+    },
+    {
+      "type": "spacer"
+    },
+    {
+      "type": "_divider"
+    }
+  ],
+  "settings": [
+    {
+      "type": "collection_list",
+      "id": "collection_list",
+      "label": "集合列表"
+    },
+    {
+      "type": "header",
+      "content": "布局"
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "label": "桌面每屏数量",
+      "min": 3,
+      "max": 8,
+      "step": 1,
+      "default": 5
+    },
+    {
+      "type": "select",
+      "id": "mobile_columns",
+      "label": "移动每屏数量",
+      "options": [
+        {
+          "value": "1",
+          "label": "1"
+        },
+        {
+          "value": "2",
+          "label": "2"
+        }
+      ],
+      "default": "2"
+    },
+    {
+      "type": "range",
+      "id": "circle_gap",
+      "label": "圆形间距",
+      "min": 0,
+      "max": 48,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "header",
+      "content": "标题样式"
+    },
+    {
+      "type": "select",
+      "id": "title_case",
+      "label": "文字大小写",
+      "options": [
+        {
+          "value": "uppercase",
+          "label": "大写"
+        },
+        {
+          "value": "none",
+          "label": "默认"
+        }
+      ],
+      "default": "uppercase"
+    },
+    {
+      "type": "range",
+      "id": "title_font_size",
+      "label": "字号",
+      "min": 10,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "title_letter_spacing",
+      "label": "字距",
+      "min": 0,
+      "max": 4,
+      "step": 0.5,
+      "unit": "px",
+      "default": 1
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "标题颜色",
+      "placeholder": "默认"
+    },
+    {
+      "type": "header",
+      "content": "翻页箭头"
+    },
+    {
+      "type": "select",
+      "id": "icons_style",
+      "label": "箭头样式",
+      "options": [
+        {
+          "value": "arrow",
+          "label": "箭头"
+        },
+        {
+          "value": "chevron",
+          "label": "尖括号"
+        },
+        {
+          "value": "arrows_large",
+          "label": "大箭头"
+        },
+        {
+          "value": "chevron_large",
+          "label": "大尖括号"
+        },
+        {
+          "value": "none",
+          "label": "无"
+        }
+      ],
+      "default": "arrow"
+    },
+    {
+      "type": "select",
+      "id": "icons_shape",
+      "label": "箭头背景",
+      "options": [
+        {
+          "value": "none",
+          "label": "无"
+        },
+        {
+          "value": "circle",
+          "label": "圆形"
+        },
+        {
+          "value": "square",
+          "label": "方形"
+        }
+      ],
+      "default": "circle"
+    },
+    {
+      "type": "header",
+      "content": "区块"
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "宽度",
+      "options": [
+        {
+          "value": "page-width",
+          "label": "页面宽"
+        },
+        {
+          "value": "full-width",
+          "label": "全宽"
+        }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "背景色",
+      "placeholder": "默认"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "上边距",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "下边距",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 36
+    }
+  ],
+  "presets": [
+    {
+      "name": "圆形集合轮播",
+      "category": "t:categories.collections",
+      "settings": {
+        "columns": 5,
+        "mobile_columns": "2",
+        "circle_gap": 16,
+        "icons_style": "arrow",
+        "icons_shape": "circle",
+        "section_width": "page-width",
+        "padding-block-start": 36,
+        "padding-block-end": 36
+      }
+    }
+  ]
+}
+{% endschema %}
