@@ -24,6 +24,19 @@
     endif
   endfor
 
+  # Circle diameter: 0 means "fill the available column width"
+  assign circle_size_css = '100%'
+  if section.settings.circle_size > 0
+    assign circle_size_css = section.settings.circle_size | append: 'px'
+  endif
+
+  assign arrow_size = section.settings.arrow_size | default: 48
+
+  assign arrow_icon = 'arrow'
+  if section.settings.icons_style contains 'chevron'
+    assign arrow_icon = 'caret'
+  endif
+
   if section.settings.background_color != blank
     render 'contrast-override', background_color: section.settings.background_color, section_id: section.id
   endif
@@ -42,6 +55,8 @@
     --circle-columns: {{ columns }};
     --circle-columns-mobile: {{ mobile_columns }};
     --circle-gap: {{ circle_gap }}px;
+    --circle-size: {{ circle_size_css }};
+    --circle-arrow-size: {{ arrow_size }}px;
     --circle-title-size: {{ section.settings.title_font_size | default: 12 }}px;
     --circle-title-spacing: {{ section.settings.title_letter_spacing | default: 1 }}px;
     --circle-title-transform: {{ section.settings.title_case | default: 'uppercase' }};
@@ -146,20 +161,44 @@
 
   {%- if section.settings.icons_style != 'none' -%}
     {%- capture custom_arrows -%}
-      <div class="circle-collections__arrows circle-collections__arrows--prev">
-        {%- render 'slideshow-arrow',
-          action: 'previous',
-          icon_style: section.settings.icons_style,
-          icon_shape: section.settings.icons_shape
-        -%}
-      </div>
-      <div class="circle-collections__arrows circle-collections__arrows--next">
-        {%- render 'slideshow-arrow',
-          action: 'next',
-          icon_style: section.settings.icons_style,
-          icon_shape: section.settings.icons_shape
-        -%}
-      </div>
+      <button
+        type="button"
+        class="
+          circle-collections__arrow circle-collections__arrow--prev
+          circle-collections__arrow--shape-{{ section.settings.icons_shape }}
+          circle-collections__arrow--{{ arrow_icon }} flip-x
+        "
+        ref="previous"
+        on:click="/previous"
+        aria-label="{{ 'accessibility.slideshow_previous' | t }}"
+      >
+        <span class="circle-collections__arrow-icon">
+          {%- if arrow_icon == 'caret' -%}
+            {{- 'icon-caret.svg' | inline_asset_content -}}
+          {%- else -%}
+            {{- 'icon-arrow.svg' | inline_asset_content -}}
+          {%- endif -%}
+        </span>
+      </button>
+      <button
+        type="button"
+        class="
+          circle-collections__arrow circle-collections__arrow--next
+          circle-collections__arrow--shape-{{ section.settings.icons_shape }}
+          circle-collections__arrow--{{ arrow_icon }}
+        "
+        ref="next"
+        on:click="/next"
+        aria-label="{{ 'accessibility.slideshow_next' | t }}"
+      >
+        <span class="circle-collections__arrow-icon">
+          {%- if arrow_icon == 'caret' -%}
+            {{- 'icon-caret.svg' | inline_asset_content -}}
+          {%- else -%}
+            {{- 'icon-arrow.svg' | inline_asset_content -}}
+          {%- endif -%}
+        </span>
+      </button>
     {%- endcapture -%}
   {%- endif -%}
 
@@ -169,7 +208,7 @@
     slides: slides,
     slide_count: slide_count,
     show_arrows: false,
-    slideshow_arrows: custom_arrows,
+    controls: custom_arrows,
     infinite: false,
     initial_slide: 0
   -%}
@@ -186,68 +225,115 @@
   }
 
   /*
-   * Grid layout: [prev arrow] [slides] [next arrow]
-   * Arrows own their own columns, so they never overlap the circles, and
-   * align-items: center centers them on the circle row (not the whole section).
+   * Three grid columns on the slideshow component itself: [prev] [slides] [next].
+   * The arrows are siblings of the carousel container (not inside it), so they can
+   * be any size, are never clipped by the container edges, and stay vertically
+   * centered on the circle row.
    */
   .circle-collections .circle-collections__carousel {
-    position: relative;
+    display: grid;
+    grid-template-columns: var(--circle-arrow-size) minmax(0, 1fr) var(--circle-arrow-size);
+    align-items: center;
+    column-gap: 16px;
     width: 100%;
   }
 
   .circle-collections .circle-collections__carousel slideshow-container {
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    grid-template-rows: 1fr;
-    align-items: center;
-    column-gap: 8px;
-  }
-
-  .circle-collections__arrows {
-    display: flex;
-    align-items: center;
-    grid-row: 1;
-  }
-
-  .circle-collections__arrows--prev {
-    grid-column: 1;
-    justify-content: flex-start;
-  }
-
-  .circle-collections__arrows--next {
-    grid-column: 3;
-    justify-content: flex-end;
-  }
-
-  .circle-collections .circle-collections__carousel slideshow-slides {
     grid-column: 2;
     grid-row: 1;
-    gap: var(--circle-gap);
-    margin-block: -12px;
-    padding-block: 12px;
+    min-width: 0;
   }
 
-  .circle-collections__arrows .slideshow-control {
-    opacity: 1;
+  .circle-collections__arrow {
+    grid-row: 1;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: var(--circle-arrow-size);
+    height: var(--circle-arrow-size);
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--color-foreground);
+    cursor: pointer;
+    transition: opacity 0.2s ease, transform 0.2s ease, background-color 0.2s ease;
+  }
+
+  .circle-collections__arrow--prev {
+    grid-column: 1;
+    justify-self: start;
+  }
+
+  .circle-collections__arrow--next {
+    grid-column: 3;
+    justify-self: end;
+  }
+
+  .circle-collections__arrow--shape-circle {
+    border-radius: 50%;
+    background: var(--color-primary-button-background);
+    color: var(--color-primary-button-text);
+  }
+
+  .circle-collections__arrow--shape-square {
+    background: var(--color-primary-button-background);
+    color: var(--color-primary-button-text);
+  }
+
+  .circle-collections__arrow-icon {
+    display: inline-flex;
+    width: calc(var(--circle-arrow-size) * 0.42);
+    height: calc(var(--circle-arrow-size) * 0.42);
+  }
+
+  .circle-collections__arrow-icon svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .circle-collections__arrow--caret .circle-collections__arrow-icon svg {
+    rotate: -90deg;
+  }
+
+  .circle-collections__arrow:hover {
+    transform: scale(1.06);
+  }
+
+  .circle-collections__arrow[disabled] {
+    opacity: 0.25;
+    cursor: default;
+    transform: none;
   }
 
   @container circle-collections (max-width: 749px) {
-    .circle-collections__arrows .slideshow-control {
-      min-width: 36px;
-      padding-inline: 0;
+    .circle-collections .circle-collections__carousel {
+      column-gap: 8px;
     }
+  }
+
+  .circle-collections .circle-collections__carousel slideshow-slides {
+    gap: var(--circle-gap);
+    margin-block: -12px;
+    padding-block: 12px;
+    justify-content: safe center;
   }
 
   .circle-collections__slide {
     flex: 0 0 auto;
     min-width: 0;
     scroll-snap-align: start;
-    width: calc((100% - (var(--circle-gap) * (var(--circle-columns-mobile) - 1))) / var(--circle-columns-mobile));
+    width: min(
+      var(--circle-size),
+      calc((100% - (var(--circle-gap) * (var(--circle-columns-mobile) - 1))) / var(--circle-columns-mobile))
+    );
   }
 
   @container circle-collections (min-width: 750px) {
     .circle-collections__slide {
-      width: calc((100% - (var(--circle-gap) * (var(--circle-columns) - 1))) / var(--circle-columns));
+      width: min(
+        var(--circle-size),
+        calc((100% - (var(--circle-gap) * (var(--circle-columns) - 1))) / var(--circle-columns))
+      );
     }
   }
 
@@ -725,6 +811,17 @@
       "default": 16
     },
     {
+      "type": "range",
+      "id": "circle_size",
+      "label": "圆形直径",
+      "info": "0 = 自动填满列宽",
+      "min": 0,
+      "max": 320,
+      "step": 4,
+      "unit": "px",
+      "default": 0
+    },
+    {
       "type": "header",
       "content": "圆形文字"
     },
@@ -821,6 +918,16 @@
         }
       ],
       "default": "circle"
+    },
+    {
+      "type": "range",
+      "id": "arrow_size",
+      "label": "箭头大小",
+      "min": 32,
+      "max": 72,
+      "step": 2,
+      "unit": "px",
+      "default": 48
     },
     {
       "type": "header",
