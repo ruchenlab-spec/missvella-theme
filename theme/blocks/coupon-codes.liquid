@@ -1,0 +1,776 @@
+{% comment %}
+  Coupon Offers — Horizon block
+  Rebuilt from BQQ coupon-banner functionality:
+  - Collapsible offer panel
+  - Up to 3 coupon tiers
+  - One-click copy
+  - Copied state
+  Visual system redesigned for the new storefront.
+{% endcomment %}
+
+{%- liquid
+  assign s = block.settings
+  assign uid = block.id | replace: '-', ''
+-%}
+
+<div
+  id="CouponOffers-{{ uid }}"
+  class="coupon-offers"
+  data-coupon-offers
+  {{ block.shopify_attributes }}
+  style="
+    --co-bg: {{ s.background }};
+    --co-surface: {{ s.surface }};
+    --co-accent: {{ s.accent }};
+    --co-text: {{ s.text_color }};
+    --co-muted: {{ s.muted_color }};
+    --co-border: {{ s.border_color }};
+    --co-radius: {{ s.radius }}px;
+  "
+>
+  <button
+    type="button"
+    class="coupon-offers__trigger"
+    data-coupon-trigger
+    aria-expanded="false"
+    aria-controls="CouponOffersPanel-{{ uid }}"
+  >
+    <span class="coupon-offers__trigger-icon" aria-hidden="true">
+      {% if s.icon != blank %}
+        {{ s.icon | image_url: width: 80 | image_tag: widths: '40, 80', loading: 'lazy', class: 'coupon-offers__custom-icon' }}
+      {% else %}
+        <svg viewBox="0 0 24 24" fill="none">
+          <path d="M4 8.5A2.5 2.5 0 0 1 6.5 6H19a1 1 0 0 1 1 1v4a2 2 0 0 0 0 4v2a1 1 0 0 1-1 1H6.5A2.5 2.5 0 0 1 4 15.5v-1a2 2 0 0 0 0-4v-2Z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/>
+          <path d="M8 8v2M8 14v2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      {% endif %}
+    </span>
+
+    <span class="coupon-offers__trigger-copy">
+      {% if s.heading != blank %}
+        <span class="coupon-offers__heading">{{ s.heading }}</span>
+      {% endif %}
+      {% if s.subheading != blank %}
+        <span class="coupon-offers__subheading">{{ s.subheading }}</span>
+      {% endif %}
+    </span>
+
+    <span class="coupon-offers__summary">
+      {%- for i in (1..3) -%}
+        {%- assign enabled_key = 'coupon_' | append: i | append: '_enabled' -%}
+        {%- assign value_key = 'coupon_' | append: i | append: '_value' -%}
+        {%- if s[enabled_key] and s[value_key] != blank -%}
+          <span>{{ s[value_key] }}</span>
+        {%- endif -%}
+      {%- endfor -%}
+    </span>
+
+    <span class="coupon-offers__chevron" aria-hidden="true">
+      <svg viewBox="0 0 16 16" fill="none">
+        <path d="M3.5 5.5 8 10l4.5-4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </span>
+  </button>
+
+  <div
+    id="CouponOffersPanel-{{ uid }}"
+    class="coupon-offers__panel"
+    data-coupon-panel
+    hidden
+  >
+    <div class="coupon-offers__panel-inner">
+      <div class="coupon-offers__intro">
+        {% if s.panel_title != blank %}
+          <span class="coupon-offers__panel-title">{{ s.panel_title }}</span>
+        {% endif %}
+        {% if s.panel_note != blank %}
+          <span class="coupon-offers__panel-note">{{ s.panel_note }}</span>
+        {% endif %}
+      </div>
+
+      <div class="coupon-offers__list">
+        {%- for i in (1..3) -%}
+          {%- assign enabled_key = 'coupon_' | append: i | append: '_enabled' -%}
+          {%- assign value_key = 'coupon_' | append: i | append: '_value' -%}
+          {%- assign tag_key = 'coupon_' | append: i | append: '_tag' -%}
+          {%- assign code_key = 'coupon_' | append: i | append: '_code' -%}
+          {%- assign btn_key = 'coupon_' | append: i | append: '_btn' -%}
+
+          {%- if s[enabled_key] and s[code_key] != blank -%}
+            <div class="coupon-offers__item">
+              <div class="coupon-offers__offer">
+                {% if s[value_key] != blank %}
+                  <span class="coupon-offers__value">{{ s[value_key] }}</span>
+                {% endif %}
+                {% if s[tag_key] != blank %}
+                  <span class="coupon-offers__tag">{{ s[tag_key] }}</span>
+                {% endif %}
+              </div>
+
+              <div class="coupon-offers__code-box">
+                <span class="coupon-offers__code-label">{{ s.code_label }}</span>
+                <span class="coupon-offers__code">{{ s[code_key] }}</span>
+              </div>
+
+              <button
+                type="button"
+                class="coupon-offers__copy"
+                data-coupon-copy
+                data-code="{{ s[code_key] | escape }}"
+                data-default-label="{{ s[btn_key] | default: 'COPY' | escape }}"
+                aria-label="Copy discount code {{ s[code_key] }}"
+              >
+                <span data-copy-label>{{ s[btn_key] | default: 'COPY' }}</span>
+                <svg class="coupon-offers__copy-icon" viewBox="0 0 20 20" fill="none" aria-hidden="true">
+                  <path d="M7.5 6.5h7a2 2 0 0 1 2 2v7a2 2 0 0 1-2 2h-7a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2Z" stroke="currentColor" stroke-width="1.5"/>
+                  <path d="M13.5 6V4.5a2 2 0 0 0-2-2h-7a2 2 0 0 0-2 2v7a2 2 0 0 0 2 2H6" stroke="currentColor" stroke-width="1.5"/>
+                </svg>
+              </button>
+            </div>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+
+      {% if s.footer_text != blank %}
+        <div class="coupon-offers__footer">{{ s.footer_text }}</div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<style>
+  #CouponOffers-{{ uid }} {
+    width: 100%;
+    color: var(--co-text);
+    background: var(--co-bg);
+    border: 1px solid var(--co-border);
+    border-radius: var(--co-radius);
+    overflow: hidden;
+  }
+
+  #CouponOffers-{{ uid }} .coupon-offers__trigger {
+    appearance: none;
+    width: 100%;
+    min-height: 62px;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto auto;
+    align-items: center;
+    gap: 12px;
+    padding: 13px 16px;
+    margin: 0;
+    border: 0;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    text-align: left;
+    font: inherit;
+  }
+
+  #CouponOffers-{{ uid }} .coupon-offers__trigger-icon {
+    width: 34px;
+    height: 34px;
+    display: grid;
+    place-items: center;
+    flex: 0 0 auto;
+    border-radius: 50%;
+    background: var(--co-surface);
+    color: var(--co-text);
+  }
+
+  #CouponOffers-{{ uid }} .coupon-offers__trigger-icon svg,
+  #CouponOffers-{{ uid }} .coupon-offers__custom-icon {
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+  }
+
+  #CouponOffers-{{ uid }} .coupon-offers__trigger-copy {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  #CouponOffers-{{ uid }} .coupon-offers__heading {
+    font-size: 13px;
+    font-weight: 650;
+    line-height: 1.2;
+    letter-spacing: .01em;
+  }
+
+  #CouponOffers-{{ uid }} .coupon-offers__subheading {
+    color: var(--co-muted);
+    font-size: 11px;
+    line-height: 1.25;
+  }
+
+  #CouponOffers-{{ uid }} .coupon-offers__summary {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+
+  #CouponOffers-{{ uid }} .coupon-offers__summary span {
+    padding: 5px 8px;
+    border-radius: 999px;
+    background: var(--co-surface);
+    color: var(--co-text);
+    font-size: 10px;
+    font-weight: 650;
+    line-height: 1;
+    white-space: nowrap;
+  }
+
+  #CouponOffers-{{ uid }} .coupon-offers__chevron {
+    width: 20px;
+    height: 20px;
+    display: grid;
+    place-items: center;
+    transition: transform .28s cubic-bezier(.22,.61,.36,1);
+  }
+
+  #CouponOffers-{{ uid }} .coupon-offers__chevron svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  #CouponOffers-{{ uid }}.is-open .coupon-offers__chevron {
+    transform: rotate(180deg);
+  }
+
+  #CouponOffers-{{ uid }} .coupon-offers__panel {
+    overflow: hidden;
+    background: var(--co-bg);
+  }
+
+  #CouponOffers-{{ uid }} .coupon-offers__panel[hidden] {
+    display: block;
+    height: 0;
+  }
+
+  #CouponOffers-{{ uid }} .coupon-offers__panel-inner {
+    padding: 0 16px 16px;
+    border-top: 1px solid var(--co-border);
+  }
+
+  #CouponOffers-{{ uid }} .coupon-offers__intro {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 13px 0 11px;
+  }
+
+  #CouponOffers-{{ uid }} .coupon-offers__panel-title {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: .12em;
+    text-transform: uppercase;
+  }
+
+  #CouponOffers-{{ uid }} .coupon-offers__panel-note {
+    color: var(--co-muted);
+    font-size: 10px;
+    line-height: 1.3;
+    text-align: right;
+  }
+
+  #CouponOffers-{{ uid }} .coupon-offers__list {
+    display: grid;
+    gap: 8px;
+  }
+
+  #CouponOffers-{{ uid }} .coupon-offers__item {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 88px 70px;
+    align-items: center;
+    gap: 6px;
+    padding: 11px 12px;
+    background: var(--co-surface);
+    border-radius: calc(var(--co-radius) - 2px);
+  }
+
+  #CouponOffers-{{ uid }} .coupon-offers__offer {
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  #CouponOffers-{{ uid }} .coupon-offers__value {
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.15;
+  }
+
+  #CouponOffers-{{ uid }} .coupon-offers__tag {
+    color: var(--co-muted);
+    font-size: 10px;
+    line-height: 1.3;
+  }
+
+  #CouponOffers-{{ uid }} .coupon-offers__code-box {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    width: 88px;
+    min-width: 0;
+    padding-left: 10px;
+    border-left: 1px dashed var(--co-border);
+  }
+
+  #CouponOffers-{{ uid }} .coupon-offers__code-label {
+    color: var(--co-muted);
+    font-size: 8px;
+    font-weight: 600;
+    letter-spacing: .1em;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+
+  #CouponOffers-{{ uid }} .coupon-offers__code {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    line-height: 1.2;
+  }
+
+  #CouponOffers-{{ uid }} .coupon-offers__copy {
+    width: 70px;
+    min-width: 70px;
+    height: 34px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 0 10px;
+    border: 1px solid var(--co-text);
+    border-radius: 8px;
+    background: var(--co-text);
+    color: #fff;
+    cursor: pointer;
+    font: inherit;
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: .08em;
+    transition: transform .2s ease, background .2s ease, color .2s ease;
+  }
+
+  #CouponOffers-{{ uid }} .coupon-offers__copy-icon {
+    width: 13px;
+    height: 13px;
+  }
+
+  @media (hover: hover) {
+    #CouponOffers-{{ uid }} .coupon-offers__copy:hover {
+      transform: translateY(-1px);
+      background: transparent;
+      color: var(--co-text);
+    }
+
+    #CouponOffers-{{ uid }} .coupon-offers__trigger:hover .coupon-offers__trigger-icon {
+      transform: scale(1.04);
+    }
+  }
+
+  #CouponOffers-{{ uid }} .coupon-offers__trigger-icon {
+    transition: transform .25s ease;
+  }
+
+  #CouponOffers-{{ uid }} .coupon-offers__copy:active {
+    transform: scale(.97);
+  }
+
+  #CouponOffers-{{ uid }} .coupon-offers__copy.is-copied {
+    border-color: var(--co-accent);
+    background: var(--co-accent);
+    color: #fff;
+  }
+
+  #CouponOffers-{{ uid }} .coupon-offers__footer {
+    padding-top: 11px;
+    color: var(--co-muted);
+    font-size: 10px;
+    line-height: 1.45;
+    text-align: center;
+  }
+
+  @media screen and (max-width: 749px) {
+    #CouponOffers-{{ uid }} .coupon-offers__trigger {
+      grid-template-columns: auto minmax(0, 1fr) auto;
+      gap: 10px;
+      padding: 12px 13px;
+    }
+
+    #CouponOffers-{{ uid }} .coupon-offers__summary {
+      display: none;
+    }
+
+    #CouponOffers-{{ uid }} .coupon-offers__panel-inner {
+      padding: 0 12px 12px;
+    }
+
+    #CouponOffers-{{ uid }} .coupon-offers__item {
+      grid-template-columns: minmax(0, 1fr) 70px 62px;
+      gap: 6px;
+      padding: 10px;
+    }
+
+    #CouponOffers-{{ uid }} .coupon-offers__offer {
+      min-width: 0;
+    }
+
+    #CouponOffers-{{ uid }} .coupon-offers__code-box {
+      grid-column: auto;
+      width: 70px;
+      min-width: 0;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: center;
+      gap: 3px;
+      padding: 0 0 0 8px;
+      border-left: 1px dashed var(--co-border);
+      border-top: 0;
+    }
+
+    #CouponOffers-{{ uid }} .coupon-offers__code-label {
+      margin-right: 0;
+    }
+
+    #CouponOffers-{{ uid }} .coupon-offers__code {
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    #CouponOffers-{{ uid }} .coupon-offers__copy {
+      width: 62px;
+      min-width: 62px;
+      padding: 0 6px;
+    }
+  }
+</style>
+
+<script>
+  (() => {
+    const root = document.getElementById('CouponOffers-{{ uid }}');
+    if (!root || root.dataset.initialized === 'true') return;
+
+    root.dataset.initialized = 'true';
+
+    const trigger = root.querySelector('[data-coupon-trigger]');
+    const panel = root.querySelector('[data-coupon-panel]');
+
+    if (trigger && panel) {
+      trigger.addEventListener('click', () => {
+        const opening = !root.classList.contains('is-open');
+
+        if (opening) {
+          panel.hidden = false;
+          panel.style.height = '0px';
+          root.classList.add('is-open');
+          trigger.setAttribute('aria-expanded', 'true');
+
+          requestAnimationFrame(() => {
+            panel.style.height = panel.scrollHeight + 'px';
+          });
+
+          const onOpenEnd = (event) => {
+            if (event.propertyName !== 'height') return;
+            panel.style.height = 'auto';
+            panel.removeEventListener('transitionend', onOpenEnd);
+          };
+
+          panel.addEventListener('transitionend', onOpenEnd);
+        } else {
+          panel.style.height = panel.scrollHeight + 'px';
+
+          requestAnimationFrame(() => {
+            panel.style.height = '0px';
+          });
+
+          root.classList.remove('is-open');
+          trigger.setAttribute('aria-expanded', 'false');
+
+          const onCloseEnd = (event) => {
+            if (event.propertyName !== 'height') return;
+            panel.hidden = true;
+            panel.removeEventListener('transitionend', onCloseEnd);
+          };
+
+          panel.addEventListener('transitionend', onCloseEnd);
+        }
+      });
+
+      panel.style.transition = 'height .32s cubic-bezier(.22,.61,.36,1)';
+    }
+
+    const fallbackCopy = (text) => {
+      const textarea = document.createElement('textarea');
+      textarea.value = text;
+      textarea.style.position = 'fixed';
+      textarea.style.left = '-9999px';
+      textarea.style.top = '0';
+      document.body.appendChild(textarea);
+      textarea.focus();
+      textarea.select();
+
+      try {
+        document.execCommand('copy');
+      } catch (error) {
+        console.warn('Coupon copy failed', error);
+      }
+
+      textarea.remove();
+    };
+
+    root.querySelectorAll('[data-coupon-copy]').forEach((button) => {
+      button.addEventListener('click', async () => {
+        const code = button.dataset.code;
+        if (!code) return;
+
+        try {
+          if (navigator.clipboard && window.isSecureContext) {
+            await navigator.clipboard.writeText(code);
+          } else {
+            fallbackCopy(code);
+          }
+        } catch (error) {
+          fallbackCopy(code);
+        }
+
+        const label = button.querySelector('[data-copy-label]');
+        const original = button.dataset.defaultLabel || 'COPY';
+
+        if (label) label.textContent = '{{ s.copied_text | default: "COPIED" | escape }}';
+        button.classList.add('is-copied');
+
+        window.setTimeout(() => {
+          if (label) label.textContent = original;
+          button.classList.remove('is-copied');
+        }, 1800);
+      });
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Coupon offers",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Header"
+    },
+    {
+      "type": "image_picker",
+      "id": "icon",
+      "label": "Custom icon"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Exclusive offers"
+    },
+    {
+      "type": "text",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "Tap to reveal and copy your code"
+    },
+    {
+      "type": "header",
+      "content": "Panel"
+    },
+    {
+      "type": "text",
+      "id": "panel_title",
+      "label": "Panel title",
+      "default": "Available offers"
+    },
+    {
+      "type": "text",
+      "id": "panel_note",
+      "label": "Panel note",
+      "default": "Click COPY to save a code"
+    },
+    {
+      "type": "text",
+      "id": "code_label",
+      "label": "Code label",
+      "default": "DISCOUNT CODE"
+    },
+    {
+      "type": "text",
+      "id": "copied_text",
+      "label": "Copied text",
+      "default": "COPIED"
+    },
+    {
+      "type": "text",
+      "id": "footer_text",
+      "label": "Footer text",
+      "default": "Discount codes cannot be combined unless otherwise stated."
+    },
+    {
+      "type": "header",
+      "content": "Coupon 1"
+    },
+    {
+      "type": "checkbox",
+      "id": "coupon_1_enabled",
+      "label": "Enable",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "coupon_1_value",
+      "label": "Discount",
+      "default": "$20 OFF"
+    },
+    {
+      "type": "text",
+      "id": "coupon_1_tag",
+      "label": "Condition",
+      "default": "Orders over $150"
+    },
+    {
+      "type": "text",
+      "id": "coupon_1_code",
+      "label": "Coupon code",
+      "default": "SAVE20"
+    },
+    {
+      "type": "text",
+      "id": "coupon_1_btn",
+      "label": "Button text",
+      "default": "COPY"
+    },
+    {
+      "type": "header",
+      "content": "Coupon 2"
+    },
+    {
+      "type": "checkbox",
+      "id": "coupon_2_enabled",
+      "label": "Enable",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "coupon_2_value",
+      "label": "Discount",
+      "default": "$35 OFF"
+    },
+    {
+      "type": "text",
+      "id": "coupon_2_tag",
+      "label": "Condition",
+      "default": "Orders over $250"
+    },
+    {
+      "type": "text",
+      "id": "coupon_2_code",
+      "label": "Coupon code",
+      "default": "SAVE35"
+    },
+    {
+      "type": "text",
+      "id": "coupon_2_btn",
+      "label": "Button text",
+      "default": "COPY"
+    },
+    {
+      "type": "header",
+      "content": "Coupon 3"
+    },
+    {
+      "type": "checkbox",
+      "id": "coupon_3_enabled",
+      "label": "Enable",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "coupon_3_value",
+      "label": "Discount",
+      "default": "$50 OFF"
+    },
+    {
+      "type": "text",
+      "id": "coupon_3_tag",
+      "label": "Condition",
+      "default": "Orders over $350"
+    },
+    {
+      "type": "text",
+      "id": "coupon_3_code",
+      "label": "Coupon code",
+      "default": "SAVE50"
+    },
+    {
+      "type": "text",
+      "id": "coupon_3_btn",
+      "label": "Button text",
+      "default": "COPY"
+    },
+    {
+      "type": "header",
+      "content": "Style"
+    },
+    {
+      "type": "color",
+      "id": "background",
+      "label": "Background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "surface",
+      "label": "Surface",
+      "default": "#EBE8E2"
+    },
+    {
+      "type": "color",
+      "id": "accent",
+      "label": "Success accent",
+      "default": "#79A3C3"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "muted_color",
+      "label": "Muted text",
+      "default": "#6F6F6F"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border",
+      "default": "#E3E1DD"
+    },
+    {
+      "type": "range",
+      "id": "radius",
+      "label": "Corner radius",
+      "min": 0,
+      "max": 20,
+      "step": 1,
+      "default": 10,
+      "unit": "px"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Coupon offers"
+    }
+  ]
+}
+{% endschema %}

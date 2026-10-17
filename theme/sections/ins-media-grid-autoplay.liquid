@@ -1,0 +1,918 @@
+{%- liquid
+  assign full_width     = section.settings.full_width
+  assign outer_pad      = section.settings.outer_padding
+  assign gap_desktop    = section.settings.grid_gap
+  assign gap_mobile     = section.settings.grid_gap_mobile
+  assign hover_effect   = section.settings.hover_effect
+  assign show_caption   = section.settings.show_caption
+  assign layout_desktop = section.settings.layout_desktop
+  assign layout_mobile  = section.settings.layout_mobile
+  assign cols_desktop   = section.settings.columns_desktop
+  assign cols_mobile    = section.settings.columns_mobile
+  assign video_loop     = section.settings.video_loop
+  assign video_controls = section.settings.video_controls
+  assign media_position = section.settings.media_position
+
+  assign video_muted = section.settings.video_muted
+  assign video_preload = 'metadata'
+  if section.settings.video_autoplay
+    assign video_muted = true
+    assign video_preload = 'auto'
+  endif
+-%}
+
+<style>
+  #ins-{{ section.id }} {
+    {%- if full_width -%}
+      width: 100%;
+      padding-left: {{ outer_pad }}px;
+      padding-right: {{ outer_pad }}px;
+    {%- else -%}
+      max-width: {{ section.settings.max_width }}px;
+      margin-left: auto;
+      margin-right: auto;
+      padding-left: 20px;
+      padding-right: 20px;
+    {%- endif -%}
+    padding-top: {{ section.settings.section_padding_v }}px;
+    padding-bottom: {{ section.settings.section_padding_v }}px;
+    box-sizing: border-box;
+  }
+
+  #ins-{{ section.id }} .ins-header {
+    text-align: {{ section.settings.header_align }};
+    margin-bottom: {{ section.settings.header_gap }}px;
+  }
+  #ins-{{ section.id }} .ins-eyebrow {
+    font-family: var(--font-body--family);
+    font-size: {{ section.settings.eyebrow_size }}px;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    opacity: 0.6;
+    margin: 0 0 8px;
+    color: {{ section.settings.title_color }};
+  }
+  #ins-{{ section.id }} .ins-title {
+    font-family: var(--font-heading--family);
+    font-size: {{ section.settings.title_size }}px;
+    line-height: 1.15;
+    margin: 0 0 10px;
+    color: {{ section.settings.title_color }};
+  }
+  #ins-{{ section.id }} .ins-subtitle {
+    font-family: var(--font-body--family);
+    font-size: {{ section.settings.subtitle_size }}px;
+    opacity: 0.7;
+    margin: 0;
+    color: {{ section.settings.title_color }};
+  }
+  #ins-{{ section.id }} .ins-handle {
+    font-family: var(--font-body--family);
+    font-size: {{ section.settings.handle_size }}px;
+    margin-top: 8px;
+    opacity: 0.5;
+    letter-spacing: 0.05em;
+    color: {{ section.settings.title_color }};
+  }
+
+  /* ── Slider ── */
+  #ins-{{ section.id }} .ins-slider-wrap { position: relative; }
+  #ins-{{ section.id }} .ins-slider-viewport {
+    overflow: hidden;
+    width: 100%;
+  }
+
+  /* track = 连续 grid，列滚动靠 translateX */
+  #ins-{{ section.id }} .ins-slider-track {
+    display: grid;
+    grid-auto-flow: column;
+    will-change: transform;
+    transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    align-items: start;
+  }
+
+  /* item 直接在 track 里 */
+  #ins-{{ section.id }} .ins-item-wrap {
+    box-sizing: border-box;
+    min-width: 0;
+  }
+
+  /* ── Item ── */
+  #ins-{{ section.id }} .ins-item {
+    position: relative;
+    overflow: hidden;
+    display: block;
+    text-decoration: none;
+    background: #f0f0f0;
+    {%- case section.settings.aspect_ratio -%}
+      {%- when 'square' -%}    aspect-ratio: 1 / 1;
+      {%- when 'portrait' -%}  aspect-ratio: 4 / 5;
+      {%- when 'portrait_3_4' -%} aspect-ratio: 3 / 4;
+      {%- when 'story' -%}     aspect-ratio: 9 / 16;
+      {%- when 'landscape' -%} aspect-ratio: 16 / 9;
+      {%- else -%}             aspect-ratio: auto;
+    {%- endcase -%}
+  }
+
+  /* 图片和 Shopify 托管视频使用同一套裁切逻辑 */
+  #ins-{{ section.id }} .ins-media {
+    width: 100%;
+    display: block;
+    object-position: {{ media_position }};
+    transition: transform 0.55s ease;
+  }
+
+  {%- if section.settings.aspect_ratio == 'auto' -%}
+    #ins-{{ section.id }} .ins-media {
+      height: auto;
+      object-fit: contain;
+    }
+  {%- else -%}
+    #ins-{{ section.id }} .ins-media {
+      height: 100%;
+      object-fit: cover;
+    }
+  {%- endif -%}
+
+  #ins-{{ section.id }} .ins-item video.ins-media {
+    position: relative;
+    z-index: 0;
+    background: #f0f0f0;
+  }
+
+  #ins-{{ section.id }} .ins-item-link {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: block;
+  }
+
+  {%- if hover_effect == 'zoom' or hover_effect == 'zoom-overlay' -%}
+    #ins-{{ section.id }} .ins-item:hover .ins-media { transform: scale(1.07); }
+  {%- endif -%}
+
+  #ins-{{ section.id }} .ins-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 16px;
+    z-index: 2;
+    transition: background 0.35s ease;
+    text-align: center;
+    pointer-events: none;
+  }
+  #ins-{{ section.id }} .ins-overlay-content {
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+    color: #fff;
+    width: 100%;
+  }
+  {%- if hover_effect == 'overlay' or hover_effect == 'zoom-overlay' -%}
+    #ins-{{ section.id }} .ins-item:hover .ins-overlay { background: rgba(0,0,0,0.45); }
+    #ins-{{ section.id }} .ins-item:hover .ins-overlay-content { opacity: 1; transform: translateY(0); }
+  {%- endif -%}
+
+  #ins-{{ section.id }} .ins-overlay-icon svg {
+    width: 24px; height: 24px;
+    margin: 0 auto 6px;
+    display: block;
+  }
+  #ins-{{ section.id }} .ins-overlay-caption {
+    font-family: var(--font-body--family);
+    font-size: 12px;
+    line-height: 1.4;
+    opacity: 0.92;
+    margin: 0;
+  }
+
+  #ins-{{ section.id }} .ins-caption-below {
+    font-family: var(--font-body--family);
+    font-size: {{ section.settings.caption_size }}px;
+    color: {{ section.settings.caption_color }};
+    padding: 6px 2px 0;
+    line-height: 1.4;
+    opacity: 0.75;
+    margin: 0;
+  }
+
+  /* ── Video hover control ── */
+  #ins-{{ section.id }} .ins-video-toggle {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    z-index: 5;
+    width: 52px;
+    height: 52px;
+    padding: 0;
+    border: 1px solid rgba(255,255,255,0.55);
+    border-radius: 50%;
+    background: rgba(0,0,0,0.42);
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    opacity: 0;
+    visibility: hidden;
+    transform: translate(-50%, -50%) scale(0.92);
+    transition: opacity 0.22s ease, visibility 0.22s ease, transform 0.22s ease, background 0.22s ease;
+    -webkit-tap-highlight-color: transparent;
+  }
+  #ins-{{ section.id }} .ins-item--video:hover .ins-video-toggle,
+  #ins-{{ section.id }} .ins-item--video:focus-within .ins-video-toggle {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  #ins-{{ section.id }} .ins-video-toggle:hover { background: rgba(0,0,0,0.62); }
+  #ins-{{ section.id }} .ins-video-toggle svg {
+    width: 18px;
+    height: 18px;
+    display: block;
+    fill: currentColor;
+  }
+  #ins-{{ section.id }} .ins-video-toggle .icon-play { margin-left: 2px; }
+  #ins-{{ section.id }} .ins-video-toggle.is-paused .icon-pause,
+  #ins-{{ section.id }} .ins-video-toggle:not(.is-paused) .icon-play { display: none; }
+  @media (hover: none) {
+    #ins-{{ section.id }} .ins-video-toggle { display: none; }
+  }
+
+  /* ── Arrows ── */
+  #ins-{{ section.id }} .ins-arrow {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 10;
+    background: rgba(255,255,255,0.85);
+    border: none;
+    width: 40px; height: 40px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    transition: background 0.2s, opacity 0.2s;
+    padding: 0;
+  }
+  #ins-{{ section.id }} .ins-arrow:hover { background: #fff; }
+  #ins-{{ section.id }} .ins-arrow--prev { left: 12px; }
+  #ins-{{ section.id }} .ins-arrow--next { right: 12px; }
+  #ins-{{ section.id }} .ins-arrow[disabled] { opacity: 0.25; pointer-events: none; }
+  #ins-{{ section.id }} .ins-arrow svg {
+    width: 18px; height: 18px;
+    stroke: #1a1a1a; fill: none; stroke-width: 2;
+  }
+  #ins-{{ section.id }} .ins-arrow[hidden] { display: none; }
+
+  @media (max-width: 768px) {
+    #ins-{{ section.id }} .ins-arrow { width: 32px; height: 32px; }
+    #ins-{{ section.id }} .ins-arrow--prev { left: 8px; }
+    #ins-{{ section.id }} .ins-arrow--next { right: 8px; }
+  }
+
+  /* ── Dots ── */
+  #ins-{{ section.id }} .ins-dots {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 16px;
+  }
+  #ins-{{ section.id }} .ins-dots[hidden] { display: none; }
+  #ins-{{ section.id }} .ins-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #ccc;
+    border: none; padding: 0;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+  }
+  #ins-{{ section.id }} .ins-dot.is-active { background: #1a1a1a; transform: scale(1.4); }
+
+  /* ── CTA ── */
+  #ins-{{ section.id }} .ins-cta {
+    text-align: {{ section.settings.header_align }};
+    margin-top: {{ section.settings.cta_gap }}px;
+  }
+  #ins-{{ section.id }} .ins-cta a {
+    display: inline-block;
+    font-family: var(--font-body--family);
+    font-size: {{ section.settings.cta_size }}px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    text-decoration: none;
+    padding: {{ section.settings.cta_padding_v }}px {{ section.settings.cta_padding_h }}px;
+    border: 1px solid {{ section.settings.cta_border_color }};
+    color: {{ section.settings.cta_text_color }};
+    background: {{ section.settings.cta_bg_color }};
+    transition: opacity 0.2s;
+    border-radius: 10px;
+  }
+  #ins-{{ section.id }} .ins-cta a:hover { opacity: 0.7; }
+</style>
+
+<section id="ins-{{ section.id }}" class="ins-media-section">
+
+  {%- if section.settings.eyebrow != blank
+      or section.settings.title != blank
+      or section.settings.subtitle != blank
+      or section.settings.instagram_handle != blank -%}
+    <div class="ins-header">
+      {%- if section.settings.eyebrow != blank -%}
+        <p class="ins-eyebrow">{{ section.settings.eyebrow }}</p>
+      {%- endif -%}
+      {%- if section.settings.title != blank -%}
+        <h2 class="ins-title">{{ section.settings.title }}</h2>
+      {%- endif -%}
+      {%- if section.settings.subtitle != blank -%}
+        <p class="ins-subtitle">{{ section.settings.subtitle }}</p>
+      {%- endif -%}
+      {%- if section.settings.instagram_handle != blank -%}
+        <p class="ins-handle">{{ section.settings.instagram_handle }}</p>
+      {%- endif -%}
+    </div>
+  {%- endif -%}
+
+  <div class="ins-slider-wrap">
+    <div class="ins-slider-viewport">
+
+      <template id="ins-tpl-{{ section.id }}">
+        {%- for block in section.blocks -%}
+          {%- liquid
+            assign has_video = false
+            if block.settings.video != blank
+              assign has_video = true
+            endif
+
+          -%}
+
+          <div class="ins-item-wrap" {{ block.shopify_attributes }}>
+            <div class="ins-item{% if has_video %} ins-item--video{% endif %}">
+
+              {%- if has_video -%}
+                {{- block.settings.video
+                  | video_tag:
+                    image_size: '1200x',
+                    autoplay: section.settings.video_autoplay,
+                    loop: video_loop,
+                    muted: video_muted,
+                    controls: video_controls,
+                    preload: video_preload,
+                    playsinline: true,
+                    class: 'ins-media ins-media--video'
+                -}}
+              {%- elsif block.settings.image != blank -%}
+                {{- block.settings.image
+                  | image_url: width: 1600
+                  | image_tag:
+                    widths: '320, 480, 640, 800, 1000, 1200, 1600',
+                    sizes: '(max-width: 768px) 50vw, 25vw',
+                    loading: 'lazy',
+                    class: 'ins-media ins-media--image'
+                -}}
+              {%- else -%}
+                {{- 'image' | placeholder_svg_tag: 'ins-media ins-media--placeholder' -}}
+              {%- endif -%}
+
+              {%- if block.settings.link != blank -%}
+                {%- comment -%}
+                  视频显示原生 controls 时不放整块透明链接，避免覆盖播放/进度控件。
+                {%- endcomment -%}
+                {%- unless has_video and video_controls -%}
+                  <a
+                    class="ins-item-link"
+                    href="{{ block.settings.link }}"
+                    aria-label="{{ block.settings.caption | default: 'Open media' | escape }}"
+                  ></a>
+                {%- endunless -%}
+              {%- endif -%}
+
+              {%- if has_video -%}
+                <button
+                  type="button"
+                  class="ins-video-toggle"
+                  aria-label="Pause video"
+                  aria-pressed="false"
+                >
+                  <svg class="icon-pause" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M7 5h4v14H7zM13 5h4v14h-4z"></path>
+                  </svg>
+                  <svg class="icon-play" viewBox="0 0 24 24" aria-hidden="true">
+                    <path d="M8 5v14l11-7z"></path>
+                  </svg>
+                </button>
+              {%- endif -%}
+
+              <div class="ins-overlay">
+                <div class="ins-overlay-content">
+                  {%- if block.settings.caption != blank -%}
+                    <p class="ins-overlay-caption">{{ block.settings.caption }}</p>
+                  {%- endif -%}
+                </div>
+              </div>
+            </div>
+
+            {%- if show_caption and block.settings.caption != blank -%}
+              <p class="ins-caption-below">{{ block.settings.caption }}</p>
+            {%- endif -%}
+          </div>
+        {%- endfor -%}
+      </template>
+
+      <div class="ins-slider-track"
+           id="ins-track-{{ section.id }}"
+           data-cols-desktop="{{ cols_desktop }}"
+           data-cols-mobile="{{ cols_mobile }}"
+           data-rows-desktop="{% if layout_desktop == 'double' %}2{% else %}1{% endif %}"
+           data-rows-mobile="{% if layout_mobile == 'double' %}2{% else %}1{% endif %}"
+           data-gap-desktop="{{ gap_desktop }}"
+           data-gap-mobile="{{ gap_mobile }}">
+      </div>
+    </div>
+
+    <button class="ins-arrow ins-arrow--prev"
+            id="ins-prev-{{ section.id }}"
+            aria-label="上一列" hidden>
+      <svg viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <button class="ins-arrow ins-arrow--next"
+            id="ins-next-{{ section.id }}"
+            aria-label="下一列" hidden>
+      <svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+  </div>
+
+  <div class="ins-dots" id="ins-dots-{{ section.id }}" hidden></div>
+
+  {%- if section.settings.cta_label != blank -%}
+    <div class="ins-cta">
+      <a href="{{ section.settings.cta_link | default: '#' }}">
+        {{ section.settings.cta_label }}
+      </a>
+    </div>
+  {%- endif -%}
+
+</section>
+
+<script>
+(function () {
+  'use strict';
+
+  var sid      = '{{ section.id }}';
+  var track    = document.getElementById('ins-track-' + sid);
+  var tpl      = document.getElementById('ins-tpl-' + sid);
+  var dotsWrap = document.getElementById('ins-dots-' + sid);
+  var btnPrev  = document.getElementById('ins-prev-' + sid);
+  var btnNext  = document.getElementById('ins-next-' + sid);
+  var videoAutoplay = {{ section.settings.video_autoplay | json }};
+  var videoObserver = null;
+
+  if (!track || !tpl) return;
+
+  var D = track.dataset;
+  var CFG = {
+    colsDesktop: parseInt(D.colsDesktop, 10),
+    colsMobile:  parseInt(D.colsMobile,  10),
+    rowsDesktop: parseInt(D.rowsDesktop, 10),
+    rowsMobile:  parseInt(D.rowsMobile,  10),
+    gapDesktop:  parseInt(D.gapDesktop,  10),
+    gapMobile:   parseInt(D.gapMobile,   10)
+  };
+
+  var currentCol  = 0;
+  var totalCols   = 0;
+  var visibleCols = 0;
+  var colStepPx   = 0; /* 每列的步进像素（列宽 + gap） */
+
+  function isMobile() { return window.innerWidth <= 768; }
+
+  function getConfig() {
+    var m = isMobile();
+    return {
+      cols: m ? CFG.colsMobile  : CFG.colsDesktop,
+      rows: m ? CFG.rowsMobile  : CFG.rowsDesktop,
+      gap:  m ? CFG.gapMobile   : CFG.gapDesktop
+    };
+  }
+
+  /* ── 视频自动播放：仅播放当前可见卡片；离开、切列、切后台自动暂停 ── */
+  function isVideoManuallyPaused(video) {
+    return video.dataset.insManualPaused === 'true';
+  }
+
+  function safePlay(video) {
+    /* 用户手动暂停优先级高于自动播放 */
+    if (!videoAutoplay || document.visibilityState === 'hidden' || isVideoManuallyPaused(video)) return;
+
+    video.muted = true;
+    video.defaultMuted = true;
+    video.autoplay = true;
+    video.playsInline = true;
+    video.setAttribute('muted', '');
+    video.setAttribute('autoplay', '');
+    video.setAttribute('playsinline', '');
+
+    var playPromise = video.play();
+    if (playPromise && typeof playPromise.catch === 'function') {
+      playPromise.catch(function () {});
+    }
+  }
+
+  function pauseVideo(video) {
+    if (!video.paused) video.pause();
+  }
+
+  function getVideoToggle(video) {
+    var item = video.closest('.ins-item--video');
+    return item ? item.querySelector('.ins-video-toggle') : null;
+  }
+
+  function updateVideoToggle(video) {
+    var button = getVideoToggle(video);
+    if (!button) return;
+
+    var paused = video.paused;
+    button.classList.toggle('is-paused', paused);
+    button.setAttribute('aria-label', paused ? 'Play video' : 'Pause video');
+    button.setAttribute('aria-pressed', paused ? 'true' : 'false');
+  }
+
+  function setupVideoToggle(video) {
+    var button = getVideoToggle(video);
+    if (!button || button.dataset.bound === 'true') {
+      updateVideoToggle(video);
+      return;
+    }
+
+    button.dataset.bound = 'true';
+
+    button.addEventListener('click', function (event) {
+      event.preventDefault();
+      event.stopPropagation();
+
+      if (video.paused) {
+        /* 用户主动恢复播放，解除手动暂停锁 */
+        delete video.dataset.insManualPaused;
+        safePlay(video);
+      } else {
+        /* 用户主动暂停：锁定状态，禁止 IntersectionObserver / hover / 翻页同步自动恢复 */
+        video.dataset.insManualPaused = 'true';
+        pauseVideo(video);
+      }
+
+      requestAnimationFrame(function () {
+        updateVideoToggle(video);
+      });
+    });
+
+    video.addEventListener('play', function () { updateVideoToggle(video); });
+    video.addEventListener('pause', function () { updateVideoToggle(video); });
+    video.addEventListener('ended', function () { updateVideoToggle(video); });
+
+    updateVideoToggle(video);
+  }
+
+  function isVideoVisibleInViewport(video) {
+    var root = track.parentElement;
+    if (!root || !video.isConnected) return false;
+
+    var vr = video.getBoundingClientRect();
+    var rr = root.getBoundingClientRect();
+    var overlapX = Math.max(0, Math.min(vr.right, rr.right) - Math.max(vr.left, rr.left));
+    var overlapY = Math.max(0, Math.min(vr.bottom, rr.bottom) - Math.max(vr.top, rr.top));
+    var visibleArea = overlapX * overlapY;
+    var totalArea = Math.max(1, vr.width * vr.height);
+
+    return visibleArea / totalArea >= 0.35;
+  }
+
+  function syncVideoPlayback() {
+    var videos = Array.from(track.querySelectorAll('video.ins-media--video'));
+    if (!videos.length) return;
+
+    videos.forEach(function (video) {
+      if (
+        videoAutoplay &&
+        document.visibilityState !== 'hidden' &&
+        isVideoVisibleInViewport(video) &&
+        !isVideoManuallyPaused(video)
+      ) {
+        safePlay(video);
+      } else if (!isVideoManuallyPaused(video)) {
+        pauseVideo(video);
+      }
+      updateVideoToggle(video);
+    });
+  }
+
+  function setupVideos() {
+    if (videoObserver) {
+      videoObserver.disconnect();
+      videoObserver = null;
+    }
+
+    var videos = Array.from(track.querySelectorAll('video.ins-media--video'));
+    if (!videos.length) return;
+
+    videos.forEach(function (video) {
+      video.playsInline = true;
+      video.setAttribute('playsinline', '');
+      setupVideoToggle(video);
+
+      if (videoAutoplay) {
+        video.muted = true;
+        video.defaultMuted = true;
+        video.autoplay = true;
+        video.setAttribute('muted', '');
+        video.setAttribute('autoplay', '');
+        video.preload = 'auto';
+      } else {
+        video.removeAttribute('autoplay');
+        pauseVideo(video);
+      }
+    });
+
+    if (!videoAutoplay) return;
+
+    if ('IntersectionObserver' in window) {
+      videoObserver = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          var video = entry.target;
+          if (isVideoManuallyPaused(video)) {
+            /* 手动暂停后，任何可见性变化都不能重新触发自动播放 */
+            pauseVideo(video);
+            updateVideoToggle(video);
+            return;
+          }
+
+          if (entry.isIntersecting && entry.intersectionRatio >= 0.35 && document.visibilityState !== 'hidden') {
+            safePlay(video);
+          } else {
+            pauseVideo(video);
+          }
+        });
+      }, {
+        root: track.parentElement,
+        threshold: [0, 0.15, 0.35, 0.75, 1]
+      });
+
+      videos.forEach(function (video) {
+        videoObserver.observe(video);
+      });
+    }
+
+    /* 克隆 template 插入 DOM 后，立即同步一次；兼容 Safari / 部分移动端浏览器。 */
+    requestAnimationFrame(syncVideoPlayback);
+  }
+
+  /* 浏览器切到后台时停止所有视频；返回页面后只恢复当前可见视频。 */
+  document.addEventListener('visibilitychange', function () {
+    if (document.visibilityState === 'hidden') {
+      Array.from(track.querySelectorAll('video.ins-media--video')).forEach(pauseVideo);
+    } else {
+      requestAnimationFrame(syncVideoPlayback);
+    }
+  });
+
+  /* ── 构建 grid ── */
+  function buildGrid() {
+    var cfg  = getConfig();
+    var frag = tpl.content.cloneNode(true);
+    var items = Array.from(frag.querySelectorAll('.ins-item-wrap'));
+
+    track.innerHTML = '';
+    currentCol  = 0;
+    visibleCols = cfg.cols;
+    totalCols   = Math.ceil(items.length / cfg.rows);
+
+    /* 设置 track grid 样式 */
+    track.style.cssText =
+      'display:grid;' +
+      'grid-auto-flow:column;' +
+      'grid-template-rows:repeat(' + cfg.rows + ',1fr);' +
+      'gap:' + cfg.gap + 'px;' +
+      'will-change:transform;' +
+      'transition:transform 0.5s cubic-bezier(0.4,0,0.2,1);' +
+      'align-items:start;';
+
+    /* 计算列宽并设置每个 item 宽度 */
+    var vpWidth = track.parentElement.offsetWidth;
+    var colW    = (vpWidth - cfg.gap * (cfg.cols - 1)) / cfg.cols;
+    colStepPx   = colW + cfg.gap;
+
+    items.forEach(function (item) {
+      item.style.width = colW + 'px';
+      track.appendChild(item);
+    });
+
+    setupVideos();
+    renderNav(cfg);
+    applyTransform(true);
+  }
+
+  /* ── 导航（dots + arrows）── */
+  function renderNav(cfg) {
+    dotsWrap.innerHTML = '';
+    var maxCol = totalCols - visibleCols;
+
+    if (maxCol <= 0) {
+      dotsWrap.hidden = true;
+      btnPrev.hidden  = true;
+      btnNext.hidden  = true;
+      return;
+    }
+
+    dotsWrap.hidden = false;
+    btnPrev.hidden  = false;
+    btnNext.hidden  = false;
+
+    for (var i = 0; i <= maxCol; i++) {
+      var dot = document.createElement('button');
+      dot.className = 'ins-dot' + (i === 0 ? ' is-active' : '');
+      dot.setAttribute('aria-label', '第' + (i + 1) + '步');
+      dot.addEventListener('click', (function (idx) {
+        return function () { goTo(idx); };
+      })(i));
+      dotsWrap.appendChild(dot);
+    }
+  }
+
+  /* ── 滚动到指定列 ── */
+  function goTo(col, instant) {
+    var maxCol = Math.max(0, totalCols - visibleCols);
+    col = Math.max(0, Math.min(col, maxCol));
+    currentCol = col;
+    applyTransform(instant);
+    syncDots();
+    syncArrows();
+  }
+
+  function applyTransform(instant) {
+    var px = currentCol * colStepPx;
+    if (instant) {
+      track.style.transition = 'none';
+      track.style.transform  = 'translateX(-' + px + 'px)';
+      requestAnimationFrame(function () {
+        requestAnimationFrame(function () {
+          track.style.transition = 'transform 0.5s cubic-bezier(0.4,0,0.2,1)';
+        });
+      });
+    } else {
+      track.style.transition = 'transform 0.5s cubic-bezier(0.4,0,0.2,1)';
+      track.style.transform  = 'translateX(-' + px + 'px)';
+    }
+  }
+
+  function syncDots() {
+    Array.from(dotsWrap.querySelectorAll('.ins-dot')).forEach(function (d, i) {
+      d.classList.toggle('is-active', i === currentCol);
+    });
+  }
+
+  function syncArrows() {
+    var maxCol = Math.max(0, totalCols - visibleCols);
+    btnPrev.disabled = currentCol === 0;
+    btnNext.disabled = currentCol >= maxCol;
+  }
+
+  /* 列滑动结束后重新判断哪些视频真正位于 viewport 内。 */
+  track.addEventListener('transitionend', function (event) {
+    if (event.propertyName === 'transform') syncVideoPlayback();
+  });
+
+  /* ── 箭头：每次滚动一列 ── */
+  btnPrev.addEventListener('click', function () { goTo(currentCol - 1); });
+  btnNext.addEventListener('click', function () { goTo(currentCol + 1); });
+
+  /* ── Touch swipe ── */
+  var startX = 0;
+  var viewport = track.parentElement;
+  viewport.addEventListener('touchstart', function (e) {
+    startX = e.touches[0].clientX;
+  }, { passive: true });
+  viewport.addEventListener('touchend', function (e) {
+    var diff = startX - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 40) { goTo(diff > 0 ? currentCol + 1 : currentCol - 1); }
+  }, { passive: true });
+
+  /* ── Resize ── */
+  var lastMobile = isMobile();
+  var resizeTimer;
+  window.addEventListener('resize', function () {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function () {
+      var nowMobile = isMobile();
+      if (nowMobile !== lastMobile) {
+        lastMobile = nowMobile;
+        buildGrid();
+      } else {
+        /* 同断点内重算列宽和偏移 */
+        var cfg    = getConfig();
+        var vpWidth = track.parentElement.offsetWidth;
+        var colW   = (vpWidth - cfg.gap * (cfg.cols - 1)) / cfg.cols;
+        colStepPx  = colW + cfg.gap;
+        Array.from(track.children).forEach(function (el) {
+          el.style.width = colW + 'px';
+        });
+        applyTransform(true);
+        syncArrows();
+      }
+    }, 200);
+  });
+
+  buildGrid();
+})();
+</script>
+
+{% schema %}
+{
+  "name": "INS 媒体展示",
+  "tag": "section",
+  "class": "ins-media-grid-section",
+  "settings": [
+    { "type": "header", "content": "版块布局" },
+    { "type": "checkbox", "id": "full_width", "label": "全屏宽度", "default": false },
+    { "type": "range", "id": "outer_padding", "label": "全屏模式左右边距（px）", "min": 0, "max": 120, "step": 4, "default": 0 },
+    { "type": "range", "id": "max_width", "label": "最大宽度（px，非全屏）", "min": 800, "max": 1920, "step": 40, "default": 1400 },
+    { "type": "range", "id": "section_padding_v", "label": "上下内边距（px）", "min": 0, "max": 120, "step": 4, "default": 60 },
+
+    { "type": "header", "content": "桌面端网格" },
+    { "type": "select", "id": "layout_desktop", "label": "桌面端布局行数", "options": [{ "value": "single", "label": "单行" }, { "value": "double", "label": "双行" }], "default": "single" },
+    { "type": "range", "id": "columns_desktop", "label": "桌面端每页列数", "min": 2, "max": 8, "step": 1, "default": 4 },
+    { "type": "range", "id": "grid_gap", "label": "桌面端间距（px）", "min": 0, "max": 40, "step": 2, "default": 4 },
+
+    { "type": "header", "content": "移动端网格" },
+    { "type": "select", "id": "layout_mobile", "label": "移动端布局行数", "options": [{ "value": "single", "label": "单行" }, { "value": "double", "label": "双行" }], "default": "double" },
+    { "type": "range", "id": "columns_mobile", "label": "移动端每页列数", "min": 1, "max": 4, "step": 1, "default": 2 },
+    { "type": "range", "id": "grid_gap_mobile", "label": "移动端间距（px）", "min": 0, "max": 24, "step": 2, "default": 4 },
+
+    { "type": "header", "content": "媒体设置" },
+    { "type": "select", "id": "aspect_ratio", "label": "媒体比例", "options": [{ "value": "square", "label": "正方形（1:1）" }, { "value": "portrait", "label": "竖版（4:5）" }, { "value": "portrait_3_4", "label": "竖版（3:4）" }, { "value": "story", "label": "竖屏视频（9:16）" }, { "value": "landscape", "label": "横版（16:9）" }, { "value": "auto", "label": "原始比例 / 自然高度" }], "default": "square" },
+    { "type": "select", "id": "media_position", "label": "裁切焦点", "options": [{ "value": "center center", "label": "居中" }, { "value": "center top", "label": "顶部" }, { "value": "center bottom", "label": "底部" }], "default": "center center" },
+    { "type": "select", "id": "hover_effect", "label": "悬停效果", "options": [{ "value": "none", "label": "无" }, { "value": "zoom", "label": "缩放" }, { "value": "overlay", "label": "暗色遮罩 + 说明文字" }, { "value": "zoom-overlay", "label": "缩放 + 遮罩" }], "default": "zoom-overlay" },
+    { "type": "checkbox", "id": "show_caption", "label": "在媒体下方显示说明文字", "default": false },
+    { "type": "range", "id": "caption_size", "label": "说明文字大小（px）", "min": 10, "max": 18, "step": 1, "default": 12 },
+    { "type": "color", "id": "caption_color", "label": "说明文字颜色", "default": "#333333" },
+
+    { "type": "header", "content": "视频播放" },
+    { "type": "checkbox", "id": "video_autoplay", "label": "视频自动播放", "info": "开启后视频会静音并在进入当前可见网格时自动播放；滑出当前列、离开可视区域或切到后台时自动暂停。", "default": true },
+    { "type": "checkbox", "id": "video_loop", "label": "循环播放", "default": true },
+    { "type": "checkbox", "id": "video_muted", "label": "静音", "default": true },
+    { "type": "checkbox", "id": "video_controls", "label": "显示视频控制条", "info": "如果开启控制条，为避免遮挡播放控件，视频卡片的整块跳转链接将停用。", "default": false },
+
+    { "type": "header", "content": "标题区域" },
+    { "type": "select", "id": "header_align", "label": "标题对齐方式", "options": [{ "value": "left", "label": "左对齐" }, { "value": "center", "label": "居中" }, { "value": "right", "label": "右对齐" }], "default": "center" },
+    { "type": "range", "id": "header_gap", "label": "标题与网格间距（px）", "min": 8, "max": 80, "step": 4, "default": 32 },
+    { "type": "text", "id": "eyebrow", "label": "标题文字", "default": "Follow us" },
+    { "type": "range", "id": "eyebrow_size", "label": "标题字体大小（px）", "min": 10, "max": 20, "step": 1, "default": 12 },
+    { "type": "text", "id": "title", "label": "标题", "default": "Our Instagram" },
+    { "type": "range", "id": "title_size", "label": "标题字体大小（px）", "min": 18, "max": 72, "step": 2, "default": 36 },
+    { "type": "text", "id": "subtitle", "label": "副标题" },
+    { "type": "range", "id": "subtitle_size", "label": "副标题字体大小（px）", "min": 12, "max": 24, "step": 1, "default": 15 },
+    { "type": "text", "id": "instagram_handle", "label": "Instagram 账号", "default": "@yourbrand" },
+    { "type": "range", "id": "handle_size", "label": "账号字体大小（px）", "min": 10, "max": 20, "step": 1, "default": 13 },
+    { "type": "color", "id": "title_color", "label": "标题区文字颜色", "default": "#1a1a1a" },
+
+    { "type": "header", "content": "按钮设置" },
+    { "type": "text", "id": "cta_label", "label": "按钮文字", "default": "View on Instagram" },
+    { "type": "url", "id": "cta_link", "label": "按钮链接" },
+    { "type": "range", "id": "cta_gap", "label": "按钮与网格间距（px）", "min": 8, "max": 80, "step": 4, "default": 32 },
+    { "type": "range", "id": "cta_size", "label": "按钮字体大小（px）", "min": 10, "max": 20, "step": 1, "default": 12 },
+    { "type": "range", "id": "cta_padding_v", "label": "按钮上下内边距（px）", "min": 6, "max": 24, "step": 2, "default": 12 },
+    { "type": "range", "id": "cta_padding_h", "label": "按钮左右内边距（px）", "min": 16, "max": 64, "step": 4, "default": 32 },
+    { "type": "color", "id": "cta_text_color", "label": "按钮文字颜色", "default": "#1a1a1a" },
+    { "type": "color", "id": "cta_bg_color", "label": "按钮背景颜色", "default": "#ffffff" },
+    { "type": "color", "id": "cta_border_color", "label": "按钮边框颜色", "default": "#1a1a1a" }
+  ],
+  "blocks": [
+    {
+      "type": "media_item",
+      "name": "媒体项目",
+      "settings": [
+        { "type": "image_picker", "id": "image", "label": "图片", "info": "未选择视频时显示此图片。" },
+        { "type": "video", "id": "video", "label": "视频（支持 Shopify 托管视频 / MOV 上传）", "info": "选择视频后优先显示视频；Shopify 会处理上传的视频并输出适合网页播放的格式。" },
+        { "type": "select", "id": "media_type", "label": "徽章类型（兼容旧数据）", "options": [{ "value": "image", "label": "图片" }, { "value": "video", "label": "视频徽章" }, { "value": "reel", "label": "Reel 徽章" }], "default": "image" },
+        { "type": "url", "id": "link", "label": "跳转链接" },
+        { "type": "text", "id": "caption", "label": "说明文字（覆盖在图片上）" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "INS 媒体展示",
+      "blocks": [
+        { "type": "media_item" }, { "type": "media_item" },
+        { "type": "media_item" }, { "type": "media_item" },
+        { "type": "media_item" }, { "type": "media_item" },
+        { "type": "media_item" }, { "type": "media_item" }
+      ]
+    }
+  ]
+}
+{% endschema %}

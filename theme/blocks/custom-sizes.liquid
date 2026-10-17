@@ -1,0 +1,1325 @@
+{% doc %}
+  Custom Sizes v7 — Horizon ProductSelectEvent compatible
+  - Renders whenever the product has a Size option, so the Custom Size entry never disappears just because the technical placeholder is absent/mis-cased.
+  - Recognizes both "Custom Sizes" and "Custom Size" as the technical Shopify placeholder value.
+  - Keeps the native Size picker UI / three-column layout untouched.
+  - Saving measurements selects the real hidden placeholder option and writes properties[Custom Size].
+  - Selecting a normal Size clears properties[Custom Size] and the saved custom-size UI state.
+{% enddoc %}
+
+{%- liquid
+  assign p = closest.product
+  if request.visual_preview_mode and p == blank
+    assign p = collections.all.products.first
+  endif
+
+  assign cs_id = block.id | replace: '_', '' | downcase
+  assign size_opt = blank
+  assign custom_size_placeholder_value = blank
+  assign has_custom_size_placeholder = false
+
+  if p
+    assign size_opt = p.options_by_name['Size']
+    if size_opt == blank
+      assign size_opt = p.options_by_name['尺寸']
+    endif
+  endif
+
+  if size_opt
+    for size_value in size_opt.values
+      assign size_value_name = size_value.name | default: size_value
+      assign size_value_key = size_value_name | strip | downcase
+      if size_value_key == 'custom sizes' or size_value_key == 'custom size'
+        assign custom_size_placeholder_value = size_value_name
+        assign has_custom_size_placeholder = true
+        break
+      endif
+    endfor
+  endif
+-%}
+
+{%- if size_opt != blank -%}
+{% style %}
+.cs-block-{{ cs_id }} {
+  --jm-blue: #79A3C3;
+  --jm-stone: #EBE8E2;
+  --jm-ink: #000000;
+  --jm-surface: #FFFFFF;
+  --jm-page: #FAFAF8;
+  --jm-border: #D9D7D2;
+  --jm-muted: #6C6A67;
+  font-family: var(--font-body--family, 'Helvetica Neue', sans-serif);
+  color: var(--jm-ink);
+}
+
+.cs-trigger-{{ cs_id }} {
+  width: 100%;
+  min-height: 58px;
+  padding: 10px 12px;
+  background: #EBE8E2;
+  border: 1px solid #DDD9D2;
+  border-radius: 10px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 11px;
+  font-family: inherit;
+  text-align: left;
+  box-sizing: border-box;
+  transition: transform .16s ease, background .16s ease, border-color .16s ease, box-shadow .16s ease;
+}
+@media (hover:hover) {
+  .cs-trigger-{{ cs_id }}:hover {
+    background: #E5E1DA;
+    border-color: rgba(0,0,0,.20);
+    transform: translateY(-1px);
+    box-shadow: 0 5px 14px rgba(0,0,0,.06);
+  }
+}
+.cs-trigger-{{ cs_id }}:focus-visible,
+.cs-btn-edit-{{ cs_id }}:focus-visible,
+.cs-btn-cancel-{{ cs_id }}:focus-visible,
+.cs-tab-btn-{{ cs_id }}:focus-visible {
+  outline: 2px solid var(--jm-ink);
+  outline-offset: 2px;
+}
+.cs-trigger-icon-{{ cs_id }} {
+  width: 34px;
+  height: 34px;
+  border-radius: 9px;
+  display: grid;
+  place-items: center;
+  background: rgba(255,255,255,.72);
+  border: 1px solid #D4D0C9;
+  color: var(--jm-ink);
+  flex-shrink: 0;
+  transition: background .16s ease, color .16s ease, border-color .16s ease;
+}
+.cs-trigger-icon-{{ cs_id }} svg { width: 18px; height: 18px; color: currentColor; }
+.cs-trigger-icon-{{ cs_id }} img { width: 18px; height: 18px; display: block; object-fit: contain; }
+/* Keep the Custom Size service icon visually stable after measurements are saved. */
+.cs-block-{{ cs_id }}.has-data .cs-trigger-icon-{{ cs_id }} {
+  background: rgba(255,255,255,.72);
+  color: var(--jm-ink);
+  border-color: #D4D0C9;
+}
+.cs-trigger-body-{{ cs_id }} { flex: 1; min-width: 0; }
+.cs-trigger-title-{{ cs_id }} {
+  font-size: 13px;
+  font-weight: 650;
+  color: var(--jm-ink);
+  letter-spacing: .015em;
+  line-height: 1.25;
+}
+.cs-trigger-sub-{{ cs_id }} {
+  font-size: 10.5px;
+  color: var(--jm-muted);
+  margin-top: 3px;
+  line-height: 1.3;
+}
+.cs-trigger-right-{{ cs_id }} {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  color: var(--jm-ink);
+}
+.cs-block-{{ cs_id }}.has-data.expanded .cs-trigger-right-{{ cs_id }} .bq-chevron { transform: rotate(180deg); }
+
+.cs-summary-{{ cs_id }} {
+  display: none;
+  margin-top: 8px;
+  padding: 13px;
+  border: 1px solid var(--jm-border);
+  border-radius: 10px;
+  background: #fff;
+  box-sizing: border-box;
+}
+.cs-summary-{{ cs_id }}.visible,
+.cs-block-{{ cs_id }}.has-data.expanded .cs-summary-{{ cs_id }} {
+  display: flex;
+  flex-direction: column;
+}
+.cs-block-{{ cs_id }}.has-data:not(.expanded) .cs-summary-{{ cs_id }} { display: none; }
+.cs-summary-label-{{ cs_id }} {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--jm-border);
+}
+.cs-summary-title-{{ cs_id }} {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 12px;
+  font-weight: 650;
+  color: var(--jm-ink);
+}
+.cs-summary-title-{{ cs_id }} .cs-ruler-icon { width: 16px; height: 16px; color: var(--jm-ink); }
+.cs-summary-status-{{ cs_id }} {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 8px;
+  border-radius: 8px;
+  font-size: 9.5px;
+  font-weight: 600;
+  color: var(--jm-ink);
+  background: #fff;
+  border: 1px solid var(--jm-border);
+  white-space: nowrap;
+}
+.cs-status-dot-{{ cs_id }} {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--jm-ink);
+}
+.cs-summary-tags-{{ cs_id }} {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  padding: 10px 0;
+}
+.cs-summary-tags-{{ cs_id }} span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 26px;
+  padding: 4px 8px;
+  border-radius: 8px;
+  background: #F6F5F2;
+  color: var(--jm-muted);
+  font-size: 10.5px;
+  white-space: nowrap;
+}
+.cs-summary-tags-{{ cs_id }} span strong { color: var(--jm-ink); font-weight: 600; }
+.cs-summary-bottom-{{ cs_id }} {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-top: 10px;
+  border-top: 1px solid var(--jm-border);
+}
+.cs-checkbox-row-{{ cs_id }} {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+.cs-checkbox-box-{{ cs_id }} {
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: var(--jm-ink);
+  flex-shrink: 0;
+  transition: background .16s ease, box-shadow .16s ease;
+}
+.cs-checkbox-box-{{ cs_id }}.unchecked {
+  background: #fff;
+  box-shadow: inset 0 0 0 1px #BEBBB5;
+}
+.cs-checkbox-box-{{ cs_id }} svg { width: 12px; height: 12px; }
+.cs-checkbox-box-{{ cs_id }}.unchecked svg { display: none; }
+.cs-checkbox-label-{{ cs_id }} { font-size: 11px; color: var(--jm-ink); font-weight: 500; }
+.cs-checkbox-row-{{ cs_id }}.unchecked .cs-checkbox-label-{{ cs_id }} { color: var(--jm-muted); }
+.cs-summary-actions-{{ cs_id }} { display: inline-flex; gap: 7px; flex-shrink: 0; }
+.cs-btn-edit-{{ cs_id }},
+.cs-btn-cancel-{{ cs_id }} {
+  min-height: 32px;
+  padding: 0 11px;
+  border-radius: 9px;
+  font: inherit;
+  font-size: 10.5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform .14s ease, background .14s ease, border-color .14s ease;
+}
+.cs-btn-edit-{{ cs_id }} { border: 1px solid var(--jm-ink); background: var(--jm-ink); color: #fff; }
+.cs-btn-cancel-{{ cs_id }} { border: 1px solid var(--jm-border); background: #fff; color: var(--jm-muted); }
+@media (hover:hover) {
+  .cs-btn-edit-{{ cs_id }}:hover { background: #1B1B1B; border-color: #1B1B1B; transform: translateY(-1px); }
+  .cs-btn-cancel-{{ cs_id }}:hover { background: #F6F5F2; color: var(--jm-ink); }
+}
+
+#cs-overlay-{{ cs_id }} {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,.28);
+  z-index: 2147483646;
+}
+#cs-overlay-{{ cs_id }}.active { display: block; }
+#cs-modal-{{ cs_id }} {
+  --jm-ink: #000000;
+  --jm-surface: #FFFFFF;
+  --jm-border: #D9D7D2;
+  --jm-muted: #6C6A67;
+  position: fixed;
+  background: #FFFFFF;
+  color: #000000;
+  z-index: 2147483647;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 24px 70px rgba(0,0,0,.16);
+  display: flex;
+  opacity: 1;
+  visibility: hidden;
+  pointer-events: none;
+  transition: transform .28s cubic-bezier(.22,.61,.36,1), visibility 0s linear .28s;
+}
+#cs-modal-{{ cs_id }}.active {
+  visibility: visible;
+  pointer-events: auto;
+  transition-delay: 0s;
+}
+@media screen and (min-width: 750px) {
+  #cs-modal-{{ cs_id }} {
+    top: 0;
+    right: 0;
+    width: min(500px, 100vw);
+    height: 100vh;
+    border-radius: 0;
+    transform: translateX(100%);
+  }
+  #cs-modal-{{ cs_id }}.active {
+    transform: translateX(0);
+  }
+}
+@media screen and (max-width: 749px) {
+  #cs-modal-{{ cs_id }} {
+    bottom: 0; left: 0; right: 0;
+    width: 100%; max-height: 88vh;
+    border-radius: 14px 14px 0 0;
+    transform: translateY(100%);
+    transition: transform .34s cubic-bezier(.22,.72,.24,1), height .36s cubic-bezier(.22,.72,.24,1), visibility 0s linear .34s;
+    will-change: transform, height;
+  }
+  #cs-modal-{{ cs_id }}.active {
+    transition-delay: 0s;
+  }
+  #cs-modal-{{ cs_id }}.active {
+    transform: translateY(0);
+  }
+  #cs-modal-{{ cs_id }}::before {
+    content: '';
+    width: 38px;
+    height: 4px;
+    border-radius: 4px;
+    background: #C8C6C2;
+    margin: 8px auto -2px;
+    flex-shrink: 0;
+  }
+}
+.cs-modal-header-{{ cs_id }} {
+  border-radius: 0;
+  border-bottom: 1px solid var(--jm-border);
+  padding: 18px 24px;
+  background: #FFFFFF;
+}
+.cs-modal-title-{{ cs_id }} {
+  font-size: 13px;
+  color: var(--jm-ink);
+  font-weight: 650;
+  letter-spacing: .055em;
+  text-transform: uppercase;
+}
+.cs-modal-subtitle-{{ cs_id }} {
+  margin-top: 3px;
+  font-size: 10.5px;
+  line-height: 1.3;
+  color: var(--jm-muted);
+}
+
+ .cs-tabs-nav-{{ cs_id }} {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5px;
+  margin: 16px 24px 0;
+  padding: 4px;
+  border-radius: 10px;
+  background: #F6F5F2;
+  border: 1px solid var(--jm-border);
+  flex-shrink: 0;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+.cs-tabs-nav-{{ cs_id }}::before {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  left: 4px;
+  top: 4px;
+  bottom: 4px;
+  width: calc((100% - 13px) / 2);
+  border-radius: 8px;
+  background: #000000;
+  box-shadow: 0 2px 7px rgba(0,0,0,.10);
+  transform: translateX(0);
+  transition: transform .34s cubic-bezier(.22,.72,.24,1), box-shadow .34s ease;
+  will-change: transform;
+}
+.cs-tabs-nav-{{ cs_id }}[data-active-tab='htm']::before {
+  transform: translateX(calc(100% + 5px));
+}
+.cs-tab-btn-{{ cs_id }} {
+  min-height: 34px;
+  padding: 0 9px;
+  background: transparent;
+  border: 0;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 10.5px;
+  font-weight: 500;
+  color: var(--jm-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  position: relative;
+  z-index: 1;
+  transition: color .26s cubic-bezier(.22,.72,.24,1), opacity .26s ease;
+}
+.cs-tab-btn-{{ cs_id }} svg {
+  width: 14px;
+  height: 14px;
+  color: currentColor;
+  transition: transform .30s cubic-bezier(.22,.72,.24,1), opacity .24s ease;
+}
+.cs-tab-btn-{{ cs_id }}.active {
+  background: transparent;
+  color: #fff;
+}
+.cs-tab-btn-{{ cs_id }}.active svg { transform: scale(1.03); }
+
+/* CM / IN segmented control — animated sliding indicator */
+.cs-unit-toggle-{{ cs_id }} {
+  display: inline-grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  width: 76px;
+  height: 34px;
+  padding: 3px;
+  border: 1px solid var(--jm-border);
+  border-radius: 9px;
+  background: #F4F2EE;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+.cs-unit-toggle-{{ cs_id }}::before {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  top: 3px;
+  bottom: 3px;
+  left: 3px;
+  width: calc((100% - 6px) / 2);
+  border-radius: 6px;
+  background: #000000;
+  box-shadow: 0 1px 4px rgba(0,0,0,.14);
+  transform: translateX(0);
+  transition: transform .32s cubic-bezier(.22,.72,.24,1), box-shadow .32s ease;
+  will-change: transform;
+}
+.cs-unit-toggle-{{ cs_id }}[data-active-unit='inch']::before {
+  transform: translateX(100%);
+}
+.cs-unit-btn-{{ cs_id }} {
+  height: 26px;
+  padding: 0;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--jm-muted);
+  font: inherit;
+  font-size: 10px;
+  font-weight: 650;
+  line-height: 1;
+  cursor: pointer;
+  position: relative;
+  z-index: 1;
+  transition: color .24s cubic-bezier(.22,.72,.24,1), transform .24s ease;
+}
+.cs-unit-btn-{{ cs_id }}.active {
+  background: transparent;
+  color: #FFFFFF;
+  box-shadow: none;
+}
+.cs-unit-btn-{{ cs_id }}:active { transform: scale(.96); }
+.cs-unit-btn-{{ cs_id }}:focus-visible {
+  outline: 2px solid #000000;
+  outline-offset: 2px;
+}
+.cs-modal-body-{{ cs_id }} { overflow-y: auto; flex: 1; min-height: 0; background: #FFFFFF; }
+.cs-tab-panel-{{ cs_id }} { display: none; }
+.cs-tab-panel-{{ cs_id }}.active { display: block; }
+/* The real form panel has no .cs-form-wrap element; apply the drawer gutter to the actual panel. */
+.cs-modal-body-{{ cs_id }} > .cs-tab-panel-{{ cs_id }}[data-panel='form'] {
+  padding: 20px 24px 24px;
+  box-sizing: border-box;
+}
+.cs-form-group-{{ cs_id }} {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  min-width: 0;
+}
+.cs-form-label-row-{{ cs_id }} {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 18px;
+}
+.cs-form-grid-{{ cs_id }} {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+@media screen and (max-width: 749px) {
+  .cs-form-grid-{{ cs_id }} { grid-template-columns: 1fr; gap: 10px; }
+  .cs-modal-header-{{ cs_id }} { padding: 16px 18px; }
+  .cs-tabs-nav-{{ cs_id }} { margin-inline: 18px; }
+}
+.cs-field-{{ cs_id }} { display: flex; flex-direction: column; gap: 6px; }
+.cs-field-head-{{ cs_id }} {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.cs-form-label-{{ cs_id }} {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--jm-ink);
+}
+.cs-optional-tag-{{ cs_id }} {
+  font-size: 9.5px;
+  color: var(--jm-muted);
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+.cs-input-wrap-{{ cs_id }} { position: relative; }
+.cs-input-unit-{{ cs_id }} {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 11px;
+  color: var(--jm-muted);
+  pointer-events: none;
+}
+.cs-form-footer-{{ cs_id }} {
+  display: flex;
+  gap: 10px;
+  margin-top: 14px;
+}
+.cs-htm-content-{{ cs_id }} {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  padding: 20px 24px 24px;
+}
+.cs-htm-image-wrapper-{{ cs_id }} {
+  position: relative;
+  width: min(100%, 300px);
+  margin-inline: auto;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #F6F5F2;
+  border: 1px solid var(--jm-border);
+  flex: 0 0 auto;
+}
+.cs-htm-image-{{ cs_id }} {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.cs-htm-image-wrapper-{{ cs_id }} .bq-hotspot {
+  width: {{ block.settings.hotspot_size }}px;
+  height: {{ block.settings.hotspot_size }}px;
+  transform: none;
+}
+.cs-htm-image-wrapper-{{ cs_id }} .bq-hotspot__dot {
+  width: 100%;
+  height: 100%;
+  font-size: calc({{ block.settings.hotspot_size }}px * .42);
+  box-sizing: border-box;
+}
+.cs-htm-accordion-wrapper-{{ cs_id }} {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+.cs-htm-note-{{ cs_id }} { margin-top: 12px; }
+@media screen and (max-width: 749px) {
+  .cs-modal-body-{{ cs_id }} > .cs-tab-panel-{{ cs_id }}[data-panel='form'] {
+    padding: 16px 18px 20px;
+  }
+  .cs-form-footer-{{ cs_id }} { flex-direction: column; }
+  .cs-htm-content-{{ cs_id }} { padding: 16px 18px 20px; gap: 14px; }
+  .cs-htm-image-wrapper-{{ cs_id }} { width: min(100%, 280px); }
+}
+@keyframes cs-shake-{{ cs_id }} {
+  0% { transform: translateX(0); }
+  20% { transform: translateX(-4px); }
+  40% { transform: translateX(4px); }
+  60% { transform: translateX(-3px); }
+  80% { transform: translateX(3px); }
+}
+{% endstyle %}
+
+<custom-sizes-{{ cs_id }} {{ block.shopify_attributes }}>
+  <div class="cs-block-{{ cs_id }}" id="cs-block-{{ cs_id }}">
+
+    <button type="button" class="cs-trigger-{{ cs_id }}" id="cs-trigger-{{ cs_id }}">
+      <div class="cs-trigger-icon-{{ cs_id }}">
+        <img src="{{ 'custom-size-icon.svg' | asset_url }}" alt="" width="18" height="18" loading="lazy">
+      </div>
+      <div class="cs-trigger-body-{{ cs_id }}">
+        <div class="cs-trigger-title-{{ cs_id }}" id="cs-trigger-title-{{ cs_id }}">{{ block.settings.button_text }}</div>
+        <div class="cs-trigger-sub-{{ cs_id }}">Made to your measurements · Free</div>
+      </div>
+      <div class="cs-trigger-right-{{ cs_id }}">
+        <span class="bq-badge-free">Free</span>
+        <svg class="bq-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none"
+          stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="4,6 8,10 12,6"/>
+        </svg>
+      </div>
+    </button>
+
+    <div class="cs-summary-{{ cs_id }}" id="cs-summary-{{ cs_id }}">
+      <div class="cs-summary-label-{{ cs_id }}">
+        <div class="cs-summary-title-{{ cs_id }}">
+          <svg class="cs-ruler-icon" viewBox="0 0 24 24" fill="none">
+            <path d="M4 6h16v12H4V6Z" stroke="currentColor" stroke-width="1.8"/>
+            <path d="M8 6v5M12 6v3M16 6v5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+          </svg>
+          Custom Measurements
+        </div>
+        <div class="cs-summary-status-{{ cs_id }}" id="cs-summary-status-{{ cs_id }}">
+          <span class="cs-status-dot-{{ cs_id }}"></span>
+          Ready to order
+        </div>
+      </div>
+      <div class="cs-summary-tags-{{ cs_id }}" id="cs-summary-tags-{{ cs_id }}"></div>
+      <div class="cs-summary-bottom-{{ cs_id }}">
+        <div class="cs-checkbox-row-{{ cs_id }}" id="cs-checkbox-row-{{ cs_id }}">
+          <div class="cs-checkbox-box-{{ cs_id }}" id="cs-checkbox-box-{{ cs_id }}">
+            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor"
+              stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M5 10.3 8.3 13.5 15.2 6.5"/>
+            </svg>
+          </div>
+          <span class="cs-checkbox-label-{{ cs_id }}">Include in order</span>
+        </div>
+        <div class="cs-summary-actions-{{ cs_id }}">
+          <button type="button" class="cs-btn-edit-{{ cs_id }}" id="cs-edit-{{ cs_id }}">Edit</button>
+          <button type="button" class="cs-btn-cancel-{{ cs_id }}" id="cs-cancel-{{ cs_id }}">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</custom-sizes-{{ cs_id }}>
+
+<div id="cs-overlay-{{ cs_id }}"></div>
+<div id="cs-modal-{{ cs_id }}">
+  <div class="bq-modal-header cs-modal-header-{{ cs_id }}">
+    <div>
+      <div class="cs-modal-title-{{ cs_id }}">{{ block.settings.modal_title }}</div>
+      <div class="cs-modal-subtitle-{{ cs_id }}">Made especially for you</div>
+    </div>
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div class="cs-unit-toggle-{{ cs_id }}" id="cs-unit-{{ cs_id }}" role="group" aria-label="Measurement unit" data-active-unit="cm">
+        <button type="button" class="cs-unit-btn-{{ cs_id }} active" data-cs-unit="cm" aria-pressed="true">CM</button>
+        <button type="button" class="cs-unit-btn-{{ cs_id }}" data-cs-unit="inch" aria-pressed="false">IN</button>
+      </div>
+      <button type="button" class="bq-modal-close" id="cs-close-{{ cs_id }}">
+        <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+          <line x1="1" y1="1" x2="13" y2="13"/>
+          <line x1="13" y1="1" x2="1" y2="13"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <div class="cs-tabs-nav-{{ cs_id }}" data-active-tab="form">
+    <button type="button" class="cs-tab-btn-{{ cs_id }} active" data-tab="form">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+      </svg>
+      Enter Measurements
+    </button>
+    <button type="button" class="cs-tab-btn-{{ cs_id }}" data-tab="htm">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+        <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+      </svg>
+      How to Measure
+    </button>
+  </div>
+
+  <div class="cs-modal-body-{{ cs_id }}">
+    <div class="cs-tab-panel-{{ cs_id }} active" data-panel="form">
+      <div class="cs-form-grid-{{ cs_id }}" id="cs-form-grid-{{ cs_id }}">
+        {%- assign fields = "bust|Bust|88|34.6|true~waist|Waist|70|27.6|true~hips|Hips|96|37.8|true~hollow|Hollow to Floor|150|59.1|true~height|Height|170|67|false" | split: "~" -%}
+        {%- for field in fields -%}
+          {%- assign parts = field | split: "|" -%}
+          <div class="cs-form-group-{{ cs_id }}">
+            <div class="cs-form-label-row-{{ cs_id }}">
+              <label class="cs-form-label-{{ cs_id }}">{{ parts[1] }}</label>
+              {%- unless parts[4] == 'true' -%}
+                <span class="cs-optional-tag-{{ cs_id }}">optional</span>
+              {%- endunless -%}
+            </div>
+            <div class="cs-input-wrap-{{ cs_id }}">
+              <input type="number" step="0.1" min="0"
+                class="bq-input{% unless parts[4] == 'true' %} optional{% endunless %}"
+                data-key="{{ parts[0] }}"
+                data-cm="{{ parts[2] }}" data-inch="{{ parts[3] }}"
+                data-required="{{ parts[4] }}"
+                placeholder="e.g. {{ parts[2] }} cm">
+              <span class="cs-input-unit-{{ cs_id }}" data-cs-unit-label>cm</span>
+            </div>
+          </div>
+        {%- endfor -%}
+      </div>
+      <div class="cs-form-footer-{{ cs_id }}">
+        <button type="button" class="bq-btn-primary-block" id="cs-submit-{{ cs_id }}"
+          style="flex:2;">Save Measurements</button>
+        <button type="button" class="bq-btn-ghost" id="cs-clear-{{ cs_id }}"
+          style="flex:1;border-radius:var(--bq-radius-md);">Clear</button>
+      </div>
+    </div>
+
+    <div class="cs-tab-panel-{{ cs_id }}" data-panel="htm">
+      <div class="cs-htm-content-{{ cs_id }}">
+        <div class="cs-htm-image-wrapper-{{ cs_id }}">
+          {%- if block.settings.htm_image != blank -%}
+            <img
+              src="{{ block.settings.htm_image | image_url: width: 600 }}"
+              alt="How to Measure"
+              class="cs-htm-image-{{ cs_id }}"
+              width="{{ block.settings.htm_image.width | at_most: 600 }}"
+              height="{{ block.settings.htm_image.height | times: 600 | divided_by: block.settings.htm_image.width }}"
+              loading="lazy"
+            >
+          {%- else -%}
+            <img
+              src="{{ 'size-chart-how-to-measure.png' | asset_url }}"
+              alt="How to Measure"
+              class="cs-htm-image-{{ cs_id }}"
+              width="852"
+              height="1394"
+              loading="lazy"
+            >
+          {%- endif -%}
+          {%- assign hotspot_half_size = block.settings.hotspot_size | divided_by: 2.0 -%}
+          {%- for hotspot_index in (1..5) -%}
+            {%- liquid
+              assign hp_x = 50
+              assign hp_y = 50
+              case hotspot_index
+                when 1
+                  assign hp_x = block.settings.hp1_x
+                  assign hp_y = block.settings.hp1_y
+                when 2
+                  assign hp_x = block.settings.hp2_x
+                  assign hp_y = block.settings.hp2_y
+                when 3
+                  assign hp_x = block.settings.hp3_x
+                  assign hp_y = block.settings.hp3_y
+                when 4
+                  assign hp_x = block.settings.hp4_x
+                  assign hp_y = block.settings.hp4_y
+                when 5
+                  assign hp_x = block.settings.hp5_x
+                  assign hp_y = block.settings.hp5_y
+              endcase
+            -%}
+            <div
+              class="bq-hotspot"
+              style="left: calc({{ hp_x }}% - {{ hotspot_half_size }}px); top: calc({{ hp_y }}% - {{ hotspot_half_size }}px);"
+              data-htm-hotspot="{{ hotspot_index }}"
+            >
+              <div class="bq-hotspot__dot">{{ hotspot_index }}</div>
+            </div>
+          {%- endfor -%}
+        </div>
+        <div>
+          <div class="cs-htm-accordion-wrapper-{{ cs_id }}">
+            {%- assign htm_fields = "1|Bust|Measure around the fullest part of your bust~2|Waist|Measure around the narrowest part of your natural waistline~3|Hips|Measure around the fullest part of your hips, about 8 inches below your waist~4|Hollow to Floor|Measure from the hollow at the base of your throat to the floor~5|Height|Stand straight and measure from the top of your head to the floor" | split: "~" -%}
+            {%- for hf in htm_fields -%}
+              {%- assign hfparts = hf | split: "|" -%}
+              <div class="bq-accordion-item" data-htm-step="{{ hfparts[0] }}">
+                <div class="bq-accordion-header">
+                  <div class="bq-accordion-number">{{ hfparts[0] }}</div>
+                  <div style="flex:1;font-size:11px;font-weight:600;color:var(--bq-text-main);letter-spacing:0.03em;">{{ hfparts[1] }}</div>
+                  <svg class="bq-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none"
+                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="4,6 8,10 12,6"/>
+                  </svg>
+                </div>
+                <div class="bq-accordion-content">
+                  <div class="bq-accordion-text" style="padding-left:42px;">{{ hfparts[2] }}</div>
+                </div>
+              </div>
+            {%- endfor -%}
+          </div>
+          {%- if block.settings.htm_note != blank -%}
+            <div class="bq-note cs-htm-note-{{ cs_id }}">{{ block.settings.htm_note }}</div>
+          {%- endif -%}
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+(function() {
+  const id = '{{ cs_id }}';
+  const PRODUCT_ID = {{ p.id | json }};
+  const PLACEHOLDER_SIZE = {{ custom_size_placeholder_value | default: 'Custom Sizes' | json }};
+  const HAS_PLACEHOLDER_SIZE = {{ has_custom_size_placeholder | json }};
+
+  function init() {
+    const block = document.getElementById('cs-block-' + id);
+    if (!block || block._csInit) return;
+    block._csInit = true;
+
+    const overlay   = document.getElementById('cs-overlay-' + id);
+    const modal     = document.getElementById('cs-modal-' + id);
+    const trigger   = document.getElementById('cs-trigger-' + id);
+    const closeBtn  = document.getElementById('cs-close-' + id);
+    const unit      = document.getElementById('cs-unit-' + id);
+    const submitBtn = document.getElementById('cs-submit-' + id);
+    const clearBtn  = document.getElementById('cs-clear-' + id);
+    const editBtn   = document.getElementById('cs-edit-' + id);
+    const cancelBtn = document.getElementById('cs-cancel-' + id);
+    const summary   = document.getElementById('cs-summary-' + id);
+    const sumTags   = document.getElementById('cs-summary-tags-' + id);
+    const cbRow     = document.getElementById('cs-checkbox-row-' + id);
+    const cbBox     = document.getElementById('cs-checkbox-box-' + id);
+    const trigTitle = document.getElementById('cs-trigger-title-' + id);
+
+    if (!overlay || !modal || !trigger || !closeBtn || !unit || !submitBtn || !clearBtn || !editBtn || !cancelBtn) {
+      return;
+    }
+
+    // Keep the visual block in its Theme Editor position. Only the modal/overlay
+    // are portaled to <body>; moving the block inside <variant-picker> would make
+    // Horizon's morph() remove it on the next option change.
+    if (!overlay.isConnected || overlay.parentElement !== document.body) document.body.appendChild(overlay);
+    if (!modal.isConnected || modal.parentElement !== document.body) document.body.appendChild(modal);
+
+    const inputs    = modal.querySelectorAll('[data-key]');
+    const tabBtns   = modal.querySelectorAll('[data-tab]');
+    const tabPanels = modal.querySelectorAll('[data-panel]');
+    const htmItems  = modal.querySelectorAll('[data-htm-step]');
+    const hotspots  = modal.querySelectorAll('[data-htm-hotspot]');
+    const unitBtns  = modal.querySelectorAll('[data-cs-unit]');
+    const tabsNav   = modal.querySelector('.cs-tabs-nav-' + id);
+
+    let sheetHeightTimer = null;
+    function animateMobileSheetHeight(mutator) {
+      if (typeof mutator !== 'function') return;
+      const isMobile = window.matchMedia('(max-width: 749px)').matches;
+      const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (!isMobile || reduceMotion || !modal.classList.contains('active')) {
+        mutator();
+        return;
+      }
+
+      const from = modal.getBoundingClientRect().height;
+      modal.style.transitionProperty = 'none';
+      modal.style.height = 'auto';
+      const to = modal.getBoundingClientRect().height;
+      modal.style.height = from + 'px';
+      void modal.offsetHeight;
+      modal.style.transitionProperty = '';
+
+      mutator();
+
+      // Measure once more after DOM state changes; max-height still caps the sheet.
+      modal.style.transitionProperty = 'none';
+      modal.style.height = 'auto';
+      const finalHeight = modal.getBoundingClientRect().height || to;
+      modal.style.height = from + 'px';
+      void modal.offsetHeight;
+      modal.style.transitionProperty = '';
+
+      requestAnimationFrame(() => {
+        modal.style.height = finalHeight + 'px';
+      });
+
+      if (sheetHeightTimer) clearTimeout(sheetHeightTimer);
+      sheetHeightTimer = setTimeout(() => {
+        modal.style.height = '';
+      }, 420);
+    }
+
+    let currentUnit = 'cm';
+    let savedData   = null;
+    let isChecked   = true;
+    let lastStandardSize = null;
+
+    const fieldMeta = {
+      bust:   { label: 'Bust' },
+      waist:  { label: 'Waist' },
+      hips:   { label: 'Hips' },
+      hollow: { label: 'Hollow to Floor' },
+      height: { label: 'Height' }
+    };
+
+    function getVariantPicker() {
+      return document.querySelector('variant-picker[data-product-id="' + PRODUCT_ID + '"]')
+        || document.querySelector('variant-picker');
+    }
+
+    function getProductForms() {
+      const forms = [];
+      const seen = new Set();
+
+      document.querySelectorAll('product-form-component').forEach(component => {
+        if (component.dataset.productId && String(component.dataset.productId) !== String(PRODUCT_ID)) return;
+        const form = component.querySelector('form[action*="/cart/add"]');
+        if (form && !seen.has(form)) {
+          seen.add(form);
+          forms.push(form);
+        }
+      });
+
+      if (forms.length === 0) {
+        document.querySelectorAll('form[action*="/cart/add"]').forEach(form => {
+          if (!seen.has(form)) {
+            seen.add(form);
+            forms.push(form);
+          }
+        });
+      }
+
+      return forms;
+    }
+
+    function optionNameOf(control) {
+      if (!control) return '';
+      const source = control instanceof HTMLSelectElement ? control.selectedOptions[0] : control;
+      return (source?.dataset?.optionName || '').trim().toLowerCase();
+    }
+
+    function isSizeControl(control) {
+      const name = optionNameOf(control);
+      return name === 'size' || name === '尺寸';
+    }
+
+    function valueOf(control) {
+      if (control instanceof HTMLSelectElement) return control.value;
+      return control?.value || '';
+    }
+
+    function getCurrentSizeControl() {
+      const picker = getVariantPicker();
+      if (!picker) return null;
+
+      const checked = Array.from(picker.querySelectorAll('input[type="radio"]:checked')).find(isSizeControl);
+      if (checked) return checked;
+
+      return Array.from(picker.querySelectorAll('select')).find(isSizeControl) || null;
+    }
+
+    function getSizeRadio(value) {
+      const picker = getVariantPicker();
+      if (!picker) return null;
+      return Array.from(picker.querySelectorAll('input[type="radio"]')).find(input => {
+        return isSizeControl(input) && input.value === value;
+      }) || null;
+    }
+
+    function getSizeSelect() {
+      const picker = getVariantPicker();
+      if (!picker) return null;
+      return Array.from(picker.querySelectorAll('select')).find(isSizeControl) || null;
+    }
+
+    function captureStandardSize() {
+      const current = getCurrentSizeControl();
+      if (current && valueOf(current) && valueOf(current) !== PLACEHOLDER_SIZE) {
+        lastStandardSize = valueOf(current);
+        return;
+      }
+
+      const picker = getVariantPicker();
+      if (!picker) return;
+      const fallback = Array.from(picker.querySelectorAll('input[type="radio"]')).find(input => {
+        return isSizeControl(input) && input.value !== PLACEHOLDER_SIZE && input.dataset.optionAvailable !== 'false';
+      });
+      if (fallback && !lastStandardSize) lastStandardSize = fallback.value;
+    }
+
+    function openModal() {
+      overlay.classList.add('active');
+      modal.classList.add('active');
+      document.body.style.overflow = 'hidden';
+      if (savedData) {
+        inputs.forEach(inp => {
+          if (savedData[inp.dataset.key] !== undefined) inp.value = savedData[inp.dataset.key];
+        });
+      }
+    }
+
+    function closeModal() {
+      overlay.classList.remove('active');
+      modal.classList.remove('active');
+      document.body.style.overflow = '';
+    }
+
+    function expandSummary() {
+      block.classList.add('expanded');
+      summary?.classList.add('visible');
+    }
+
+    function collapseSummary() {
+      block.classList.remove('expanded');
+      summary?.classList.remove('visible');
+    }
+
+    function removePropertyInputs() {
+      getProductForms().forEach(form => {
+        form.querySelectorAll('input[name="properties[Custom Size]"]').forEach(inp => inp.remove());
+      });
+    }
+
+    function syncProperty() {
+      if (!savedData || !isChecked) {
+        removePropertyInputs();
+        return;
+      }
+
+      const u = savedData._unit === 'cm' ? 'cm' : 'in';
+      const parts = [];
+      Object.entries(fieldMeta).forEach(([k, m]) => {
+        if (savedData[k] !== undefined) parts.push(m.label + ' ' + savedData[k] + u);
+      });
+      const value = parts.join(' / ');
+
+      getProductForms().forEach(form => {
+        let inp = form.querySelector('input[name="properties[Custom Size]"]');
+        if (!inp) {
+          inp = document.createElement('input');
+          inp.type = 'hidden';
+          inp.name = 'properties[Custom Size]';
+          form.appendChild(inp);
+        }
+        inp.value = value;
+      });
+    }
+
+    function selectNativeSize(value) {
+      const radio = getSizeRadio(value);
+      if (radio) {
+        if (!radio.checked) radio.click();
+        return true;
+      }
+
+      const select = getSizeSelect();
+      if (select) {
+        const option = Array.from(select.options).find(opt => opt.value === value);
+        if (option) {
+          select.value = value;
+          select.dispatchEvent(new Event('change', { bubbles: true }));
+          return true;
+        }
+      }
+
+      return false;
+    }
+
+    function syncNativeSizeVariant(toCustom) {
+      if (toCustom) {
+        captureStandardSize();
+        if (!HAS_PLACEHOLDER_SIZE) return false;
+        return selectNativeSize(PLACEHOLDER_SIZE);
+      }
+
+      captureStandardSize();
+      let target = lastStandardSize;
+      if (!target || target === PLACEHOLDER_SIZE) {
+        const picker = getVariantPicker();
+        const fallback = picker
+          ? Array.from(picker.querySelectorAll('input[type="radio"]')).find(input =>
+              isSizeControl(input) &&
+              input.value !== PLACEHOLDER_SIZE &&
+              input.dataset.optionAvailable !== 'false'
+            )
+          : null;
+        target = fallback?.value || null;
+      }
+
+      if (target) return selectNativeSize(target);
+      return false;
+    }
+
+    function resetCustomSizeState(options = {}) {
+      const { clearInputs = true, switchVariant = false } = options;
+      savedData = null;
+      isChecked = true;
+      if (clearInputs) inputs.forEach(inp => inp.value = '');
+      cbBox?.classList.remove('unchecked');
+      cbRow?.classList.remove('unchecked');
+      collapseSummary();
+      block.classList.remove('has-data');
+      removePropertyInputs();
+      if (switchVariant) syncNativeSizeVariant(false);
+    }
+
+    trigger.addEventListener('click', () => {
+      if (!savedData) openModal();
+      else block.classList.contains('expanded') ? collapseSummary() : expandSummary();
+    });
+
+    overlay.addEventListener('click', closeModal);
+    closeBtn.addEventListener('click', closeModal);
+    editBtn.addEventListener('click', openModal);
+
+    cancelBtn.addEventListener('click', () => {
+      resetCustomSizeState({ clearInputs: true, switchVariant: true });
+    });
+
+    unitBtns.forEach(btn => btn.addEventListener('click', () => setUnit(btn.dataset.csUnit)));
+    tabBtns.forEach(b => b.addEventListener('click', () => switchTab(b.dataset.tab)));
+
+    function switchTab(tab) {
+      const nextPanel = Array.from(tabPanels).find(p => p.dataset.panel === tab);
+      animateMobileSheetHeight(() => {
+        if (tabsNav) tabsNav.dataset.activeTab = tab;
+        tabBtns.forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+        tabPanels.forEach(p => p.classList.toggle('active', p.dataset.panel === tab));
+      });
+
+      if (nextPanel && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        requestAnimationFrame(() => {
+          nextPanel.animate(
+            [
+              { opacity: 0, transform: 'translateY(4px)' },
+              { opacity: 1, transform: 'translateY(0)' }
+            ],
+            { duration: 240, easing: 'cubic-bezier(.22,.72,.24,1)', fill: 'both' }
+          );
+        });
+      }
+    }
+
+    function setUnit(nextUnit) {
+      if (nextUnit !== 'cm' && nextUnit !== 'inch') return;
+      if (nextUnit === currentUnit) return;
+
+      const previousUnit = currentUnit;
+      currentUnit = nextUnit;
+      const lbl = currentUnit === 'cm' ? 'cm' : 'in';
+
+      unit.dataset.activeUnit = currentUnit;
+      unitBtns.forEach(btn => {
+        const active = btn.dataset.csUnit === currentUnit;
+        btn.classList.toggle('active', active);
+        btn.setAttribute('aria-pressed', active ? 'true' : 'false');
+      });
+
+      inputs.forEach(inp => {
+        const ph = currentUnit === 'cm' ? inp.dataset.cm : inp.dataset.inch;
+        inp.placeholder = 'e.g. ' + ph + ' ' + lbl;
+        if (inp.value) {
+          const v = parseFloat(inp.value);
+          if (!Number.isNaN(v)) {
+            inp.value = previousUnit === 'inch' && currentUnit === 'cm'
+              ? (v * 2.54).toFixed(1)
+              : (v / 2.54).toFixed(1);
+          }
+        }
+      });
+
+      modal.querySelectorAll('[data-cs-unit-label]').forEach(el => el.textContent = lbl);
+    }
+
+    function showSummary() {
+      const u = savedData._unit === 'cm' ? 'cm' : 'in';
+      if (sumTags) {
+        sumTags.innerHTML = Object.entries(fieldMeta)
+          .filter(([k]) => savedData[k] !== undefined)
+          .map(([k, m]) => '<span><strong>' + m.label + '</strong> ' + savedData[k] + u + '</span>')
+          .join('');
+      }
+      summary?.classList.add('visible');
+      block.classList.add('has-data');
+      block.classList.add('expanded');
+      if (trigTitle) trigTitle.textContent = '{{ block.settings.button_text }}';
+    }
+
+    submitBtn.addEventListener('click', () => {
+      const data = {};
+      let valid = true;
+
+      inputs.forEach(inp => {
+        const v = inp.value.trim();
+        const req = inp.dataset.required === 'true';
+        inp.style.borderColor = '';
+        inp.style.animation = '';
+
+        if (req && (!v || isNaN(v) || parseFloat(v) <= 0)) {
+          inp.style.borderColor = '#c0392b';
+          void inp.offsetWidth;
+          inp.style.animation = 'cs-shake-' + id + ' 0.4s ease';
+          setTimeout(() => inp.style.animation = '', 400);
+          valid = false;
+        } else if (v && !isNaN(v) && parseFloat(v) > 0) {
+          data[inp.dataset.key] = parseFloat(v);
+        }
+      });
+
+      if (!valid) return;
+
+      data._unit = currentUnit;
+      savedData = data;
+      isChecked = true;
+      cbBox?.classList.remove('unchecked');
+      cbRow?.classList.remove('unchecked');
+
+      showSummary();
+      syncProperty();
+
+      if (!syncNativeSizeVariant(true)) {
+        resetCustomSizeState({ clearInputs: false, switchVariant: false });
+        console.error('[Custom Sizes] This product needs a real Shopify Size option value named "Custom Sizes" or "Custom Size".');
+        window.alert('Custom sizing is not configured for this product yet. Please add a "Custom Sizes" value to the Shopify Size option.');
+        return;
+      }
+
+      closeModal();
+    });
+
+    inputs.forEach(inp => inp.addEventListener('input', () => {
+      inp.style.borderColor = '';
+      inp.style.animation = '';
+    }));
+
+    clearBtn.addEventListener('click', () => inputs.forEach(inp => inp.value = ''));
+
+    cbRow?.addEventListener('click', () => {
+      isChecked = !isChecked;
+      cbBox?.classList.toggle('unchecked', !isChecked);
+      cbRow.classList.toggle('unchecked', !isChecked);
+      syncProperty();
+      syncNativeSizeVariant(isChecked);
+    });
+
+    // Same clear rule as the example: once the customer chooses a normal Shopify
+    // Size again, Custom Size is no longer part of the line item.
+    document.addEventListener('change', event => {
+      const control = event.target;
+      if (!(control instanceof HTMLInputElement || control instanceof HTMLSelectElement)) return;
+
+      const picker = control.closest('variant-picker');
+      if (!picker || String(picker.dataset.productId || '') !== String(PRODUCT_ID)) return;
+      if (!isSizeControl(control)) return;
+
+      const value = valueOf(control);
+      if (value && value !== PLACEHOLDER_SIZE) {
+        lastStandardSize = value;
+        if (savedData || block.classList.contains('has-data')) {
+          resetCustomSizeState({ clearInputs: true, switchVariant: false });
+        } else {
+          removePropertyInputs();
+        }
+      }
+    }, true);
+
+    htmItems.forEach(item => {
+      item.querySelector('.bq-accordion-header')?.addEventListener('click', () => {
+        animateMobileSheetHeight(() => {
+          const isActive = item.classList.contains('active');
+          htmItems.forEach(i => i.classList.remove('active'));
+          hotspots.forEach(h => h.classList.remove('active'));
+          if (!isActive) {
+            item.classList.add('active');
+            const hs = modal.querySelector('[data-htm-hotspot="' + item.dataset.htmStep + '"]');
+            if (hs) hs.classList.add('active');
+          }
+        });
+      });
+    });
+
+    hotspots.forEach(hs => {
+      hs.addEventListener('click', () => {
+        animateMobileSheetHeight(() => {
+          const step = hs.dataset.htmHotspot;
+          htmItems.forEach(i => i.classList.remove('active'));
+          hotspots.forEach(h => h.classList.remove('active'));
+          const item = modal.querySelector('[data-htm-step="' + step + '"]');
+          if (item) item.classList.add('active');
+          hs.classList.add('active');
+        });
+      });
+    });
+
+    captureStandardSize();
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape') closeModal();
+    });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+
+  document.addEventListener('shopify:section:load', init);
+  document.addEventListener('shopify:block:select', init);
+})();
+</script>
+
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Custom Sizes",
+  "tag": null,
+  "settings": [
+    { "type": "text", "id": "button_text", "label": "Button Text", "default": "Custom Size" },
+    { "type": "text", "id": "modal_title", "label": "Modal Title", "default": "Custom Size" },
+    { "type": "image_picker", "id": "htm_image", "label": "How to Measure Image" },
+    { "type": "richtext", "id": "htm_note", "label": "Measurement Note",
+      "default": "<p>All measurements should be taken over underwear. For best results, have someone help you measure.</p>" },
+    { "type": "header", "content": "Hotspot Positions" },
+    { "type": "range", "id": "hotspot_size", "label": "Hotspot Size", "min": 20, "max": 40, "step": 2, "unit": "px", "default": 22 },
+    { "type": "header", "content": "Hotspot 1 — Bust" },
+    { "type": "range", "id": "hp1_x", "label": "X %", "min": 0, "max": 100, "step": 1, "unit": "%", "default": 23 },
+    { "type": "range", "id": "hp1_y", "label": "Y %", "min": 0, "max": 100, "step": 1, "unit": "%", "default": 25 },
+    { "type": "header", "content": "Hotspot 2 — Waist" },
+    { "type": "range", "id": "hp2_x", "label": "X %", "min": 0, "max": 100, "step": 1, "unit": "%", "default": 23 },
+    { "type": "range", "id": "hp2_y", "label": "Y %", "min": 0, "max": 100, "step": 1, "unit": "%", "default": 33 },
+    { "type": "header", "content": "Hotspot 3 — Hips" },
+    { "type": "range", "id": "hp3_x", "label": "X %", "min": 0, "max": 100, "step": 1, "unit": "%", "default": 23 },
+    { "type": "range", "id": "hp3_y", "label": "Y %", "min": 0, "max": 100, "step": 1, "unit": "%", "default": 44 },
+    { "type": "header", "content": "Hotspot 4 — Hollow to Floor" },
+    { "type": "range", "id": "hp4_x", "label": "X %", "min": 0, "max": 100, "step": 1, "unit": "%", "default": 13 },
+    { "type": "range", "id": "hp4_y", "label": "Y %", "min": 0, "max": 100, "step": 1, "unit": "%", "default": 57 },
+    { "type": "header", "content": "Hotspot 5 — Height" },
+    { "type": "range", "id": "hp5_x", "label": "X %", "min": 0, "max": 100, "step": 1, "unit": "%", "default": 84 },
+    { "type": "range", "id": "hp5_y", "label": "Y %", "min": 0, "max": 100, "step": 1, "unit": "%", "default": 50 }
+  ],
+  "presets": [{ "name": "Custom Sizes" }]
+}
+{% endschema %}

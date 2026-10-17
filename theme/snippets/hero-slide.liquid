@@ -1,0 +1,134 @@
+{%- liquid
+  assign overlay_opacity = block.settings.overlay_opacity | divided_by: 100.0
+  assign overlay_color   = block.settings.overlay_color
+  assign text_color      = block.settings.text_color
+  assign btn_style       = block.settings.button_style
+  assign h_align         = block.settings.content_h_align
+  assign v_align         = block.settings.content_v_align
+  assign text_align      = block.settings.text_alignment | default: 'center'
+
+  case text_align
+    when 'left'
+      assign inner_align = 'flex-start'
+    when 'right'
+      assign inner_align = 'flex-end'
+    else
+      assign inner_align = 'center'
+  endcase
+-%}
+
+<div
+  class="slide-item"
+  {{ block.shopify_attributes }}
+>
+  {%- if block.settings.image != blank -%}
+    {{
+      block.settings.image
+      | image_url: width: 3840
+      | image_tag:
+        class: 'slide-img slide-img-desktop',
+        loading: 'lazy',
+        widths: '750, 1100, 1500, 1780, 2000, 3000, 3840',
+        sizes: '100vw',
+        alt: block.settings.title
+    }}
+  {%- else -%}
+    <div class="slide-img-desktop" style="width:100%;height:100%;background:#e8e8e8;display:flex;align-items:center;justify-content:center;">
+      {{ 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg' }}
+    </div>
+  {%- endif -%}
+
+  {%- if block.settings.image_mobile != blank -%}
+    {{
+      block.settings.image_mobile
+      | image_url: width: 1200
+      | image_tag:
+        class: 'slide-img slide-img-mobile',
+        loading: 'lazy',
+        widths: '375, 550, 750, 1000, 1200',
+        sizes: '100vw',
+        alt: block.settings.title
+    }}
+  {%- elsif block.settings.image != blank -%}
+    {{
+      block.settings.image
+      | image_url: width: 1200
+      | image_tag:
+        class: 'slide-img slide-img-mobile',
+        loading: 'lazy',
+        widths: '375, 550, 750, 1000, 1200',
+        sizes: '100vw',
+        alt: block.settings.title
+    }}
+  {%- endif -%}
+
+  <div
+    class="slide-overlay"
+    style="background-color: {{ overlay_color }}; opacity: {{ overlay_opacity }};"
+  ></div>
+
+  <div
+    class="slide-content"
+    style="
+      align-items: {{ h_align }};
+      justify-content: {{ v_align }};
+      color: {{ text_color }};
+    "
+  >
+    <div
+      class="slide-content-inner"
+      style="
+        text-align: {{ text_align }};
+        align-items: {{ inner_align }};
+      "
+    >
+    {%- if block.settings.subtitle != blank -%}
+      <p class="slide-subtitle" style="font-size: {{ block.settings.subtitle_size }}px; margin-bottom: {{ block.settings.subtitle_spacing_bottom | default: 6 }}px;">
+        {{ block.settings.subtitle }}
+      </p>
+    {%- endif -%}
+
+    {%- if block.settings.title != blank -%}
+      <h2 class="slide-title" style="font-size: {{ block.settings.title_size }}px; margin-bottom: {{ block.settings.title_spacing_bottom | default: 6 }}px;">
+        {{ block.settings.title }}
+      </h2>
+    {%- endif -%}
+
+    {%- if block.settings.text != blank -%}
+      <p class="slide-text" style="font-size: {{ block.settings.text_size }}px; margin-bottom: {{ block.settings.text_spacing_bottom | default: 10 }}px;">
+        {{ block.settings.text }}
+      </p>
+    {%- endif -%}
+
+    {%- if block.settings.button_label != blank -%}
+      {%- liquid
+        assign btn_text_color = block.settings.button_text_color
+        assign btn_pv = block.settings.button_padding_v
+        assign btn_ph = block.settings.button_padding_h
+        assign btn_fs = block.settings.button_size
+        assign btn_tint = block.settings.button_tint_color
+        assign btn_bg_alpha = block.settings.button_bg_opacity | divided_by: 100.0
+        assign btn_border_alpha = block.settings.button_border_opacity | divided_by: 100.0
+        assign btn_hover_bg_alpha = btn_bg_alpha | plus: 0.10
+        assign btn_hover_border_alpha = btn_border_alpha | plus: 0.15
+      -%}
+      <a
+        href="{{ block.settings.button_link | default: '#' }}"
+        class="slide-btn"
+        style="
+          font-size: {{ btn_fs }}px;
+          padding: {{ btn_pv }}px {{ btn_ph }}px;
+          color: {{ btn_text_color }};
+          --hero-btn-bg: {{ btn_tint | color_modify: 'alpha', btn_bg_alpha }};
+          --hero-btn-hover-bg: {{ btn_tint | color_modify: 'alpha', btn_hover_bg_alpha }};
+          --hero-btn-border: {{ btn_tint | color_modify: 'alpha', btn_border_alpha }};
+          --hero-btn-hover-border: {{ btn_tint | color_modify: 'alpha', btn_hover_border_alpha }};
+          --hero-btn-blur: {{ block.settings.button_blur }}px;
+        "
+      >
+        {{ block.settings.button_label }}
+      </a>
+    {%- endif -%}
+    </div>
+  </div>
+</div>

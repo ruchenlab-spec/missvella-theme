@@ -6,7 +6,7 @@
 -%}
 
 {% unless product_resource == blank %}
-  {% render 'variant-main-picker', product_resource: product_resource, section: section, product: product %}
+  {% render 'variant-main-picker', product_resource: product_resource, section: section, product: product, block: block %}
 {% endunless %}
 
 {% schema %}
@@ -38,6 +38,16 @@
       "type": "checkbox",
       "id": "show_swatches",
       "label": "t:settings.swatches",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "尺码表"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_size_chart",
+      "label": "显示尺码表",
       "default": true
     },
     {

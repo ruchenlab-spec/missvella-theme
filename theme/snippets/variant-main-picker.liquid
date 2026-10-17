@@ -22,6 +22,21 @@
     assign has_custom_variant_buttons = true
   endif
   assign fieldset_index = 0
+
+  assign product_has_size_option = false
+  for option_scan in product_resource.options_with_values
+    assign option_scan_key = option_scan.name | strip | downcase
+    if option_scan_key == 'size' or option_scan_key == '尺寸'
+      assign product_has_size_option = true
+      break
+    endif
+  endfor
+
+  assign show_size_chart = false
+  if request.page_type == 'product' and product_has_size_option and block_settings.show_size_chart
+    assign show_size_chart = true
+  endif
+  assign size_chart_uid = section.id | append: '-' | append: block.id | handleize
 %}
 
 {% unless product_resource.has_only_default_variant %}
@@ -55,10 +70,94 @@
     <form class="variant-picker__form">
       {%- for product_option in product_resource.options_with_values -%}
         {%- liquid
+          assign option_name_key = product_option.name | strip | downcase
+          assign is_color_option = false
+          assign is_size_option = false
+          assign has_custom_color_option = false
+
+          if option_name_key == 'color' or option_name_key == 'colour' or option_name_key == '颜色'
+            assign is_color_option = true
+          endif
+
+          if option_name_key == 'size' or option_name_key == '尺寸'
+            assign is_size_option = true
+          endif
+
+          if is_color_option
+            for option_scan_value in product_option.values
+              assign option_scan_name = option_scan_value.name | strip | downcase
+              if option_scan_name == 'custom color' or option_scan_name == 'custom colors' or option_scan_name == 'custom colour' or option_scan_name == 'custom colours'
+                assign has_custom_color_option = true
+                break
+              endif
+            endfor
+          endif
+        -%}
+
+        {%- comment -%}
+          Products that contain the real Shopify option value "Custom Color" use
+          the dedicated Color Swatch Picker block for the visible UI. Keep the
+          complete native radio fieldset in the DOM so Horizon still owns variant
+          resolution, media, price, availability and URL changes.
+        {%- endcomment -%}
+        {%- if is_color_option and has_custom_color_option -%}
+          <div
+            data-bq-hidden-color-picker
+            style="position:absolute;width:0;height:0;overflow:hidden;pointer-events:none;opacity:0;"
+            aria-hidden="true"
+          >
+            <fieldset
+              class="variant-option"
+              data-fieldset-index="{{ fieldset_index }}"
+              data-bq-option-kind="color"
+              ref="fieldsets[]"
+            >
+              {%- for product_option_value in product_option.values -%}
+                <label>
+                  <input
+                    type="radio"
+                    name="{{ product_option.name | escape }}-{{ block.id }}-{{ product_resource.id }}"
+                    value="{{ product_option_value | escape }}"
+                    aria-label="{{ product_option_value.name | escape }}"
+                    {% if product_option_value.available == false %}
+                      aria-disabled="true"
+                    {% endif %}
+                    data-previous-checked="false"
+                    data-fieldset-index="{{ fieldset_index }}"
+                    data-input-index="{{ forloop.index0 }}"
+                    data-input-id="{{ product_option.position }}-{{ forloop.index0 }}"
+                    data-option-name="{{ product_option.name | escape }}"
+                    data-option-value-id="{{ product_option_value.id }}"
+                    data-option-available="{{ product_option_value.available }}"
+                    data-connected-product-url="{{ product_option_value.product_url }}"
+                    {% if product_option_value.variant.id %}
+                      data-variant-id="{{ product_option_value.variant.id }}"
+                    {% endif %}
+                    {% if product_option_value.selected %}
+                      data-current-checked="true"
+                      checked
+                    {% else %}
+                      data-current-checked="false"
+                    {% endif %}
+                  >
+                </label>
+              {%- endfor -%}
+            </fieldset>
+          </div>
+          {%- assign fieldset_index = fieldset_index | plus: 1 -%}
+          {%- continue -%}
+        {%- endif -%}
+
+        {%- liquid
           assign swatch_count = product_option.values | map: 'swatch' | compact | size
           assign variant_style = block_settings.variant_style
 
-          if swatch_count > 0 and block_settings.show_swatches
+          # PDP Color options should always use swatches when swatches are enabled.
+          # Shopify may leave product_option_value.swatch empty, but we can still
+          # resolve the visual from the variant image or the JiMiss color palette.
+          if is_color_option and block_settings.show_swatches
+            assign variant_style = 'swatch'
+          elsif swatch_count > 0 and block_settings.show_swatches
             if block_settings.variant_style == 'dropdown'
               assign variant_style = 'swatch_dropdown'
             else
@@ -66,10 +165,32 @@
             endif
           endif
 
+          assign option_id_attribute = blank
+          assign longest_value = 0
+          assign is_plus_size_collapsible = false
+          assign plus_size_selected = false
+
           if variant_style == 'buttons' and settings.variant_button_width == 'equal-width-buttons'
             assign fieldset_id = section.id | append: '-' | append: product_resource.id | append: '-' | append: product_option.name | handleize
             assign option_id_attribute = 'data-option-id="' | append: fieldset_id | append: '"'
-            assign longest_value = 0
+          endif
+
+          # PDP Size option: collapse everything from US18+ onward behind a compact toggle.
+          # Custom Sizes is a technical placeholder and must not affect Plus Size expansion.
+          if variant_style != 'swatch'
+            if is_size_option
+              assign plus_size_scan_started = false
+              for option_scan_value in product_option.values
+                assign option_scan_name = option_scan_value.name | strip | downcase
+                if option_scan_name == 'us18+'
+                  assign plus_size_scan_started = true
+                  assign is_plus_size_collapsible = true
+                endif
+                if plus_size_scan_started and option_scan_value.selected and option_scan_name != 'custom sizes' and option_scan_name != 'custom size'
+                  assign plus_size_selected = true
+                endif
+              endfor
+            endif
           endif
         -%}
 
@@ -88,23 +209,82 @@
           </div>
         {%- elsif variant_style == 'swatch' or block_settings.variant_style == 'buttons' -%}
           <fieldset
-            class="variant-option variant-option--buttons{% if variant_style == 'swatch' %} variant-option--swatches{% else %} variant-option--{{ settings.variant_button_width }}{% endif %}"
+            class="variant-option variant-option--buttons{% if variant_style == 'swatch' %} variant-option--swatches{% else %} variant-option--{{ settings.variant_button_width }}{% endif %}{% if is_plus_size_collapsible %} variant-option--plus-size-collapsible{% endif %}"
             data-fieldset-index="{{ fieldset_index }}"
+            {% if is_color_option %}
+              data-bq-option-kind="color"
+            {% elsif is_size_option %}
+              data-bq-option-kind="size"
+            {% endif %}
+            {% if is_plus_size_collapsible %}
+              data-plus-size-collapsible="true"
+              data-plus-size-key="{{ product_resource.id }}-{{ product_option.position }}"
+              data-plus-size-initial-expanded="{% if plus_size_selected %}true{% else %}false{% endif %}"
+            {% endif %}
             ref="fieldsets[]"
             {{ option_id_attribute }}
           >
-            <legend>
-              {{ product_option.name | escape -}}
-              {%- if variant_style == 'swatch' -%}
-                <span class="variant-option__swatch-value">{{ product_option.selected_value }}</span>
-              {%- endif %}
+            <legend{% if is_size_option and show_size_chart %} class="bq-size-legend"{% endif %}>
+              {%- if is_size_option and show_size_chart -%}
+                <span class="bq-size-legend-row">
+                  <span>{{ product_option.name | escape }}</span>
+                  <button
+                    type="button"
+                    class="bq-size-chart-trigger"
+                    data-size-chart-trigger="{{ size_chart_uid }}"
+                    aria-haspopup="dialog"
+                    aria-controls="bq-size-chart-drawer-{{ size_chart_uid }}"
+                  >
+                    <img
+                      class="bq-size-chart-trigger-icon"
+                      src="{{ 'size-chart-icon.svg' | asset_url }}"
+                      alt=""
+                      width="14"
+                      height="14"
+                      loading="lazy"
+                      aria-hidden="true"
+                    >
+                    <span>SIZE GUIDE</span>
+                  </button>
+                </span>
+              {%- else -%}
+                {{ product_option.name | escape -}}
+                {%- if variant_style == 'swatch' -%}
+                  <span class="variant-option__swatch-value">{{ product_option.selected_value }}</span>
+                {%- endif %}
+              {%- endif -%}
             </legend>
+            {%- assign plus_size_render_started = false -%}
             {%- for product_option_value in product_option.values -%}
+              {%- assign current_option_value_name = product_option_value.name | strip | downcase -%}
               {% if product_option_value.size > longest_value and option_id_attribute %}
                 {% assign longest_value = product_option_value.size %}
               {% endif %}
+
+              {%- if is_plus_size_collapsible -%}
+                {%- if current_option_value_name == 'us18+' -%}
+                  {%- assign plus_size_render_started = true -%}
+                  <button
+                    type="button"
+                    class="variant-option__button-label variant-option__plus-size-toggle"
+                    data-plus-size-toggle
+                    aria-expanded="{% if plus_size_selected %}true{% else %}false{% endif %}"
+                  >
+                    <span data-plus-size-toggle-text>More Plus Size</span>
+                  </button>
+                {%- endif -%}
+              {%- endif -%}
+
+              {%- liquid
+                assign is_custom_size_placeholder_value = false
+                if is_size_option and current_option_value_name == 'custom sizes'
+                  assign is_custom_size_placeholder_value = true
+                elsif is_size_option and current_option_value_name == 'custom size'
+                  assign is_custom_size_placeholder_value = true
+                endif
+              -%}
               <label
-                class="variant-option__button-label{% if variant_style == 'swatch' %} variant-option__button-label--has-swatch{% endif %}"
+                class="variant-option__button-label{% if variant_style == 'swatch' %} variant-option__button-label--has-swatch{% endif %}{% if is_plus_size_collapsible and plus_size_render_started %} variant-option__button-label--plus-size{% endif %}{% if is_custom_size_placeholder_value %} variant-option__button-label--custom-size-placeholder{% endif %}"
               >
                 <input
                   type="radio"
@@ -122,6 +302,9 @@
                   data-option-value-id="{{ product_option_value.id }}"
                   data-option-available="{{ product_option_value.available }}"
                   data-connected-product-url="{{ product_option_value.product_url }}"
+                  {% if is_custom_size_placeholder_value %}
+                    data-bq-custom-size-placeholder="true"
+                  {% endif %}
                   {% if product_option_value.variant.id %}
                     data-variant-id="{{ product_option_value.variant.id }}"
                   {% endif %}
@@ -146,7 +329,9 @@
                   {% render 'swatch',
                     swatch: product_option_value.swatch,
                     variant_image: featured_media,
-                    mode: 'unscaled'
+                    mode: 'unscaled',
+                    label: product_option_value.name,
+                    force_variant_image: is_color_option
                   %}
                 {% else %}
                   {% if product_option_value.available == true %}
@@ -190,7 +375,31 @@
           %}
 
           <div class="variant-option variant-option--dropdowns">
-            <label for="Option-{{ block.id }}-{{ forloop.index0 }}">{{ product_option.name | escape }}</label>
+            {%- if is_size_option and show_size_chart -%}
+              <div class="bq-size-dropdown-label-row">
+                <label for="Option-{{ block.id }}-{{ forloop.index0 }}">{{ product_option.name | escape }}</label>
+                <button
+                  type="button"
+                  class="bq-size-chart-trigger"
+                  data-size-chart-trigger="{{ size_chart_uid }}"
+                  aria-haspopup="dialog"
+                  aria-controls="bq-size-chart-drawer-{{ size_chart_uid }}"
+                >
+                  <img
+                      class="bq-size-chart-trigger-icon"
+                      src="{{ 'size-chart-icon.svg' | asset_url }}"
+                      alt=""
+                      width="14"
+                      height="14"
+                      loading="lazy"
+                      aria-hidden="true"
+                    >
+                  <span>SIZE GUIDE</span>
+                </button>
+              </div>
+            {%- else -%}
+              <label for="Option-{{ block.id }}-{{ forloop.index0 }}">{{ product_option.name | escape }}</label>
+            {%- endif -%}
             <div
               class="variant-option__select-wrapper"
               style="
@@ -205,6 +414,7 @@
                 class="variant-option__select"
               >
                 {%- for product_option_value in product_option.values -%}
+                  {%- assign dropdown_option_value_name = product_option_value.name | strip | downcase -%}
                   <option
                     value="{{ product_option_value | escape }}"
                     data-input-id="{{ product_option.position }}-{{ forloop.index0 }}"
@@ -212,6 +422,12 @@
                     data-option-value-id="{{ product_option_value.id }}"
                     data-variant-id="{{ product_option_value.variant.id }}"
                     data-connected-product-url="{{ product_option_value.product_url }}"
+                    {% if is_size_option %}
+                      {% if dropdown_option_value_name == 'custom sizes' or dropdown_option_value_name == 'custom size' %}
+                        data-bq-custom-size-placeholder="true"
+                        hidden
+                      {% endif %}
+                    {% endif %}
                     {% if product_option_value.selected %}
                       selected="selected"
                     {% endif %}
@@ -244,5 +460,745 @@
   </variant-picker>
 {% endunless %}
 
+{%- if show_size_chart -%}
+  <div class="bq-size-chart-overlay" id="bq-size-chart-overlay-{{ size_chart_uid }}" aria-hidden="true"></div>
+  <aside
+    class="bq-size-chart-drawer"
+    id="bq-size-chart-drawer-{{ size_chart_uid }}"
+    data-size-chart-drawer="{{ size_chart_uid }}"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="bq-size-chart-title-{{ size_chart_uid }}"
+    aria-hidden="true"
+  >
+    <div class="bq-size-chart-drag" aria-hidden="true"></div>
+    <header class="bq-size-chart-header">
+      <div>
+        <h2 id="bq-size-chart-title-{{ size_chart_uid }}">SIZE GUIDE</h2>
+        <p>Find your best fit and learn how to measure.</p>
+      </div>
+      <div class="bq-size-chart-header-actions">
+        <div class="bq-size-chart-unit" data-sc-unit="cm" role="group" aria-label="Measurement unit">
+          <span class="bq-size-chart-unit-slider" aria-hidden="true"></span>
+          <button type="button" data-unit="cm" class="active" aria-pressed="true">CM</button>
+          <button type="button" data-unit="in" aria-pressed="false">IN</button>
+        </div>
+        <button type="button" class="bq-size-chart-close" data-size-chart-close aria-label="Close size guide">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 5 19 19M19 5 5 19"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <div class="bq-size-chart-tabs" data-sc-tab="chart">
+      <span class="bq-size-chart-tab-slider" aria-hidden="true"></span>
+      <button type="button" class="active" data-size-chart-tab="chart">Size Chart</button>
+      <button type="button" data-size-chart-tab="measure">How to Measure</button>
+    </div>
+
+    <div class="bq-size-chart-body">
+      <section class="bq-size-chart-panel active" data-size-chart-panel="chart">
+        <div class="size-chart-section">
+          <div class="size-chart-heading-row">
+            <h2 class="size-chart-title">Adult Sizes</h2>
+            <div class="size-chart-unit-copy">All measurements in <span data-size-chart-unit-copy>CM</span></div>
+          </div>
+          <div class="size-chart-scroll">
+            <table class="size-chart">
+              <thead><tr><th>Size</th><th>Bust</th><th>Waist</th><th>Hips</th><th>Hollow to Hem</th></tr></thead>
+              <tbody>
+              <tr><td>US0</td><td data-cm="80">80</td><td data-cm="63">63</td><td data-cm="89">89</td><td data-cm="147">147</td></tr>
+              <tr><td>US2</td><td data-cm="83">83</td><td data-cm="65">65</td><td data-cm="91">91</td><td data-cm="147">147</td></tr>
+              <tr><td>US4</td><td data-cm="84">84</td><td data-cm="68">68</td><td data-cm="92">92</td><td data-cm="147">147</td></tr>
+              <tr><td>US6</td><td data-cm="88">88</td><td data-cm="70">70</td><td data-cm="96">96</td><td data-cm="150">150</td></tr>
+              <tr><td>US8</td><td data-cm="90">90</td><td data-cm="72">72</td><td data-cm="98">98</td><td data-cm="150">150</td></tr>
+              <tr><td>US10</td><td data-cm="93">93</td><td data-cm="75">75</td><td data-cm="101">101</td><td data-cm="152">152</td></tr>
+              <tr><td>US12</td><td data-cm="97">97</td><td data-cm="79">79</td><td data-cm="105">105</td><td data-cm="152">152</td></tr>
+              <tr><td>US14</td><td data-cm="100">100</td><td data-cm="83">83</td><td data-cm="109">109</td><td data-cm="155">155</td></tr>
+              <tr><td>US16</td><td data-cm="104">104</td><td data-cm="86">86</td><td data-cm="112">112</td><td data-cm="155">155</td></tr>
+              <tr><td>US18+</td><td data-cm="114">114</td><td data-cm="98">98</td><td data-cm="121">121</td><td data-cm="155">155</td></tr>
+              <tr><td>US20+</td><td data-cm="119">119</td><td data-cm="104">104</td><td data-cm="126">126</td><td data-cm="155">155</td></tr>
+              <tr><td>US22+</td><td data-cm="124">124</td><td data-cm="109">109</td><td data-cm="131">131</td><td data-cm="155">155</td></tr>
+              <tr><td>US24+</td><td data-cm="130">130</td><td data-cm="115">115</td><td data-cm="136">136</td><td data-cm="155">155</td></tr>
+              <tr><td>US26+</td><td data-cm="135">135</td><td data-cm="124">124</td><td data-cm="141">141</td><td data-cm="155">155</td></tr>
+              <tr><td>US28+</td><td data-cm="140">140</td><td data-cm="130">130</td><td data-cm="146">146</td><td data-cm="155">155</td></tr>
+              <tr><td>US30+</td><td data-cm="145">145</td><td data-cm="136">136</td><td data-cm="151">151</td><td data-cm="155">155</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="bq-size-chart-panel" data-size-chart-panel="measure">
+        <div class="bq-size-chart-htm">
+          <div class="bq-size-chart-image-wrap">
+            <img src="{{ 'size-chart-how-to-measure.png' | asset_url }}" alt="How to measure" width="852" height="1394" loading="lazy">
+            <div class="bq-size-chart-hotspot" style="left:calc(23% - 11px);top:calc(25% - 11px);" data-sc-hotspot="1"><span>1</span></div>
+            <div class="bq-size-chart-hotspot" style="left:calc(23% - 11px);top:calc(33% - 11px);" data-sc-hotspot="2"><span>2</span></div>
+            <div class="bq-size-chart-hotspot" style="left:calc(23% - 11px);top:calc(44% - 11px);" data-sc-hotspot="3"><span>3</span></div>
+            <div class="bq-size-chart-hotspot" style="left:calc(13% - 11px);top:calc(57% - 11px);" data-sc-hotspot="4"><span>4</span></div>
+            <div class="bq-size-chart-hotspot" style="left:calc(84% - 11px);top:calc(50% - 11px);" data-sc-hotspot="5"><span>5</span></div>
+          </div>
+          <div class="bq-size-chart-accordions">
+            <div class="bq-accordion-item" data-sc-step="1"><button type="button" class="bq-accordion-header"><span class="bq-accordion-number">1</span><strong>Bust</strong><svg class="bq-chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4,6 8,10 12,6"/></svg></button><div class="bq-accordion-content"><div class="bq-accordion-text">Measure around the fullest part of your bust, keeping the tape level around your back.</div></div></div>
+            <div class="bq-accordion-item" data-sc-step="2"><button type="button" class="bq-accordion-header"><span class="bq-accordion-number">2</span><strong>Waist</strong><svg class="bq-chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4,6 8,10 12,6"/></svg></button><div class="bq-accordion-content"><div class="bq-accordion-text">Measure around the narrowest part of your natural waistline without pulling the tape tight.</div></div></div>
+            <div class="bq-accordion-item" data-sc-step="3"><button type="button" class="bq-accordion-header"><span class="bq-accordion-number">3</span><strong>Hips</strong><svg class="bq-chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4,6 8,10 12,6"/></svg></button><div class="bq-accordion-content"><div class="bq-accordion-text">Measure around the fullest part of your hips, keeping the tape parallel to the floor.</div></div></div>
+            <div class="bq-accordion-item" data-sc-step="4"><button type="button" class="bq-accordion-header"><span class="bq-accordion-number">4</span><strong>Hollow to Floor</strong><svg class="bq-chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4,6 8,10 12,6"/></svg></button><div class="bq-accordion-content"><div class="bq-accordion-text">Measure from the hollow where the collarbones meet at the front of the neck vertically down to the floor, barefoot.</div></div></div>
+            <div class="bq-accordion-item" data-sc-step="5"><button type="button" class="bq-accordion-header"><span class="bq-accordion-number">5</span><strong>Height</strong><svg class="bq-chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4,6 8,10 12,6"/></svg></button><div class="bq-accordion-content"><div class="bq-accordion-text">Stand straight and measure from the top of your head to the floor, barefoot.</div></div></div>
+          </div>
+          <div class="bq-size-chart-note">All measurements should be taken over underwear. For best results, have someone help you measure.</div>
+        </div>
+      </section>
+    </div>
+  </aside>
+{%- endif -%}
+
+{% if request.page_type == 'product' %}
+  <script>
+    (function() {
+      var blockId = {{ block.id | json }};
+      var pickerSelector = 'variant-picker[data-block-id=\"' + blockId + '\"]';
+
+      function normalizeName(value) {
+        return String(value || '').trim().toLowerCase().replace(/\s+/g, ' ');
+      }
+
+      function applyColorPaletteFallback() {
+        var picker = document.querySelector(pickerSelector);
+        if (!picker) return;
+
+        var palette = window.JIMISS_CUSTOM_COLOR_PALETTE || {};
+        var swatches = picker.querySelectorAll('.variant-option--swatches .swatch[data-bq-swatch-name]');
+
+        swatches.forEach(function(sw) {
+          if (sw.dataset.bqSwatchHasVisual === 'true') return;
+
+          var key = normalizeName(sw.dataset.bqSwatchName);
+          var color = palette[key];
+          if (!color || !color.hex) return;
+
+          sw.style.setProperty('--swatch-background', color.hex);
+          sw.style.backgroundImage = 'none';
+          sw.dataset.bqSwatchHasVisual = 'true';
+          sw.classList.remove('swatch--unavailable');
+          sw.setAttribute('title', color.name || sw.dataset.bqSwatchName);
+        });
+      }
+
+      var scheduled = false;
+      function scheduleApply() {
+        if (scheduled) return;
+        scheduled = true;
+        requestAnimationFrame(function() {
+          scheduled = false;
+          applyColorPaletteFallback();
+        });
+      }
+
+      scheduleApply();
+      document.addEventListener('change', scheduleApply);
+
+      var observer = new MutationObserver(scheduleApply);
+      var root = document.querySelector(pickerSelector);
+      if (root) observer.observe(root, { childList: true, subtree: true });
+    })();
+  </script>
+{% endif %}
+
 {% render 'swatch-styles' %}
 {% render 'variant-picker-styles' %}
+{%- comment -%}
+  Compact PDP variant buttons
+  - Scoped to this main variant-picker block only
+  - Does not alter native swatches
+  - Keeps Horizon's variant selection / morph behavior unchanged
+{%- endcomment -%}
+{% if request.page_type == 'product' %}
+  {% style %}
+    /* JiMiss PDP variant visual system: blue selection, stone utilities, 8–12px geometry. */
+    variant-picker[data-block-id='{{ block.id }}'][data-template-product-match='true'] {
+      --options-border-radius: 10px;
+      --color-variant-border: #D9D7D2;
+      --color-variant-background: #FFFFFF;
+      --color-variant-text: #000000;
+      --color-variant-text-rgb: 0 0 0;
+      --color-variant-hover-background: #F6F5F2;
+      --color-variant-hover-border: #A9A7A2;
+      --color-variant-hover-text: #000000;
+      --color-selected-variant-background: #000000;
+      --color-selected-variant-border: #000000;
+      --color-selected-variant-text: #FFFFFF;
+      --color-selected-variant-hover-background: #1A1A1A;
+      --color-selected-variant-hover-border: #1A1A1A;
+      --color-selected-variant-hover-text: #FFFFFF;
+    }
+
+    /* Technical placeholder used by the Custom Sizes block; never show as a normal Size button. */
+    variant-picker[data-block-id='{{ block.id }}'][data-template-product-match='true']
+      .variant-option__button-label--custom-size-placeholder {
+      display: none !important;
+    }
+
+    /* Keep Color typography consistent even when the product has only one color. */
+    variant-picker[data-block-id='{{ block.id }}'][data-template-product-match='true']
+      .variant-option[data-bq-option-kind='color'] > legend {
+      margin-block-end: 8px;
+      line-height: 1.25;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.035em;
+      text-transform: uppercase;
+      color: #000000;
+    }
+
+    variant-picker[data-block-id='{{ block.id }}'][data-template-product-match='true']
+      .variant-option--buttons:not(.variant-option--swatches) {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      column-gap: 8px;
+      row-gap: 8px;
+      width: 100%;
+    }
+
+    variant-picker[data-block-id='{{ block.id }}'][data-template-product-match='true']
+      .variant-option--buttons:not(.variant-option--swatches) > legend {
+      grid-column: 1 / -1;
+      width: 100%;
+    }
+
+    variant-picker[data-block-id='{{ block.id }}'][data-template-product-match='true']
+      .variant-option--buttons:not(.variant-option--swatches)
+      legend {
+      margin-block-end: 8px;
+      line-height: 1.25;
+      font-size: 13px;
+      font-weight: 600;
+      letter-spacing: 0.035em;
+      text-transform: uppercase;
+      color: #000000;
+    }
+
+    variant-picker[data-block-id='{{ block.id }}'][data-template-product-match='true']
+      .variant-option + .variant-option {
+      margin-top: 14px;
+    }
+
+    variant-picker[data-block-id='{{ block.id }}'][data-template-product-match='true']
+      .variant-option--buttons:not(.variant-option--swatches)
+      .variant-option__button-label {
+      width: 100%;
+      min-width: 0;
+      max-width: none;
+      min-height: 44px;
+      padding-block: 7px;
+      padding-inline: 8px;
+      line-height: 1.2;
+      box-sizing: border-box;
+      border-radius: 10px;
+      font-weight: 500;
+      transition: transform 0.16s ease, box-shadow 0.16s ease, background-color 0.16s ease, border-color 0.16s ease, color 0.16s ease;
+    }
+
+    @media (hover: hover) {
+      variant-picker[data-block-id='{{ block.id }}'][data-template-product-match='true']
+        .variant-option--buttons:not(.variant-option--swatches)
+        .variant-option__button-label:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.055);
+      }
+
+      variant-picker[data-block-id='{{ block.id }}'][data-template-product-match='true']
+        .variant-option--buttons:not(.variant-option--swatches)
+        .variant-option__button-label:has(:checked):hover {
+        box-shadow: 0 5px 14px rgba(0, 0, 0, 0.12);
+      }
+    }
+
+    variant-picker[data-block-id='{{ block.id }}'][data-template-product-match='true']
+      .variant-option--equal-width-buttons:not(.variant-option--swatches) {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      column-gap: 8px;
+      row-gap: 8px;
+    }
+
+    @media screen and (max-width: 749px) {
+      variant-picker[data-block-id='{{ block.id }}'][data-template-product-match='true']
+        .variant-option--buttons:not(.variant-option--swatches)
+        .variant-option__button-label {
+        min-height: 42px;
+        padding-block: 6px;
+        padding-inline: 6px;
+      }
+
+      variant-picker[data-block-id='{{ block.id }}'][data-template-product-match='true']
+        .variant-option + .variant-option {
+        margin-top: 12px;
+      }
+    }
+
+    /* Progressive enhancement: without JS, all sizes remain accessible and the toggle stays hidden. */
+    variant-picker[data-block-id='{{ block.id }}'][data-template-product-match='true']
+      .variant-option--plus-size-collapsible
+      .variant-option__plus-size-toggle {
+      display: none;
+      order: 999;
+      width: 100%;
+      min-width: 0;
+      max-width: none;
+      min-height: 44px;
+      padding-block: 7px;
+      padding-inline: 6px;
+      box-sizing: border-box;
+      font: inherit;
+      line-height: 1.2;
+      cursor: pointer;
+      appearance: none;
+      -webkit-appearance: none;
+    }
+
+    variant-picker[data-block-id='{{ block.id }}'][data-template-product-match='true']
+      .variant-option--plus-size-collapsible[data-plus-size-ready='true']
+      .variant-option__plus-size-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    variant-picker[data-block-id='{{ block.id }}'][data-template-product-match='true']
+      .variant-option--plus-size-collapsible[data-plus-size-ready='true'][data-plus-size-expanded='false']
+      > .variant-option__button-label--plus-size {
+      display: none !important;
+    }
+
+    /* Utility control uses the warm stone service color instead of looking like another size. */
+    variant-picker[data-block-id='{{ block.id }}'][data-template-product-match='true']
+      .variant-option__plus-size-toggle {
+      background: #EBE8E2;
+      color: #000000;
+      border: 1px solid transparent;
+      border-radius: 10px;
+      font-weight: 500;
+      white-space: nowrap;
+      transition: transform 0.16s ease, background 0.16s ease, border-color 0.16s ease;
+    }
+
+    @media (hover: hover) {
+      variant-picker[data-block-id='{{ block.id }}'][data-template-product-match='true']
+        .variant-option__plus-size-toggle:hover {
+        background: #F6F5F2;
+        border-color: rgba(0, 0, 0, 0.16);
+        transform: translateY(-1px);
+      }
+    }
+
+    variant-picker[data-block-id='{{ block.id }}'][data-template-product-match='true']
+      .variant-option__plus-size-toggle:focus-visible {
+      outline: 2px solid #000000;
+      outline-offset: 2px;
+    }
+
+    @media screen and (max-width: 749px) {
+      variant-picker[data-block-id='{{ block.id }}'][data-template-product-match='true']
+        .variant-option--plus-size-collapsible
+        .variant-option__plus-size-toggle {
+        min-height: 42px;
+        padding-block: 6px;
+        padding-inline: 4px;
+        font-size: 0.92em;
+      }
+    }
+
+
+    /* Size Chart trigger beside the Size option title. */
+    .bq-size-legend-row,
+    .bq-size-dropdown-label-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      width: 100%;
+    }
+    .bq-size-chart-trigger {
+      appearance: none;
+      border: 0;
+      background: transparent;
+      color: #000;
+      padding: 2px 0;
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font: inherit;
+      font-size: 11px;
+      font-weight: 500;
+      text-transform: none;
+      letter-spacing: 0;
+      white-space: nowrap;
+      cursor: pointer;
+      border-bottom: 1px solid rgba(0,0,0,.32);
+    }
+    .bq-size-chart-trigger-icon { width:14px; height:14px; display:block; flex:0 0 14px; object-fit:contain; }
+    @media (hover:hover) { .bq-size-chart-trigger:hover { border-color:#000; } }
+    .bq-size-chart-trigger:focus-visible { outline:2px solid #000; outline-offset:3px; border-radius:4px; }
+
+    .bq-size-chart-overlay {
+      display:none; position:fixed; inset:0; z-index:2147483644; background:rgba(0,0,0,.30);
+    }
+    .bq-size-chart-overlay.open { display:block; }
+    .bq-size-chart-drawer {
+      --sc-border:#D9D7D2; --sc-stone:#EBE8E2; --sc-muted:#6C6A67;
+      position:fixed; z-index:2147483645; background:#fff; color:#000;
+      display:flex; flex-direction:column; overflow:hidden; visibility:hidden; pointer-events:none;
+      box-shadow:0 20px 70px rgba(0,0,0,.16);
+      transition:transform .32s cubic-bezier(.22,.72,.24,1), visibility 0s linear .32s;
+    }
+    .bq-size-chart-drawer.open { visibility:visible; pointer-events:auto; transition-delay:0s; }
+    .bq-size-chart-drag { display:none; }
+    @media screen and (min-width:750px) {
+      .bq-size-chart-drawer { top:0; right:0; width:min(500px,100vw); height:100vh; transform:translateX(100%); }
+      .bq-size-chart-drawer.open { transform:translateX(0); }
+    }
+    @media screen and (max-width:749px) {
+      .bq-size-chart-drawer { left:0; right:0; bottom:0; width:100%; height:min(88vh,760px); border-radius:14px 14px 0 0; transform:translateY(100%); }
+      .bq-size-chart-drawer.open { transform:translateY(0); }
+      .bq-size-chart-drag { display:block; width:38px; height:4px; border-radius:4px; background:#C8C6C2; margin:8px auto -2px; flex:0 0 auto; }
+    }
+    .bq-size-chart-header { display:flex; align-items:flex-start; justify-content:space-between; gap:18px; padding:20px 22px 16px; border-bottom:1px solid var(--sc-border); }
+    .bq-size-chart-header h2 { margin:0; font:inherit; font-size:14px; font-weight:700; letter-spacing:.055em; }
+    .bq-size-chart-header p { margin:4px 0 0; font-size:11px; color:var(--sc-muted); line-height:1.4; }
+    .bq-size-chart-header-actions { display:flex; align-items:center; gap:10px; flex:0 0 auto; }
+    .bq-size-chart-close { width:36px; height:36px; border:1px solid var(--sc-border); background:#fff; border-radius:10px; display:grid; place-items:center; cursor:pointer; padding:0; }
+    .bq-size-chart-close svg { width:18px; height:18px; }
+    .bq-size-chart-unit { position:relative; display:grid; grid-template-columns:1fr 1fr; width:104px; height:40px; padding:4px; border:1px solid var(--sc-border); background:#F5F3EF; border-radius:11px; overflow:hidden; }
+    .bq-size-chart-unit-slider { position:absolute; top:4px; left:4px; width:46px; height:30px; background:#000; border-radius:8px; transition:transform .26s cubic-bezier(.22,.72,.24,1); }
+    .bq-size-chart-unit[data-sc-unit='in'] .bq-size-chart-unit-slider { transform:translateX(48px); }
+    .bq-size-chart-unit button { position:relative; z-index:1; border:0; background:transparent; color:#777; font:inherit; font-size:11px; font-weight:650; cursor:pointer; padding:0; transition:color .2s ease; }
+    .bq-size-chart-unit button.active { color:#fff; }
+
+    .bq-size-chart-tabs { position:relative; margin:14px 22px 0; display:grid; grid-template-columns:1fr 1fr; padding:4px; border:1px solid var(--sc-border); background:#F5F3EF; border-radius:11px; min-height:44px; }
+    .bq-size-chart-tab-slider { position:absolute; top:4px; left:4px; width:calc(50% - 4px); height:calc(100% - 8px); background:#000; border-radius:8px; transition:transform .28s cubic-bezier(.22,.72,.24,1); }
+    .bq-size-chart-tabs[data-sc-tab='measure'] .bq-size-chart-tab-slider { transform:translateX(100%); }
+    .bq-size-chart-tabs button { position:relative; z-index:1; border:0; background:transparent; color:#777; font:inherit; font-size:11px; cursor:pointer; transition:color .2s ease; }
+    .bq-size-chart-tabs button.active { color:#fff; }
+    .bq-size-chart-body { min-height:0; flex:1; overflow-y:auto; }
+    .bq-size-chart-panel { display:none; }
+    .bq-size-chart-panel.active { display:block; }
+    .size-chart-section { padding:20px 22px 28px; }
+    .size-chart-heading-row { display:flex; align-items:flex-end; justify-content:space-between; gap:12px; margin-bottom:14px; }
+    .size-chart-title { margin:0; font:inherit; font-size:16px; font-weight:700; }
+    .size-chart-unit-copy { font-size:10px; color:var(--sc-muted); white-space:nowrap; }
+    /* The size table owns both scroll axes so sticky header/first column stay reliable. */
+    .size-chart-scroll {
+      position:relative;
+      overflow:auto;
+      max-height:calc(100vh - 285px);
+      border:1px solid var(--sc-border);
+      border-radius:10px;
+      background:#fff;
+      scrollbar-gutter:stable;
+      overscroll-behavior:contain;
+      -webkit-overflow-scrolling:touch;
+    }
+    .size-chart {
+      width:100%;
+      min-width:470px;
+      border-collapse:separate;
+      border-spacing:0;
+      table-layout:auto;
+      font-size:11px;
+      background:#fff;
+    }
+    .size-chart th {
+      position:sticky;
+      top:0;
+      z-index:3;
+      padding:9px 7px;
+      background:#EBE8E2;
+      color:#000;
+      font-weight:650;
+      text-align:center;
+      white-space:nowrap;
+      border-bottom:1px solid #DEDAD4;
+    }
+    .size-chart td {
+      padding:8px 7px;
+      text-align:center;
+      border-top:1px solid #ECEAE6;
+      white-space:nowrap;
+      background:#fff;
+    }
+    /* Freeze the Size column while horizontally scrolling. */
+    .size-chart th:first-child,
+    .size-chart td:first-child {
+      position:sticky;
+      left:0;
+      min-width:68px;
+      width:68px;
+      max-width:68px;
+      font-weight:650;
+      box-shadow:1px 0 0 #E2DFDA;
+    }
+    .size-chart td:first-child {
+      z-index:2;
+      background:#FAFAF8;
+    }
+    /* Top-left cell must sit above both sticky axes. */
+    .size-chart th:first-child {
+      z-index:5;
+      background:#EBE8E2;
+    }
+    .size-chart th:not(:first-child),
+    .size-chart td:not(:first-child) { min-width:82px; }
+    .size-chart th:last-child,
+    .size-chart td:last-child { min-width:108px; }
+    .bq-size-chart-htm { padding:20px 22px 28px; display:flex; flex-direction:column; gap:16px; }
+    .bq-size-chart-image-wrap { position:relative; width:min(100%,300px); margin:0 auto; border:1px solid var(--sc-border); border-radius:12px; overflow:hidden; background:#fff; }
+    .bq-size-chart-image-wrap img { width:100%; height:auto; display:block; }
+    .bq-size-chart-hotspot { position:absolute; width:22px; height:22px; z-index:3; }
+    .bq-size-chart-hotspot span { width:22px; height:22px; display:grid; place-items:center; border-radius:7px; border:1.5px solid #000; background:#fff; color:#000; font-size:9px; font-weight:700; transition:background .16s,color .16s,transform .16s; }
+    .bq-size-chart-hotspot.active span { background:#000; color:#fff; transform:scale(1.06); }
+    .bq-size-chart-accordions { display:flex; flex-direction:column; gap:8px; }
+    .bq-size-chart-accordions .bq-accordion-header { width:100%; border:0; font:inherit; text-align:left; }
+    .bq-size-chart-accordions .bq-accordion-header strong { flex:1; font-size:11px; }
+    /* Scope the accordion arrow so global theme SVG rules cannot blow it up. */
+    .bq-size-chart-accordions .bq-chevron {
+      width:16px !important;
+      height:16px !important;
+      min-width:16px !important;
+      max-width:16px !important;
+      min-height:16px !important;
+      max-height:16px !important;
+      flex:0 0 16px !important;
+      display:block !important;
+      overflow:visible;
+      margin-left:auto;
+      transform-origin:50% 50%;
+    }
+    .bq-size-chart-accordions .bq-chevron polyline {
+      vector-effect:non-scaling-stroke;
+    }
+    .bq-size-chart-note { padding:10px 12px; border-left:3px solid #000; border-radius:8px; background:#F5F3EF; color:var(--sc-muted); font-size:10.5px; line-height:1.55; }
+    @media screen and (max-width:749px) {
+      .bq-size-chart-header { padding:16px 18px 14px; }
+      .bq-size-chart-tabs { margin:12px 18px 0; }
+      .size-chart-section, .bq-size-chart-htm { padding:16px 18px 22px; }
+      .size-chart-scroll { max-height:calc(88vh - 250px); }
+      .size-chart { min-width:450px; }
+      .size-chart th, .size-chart td { padding-inline:6px; }
+      .size-chart th:not(:first-child), .size-chart td:not(:first-child) { min-width:76px; }
+      .size-chart th:last-child, .size-chart td:last-child { min-width:102px; }
+      .bq-size-chart-image-wrap { width:min(100%,280px); }
+      .bq-size-chart-unit { width:92px; }
+      .bq-size-chart-unit-slider { width:40px; }
+      .bq-size-chart-unit[data-sc-unit='in'] .bq-size-chart-unit-slider { transform:translateX(42px); }
+      .bq-size-chart-header p { display:none; }
+    }
+
+  {% endstyle %}
+
+  <script>
+    (function () {
+      const pickerSelector = "variant-picker[data-block-id='{{ block.id }}'][data-template-product-match='true']";
+      window.__jimissPlusSizeState = window.__jimissPlusSizeState || {};
+      window.__jimissPlusSizeObservers = window.__jimissPlusSizeObservers || new WeakMap();
+
+      function getPicker() {
+        return document.querySelector(pickerSelector);
+      }
+
+      function applyPlusSizeState(picker) {
+        if (!picker || !picker.isConnected) return;
+
+        picker.querySelectorAll('[data-plus-size-collapsible="true"]').forEach((fieldset) => {
+          const stateKey = fieldset.dataset.plusSizeKey;
+          if (!stateKey) return;
+
+          if (typeof window.__jimissPlusSizeState[stateKey] !== 'boolean') {
+            window.__jimissPlusSizeState[stateKey] = fieldset.dataset.plusSizeInitialExpanded === 'true';
+          }
+
+          const expanded = window.__jimissPlusSizeState[stateKey];
+          const expandedValue = expanded ? 'true' : 'false';
+
+          if (fieldset.dataset.plusSizeReady !== 'true') {
+            fieldset.dataset.plusSizeReady = 'true';
+          }
+          if (fieldset.dataset.plusSizeExpanded !== expandedValue) {
+            fieldset.dataset.plusSizeExpanded = expandedValue;
+          }
+
+          const toggle = fieldset.querySelector('[data-plus-size-toggle]');
+          if (!toggle) return;
+
+          if (toggle.getAttribute('aria-expanded') !== expandedValue) {
+            toggle.setAttribute('aria-expanded', expandedValue);
+          }
+
+          const text = toggle.querySelector('[data-plus-size-toggle-text]');
+          const desiredText = expanded ? 'Hide Plus Size' : 'More Plus Size';
+
+          // IMPORTANT: only write text when it actually changes.
+          // Writing textContent on every MutationObserver callback would itself
+          // create another childList mutation and cause an endless observer loop.
+          if (text && text.textContent !== desiredText) {
+            text.textContent = desiredText;
+          }
+        });
+      }
+
+      function initializePicker() {
+        const picker = getPicker();
+        if (!picker) return;
+
+        applyPlusSizeState(picker);
+
+        if (!window.__jimissPlusSizeObservers.has(picker)) {
+          let updateScheduled = false;
+          const observer = new MutationObserver(() => {
+            if (updateScheduled) return;
+            updateScheduled = true;
+
+            requestAnimationFrame(() => {
+              updateScheduled = false;
+              applyPlusSizeState(picker);
+            });
+          });
+
+          // Horizon morphs the existing <variant-picker> subtree after a
+          // variant change. Watching childList is enough to re-apply the UI
+          // state; do not observe attributes, otherwise our own data/ARIA
+          // updates could feed back into the observer.
+          observer.observe(picker, { childList: true, subtree: true });
+          window.__jimissPlusSizeObservers.set(picker, observer);
+        }
+      }
+
+      if (!window.__jimissPlusSizeToggleClickBound) {
+        window.__jimissPlusSizeToggleClickBound = true;
+
+        document.addEventListener('click', function (event) {
+          const target = event.target;
+          if (!(target instanceof Element)) return;
+
+          const toggle = target.closest('[data-plus-size-toggle]');
+          if (!toggle) return;
+
+          const fieldset = toggle.closest('[data-plus-size-collapsible="true"]');
+          const picker = toggle.closest('variant-picker');
+          if (!fieldset || !picker) return;
+
+          const stateKey = fieldset.dataset.plusSizeKey;
+          if (!stateKey) return;
+
+          const isExpanded = fieldset.dataset.plusSizeExpanded === 'true';
+          window.__jimissPlusSizeState[stateKey] = !isExpanded;
+          applyPlusSizeState(picker);
+        });
+      }
+
+      initializePicker();
+      document.addEventListener('shopify:section:load', initializePicker);
+    })();
+  </script>
+
+
+  {%- if show_size_chart -%}
+  <script>
+    (function () {
+      const uid = {{ size_chart_uid | json }};
+      const overlayId = 'bq-size-chart-overlay-' + uid;
+      const drawerId = 'bq-size-chart-drawer-' + uid;
+
+      function initSizeChart() {
+        let drawer = document.getElementById(drawerId);
+        let overlay = document.getElementById(overlayId);
+        if (!drawer || !overlay) return;
+
+        const oldDrawer = document.body.querySelector('#' + CSS.escape(drawerId));
+        if (oldDrawer && oldDrawer !== drawer) oldDrawer.remove();
+        const oldOverlay = document.body.querySelector('#' + CSS.escape(overlayId));
+        if (oldOverlay && oldOverlay !== overlay) oldOverlay.remove();
+
+        if (drawer.parentElement !== document.body) document.body.appendChild(drawer);
+        if (overlay.parentElement !== document.body) document.body.appendChild(overlay);
+        if (drawer.dataset.initialized === 'true') return;
+        drawer.dataset.initialized = 'true';
+
+        const closeBtn = drawer.querySelector('[data-size-chart-close]');
+        const unit = drawer.querySelector('.bq-size-chart-unit');
+        const unitBtns = drawer.querySelectorAll('[data-unit]');
+        const unitCopy = drawer.querySelector('[data-size-chart-unit-copy]');
+        const cells = drawer.querySelectorAll('[data-cm]');
+        const tabs = drawer.querySelector('.bq-size-chart-tabs');
+        const tabBtns = drawer.querySelectorAll('[data-size-chart-tab]');
+        const panels = drawer.querySelectorAll('[data-size-chart-panel]');
+        const accordions = drawer.querySelectorAll('[data-sc-step]');
+        const hotspots = drawer.querySelectorAll('[data-sc-hotspot]');
+
+        function open() {
+          drawer.classList.add('open');
+          overlay.classList.add('open');
+          drawer.setAttribute('aria-hidden','false');
+          overlay.setAttribute('aria-hidden','false');
+          document.body.style.overflow = 'hidden';
+        }
+        function close() {
+          drawer.classList.remove('open');
+          overlay.classList.remove('open');
+          drawer.setAttribute('aria-hidden','true');
+          overlay.setAttribute('aria-hidden','true');
+          document.body.style.overflow = '';
+        }
+        function setUnit(next) {
+          const isIn = next === 'in';
+          unit.dataset.scUnit = isIn ? 'in' : 'cm';
+          unitBtns.forEach(btn => {
+            const active = btn.dataset.unit === next;
+            btn.classList.toggle('active',active);
+            btn.setAttribute('aria-pressed',active ? 'true':'false');
+          });
+          if (unitCopy) unitCopy.textContent = isIn ? 'IN' : 'CM';
+          cells.forEach(cell => {
+            const cm = Number(cell.dataset.cm);
+            if (!Number.isFinite(cm)) return;
+            cell.textContent = isIn ? (cm / 2.54).toFixed(1).replace(/\.0$/,'') : String(cm);
+          });
+        }
+        function setTab(next) {
+          tabs.dataset.scTab = next;
+          tabBtns.forEach(btn => btn.classList.toggle('active',btn.dataset.sizeChartTab === next));
+          panels.forEach(panel => panel.classList.toggle('active',panel.dataset.sizeChartPanel === next));
+        }
+
+        document.addEventListener('click', function (event) {
+          const target = event.target instanceof Element ? event.target.closest('[data-size-chart-trigger="' + uid + '"]') : null;
+          if (target) open();
+        });
+        overlay.addEventListener('click',close);
+        closeBtn?.addEventListener('click',close);
+        unitBtns.forEach(btn => btn.addEventListener('click',() => setUnit(btn.dataset.unit)));
+        tabBtns.forEach(btn => btn.addEventListener('click',() => setTab(btn.dataset.sizeChartTab)));
+        document.addEventListener('keydown',event => { if (event.key === 'Escape' && drawer.classList.contains('open')) close(); });
+
+        accordions.forEach(item => {
+          item.querySelector('.bq-accordion-header')?.addEventListener('click',() => {
+            const active = item.classList.contains('active');
+            accordions.forEach(a => a.classList.remove('active'));
+            hotspots.forEach(h => h.classList.remove('active'));
+            if (!active) {
+              item.classList.add('active');
+              drawer.querySelector('[data-sc-hotspot="' + item.dataset.scStep + '"]')?.classList.add('active');
+            }
+          });
+        });
+        hotspots.forEach(h => h.addEventListener('click',() => {
+          const item = drawer.querySelector('[data-sc-step="' + h.dataset.scHotspot + '"]');
+          if (item) item.querySelector('.bq-accordion-header')?.click();
+        }));
+      }
+
+      initSizeChart();
+      document.addEventListener('shopify:section:load',initSizeChart);
+    })();
+  </script>
+  {%- endif -%}
+{% endif %}

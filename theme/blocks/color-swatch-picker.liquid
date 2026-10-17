@@ -1,0 +1,1151 @@
+{% doc %}
+  Color Swatch Picker v10 — Horizon ProductSelectEvent compatible
+  - Renders only when a real Custom Color placeholder exists in the Shopify Color/Colour option.
+  - Placeholder matching is case-insensitive and accepts Custom Color/Colors/Colour/Colours.
+  - The selected/default native color is presented first.
+  - Native colors clear properties[Custom Color] and trigger Horizon's real Color control.
+  - Palette colors select the real Custom Color placeholder and write properties[Custom Color].
+{% enddoc %}
+
+{%- liquid
+  assign p = closest.product
+  if request.visual_preview_mode and p == blank
+    assign p = collections.all.products.first
+  endif
+
+  assign cp_id = block.id | replace: '_', '' | downcase
+  assign color_opt = blank
+  assign has_custom_color = false
+  assign custom_color_placeholder_value = blank
+  assign initial_color_name = ''
+
+  if p
+    assign color_opt = p.options_by_name['Color']
+    if color_opt == blank
+      assign color_opt = p.options_by_name['Colour']
+    endif
+    if color_opt == blank
+      assign color_opt = p.options_by_name['颜色']
+    endif
+  endif
+
+  if color_opt
+    for v in color_opt.values
+      assign v_name = v.name | default: v
+      assign v_key = v_name | strip | downcase
+      assign is_custom_color_value = false
+      if v_key == 'custom color' or v_key == 'custom colors' or v_key == 'custom colour' or v_key == 'custom colours'
+        assign is_custom_color_value = true
+      endif
+
+      if is_custom_color_value
+        assign has_custom_color = true
+        assign custom_color_placeholder_value = v_name
+      elsif initial_color_name == ''
+        assign initial_color_name = v_name
+      endif
+    endfor
+
+    assign selected_color_name = color_opt.selected_value.name | default: color_opt.selected_value
+    assign selected_color_key = selected_color_name | strip | downcase
+    assign selected_is_custom = false
+    if selected_color_key == 'custom color' or selected_color_key == 'custom colors' or selected_color_key == 'custom colour' or selected_color_key == 'custom colours'
+      assign selected_is_custom = true
+    endif
+
+    if selected_color_name != blank and selected_is_custom == false
+      assign initial_color_name = selected_color_name
+    endif
+  endif
+
+-%}
+
+<script>
+(function() {
+  var palette = window.JIMISS_CUSTOM_COLOR_PALETTE || {};
+  var canonical = [
+    'Black#000000','Navy Blue#182a55','Dusty Rose#d3b6b6','Sage Green#8a9a5b','Sky Blue#cee7f5','Burgundy#751e15','Emerald#134c36','Champagne#f1e9d2',
+    'Mint Green#a1d2b4','Dusty Sage#a3bf9f','Green#05AA3D','Olive Green#556b2f','Peacock#174d4b','Forest Green#12392e',
+    'Peacock Blue#33a1c9','Dusty Blue#8397a6','Steel Blue#4682b4','Slate Blue#6a5acd','Blue#005BD3','Stormy#4f5d75','Royal Blue#0f47a9','Teal#014a5f',
+    'Blushing Pink#fde9e9','Petal#ffd6db','Pink#FFC0CB','Dusty Rose#d3b6b6','Coral#ff777f','Rose Gold#B76E79','Red#F61F1F','Cabernet#722f37','Burgundy#751e15',
+    'Lemon#fff27b','Daffodil#ffe9a1','Butter#fcddae','Yellow#FFE500','Marigold#D49A06',
+    'Orange#FF8A00','Cinnamon#c35d32','Terracotta#874329','Rust#90322a',
+    'Lilac#e5d6df','Wisteria#c9a0dc','Lavender#b59eb0','Mauve#9289bc','Mulberry#772c54','Plum#3d0f42',
+    'White#fafafa','Ivory#f6f5f0','Champagne#f1e9d2','Sand#eae3d6','Gold#efcc93','Silver#c0c0c0','Grey#adaca9',
+    'Espresso#52443b','Mocha#3e2a20','Dark Navy#000046'
+  ];
+  var raw = [
+    {{ block.settings.colors_popular | json }},
+    {{ block.settings.colors_greens | json }},
+    {{ block.settings.colors_blues | json }},
+    {{ block.settings.colors_pinks | json }},
+    {{ block.settings.colors_yellow | json }},
+    {{ block.settings.colors_orange | json }},
+    {{ block.settings.colors_purples | json }},
+    {{ block.settings.colors_neutrals | json }},
+    {{ block.settings.colors_darks | json }}
+  ];
+  canonical.forEach(function(line) {
+    var i = line.lastIndexOf('#');
+    if (i < 1) return;
+    var name = line.slice(0, i).trim();
+    palette[name.toLowerCase()] = { name: name, hex: '#' + line.slice(i + 1).trim() };
+  });
+  // Respect theme-editor customizations. Legacy default lists are intentionally
+  // ignored because the drawer itself migrates those lists to the canonical JiMiss palette.
+  var legacy = [
+    'Sage Green#A3BF9F\nDusty Rose#DCAE96\nBlush#FFB6C1\nLemon#fff27b',
+    'Sage Green#A3BF9F\nMint#98FF98\nEmerald#50C878\nForest#228B22\nOlive#808000\nMoss#8A9A5B',
+    'Powder Blue#B0E0E6\nSky Blue#87CEEB\nCobalt#0047AB\nNavy#000080\nTeal#008080\nSeafoam#AFE4DE',
+    'Blush#FFB6C1\nDusty Rose#DCAE96\nMauve#E0B0B0\nCoral#FF7F6E\nRed#CC0000\nBurgundy#800020\nTerracotta#C66B3D\nFlamingo#FC8EAC',
+    'Lemon#fff27b\nDaffodil#ffe9a1\nButter#fcddae',
+    'Tangerine#F28500\nPeach#FFCBA4\nApricot#FBCEB1\nCoral Orange#FF6347\nRust#B7410E\nPumpkin#FF7518',
+    'Lilac#C8A2C8\nLavender#B57EDC\nPlum#8E4585\nWisteria#C9A0DC\nMulberry#C54B8C\nIndigo#4B0082',
+    'Ivory#FFFFF0\nChampagne#F7E7CE\nNude#E8C9A0\nSand#C2B280\nTaupe#8B7D6B\nSilver#C0C0C0\nGold#D4AF6A\nPearl#EAE0C8',
+    'Rich Wine Red#441729\nEspresso#3E2723\nCharcoal#36454F\nBlack#1a1a1a\nChocolate#7B3F00\nSlate#708090'
+  ];
+  var hasCustomSettings = raw.some(function(list, index) {
+    return String(list || '').trim() && String(list || '').trim() !== String(legacy[index] || '').trim();
+  });
+  if (hasCustomSettings) {
+    raw.forEach(function(list, index) {
+      if (String(list || '').trim() === String(legacy[index] || '').trim()) return;
+      String(list || '').split('\n').forEach(function(line) {
+        line = line.trim();
+        var i = line.lastIndexOf('#');
+        if (i < 1) return;
+        var name = line.slice(0, i).trim();
+        var hex = line.slice(i + 1).trim();
+        if (name && hex.length >= 3) palette[name.toLowerCase()] = { name: name, hex: '#' + hex };
+      });
+    });
+  }
+  window.JIMISS_CUSTOM_COLOR_PALETTE = palette;
+})();
+</script>
+
+{%- if has_custom_color -%}
+{% style %}
+.cpv3-{{ cp_id }} {
+  --cc-ink: #000000;
+  --cc-surface: #FFFFFF;
+  --cc-soft: #F6F6F4;
+  --cc-border: #D9D7D2;
+  --cc-muted: #6C6A67;
+  font-family: var(--font-body--family, 'Mona Sans', sans-serif);
+  color: var(--cc-ink);
+}
+
+.cpv3-label-row-{{ cp_id }} {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.cpv3-label-prefix-{{ cp_id }} {
+  font-size: 13px;
+  font-weight: 650;
+  letter-spacing: .035em;
+  color: var(--cc-ink);
+}
+.cpv3-label-name-{{ cp_id }} {
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--cc-muted);
+  letter-spacing: .025em;
+  text-transform: uppercase;
+}
+
+.cpv3-quick-row-{{ cp_id }} {
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
+  gap: 10px;
+  overflow-x: auto;
+  width: 100%;
+  padding-bottom: 2px;
+  scrollbar-width: none;
+}
+.cpv3-quick-row-{{ cp_id }}::-webkit-scrollbar { display: none; }
+.cpv3-native-row-{{ cp_id }} {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 9px;
+  align-items: center;
+  flex: 0 0 auto;
+  min-width: 0;
+}
+
+.cpv3-swatch-{{ cp_id }} {
+  width: 38px;
+  height: 38px;
+  border-radius: 9px;
+  cursor: pointer;
+  border: 1px solid rgba(0,0,0,.12);
+  padding: 0;
+  position: relative;
+  background-color: #ccc;
+  background-size: cover;
+  background-position: center;
+  transition: transform .16s ease, box-shadow .16s ease, border-color .16s ease;
+  outline: none;
+  box-shadow: none;
+  box-sizing: border-box;
+  flex-shrink: 0;
+}
+.cpv3-toggle-icon-{{ cp_id }} img { width: 18px; height: 18px; display: block; }
+@media (hover:hover) {
+  .cpv3-swatch-{{ cp_id }}:hover {
+    transform: translateY(-1px);
+    border-color: rgba(0,0,0,.35);
+    box-shadow: 0 5px 14px rgba(0,0,0,.08);
+  }
+}
+.cpv3-swatch-{{ cp_id }}.active {
+  /* Keep the entire selected treatment inside the 38px swatch so scroll/overflow containers never clip it. */
+  border: 2px solid #000000;
+  box-shadow: inset 0 0 0 2px #FFFFFF;
+  outline: none;
+}
+.cpv3-grid-{{ cp_id }} .cpv3-swatch-{{ cp_id }} {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  border-radius: 8px;
+}
+.cpv3-swatch-{{ cp_id }}::before {
+  content: attr(data-name);
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  transform: translateX(-50%) translateY(4px);
+  background: rgba(0,0,0,.92);
+  color: #fff;
+  font-size: 10px;
+  line-height: 1;
+  padding: 6px 8px;
+  border-radius: 7px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .15s ease, transform .15s ease;
+  z-index: 30;
+}
+@media (hover:hover) {
+  .cpv3-swatch-{{ cp_id }}:hover::before {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+.cpv3-toggle-{{ cp_id }} {
+  min-height: 42px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  background: #EBE8E2;
+  border: 1px solid #DDD9D2;
+  border-radius: 10px;
+  padding: 7px 11px;
+  cursor: pointer;
+  color: var(--cc-ink);
+  font-family: inherit;
+  text-align: left;
+  transition: background .16s ease, border-color .16s ease, box-shadow .16s ease;
+  flex: 0 1 auto;
+  min-width: 170px;
+  max-width: 240px;
+}
+.cpv3-toggle-icon-{{ cp_id }} {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  background: #FFFFFF;
+  border: 1px solid var(--cc-border);
+  color: var(--cc-ink);
+  flex-shrink: 0;
+}
+.cpv3-toggle-copy-{{ cp_id }} {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  min-width: 0;
+}
+.cpv3-toggle-title-{{ cp_id }} {
+  font-size: 12px;
+  line-height: 1.2;
+  font-weight: 650;
+}
+.cpv3-toggle-meta-{{ cp_id }} {
+  font-size: 10px;
+  line-height: 1.2;
+  color: var(--cc-muted);
+}
+.cpv3-toggle-arrow-{{ cp_id }} {
+  margin-left: auto;
+  color: var(--cc-ink);
+  transition: transform .18s ease;
+  flex-shrink: 0;
+}
+@media (hover:hover) {
+  .cpv3-toggle-{{ cp_id }}:hover {
+    background: #E5E1DA;
+    border-color: rgba(0,0,0,.20);
+    transform: none;
+    box-shadow: 0 3px 10px rgba(0,0,0,.05);
+  }
+}
+.cpv3-toggle-{{ cp_id }}:focus-visible,
+.cpv3-swatch-{{ cp_id }}:focus-visible,
+.cpv3-tab-{{ cp_id }}:focus-visible,
+.cpv3-close-{{ cp_id }}:focus-visible {
+  outline: 2px solid var(--cc-ink);
+  outline-offset: 2px;
+}
+
+.cpv3-overlay-{{ cp_id }} {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 2147483644;
+  background: rgba(0,0,0,.28);
+}
+.cpv3-overlay-{{ cp_id }}.open { display: block; }
+
+.cpv3-panel-{{ cp_id }} {
+  /* This node is portaled to <body>, so it must own the variables it uses instead of inheriting them from .cpv3-root. */
+  --cc-ink: #000000;
+  --cc-surface: #FFFFFF;
+  --cc-soft: #F6F6F4;
+  --cc-border: #D9D7D2;
+  --cc-muted: #6C6A67;
+  position: fixed;
+  z-index: 2147483645;
+  background: #FFFFFF;
+  color: #000000;
+  overflow: hidden;
+  box-shadow: 0 24px 70px rgba(0,0,0,.16);
+  display: flex;
+  flex-direction: column;
+  opacity: 1;
+  visibility: hidden;
+  pointer-events: none;
+  transition: transform .28s cubic-bezier(.22,.61,.36,1), visibility 0s linear .28s;
+}
+.cpv3-panel-{{ cp_id }}.open {
+  visibility: visible;
+  pointer-events: auto;
+  transition-delay: 0s;
+}
+@media screen and (min-width: 750px) {
+  .cpv3-panel-{{ cp_id }} {
+    top: 0;
+    right: 0;
+    width: min(480px, 100vw);
+    height: 100vh;
+    border-radius: 0;
+    transform: translateX(100%);
+  }
+  .cpv3-panel-{{ cp_id }}.open {
+    transform: translateX(0);
+  }
+}
+@media screen and (max-width: 749px) {
+  .cpv3-panel-{{ cp_id }} {
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    max-height: 82vh;
+    border-radius: 14px 14px 0 0;
+    transform: translateY(100%);
+    transition: transform .34s cubic-bezier(.22,.72,.24,1), height .36s cubic-bezier(.22,.72,.24,1), visibility 0s linear .34s;
+    will-change: transform, height;
+  }
+  .cpv3-panel-{{ cp_id }}.open { transition-delay: 0s; }
+  .cpv3-panel-{{ cp_id }}.open {
+    transform: translateY(0);
+  }
+  .cpv3-panel-{{ cp_id }}::before {
+    content: '';
+    width: 38px;
+    height: 4px;
+    border-radius: 4px;
+    background: #C8C6C2;
+    margin: 8px auto -2px;
+    flex-shrink: 0;
+  }
+}
+.cpv3-panel-header-{{ cp_id }} {
+  display: flex;
+  background: #FFFFFF;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 18px 20px 14px;
+  border-bottom: 1px solid var(--cc-border);
+}
+.cpv3-panel-kicker-{{ cp_id }} {
+  font-size: 13px;
+  font-weight: 650;
+  letter-spacing: .055em;
+}
+.cpv3-panel-sub-{{ cp_id }} {
+  margin: 4px 0 0;
+  font-size: 11px;
+  line-height: 1.45;
+  color: var(--cc-muted);
+}
+.cpv3-close-{{ cp_id }} {
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--cc-border);
+  border-radius: 9px;
+  background: #fff;
+  color: var(--cc-ink);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background .16s ease, border-color .16s ease;
+}
+@media (hover:hover) {
+  .cpv3-close-{{ cp_id }}:hover { background: var(--cc-soft); border-color: rgba(0,0,0,.24); }
+}
+.cpv3-panel-body-{{ cp_id }} {
+  min-height: 0;
+  background: #FFFFFF;
+  overflow-y: auto;
+  padding: 14px 16px 20px;
+}
+.cpv3-tabs-{{ cp_id }} {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  overflow: visible;
+  padding: 2px 1px 10px;
+  margin: 0 0 6px;
+}
+.cpv3-tab-{{ cp_id }} {
+  min-height: 30px;
+  padding: 0 9px;
+  flex: 0 0 auto;
+  border: 1px solid var(--cc-border);
+  border-radius: 9px;
+  font-size: 9.5px;
+  letter-spacing: .01em;
+  white-space: nowrap;
+  cursor: pointer;
+  background: #fff;
+  color: var(--cc-muted);
+  transition: background .16s ease, color .16s ease, border-color .16s ease;
+  font-family: inherit;
+}
+.cpv3-tab-{{ cp_id }}.active {
+  background: var(--cc-ink);
+  color: #fff;
+  border-color: var(--cc-ink);
+}
+@media (hover:hover) {
+  .cpv3-tab-{{ cp_id }}:not(.active):hover {
+    border-color: rgba(0,0,0,.28);
+    color: var(--cc-ink);
+    background: var(--cc-soft);
+  }
+}
+.cpv3-grid-{{ cp_id }} {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(42px, 1fr));
+  gap: 10px;
+  padding: 4px;
+}
+
+@media screen and (max-width: 520px) {
+  .cpv3-quick-row-{{ cp_id }} { gap: 8px; }
+  .cpv3-native-row-{{ cp_id }} { gap: 8px; }
+  .cpv3-swatch-{{ cp_id }} { width: 36px; height: 36px; border-radius: 8px; }
+  .cpv3-toggle-{{ cp_id }} { width: auto; min-width: 168px; max-width: 220px; padding: 7px 10px; }
+  .cpv3-toggle-title-{{ cp_id }} { font-size: 11.5px; }
+  .cpv3-toggle-meta-{{ cp_id }} { font-size: 9.5px; }
+  .cpv3-panel-header-{{ cp_id }} { padding: 16px 16px 12px; }
+  .cpv3-panel-body-{{ cp_id }} { padding: 12px 14px 18px; }
+  .cpv3-grid-{{ cp_id }} { grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 9px; }
+}
+{% endstyle %}
+
+<div class="cpv3-{{ cp_id }}" {{ block.shopify_attributes }}>
+  <div class="cpv3-label-row-{{ cp_id }}">
+    <span class="cpv3-label-prefix-{{ cp_id }}">COLOR</span>
+    <span class="cpv3-label-name-{{ cp_id }}" id="cpv3-label-name-{{ cp_id }}">{{ initial_color_name }}</span>
+  </div>
+
+  <div class="cpv3-quick-row-{{ cp_id }}">
+    <div id="cpv3-native-row-{{ cp_id }}" class="cpv3-native-row-{{ cp_id }}"></div>
+
+    <button type="button" class="cpv3-toggle-{{ cp_id }}" id="cpv3-toggle-{{ cp_id }}" aria-expanded="false" aria-controls="cpv3-panel-{{ cp_id }}">
+      <span class="cpv3-toggle-icon-{{ cp_id }}" aria-hidden="true">
+        <img src="{{ 'custom-color-icon.svg' | asset_url }}" alt="" width="18" height="18" loading="lazy">
+      </span>
+      <span class="cpv3-toggle-copy-{{ cp_id }}">
+        <span class="cpv3-toggle-title-{{ cp_id }}">Custom Color</span>
+        <span class="cpv3-toggle-meta-{{ cp_id }}"><span id="cpv3-total-count-{{ cp_id }}">0</span> colors available</span>
+      </span>
+      <svg class="cpv3-toggle-arrow-{{ cp_id }}" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <polyline points="9 18 15 12 9 6"/>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<div class="cpv3-overlay-{{ cp_id }}" id="cpv3-overlay-{{ cp_id }}"></div>
+<div class="cpv3-panel-{{ cp_id }}" id="cpv3-panel-{{ cp_id }}" role="dialog" aria-modal="true" aria-labelledby="cpv3-panel-title-{{ cp_id }}" aria-hidden="true">
+  <div class="cpv3-panel-header-{{ cp_id }}">
+    <div>
+      <div class="cpv3-panel-kicker-{{ cp_id }}" id="cpv3-panel-title-{{ cp_id }}">CUSTOM COLOR</div>
+      <p class="cpv3-panel-sub-{{ cp_id }}">Choose from our extended color collection.</p>
+    </div>
+    <button type="button" class="cpv3-close-{{ cp_id }}" id="cpv3-close-{{ cp_id }}" aria-label="Close custom colors">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+        <line x1="1" y1="1" x2="13" y2="13"/><line x1="13" y1="1" x2="1" y2="13"/>
+      </svg>
+    </button>
+  </div>
+  <div class="cpv3-panel-body-{{ cp_id }}">
+    <div class="cpv3-tabs-{{ cp_id }}" id="cpv3-tabs-{{ cp_id }}"></div>
+    <div class="cpv3-grid-{{ cp_id }}" id="cpv3-grid-{{ cp_id }}"></div>
+  </div>
+</div>
+
+<script>
+(function() {
+  var ID = '{{ cp_id }}';
+  var PRODUCT_ID = {{ p.id | json }};
+  var PROPERTY_KEY = '{{ block.settings.label | default: "Custom Color" }}';
+  var PLACEHOLDER_VALUE = {{ custom_color_placeholder_value | default: 'Custom Color' | json }};
+  var INITIAL_COLOR_NAME = {{ initial_color_name | json }};
+
+  // ── 原生 Shopify Color values：全部非 "Custom Color" 值 ──
+  var nativeColors = [
+    {%- assign native_emitted = 0 -%}
+    {%- for v in color_opt.values -%}
+      {%- assign v_name = v.name | default: v -%}
+      {%- assign v_key = v_name | strip | downcase -%}
+      {%- assign v_is_custom = false -%}
+      {%- if v_key == 'custom color' or v_key == 'custom colors' or v_key == 'custom colour' or v_key == 'custom colours' -%}
+        {%- assign v_is_custom = true -%}
+      {%- endif -%}
+      {%- unless v_is_custom -%}
+        {%- if native_emitted > 0 -%},{%- endif -%}
+        {
+          name: {{ v_name | json }},
+          hex: {%- if v.swatch.color -%}{{ v.swatch.color | json }}{%- else -%}""{%- endif -%},
+          image: {%- if v.swatch.image -%}{{ v.swatch.image | image_url: width: 120 | json }}{%- else -%}""{%- endif -%},
+          variantImage: {%- if v.variant.featured_media -%}{{ v.variant.featured_media | image_url: width: 160 | json }}{%- elsif v.product_url and v.variant.product.featured_media -%}{{ v.variant.product.featured_media | image_url: width: 160 | json }}{%- else -%}""{%- endif -%},
+          native: true
+        }
+        {%- assign native_emitted = native_emitted | plus: 1 -%}
+      {%- endunless -%}
+    {%- endfor -%}
+  ];
+
+  nativeColors = nativeColors.filter(function(c) { return c && c.name; });
+
+  // Keep the Shopify-selected/default native color in the first position.
+  // This only changes presentation order; the real option values remain untouched.
+  if (INITIAL_COLOR_NAME) {
+    var selectedNativeIndex = nativeColors.findIndex(function(c) {
+      return c.name === INITIAL_COLOR_NAME;
+    });
+    if (selectedNativeIndex > 0) {
+      nativeColors.unshift(nativeColors.splice(selectedNativeIndex, 1)[0]);
+    }
+  }
+
+  function parseColors(raw) {
+    if (!raw) return [];
+    return raw.split('\n').map(function(line) {
+      line = line.trim();
+      if (!line) return null;
+      var idx = line.lastIndexOf('#');
+      if (idx < 1) return null;
+      var name = line.substring(0, idx).trim();
+      var hex  = '#' + line.substring(idx + 1).trim();
+      return (name && hex.length >= 4) ? { name: name, hex: hex, native: false } : null;
+    }).filter(Boolean);
+  }
+
+  // Canonical JiMiss 54-color custom palette (Custom Color placeholder is not part of this list).
+  // If an existing block still contains the legacy defaults, migrate it automatically at runtime;
+  // manually customized textarea values continue to override the canonical defaults.
+  var CANONICAL_PALETTE = {
+    "popular": ["Black#000000", "Navy Blue#182a55", "Dusty Rose#d3b6b6", "Sage Green#8a9a5b", "Sky Blue#cee7f5", "Burgundy#751e15", "Emerald#134c36", "Champagne#f1e9d2"].join('\n'),
+    "greens": ["Mint Green#a1d2b4", "Dusty Sage#a3bf9f", "Sage Green#8a9a5b", "Green#05AA3D", "Olive Green#556b2f", "Peacock#174d4b", "Emerald#134c36", "Forest Green#12392e"].join('\n'),
+    "blues": ["Sky Blue#cee7f5", "Mist#d6e0ef", "Peacock Blue#33a1c9", "Dusty Blue#8397a6", "Steel Blue#4682b4", "Slate Blue#6a5acd", "Blue#005BD3", "Stormy#4f5d75", "Royal Blue#0f47a9", "Teal#014a5f"].join('\n'),
+    "pinks": ["Blushing Pink#fde9e9", "Petal#ffd6db", "Pink#FFC0CB", "Dusty Rose#d3b6b6", "Coral#ff777f", "Rose Gold#B76E79", "Red#F61F1F", "Cabernet#722f37", "Burgundy#751e15"].join('\n'),
+    "yellow": ["Lemon#fff27b", "Daffodil#ffe9a1", "Butter#fcddae", "Yellow#FFE500", "Marigold#D49A06"].join('\n'),
+    "orange": ["Orange#FF8A00", "Cinnamon#c35d32", "Terracotta#874329", "Rust#90322a"].join('\n'),
+    "purples": ["Lilac#e5d6df", "Wisteria#c9a0dc", "Lavender#b59eb0", "Mauve#9289bc", "Mulberry#772c54", "Plum#3d0f42"].join('\n'),
+    "neutrals": ["White#fafafa", "Ivory#f6f5f0", "Champagne#f1e9d2", "Sand#eae3d6", "Gold#efcc93", "Silver#c0c0c0", "Grey#adaca9"].join('\n'),
+    "darks": ["Espresso#52443b", "Mocha#3e2a20", "Navy Blue#182a55", "Dark Navy#000046", "Black#000000"].join('\n')
+  };
+  var LEGACY_PALETTE_DEFAULTS = {
+    "popular": ["Sage Green#A3BF9F", "Dusty Rose#DCAE96", "Blush#FFB6C1", "Lemon#fff27b"].join('\n'),
+    "greens": ["Sage Green#A3BF9F", "Mint#98FF98", "Emerald#50C878", "Forest#228B22", "Olive#808000", "Moss#8A9A5B"].join('\n'),
+    "blues": ["Powder Blue#B0E0E6", "Sky Blue#87CEEB", "Cobalt#0047AB", "Navy#000080", "Teal#008080", "Seafoam#AFE4DE"].join('\n'),
+    "pinks": ["Blush#FFB6C1", "Dusty Rose#DCAE96", "Mauve#E0B0B0", "Coral#FF7F6E", "Red#CC0000", "Burgundy#800020", "Terracotta#C66B3D", "Flamingo#FC8EAC"].join('\n'),
+    "yellow": ["Lemon#fff27b", "Daffodil#ffe9a1", "Butter#fcddae"].join('\n'),
+    "orange": ["Tangerine#F28500", "Peach#FFCBA4", "Apricot#FBCEB1", "Coral Orange#FF6347", "Rust#B7410E", "Pumpkin#FF7518"].join('\n'),
+    "purples": ["Lilac#C8A2C8", "Lavender#B57EDC", "Plum#8E4585", "Wisteria#C9A0DC", "Mulberry#C54B8C", "Indigo#4B0082"].join('\n'),
+    "neutrals": ["Ivory#FFFFF0", "Champagne#F7E7CE", "Nude#E8C9A0", "Sand#C2B280", "Taupe#8B7D6B", "Silver#C0C0C0", "Gold#D4AF6A", "Pearl#EAE0C8"].join('\n'),
+    "darks": ["Rich Wine Red#441729", "Espresso#3E2723", "Charcoal#36454F", "Black#1a1a1a", "Chocolate#7B3F00", "Slate#708090"].join('\n')
+  };
+
+  function paletteSource(raw, key) {
+    var normalized = (raw || '').trim();
+    if (!normalized || normalized === LEGACY_PALETTE_DEFAULTS[key].trim()) {
+      return CANONICAL_PALETTE[key];
+    }
+    return normalized;
+  }
+
+  var popularColors = parseColors(paletteSource({{ block.settings.colors_popular | json }}, 'popular'));
+
+  var groups = [
+    { name: 'Greens',       colors: parseColors(paletteSource({{ block.settings.colors_greens | json }}, 'greens')) },
+    { name: 'Blues',        colors: parseColors(paletteSource({{ block.settings.colors_blues | json }}, 'blues')) },
+    { name: 'Pinks & Reds', colors: parseColors(paletteSource({{ block.settings.colors_pinks | json }}, 'pinks')) },
+    { name: 'Yellow',       colors: parseColors(paletteSource({{ block.settings.colors_yellow | json }}, 'yellow')) },
+    { name: 'Orange',       colors: parseColors(paletteSource({{ block.settings.colors_orange | json }}, 'orange')) },
+    { name: 'Purples',      colors: parseColors(paletteSource({{ block.settings.colors_purples | json }}, 'purples')) },
+    { name: 'Neutrals',     colors: parseColors(paletteSource({{ block.settings.colors_neutrals | json }}, 'neutrals')) },
+    { name: 'Darks',        colors: parseColors(paletteSource({{ block.settings.colors_darks | json }}, 'darks')) }
+  ];
+  var activeGroups = groups.filter(function(g) { return g.colors.length > 0; });
+
+  // All N Colors 的 N 只统计 Custom Color 色库，保持按钮含义稳定；
+  // 原生 variant 色始终额外显示在按钮前，不会把 50 变成 53/54。
+  var customPaletteSeen = {};
+  var customPaletteColors = [];
+  activeGroups.forEach(function(g) {
+    g.colors.forEach(function(c) {
+      if (!customPaletteSeen[c.name]) {
+        customPaletteSeen[c.name] = true;
+        customPaletteColors.push(c);
+      }
+    });
+  });
+  popularColors.forEach(function(c) {
+    if (!customPaletteSeen[c.name]) {
+      customPaletteSeen[c.name] = true;
+      customPaletteColors.push(c);
+    }
+  });
+
+  // Expose the same runtime palette used by the Custom Color drawer so native
+  // product swatches can resolve color names even when no Custom Color
+  // placeholder exists on the product.
+  window.JIMISS_CUSTOM_COLOR_PALETTE = window.JIMISS_CUSTOM_COLOR_PALETTE || {};
+  customPaletteColors.forEach(function(c) {
+    if (c && c.name && c.hex) {
+      window.JIMISS_CUSTOM_COLOR_PALETTE[c.name.trim().toLowerCase()] = { name: c.name, hex: c.hex };
+    }
+  });
+
+  var nativeByName = {};
+  nativeColors.forEach(function(c) { nativeByName[c.name] = c; });
+
+  function isNativeColor(name) {
+    return !!nativeByName[name];
+  }
+
+  function preferNative(c) {
+    return nativeByName[c.name] || c;
+  }
+
+  // Custom Color drawer only contains extended colors. Native Shopify colors stay in the main row.
+  var allColors = customPaletteColors.filter(function(c) { return !isNativeColor(c.name); });
+  var popularCustomColors = popularColors.filter(function(c) { return !isNativeColor(c.name); });
+
+  // ── DOM 引用 ──
+  var root = document.querySelector('.cpv3-' + ID);
+  var labelNameEl = document.getElementById('cpv3-label-name-' + ID);
+  var totalCountEl = document.getElementById('cpv3-total-count-' + ID);
+  var toggleBtn = document.getElementById('cpv3-toggle-' + ID);
+
+  // Prefer the fresh sibling nodes created by this block render; remove stale portals left by theme-editor rerenders.
+  var overlay = root?.nextElementSibling?.id === 'cpv3-overlay-' + ID
+    ? root.nextElementSibling
+    : document.getElementById('cpv3-overlay-' + ID);
+  var panel = overlay?.nextElementSibling?.id === 'cpv3-panel-' + ID
+    ? overlay.nextElementSibling
+    : document.getElementById('cpv3-panel-' + ID);
+
+  var sheetHeightTimer = null;
+  function animateMobilePanelHeight(mutator) {
+    if (typeof mutator !== 'function') return;
+    var isMobile = window.matchMedia('(max-width: 749px)').matches;
+    var reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (!isMobile || reduceMotion || !panel || !panel.classList.contains('open')) {
+      mutator();
+      return;
+    }
+
+    var from = panel.getBoundingClientRect().height;
+    panel.style.transitionProperty = 'none';
+    panel.style.height = 'auto';
+    var provisional = panel.getBoundingClientRect().height;
+    panel.style.height = from + 'px';
+    void panel.offsetHeight;
+    panel.style.transitionProperty = '';
+
+    mutator();
+
+    panel.style.transitionProperty = 'none';
+    panel.style.height = 'auto';
+    var finalHeight = panel.getBoundingClientRect().height || provisional;
+    panel.style.height = from + 'px';
+    void panel.offsetHeight;
+    panel.style.transitionProperty = '';
+
+    requestAnimationFrame(function() {
+      panel.style.height = finalHeight + 'px';
+    });
+
+    if (sheetHeightTimer) clearTimeout(sheetHeightTimer);
+    sheetHeightTimer = setTimeout(function() {
+      panel.style.height = '';
+    }, 420);
+  }
+
+  document.querySelectorAll('[id="cpv3-overlay-' + ID + '"]').forEach(function(node) {
+    if (node !== overlay) node.remove();
+  });
+  document.querySelectorAll('[id="cpv3-panel-' + ID + '"]').forEach(function(node) {
+    if (node !== panel) node.remove();
+  });
+
+  var closeBtn = panel?.querySelector('#cpv3-close-' + ID) || null;
+  var tabsEl = panel?.querySelector('#cpv3-tabs-' + ID) || null;
+  var gridEl = panel?.querySelector('#cpv3-grid-' + ID) || null;
+  var nativeRowEl = document.getElementById('cpv3-native-row-' + ID);
+
+  if (totalCountEl) totalCountEl.textContent = allColors.length;
+
+  // Portal the drawer to body so Horizon/product layout stacking contexts cannot clip it.
+  if (overlay && overlay.parentElement !== document.body) document.body.appendChild(overlay);
+  if (panel && panel.parentElement !== document.body) document.body.appendChild(panel);
+
+  // ── 状态 ──
+  var selectedName = INITIAL_COLOR_NAME || (nativeColors[0] ? nativeColors[0].name : null);
+  var activeGroup = popularCustomColors.length > 0 ? 'Popular' : 'All';
+  var currentList = popularCustomColors.length > 0 ? popularCustomColors : allColors;
+  var isOpen = false;
+
+  function setActiveByName(name) {
+    selectedName = name;
+    var sws = document.querySelectorAll('.cpv3-swatch-' + ID);
+    sws.forEach(function(sw) {
+      sw.classList.toggle('active', sw.dataset.name === name);
+    });
+    if (labelNameEl) labelNameEl.textContent = name || '';
+  }
+
+  // The hidden Shopify `Custom Color` radio has no visible swatch of its own.
+  // Reuse the first native swatch as the current-color preview slot while a
+  // custom palette color is selected, so the visible swatch always matches
+  // the color name shown in the label.
+  function rememberNativeSwatchVisual(sw) {
+    if (!sw || sw.dataset.originalVisualSaved === 'true') return;
+    sw.dataset.originalVisualSaved = 'true';
+    sw.dataset.originalBackgroundColor = sw.style.backgroundColor || '';
+    sw.dataset.originalBackgroundImage = sw.style.backgroundImage || '';
+    sw.dataset.originalBackgroundSize = sw.style.backgroundSize || '';
+    sw.dataset.originalBackgroundPosition = sw.style.backgroundPosition || '';
+  }
+
+  function restoreNativeSwatchVisuals() {
+    if (!nativeRowEl) return;
+    nativeRowEl.querySelectorAll('.cpv3-swatch-' + ID).forEach(function(sw) {
+      rememberNativeSwatchVisual(sw);
+      sw.style.backgroundColor = sw.dataset.originalBackgroundColor || '';
+      sw.style.backgroundImage = sw.dataset.originalBackgroundImage || 'none';
+      sw.style.backgroundSize = sw.dataset.originalBackgroundSize || '';
+      sw.style.backgroundPosition = sw.dataset.originalBackgroundPosition || '';
+      sw.removeAttribute('data-custom-preview');
+      sw.removeAttribute('title');
+    });
+  }
+
+  function findCustomPaletteColor(name) {
+    return customPaletteColors.find(function(c) { return c.name === name; }) || null;
+  }
+
+  function showCustomColorInNativePreview(name) {
+    if (!nativeRowEl) return;
+    var color = findCustomPaletteColor(name);
+    if (!color) return;
+
+    restoreNativeSwatchVisuals();
+
+    var preview = nativeRowEl.querySelector('.cpv3-swatch-' + ID);
+    if (!preview) return;
+    rememberNativeSwatchVisual(preview);
+
+    if (color.hex) {
+      preview.style.backgroundColor = color.hex;
+      preview.style.backgroundImage = 'none';
+    } else if (color.image) {
+      preview.style.backgroundColor = '';
+      preview.style.backgroundImage = "url('" + color.image + "')";
+      preview.style.backgroundSize = 'cover';
+      preview.style.backgroundPosition = 'center';
+    }
+
+    // Visually mark the preview slot as the current selection even though
+    // Shopify's real checked control is the hidden `Custom Color` placeholder.
+    nativeRowEl.querySelectorAll('.cpv3-swatch-' + ID).forEach(function(sw) {
+      sw.classList.remove('active');
+    });
+    preview.classList.add('active');
+    preview.setAttribute('data-custom-preview', 'true');
+    preview.setAttribute('title', name + ' · Custom Color');
+  }
+
+  // ── cart line item property ──
+  function getProductForms() {
+    var result = [];
+    var seen = new Set();
+
+    document.querySelectorAll('product-form-component').forEach(function(component) {
+      if (component.dataset.productId && String(component.dataset.productId) !== String(PRODUCT_ID)) return;
+      var form = component.querySelector('form[action*="/cart/add"]');
+      if (form && !seen.has(form)) {
+        seen.add(form);
+        result.push(form);
+      }
+    });
+
+    if (result.length === 0) {
+      document.querySelectorAll('form[action*="/cart/add"]').forEach(function(form) {
+        if (!seen.has(form)) {
+          seen.add(form);
+          result.push(form);
+        }
+      });
+    }
+
+    return result;
+  }
+
+  function writeCustomColorProperty(colorName) {
+    var key = 'properties[' + PROPERTY_KEY + ']';
+
+    getProductForms().forEach(function(form) {
+      var inp = form.querySelector('input[name="' + key + '"]');
+
+      if (colorName) {
+        if (!inp) {
+          inp = document.createElement('input');
+          inp.type = 'hidden';
+          inp.name = key;
+          form.appendChild(inp);
+        }
+        inp.value = colorName;
+      } else if (inp && inp.parentNode) {
+        inp.parentNode.removeChild(inp);
+      }
+    });
+  }
+
+  // ── 找到 variant-main-picker 中被隐藏的真实 Color radio ──
+  function getVariantPicker() {
+    return document.querySelector('variant-picker[data-product-id="' + PRODUCT_ID + '"]')
+        || document.querySelector('variant-picker');
+  }
+
+  function findColorRadio(colorName) {
+    var picker = getVariantPicker();
+    if (!picker) return null;
+
+    var inputs = picker.querySelectorAll('input[type="radio"]');
+    for (var i = 0; i < inputs.length; i++) {
+      var input = inputs[i];
+      var optionName = (input.dataset.optionName || '').trim().toLowerCase();
+      var fieldName = (input.name || '').toLowerCase();
+      var isColorField =
+        optionName === 'color' ||
+        optionName === 'colour' ||
+        optionName === '颜色' ||
+        fieldName.indexOf('color-') === 0 ||
+        fieldName.indexOf('colour-') === 0 ||
+        fieldName.indexOf('颜色-') === 0;
+      if (isColorField && input.value === colorName) return input;
+    }
+
+    // 兼容 name 被主题改写的情况：最后按 value 匹配，但排除 Size
+    for (var j = 0; j < inputs.length; j++) {
+      var fallback = inputs[j];
+      var fallbackName = (fallback.name || '').toLowerCase();
+      if (fallback.value === colorName && fallbackName.indexOf('size-') !== 0 && fallbackName.indexOf('尺寸-') !== 0) {
+        return fallback;
+      }
+    }
+    return null;
+  }
+
+  function selectShopifyColor(colorName) {
+    var radio = findColorRadio(colorName);
+
+    // 关键：触发 Horizon 原生 radio，而不是只改 variant id。
+    // 这样图片、价格、URL、availability 都走主题原生 variant change 流程。
+    if (radio && !radio.checked) {
+      radio.click();
+    }
+
+    return !!radio;
+  }
+
+  // ── 选色入口 ──
+  function selectColor(name) {
+    setActiveByName(name);
+
+    if (isNativeColor(name)) {
+      // Native color: restore its original Shopify swatch visual.
+      restoreNativeSwatchVisuals();
+      setActiveByName(name);
+      writeCustomColorProperty(null);
+      selectShopifyColor(name);
+    } else {
+      // Custom palette color: show that exact color in the visible current-color
+      // swatch while the real Shopify option is the hidden Custom Color placeholder.
+      showCustomColorInNativePreview(name);
+      writeCustomColorProperty(name);
+      selectShopifyColor(PLACEHOLDER_VALUE);
+    }
+
+    document.dispatchEvent(new CustomEvent('cpv3:colorSelected', {
+      detail: {
+        colorName: name,
+        isNative: isNativeColor(name)
+      }
+    }));
+
+    if (isOpen) window.setTimeout(closePanel, 120);
+  }
+
+  // If another control changes the native Color option, keep this UI/property state synchronized.
+  // The custom block itself is the normal entry point, but this also covers theme-editor / linked-option changes.
+  document.addEventListener('change', function(event) {
+    var target = event.target;
+    if (!(target instanceof HTMLInputElement)) return;
+    var picker = target.closest('variant-picker');
+    if (!picker || String(picker.dataset.productId || '') !== String(PRODUCT_ID)) return;
+
+    var optionName = (target.dataset.optionName || '').trim().toLowerCase();
+    if (optionName !== 'color' && optionName !== 'colour' && optionName !== '颜色') return;
+
+    if (target.value !== PLACEHOLDER_VALUE && isNativeColor(target.value)) {
+      writeCustomColorProperty(null);
+      restoreNativeSwatchVisuals();
+      setActiveByName(target.value);
+    }
+  });
+
+  function createSwatch(c) {
+    c = preferNative(c);
+
+    var sw = document.createElement('button');
+    sw.type = 'button';
+    sw.className = 'cpv3-swatch-' + ID;
+    sw.setAttribute('data-name', c.name);
+    sw.setAttribute('data-native', c.native ? 'true' : 'false');
+    sw.setAttribute('aria-label', c.name);
+
+    // Visual priority for native product variants:
+    // 1) variant featured image, 2) Shopify swatch image, 3) Shopify swatch color,
+    // 4) JiMiss palette match. Never fall back to an unexplained gray swatch.
+    var paletteColor = (window.JIMISS_CUSTOM_COLOR_PALETTE || {})[(c.name || '').trim().toLowerCase()];
+    if (c.variantImage) {
+      sw.style.backgroundColor = '';
+      sw.style.backgroundImage = "url('" + c.variantImage + "')";
+      sw.style.backgroundSize = 'cover';
+      sw.style.backgroundPosition = 'center';
+    } else if (c.image) {
+      sw.style.backgroundColor = '';
+      sw.style.backgroundImage = "url('" + c.image + "')";
+      sw.style.backgroundSize = 'cover';
+      sw.style.backgroundPosition = 'center';
+    } else if (c.hex) {
+      sw.style.backgroundColor = c.hex;
+      sw.style.backgroundImage = 'none';
+    } else if (paletteColor && paletteColor.hex) {
+      sw.style.backgroundColor = paletteColor.hex;
+      sw.style.backgroundImage = 'none';
+    } else {
+      sw.style.backgroundColor = '#f2f0ec';
+      sw.style.backgroundImage = 'none';
+    }
+
+    if (c.name === selectedName) sw.classList.add('active');
+
+    sw.addEventListener('click', function() {
+      selectColor(c.name);
+    });
+
+    sw.addEventListener('keydown', function(e) {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        selectColor(c.name);
+      }
+    });
+
+    return sw;
+  }
+
+  // ── 快速行：所有原生 variant 色必须排在最前 ──
+  if (nativeRowEl) {
+    nativeColors.forEach(function(c) {
+      var nativeSwatch = createSwatch(c);
+      nativeRowEl.appendChild(nativeSwatch);
+      rememberNativeSwatchVisual(nativeSwatch);
+    });
+  }
+
+
+  function openPanel() {
+    if (!panel || !overlay) return;
+    isOpen = true;
+    overlay.classList.add('open');
+    panel.classList.add('open');
+    panel.setAttribute('aria-hidden', 'false');
+    toggleBtn?.setAttribute('aria-expanded', 'true');
+    document.body.style.overflow = 'hidden';
+    if (gridEl && gridEl.children.length === 0) {
+      renderTabs();
+      renderSwatches();
+    }
+    window.setTimeout(function() { closeBtn?.focus(); }, 0);
+  }
+
+  function closePanel() {
+    if (!panel || !overlay) return;
+    isOpen = false;
+    overlay.classList.remove('open');
+    panel.classList.remove('open');
+    panel.setAttribute('aria-hidden', 'true');
+    toggleBtn?.setAttribute('aria-expanded', 'false');
+    document.body.style.overflow = '';
+  }
+
+  if (toggleBtn) toggleBtn.addEventListener('click', openPanel);
+  if (overlay) overlay.addEventListener('click', closePanel);
+  if (closeBtn) closeBtn.addEventListener('click', closePanel);
+  document.addEventListener('keydown', function(event) {
+    if (event.key === 'Escape' && isOpen) closePanel();
+  });
+
+  function renderTabs() {
+    if (!tabsEl) return;
+    tabsEl.innerHTML = '';
+
+    var tabList = ['All'];
+    if (popularCustomColors.length > 0) tabList.push('Popular');
+    tabList = tabList.concat(activeGroups.map(function(g) { return g.name; }));
+
+    tabList.forEach(function(g) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'cpv3-tab-' + ID + (g === activeGroup ? ' active' : '');
+      btn.textContent = g;
+
+      btn.addEventListener('click', function() {
+        animateMobilePanelHeight(function() {
+          activeGroup = g;
+
+          if (g === 'All') {
+            currentList = allColors;
+          } else if (g === 'Popular') {
+            currentList = popularCustomColors;
+          } else {
+            var group = activeGroups.find(function(ag) { return ag.name === g; });
+            currentList = (group ? group.colors : []).filter(function(c) { return !isNativeColor(c.name); });
+          }
+
+          renderTabs();
+          renderSwatches();
+        });
+
+        if (gridEl && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+          requestAnimationFrame(function() {
+            gridEl.animate(
+              [
+                { opacity: 0, transform: 'translateY(4px)' },
+                { opacity: 1, transform: 'translateY(0)' }
+              ],
+              { duration: 230, easing: 'cubic-bezier(.22,.72,.24,1)', fill: 'both' }
+            );
+          });
+        }
+      });
+
+      tabsEl.appendChild(btn);
+    });
+  }
+
+  function renderSwatches() {
+    if (!gridEl) return;
+    gridEl.innerHTML = '';
+    currentList.forEach(function(c) {
+      gridEl.appendChild(createSwatch(c));
+    });
+  }
+
+  // ── 初始化 ──
+  if (selectedName) setActiveByName(selectedName);
+})();
+</script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Color Swatch Picker",
+  "tag": null,
+  "settings": [
+    { "type": "header", "content": "基础设置" },
+    { "type": "text", "id": "label", "label": "Properties 标签(订单中显示)", "default": "Custom Color" },
+
+    { "type": "header", "content": "🔥 Popular 热门色(首屏显示)" },
+    { "type": "paragraph", "content": "首屏会先显示产品全部原生变体色，再显示这里配置的 Popular 颜色。若 Popular 与原生变体同名则不重复显示。当前标准色库共 54 个真实颜色；Custom Color 为技术占位，不计入数量。All N Colors 的 N 仅统计自定义色库，不包含原生变体色。" },
+    { "type": "textarea", "id": "colors_popular", "label": "颜色列表(每行:颜色名#十六进制)", "info": "示例:Sage Green#8a9a5b", "default": "Black#000000\nNavy Blue#182a55\nDusty Rose#d3b6b6\nSage Green#8a9a5b\nSky Blue#cee7f5\nBurgundy#751e15\nEmerald#134c36\nChampagne#f1e9d2" },
+
+    { "type": "header", "content": "Pinks & Reds 粉红红色" },
+    { "type": "textarea", "id": "colors_pinks", "label": "颜色列表(每行:颜色名#十六进制)", "info": "示例:Blushing Pink#fde9e9", "default": "Blushing Pink#fde9e9\nPetal#ffd6db\nPink#FFC0CB\nDusty Rose#d3b6b6\nCoral#ff777f\nRose Gold#B76E79\nRed#F61F1F\nCabernet#722f37\nBurgundy#751e15" },
+
+    { "type": "header", "content": "Orange 橙色系" },
+    { "type": "textarea", "id": "colors_orange", "label": "颜色列表(每行:颜色名#十六进制)", "info": "示例:Orange#FF8A00", "default": "Orange#FF8A00\nCinnamon#c35d32\nTerracotta#874329\nRust#90322a" },
+
+    { "type": "header", "content": "Yellow 黄色系" },
+    { "type": "textarea", "id": "colors_yellow", "label": "颜色列表(每行:颜色名#十六进制)", "info": "示例:Lemon#fff27b", "default": "Lemon#fff27b\nDaffodil#ffe9a1\nButter#fcddae\nYellow#FFE500\nMarigold#D49A06" },
+
+    { "type": "header", "content": "Blues 蓝色系" },
+    { "type": "textarea", "id": "colors_blues", "label": "颜色列表(每行:颜色名#十六进制)", "info": "示例:Navy Blue#182a55", "default": "Sky Blue#cee7f5\nMist#d6e0ef\nPeacock Blue#33a1c9\nDusty Blue#8397a6\nSteel Blue#4682b4\nSlate Blue#6a5acd\nBlue#005BD3\nStormy#4f5d75\nRoyal Blue#0f47a9\nTeal#014a5f" },
+
+    { "type": "header", "content": "Greens 绿色系" },
+    { "type": "textarea", "id": "colors_greens", "label": "颜色列表(每行:颜色名#十六进制)", "info": "示例:Sage Green#8a9a5b", "default": "Mint Green#a1d2b4\nDusty Sage#a3bf9f\nSage Green#8a9a5b\nGreen#05AA3D\nOlive Green#556b2f\nPeacock#174d4b\nEmerald#134c36\nForest Green#12392e" },
+
+    { "type": "header", "content": "Neutrals 中性色" },
+    { "type": "textarea", "id": "colors_neutrals", "label": "颜色列表(每行:颜色名#十六进制)", "info": "示例:Ivory#f6f5f0", "default": "White#fafafa\nIvory#f6f5f0\nChampagne#f1e9d2\nSand#eae3d6\nGold#efcc93\nSilver#c0c0c0\nGrey#adaca9" },
+
+    { "type": "header", "content": "Purples 紫色系" },
+    { "type": "textarea", "id": "colors_purples", "label": "颜色列表(每行:颜色名#十六进制)", "info": "示例:Lavender#b59eb0", "default": "Lilac#e5d6df\nWisteria#c9a0dc\nLavender#b59eb0\nMauve#9289bc\nMulberry#772c54\nPlum#3d0f42" },
+
+    { "type": "header", "content": "Darks 深色系" },
+    { "type": "textarea", "id": "colors_darks", "label": "颜色列表(每行:颜色名#十六进制)", "info": "示例:Black#000000", "default": "Espresso#52443b\nMocha#3e2a20\nNavy Blue#182a55\nDark Navy#000046\nBlack#000000" }
+  ],
+  "presets": [{ "name": "Color Swatch Picker" }]
+}
+{% endschema %}

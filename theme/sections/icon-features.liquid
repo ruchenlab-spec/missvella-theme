@@ -1,0 +1,373 @@
+{%- liquid
+  assign s = section.settings
+  assign desktop_cols = s.cols
+  assign icon_pos = s.icon_pos
+  assign text_align = s.txt_align
+  assign mobile_layout = s.mob_layout
+-%}
+
+{% style %}
+  #icon-features-{{ section.id }} {
+    --if-section-bg: {{ s.bg_color }};
+    --if-card-bg: {{ s.card_bg }};
+    --if-card-border: {{ s.card_border }};
+    --if-icon-bg: {{ s.icon_bg }};
+    --if-title: {{ s.title_color }};
+    --if-desc: {{ s.desc_color }};
+    --if-radius: {{ s.card_radius }}px;
+    --if-icon-radius: {{ s.icon_radius }}px;
+    --if-icon-size: {{ s.icon_size }}px;
+    --if-icon-box-size: {{ s.icon_box_size }}px;
+    position: relative;
+    background: var(--if-section-bg);
+  }
+
+  #icon-features-{{ section.id }} .icon-features__shell {
+    width: 100%;
+    box-sizing: border-box;
+    padding-block: {{ s.padding_v }}px;
+    padding-inline: 24px;
+  }
+
+  #icon-features-{{ section.id }} .icon-features__inner {
+    width: 100%;
+    {% unless s.full_width %}
+      max-width: {{ s.max_width }}px;
+      margin-inline: auto;
+    {% endunless %}
+  }
+
+  #icon-features-{{ section.id }} .icon-features__grid {
+    display: grid;
+    grid-template-columns: repeat({{ desktop_cols }}, minmax(0, 1fr));
+    gap: {{ s.row_gap }}px {{ s.col_gap }}px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  #icon-features-{{ section.id }} .icon-features__item {
+    min-width: 0;
+  }
+
+  #icon-features-{{ section.id }} .icon-features__item-inner {
+    position: relative;
+    display: flex;
+    width: 100%;
+    min-height: 100%;
+    box-sizing: border-box;
+    padding: {{ s.card_padding_v }}px 16px;
+    gap: {{ s.icon_gap }}px;
+    background: var(--if-card-bg);
+    border: 1px solid var(--if-card-border);
+    border-radius: var(--if-radius);
+    color: inherit;
+    text-decoration: none;
+    transition: background-color .18s ease, border-color .18s ease, box-shadow .18s ease;
+    {% if icon_pos == 'top' %}
+      flex-direction: column;
+      align-items: {% if text_align == 'center' %}center{% elsif text_align == 'right' %}flex-end{% else %}flex-start{% endif %};
+      text-align: {{ text_align }};
+    {% elsif icon_pos == 'right' %}
+      flex-direction: row-reverse;
+      align-items: center;
+      text-align: {{ text_align }};
+    {% else %}
+      flex-direction: row;
+      align-items: center;
+      text-align: {{ text_align }};
+    {% endif %}
+  }
+
+  {% if s.hover_effect %}
+    @media (hover: hover) {
+      #icon-features-{{ section.id }} a.icon-features__item-inner:hover {
+        background: #e4e0d9;
+        border-color: #c9c5be;
+        box-shadow: 0 8px 24px rgb(0 0 0 / 0.055);
+      }
+    }
+  {% endif %}
+
+  #icon-features-{{ section.id }} .icon-features__icon-box {
+    flex: 0 0 var(--if-icon-box-size);
+    width: var(--if-icon-box-size);
+    height: var(--if-icon-box-size);
+    display: grid;
+    place-items: center;
+    box-sizing: border-box;
+    background: var(--if-icon-bg);
+    border: 1px solid var(--if-card-border);
+    border-radius: var(--if-icon-radius);
+    overflow: hidden;
+  }
+
+  #icon-features-{{ section.id }} .icon-features__icon {
+    width: var(--if-icon-size);
+    height: var(--if-icon-size);
+    display: grid;
+    place-items: center;
+    color: {{ s.icon_color }};
+  }
+
+  #icon-features-{{ section.id }} .icon-features__icon > svg,
+  #icon-features-{{ section.id }} .icon-features__icon .custom-svg,
+  #icon-features-{{ section.id }} .icon-features__icon img {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+
+  #icon-features-{{ section.id }} .icon-features__icon > svg,
+  #icon-features-{{ section.id }} .icon-features__icon .custom-svg svg {
+    width: 100%;
+    height: 100%;
+    color: inherit;
+  }
+
+  #icon-features-{{ section.id }} .icon-features__icon .custom-svg :is(path, circle, rect, line, polyline, polygon, ellipse) {
+    vector-effect: non-scaling-stroke;
+  }
+
+  #icon-features-{{ section.id }} .icon-features__icon img {
+    object-fit: contain;
+  }
+
+  #icon-features-{{ section.id }} .icon-features__text {
+    min-width: 0;
+    flex: 1;
+  }
+
+  #icon-features-{{ section.id }} .icon-features__title {
+    margin: 0;
+    color: var(--if-title);
+    font-family: var(--font-body--family, inherit);
+    font-size: {{ s.title_size }}px;
+    line-height: 1.25;
+    font-weight: {{ s.title_weight }};
+    letter-spacing: .01em;
+  }
+
+  #icon-features-{{ section.id }} .icon-features__desc {
+    margin: {{ s.title_desc_gap }}px 0 0;
+    color: var(--if-desc);
+    font-family: var(--font-body--family, inherit);
+    font-size: {{ s.desc_size }}px;
+    line-height: 1.45;
+    font-weight: 400;
+  }
+
+  @media screen and (max-width: 749px) {
+    #icon-features-{{ section.id }} .icon-features__shell {
+      padding-block: {{ s.mob_padding_v }}px;
+      padding-inline: 16px;
+    }
+
+    {% if mobile_layout == 'grid-1' %}
+      #icon-features-{{ section.id }} .icon-features__grid {
+        grid-template-columns: 1fr;
+        gap: 10px;
+      }
+    {% elsif mobile_layout == 'grid-2' %}
+      #icon-features-{{ section.id }} .icon-features__grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+    {% else %}
+      #icon-features-{{ section.id }} .icon-features__grid {
+        display: flex;
+        gap: 10px;
+        overflow-x: auto;
+        scroll-snap-type: x proximity;
+        scrollbar-width: none;
+        padding-bottom: 2px;
+      }
+      #icon-features-{{ section.id }} .icon-features__grid::-webkit-scrollbar { display: none; }
+      #icon-features-{{ section.id }} .icon-features__item {
+        flex: 0 0 min(260px, 82vw);
+        scroll-snap-align: start;
+      }
+    {% endif %}
+
+    #icon-features-{{ section.id }} .icon-features__item-inner {
+      padding: {{ s.card_padding_v }}px 14px;
+      gap: {{ s.icon_gap }}px;
+      {% if s.mob_icon_pos == 'top' %}
+        flex-direction: column;
+        align-items: {% if s.mob_txt_align == 'center' %}center{% elsif s.mob_txt_align == 'right' %}flex-end{% else %}flex-start{% endif %};
+        text-align: {{ s.mob_txt_align }};
+      {% elsif s.mob_icon_pos == 'right' %}
+        flex-direction: row-reverse;
+        align-items: center;
+        text-align: {{ s.mob_txt_align }};
+      {% else %}
+        flex-direction: row;
+        align-items: center;
+        text-align: {{ s.mob_txt_align }};
+      {% endif %}
+    }
+  }
+{% endstyle %}
+
+<section id="icon-features-{{ section.id }}" class="icon-features">
+  <div class="icon-features__shell">
+    <div class="icon-features__inner">
+      <ul class="icon-features__grid" role="list">
+        {%- for block in section.blocks -%}
+          <li class="icon-features__item" {{ block.shopify_attributes }}>
+            {%- if block.settings.link != blank -%}
+              <a class="icon-features__item-inner" href="{{ block.settings.link }}">
+            {%- else -%}
+              <div class="icon-features__item-inner">
+            {%- endif -%}
+
+              {%- if block.settings.icon_svg != blank or block.settings.icon_image != blank -%}
+                <div class="icon-features__icon-box" aria-hidden="true">
+                  <div class="icon-features__icon">
+                    {%- if block.settings.icon_svg != blank -%}
+                      <span class="custom-svg">{{ block.settings.icon_svg }}</span>
+                    {%- elsif block.settings.icon_image != blank -%}
+                      {{
+                        block.settings.icon_image
+                        | image_url: width: 240
+                        | image_tag:
+                          loading: 'lazy',
+                          widths: '48, 72, 96, 144, 192, 240',
+                          sizes: '96px',
+                          alt: ''
+                      }}
+                    {%- endif -%}
+                  </div>
+                </div>
+              {%- endif -%}
+
+              <div class="icon-features__text">
+                {%- if block.settings.title != blank -%}
+                  <p class="icon-features__title">{{ block.settings.title | escape }}</p>
+                {%- endif -%}
+                {%- if block.settings.desc != blank -%}
+                  <p class="icon-features__desc">{{ block.settings.desc | escape | newline_to_br }}</p>
+                {%- endif -%}
+              </div>
+
+            {%- if block.settings.link != blank -%}
+              </a>
+            {%- else -%}
+              </div>
+            {%- endif -%}
+          </li>
+        {%- endfor -%}
+      </ul>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "Icon Features",
+  "tag": "section",
+  "class": "icon-features-section",
+  "max_blocks": 12,
+  "settings": [
+    { "type": "header", "content": "Layout" },
+    { "type": "checkbox", "id": "full_width", "label": "Full width", "default": false },
+    { "type": "range", "id": "max_width", "label": "Max width", "min": 600, "max": 1800, "step": 40, "unit": "px", "default": 1200 },
+    { "type": "range", "id": "cols", "label": "Desktop columns", "min": 1, "max": 6, "step": 1, "default": 4 },
+    {
+      "type": "select", "id": "icon_pos", "label": "Desktop icon position",
+      "options": [
+        { "value": "top", "label": "Top" },
+        { "value": "left", "label": "Left" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "select", "id": "txt_align", "label": "Desktop text alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left"
+    },
+    { "type": "range", "id": "col_gap", "label": "Column gap", "min": 0, "max": 48, "step": 2, "unit": "px", "default": 12 },
+    { "type": "range", "id": "row_gap", "label": "Row gap", "min": 0, "max": 48, "step": 2, "unit": "px", "default": 12 },
+
+    { "type": "header", "content": "Section spacing" },
+    { "type": "range", "id": "padding_v", "label": "Desktop vertical padding", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 24 },
+    { "type": "range", "id": "mob_padding_v", "label": "Mobile vertical padding", "min": 0, "max": 80, "step": 4, "unit": "px", "default": 16 },
+
+    { "type": "header", "content": "Background" },
+    { "type": "color", "id": "bg_color", "label": "Section background", "default": "#FFFFFF" },
+
+    { "type": "header", "content": "Feature cards" },
+    { "type": "color", "id": "card_bg", "label": "Card background", "default": "#EBE8E2" },
+    { "type": "color", "id": "card_border", "label": "Card border", "default": "#D9D7D2" },
+    { "type": "range", "id": "card_radius", "label": "Card radius", "min": 0, "max": 24, "step": 1, "unit": "px", "default": 10 },
+    { "type": "range", "id": "card_padding_v", "label": "Card vertical padding", "min": 8, "max": 40, "step": 2, "unit": "px", "default": 14 },
+    { "type": "checkbox", "id": "hover_effect", "label": "Enable linked-card hover effect", "default": true },
+
+    { "type": "header", "content": "Icons" },
+    { "type": "range", "id": "icon_box_size", "label": "Icon box size", "min": 28, "max": 88, "step": 2, "unit": "px", "default": 44 },
+    { "type": "range", "id": "icon_size", "label": "Icon size", "min": 16, "max": 64, "step": 2, "unit": "px", "default": 24 },
+    { "type": "color", "id": "icon_bg", "label": "Icon box background", "default": "#FFFFFF" },
+    { "type": "range", "id": "icon_radius", "label": "Icon box radius", "min": 0, "max": 24, "step": 1, "unit": "px", "default": 10 },
+    { "type": "color", "id": "icon_color", "label": "SVG icon color", "default": "#000000" },
+    { "type": "range", "id": "icon_gap", "label": "Icon/text gap", "min": 4, "max": 32, "step": 2, "unit": "px", "default": 12 },
+
+    { "type": "header", "content": "Text" },
+    { "type": "range", "id": "title_size", "label": "Title size", "min": 10, "max": 28, "step": 1, "unit": "px", "default": 14 },
+    { "type": "range", "id": "title_weight", "label": "Title weight", "min": 400, "max": 700, "step": 100, "default": 600 },
+    { "type": "color", "id": "title_color", "label": "Title color", "default": "#000000" },
+    { "type": "range", "id": "desc_size", "label": "Description size", "min": 10, "max": 22, "step": 1, "unit": "px", "default": 12 },
+    { "type": "color", "id": "desc_color", "label": "Description color", "default": "#6C6A67" },
+    { "type": "range", "id": "title_desc_gap", "label": "Title/description gap", "min": 0, "max": 20, "step": 1, "unit": "px", "default": 4 },
+
+    { "type": "header", "content": "Mobile" },
+    {
+      "type": "select", "id": "mob_layout", "label": "Mobile layout",
+      "options": [
+        { "value": "grid-1", "label": "1 column" },
+        { "value": "grid-2", "label": "2 columns" },
+        { "value": "scroll", "label": "Horizontal scroll" }
+      ],
+      "default": "grid-2"
+    },
+    {
+      "type": "select", "id": "mob_icon_pos", "label": "Mobile icon position",
+      "options": [
+        { "value": "top", "label": "Top" },
+        { "value": "left", "label": "Left" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "top"
+    },
+    {
+      "type": "select", "id": "mob_txt_align", "label": "Mobile text alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "feature",
+      "name": "Feature",
+      "settings": [
+        { "type": "image_picker", "id": "icon_image", "label": "Custom icon image" },
+        { "type": "textarea", "id": "icon_svg", "label": "Custom SVG code", "info": "Optional. If filled, SVG code is used instead of the image." },
+        { "type": "text", "id": "title", "label": "Title", "default": "Feature title" },
+        { "type": "textarea", "id": "desc", "label": "Description", "default": "Add a short feature description." },
+        { "type": "url", "id": "link", "label": "Optional link" }
+      ]
+    }
+  ],
+  "presets": [
+    { "name": "Icon Features" }
+  ]
+}
+{% endschema %}
