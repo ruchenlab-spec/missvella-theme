@@ -1,15 +1,12 @@
 {%- comment -%}
   Circular collection list carousel.
 
-  Header: native theme blocks (group / text / image / button ...) rendered above the
-  carousel through content_for 'blocks'. Adding a "group" block gives the full theme
-  header styling panel (direction, alignment, gap, background media, borders, radius).
-
-  Circles: section.settings.collection_list, one circle per collection.
-  Per-item overrides are supported through collection metafields:
-    - custom.circle_image  (file_reference -> image) overrides the collection cover
-    - custom.circle_video  (file_reference -> video) takes priority over images
-    - custom.circle_title  (single_line_text_field) overrides the collection title
+  Blocks (all section-scoped, so header text and circles can live side by side):
+  - heading: renders through the theme's native `text` snippet, so it keeps the full
+    native text settings (richtext, width / max width, typography preset, font, size,
+    line height, letter spacing, case, wrap, text color, background, padding).
+  - circle_collection: one circle per block - pick a collection and optionally override
+    with a custom image / video and a custom title, straight in the theme editor.
 
   Arrows: theme slideshow arrows in their own grid columns beside the circles
   (never overlapping), vertically centered on the circle row.
@@ -20,8 +17,12 @@
   assign columns = section.settings.columns | default: 5
   assign mobile_columns = section.settings.mobile_columns | default: '2'
 
-  assign section_collections = section.settings.collection_list
-  assign slide_count = section_collections.size
+  assign slide_count = 0
+  for block in section.blocks
+    if block.type == 'circle_collection'
+      assign slide_count = slide_count | plus: 1
+    endif
+  endfor
 
   if section.settings.background_color != blank
     render 'contrast-override', background_color: section.settings.background_color, section_id: section.id
@@ -47,28 +48,36 @@
     {% if section.settings.title_color != blank %}--circle-title-color: {{ section.settings.title_color }};{% endif %}
   "
 >
-  {%- comment -%} Header area: native theme blocks (group, text, image, button ...) {%- endcomment -%}
-  {%- content_for 'blocks' -%}
+  {%- comment -%} Header: heading blocks rendered with the native text snippet {%- endcomment -%}
+  {%- for block in section.blocks -%}
+    {%- if block.type == 'heading' -%}
+      <div class="circle-collections__header">
+        {%- render 'text', block: block -%}
+      </div>
+    {%- endif -%}
+  {%- endfor -%}
 
   {%- capture slides -%}
-    {%- if section_collections != blank -%}
-      {%- for collection in section_collections -%}
+    {%- assign circle_index = 0 -%}
+    {%- for block in section.blocks -%}
+      {%- if block.type == 'circle_collection' -%}
         {%- liquid
-          assign custom_image = collection.metafields.custom.circle_image.value
-          assign custom_video = collection.metafields.custom.circle_video.value
-          assign custom_title = collection.metafields.custom.circle_title.value
-
-          assign item_title = custom_title
-          if item_title == blank
-            assign item_title = collection.title
+          assign col = block.settings.collection
+          assign item_link = '#'
+          if col != blank
+            assign item_link = col.url
+          endif
+          assign item_title = block.settings.custom_title
+          if item_title == blank and col != blank
+            assign item_title = col.title
           endif
         -%}
         {%- capture circle_content -%}
-          <a class="circle-collections__item" href="{{ collection.url }}">
+          <a class="circle-collections__item" href="{{ item_link }}">
             <div class="circle-collections__media">
-              {%- if custom_video != blank -%}
+              {%- if block.settings.custom_video != blank -%}
                 {{
-                  custom_video
+                  block.settings.custom_video
                   | video_tag:
                     image_size: '600x',
                     muted: true,
@@ -77,9 +86,9 @@
                     controls: false,
                     class: 'circle-collections__image circle-collections__video'
                 }}
-              {%- elsif custom_image != blank -%}
+              {%- elsif block.settings.custom_image != blank -%}
                 {{
-                  custom_image
+                  block.settings.custom_image
                   | image_url: width: 600
                   | image_tag:
                     loading: 'lazy',
@@ -87,9 +96,9 @@
                     widths: '150, 300, 450, 600',
                     class: 'circle-collections__image'
                 }}
-              {%- elsif collection.featured_image -%}
+              {%- elsif col != blank and col.featured_image -%}
                 {{
-                  collection.featured_image
+                  col.featured_image
                   | image_url: width: 600
                   | image_tag:
                     loading: 'lazy',
@@ -107,12 +116,15 @@
           </a>
         {%- endcapture -%}
         {%- render 'slideshow-slide',
-          index: forloop.index0,
+          index: circle_index,
           class: 'circle-collections__slide',
-          children: circle_content
+          children: circle_content,
+          attributes: block.shopify_attributes
         -%}
-      {%- endfor -%}
-    {%- else -%}
+        {%- assign circle_index = circle_index | plus: 1 -%}
+      {%- endif -%}
+    {%- endfor -%}
+    {%- if slide_count == 0 -%}
       {%- for i in (1..columns) -%}
         {%- capture placeholder_index -%}{% cycle '1', '2', '3', '4', '5', '6' %}{%- endcapture -%}
         {%- capture slide_content -%}
@@ -167,6 +179,10 @@
   .circle-collections {
     container-type: inline-size;
     container-name: circle-collections;
+  }
+
+  .circle-collections__header {
+    margin-block-end: 20px;
   }
 
   /*
@@ -289,24 +305,386 @@
 {
   "name": "圆形集合轮播",
   "class": "circle-collections-section",
-  "blocks": [
-    {
-      "type": "@theme"
-    },
-    {
-      "type": "@app"
-    }
-  ],
+  "max_blocks": 24,
   "disabled_on": {
     "groups": ["header", "footer"]
   },
-  "settings": [
+  "blocks": [
     {
-      "type": "collection_list",
-      "id": "collection_list",
-      "label": "集合列表",
-      "info": "每个集合显示为一个圆形；可在集合的自定义数据中设置 circle_image / circle_video / circle_title 覆盖"
+      "type": "heading",
+      "name": "标题",
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "t:settings.text"
+        },
+        {
+          "type": "header",
+          "content": "t:content.layout"
+        },
+        {
+          "type": "select",
+          "id": "width",
+          "label": "t:settings.width",
+          "options": [
+            {
+              "value": "fit-content",
+              "label": "t:options.fit"
+            },
+            {
+              "value": "100%",
+              "label": "t:options.fill"
+            }
+          ],
+          "default": "fit-content"
+        },
+        {
+          "type": "select",
+          "id": "max_width",
+          "label": "t:settings.max_width",
+          "options": [
+            {
+              "value": "narrow",
+              "label": "t:options.narrow"
+            },
+            {
+              "value": "normal",
+              "label": "t:options.normal"
+            },
+            {
+              "value": "none",
+              "label": "t:options.none"
+            }
+          ],
+          "default": "normal"
+        },
+        {
+          "type": "text_alignment",
+          "id": "alignment",
+          "label": "t:settings.alignment",
+          "default": "center",
+          "visible_if": "{{ block.settings.width == '100%' }}"
+        },
+        {
+          "type": "header",
+          "content": "t:content.typography"
+        },
+        {
+          "type": "select",
+          "id": "type_preset",
+          "label": "t:settings.preset",
+          "options": [
+            {
+              "value": "rte",
+              "label": "t:options.default"
+            },
+            {
+              "value": "paragraph",
+              "label": "t:options.paragraph"
+            },
+            {
+              "value": "h1",
+              "label": "t:options.h1"
+            },
+            {
+              "value": "h2",
+              "label": "t:options.h2"
+            },
+            {
+              "value": "h3",
+              "label": "t:options.h3"
+            },
+            {
+              "value": "h4",
+              "label": "t:options.h4"
+            },
+            {
+              "value": "h5",
+              "label": "t:options.h5"
+            },
+            {
+              "value": "h6",
+              "label": "t:options.h6"
+            },
+            {
+              "value": "custom",
+              "label": "t:options.custom"
+            }
+          ],
+          "default": "rte",
+          "info": "t:info.edit_presets_in_theme_settings"
+        },
+        {
+          "type": "select",
+          "id": "font",
+          "label": "t:settings.font",
+          "options": [
+            {
+              "value": "var(--font-body--family)",
+              "label": "t:options.body"
+            },
+            {
+              "value": "var(--font-subheading--family)",
+              "label": "t:options.subheading"
+            },
+            {
+              "value": "var(--font-heading--family)",
+              "label": "t:options.heading"
+            },
+            {
+              "value": "var(--font-accent--family)",
+              "label": "t:options.accent"
+            }
+          ],
+          "default": "var(--font-heading--family)",
+          "visible_if": "{{ block.settings.type_preset == 'custom' }}"
+        },
+        {
+          "type": "select",
+          "id": "font_size",
+          "label": "t:settings.size",
+          "options": [
+            {
+              "value": "",
+              "label": "t:options.default"
+            },
+            {
+              "value": "0.625rem",
+              "label": "10px"
+            },
+            {
+              "value": "0.75rem",
+              "label": "12px"
+            },
+            {
+              "value": "0.875rem",
+              "label": "14px"
+            },
+            {
+              "value": "1rem",
+              "label": "16px"
+            },
+            {
+              "value": "1.125rem",
+              "label": "18px"
+            },
+            {
+              "value": "1.25rem",
+              "label": "20px"
+            },
+            {
+              "value": "1.5rem",
+              "label": "24px"
+            },
+            {
+              "value": "2rem",
+              "label": "32px"
+            },
+            {
+              "value": "2.5rem",
+              "label": "40px"
+            },
+            {
+              "value": "3rem",
+              "label": "48px"
+            }
+          ],
+          "default": "1rem",
+          "visible_if": "{{ block.settings.type_preset == 'custom' }}"
+        },
+        {
+          "type": "select",
+          "id": "line_height",
+          "label": "t:settings.line_height",
+          "options": [
+            {
+              "value": "tight",
+              "label": "t:options.tight"
+            },
+            {
+              "value": "normal",
+              "label": "t:options.normal"
+            },
+            {
+              "value": "loose",
+              "label": "t:options.loose"
+            }
+          ],
+          "default": "normal",
+          "visible_if": "{{ block.settings.type_preset == 'custom' }}"
+        },
+        {
+          "type": "select",
+          "id": "letter_spacing",
+          "label": "t:settings.letter_spacing",
+          "options": [
+            {
+              "value": "tight",
+              "label": "t:options.tight"
+            },
+            {
+              "value": "normal",
+              "label": "t:options.normal"
+            },
+            {
+              "value": "loose",
+              "label": "t:options.loose"
+            }
+          ],
+          "default": "normal",
+          "visible_if": "{{ block.settings.type_preset == 'custom' }}"
+        },
+        {
+          "type": "select",
+          "id": "case",
+          "label": "t:settings.case",
+          "options": [
+            {
+              "value": "none",
+              "label": "t:options.default"
+            },
+            {
+              "value": "uppercase",
+              "label": "t:options.uppercase"
+            }
+          ],
+          "default": "none",
+          "visible_if": "{{ block.settings.type_preset == 'custom' }}"
+        },
+        {
+          "type": "select",
+          "id": "wrap",
+          "label": "t:settings.wrap",
+          "options": [
+            {
+              "value": "pretty",
+              "label": "t:options.pretty"
+            },
+            {
+              "value": "balance",
+              "label": "t:options.balance"
+            },
+            {
+              "value": "nowrap",
+              "label": "t:options.none"
+            }
+          ],
+          "default": "pretty",
+          "visible_if": "{{ block.settings.type_preset == 'custom' }}"
+        },
+        {
+          "type": "header",
+          "content": "t:content.appearance"
+        },
+        {
+          "type": "color",
+          "id": "text_color",
+          "label": "t:settings.text_color",
+          "placeholder": "t:settings.default"
+        },
+        {
+          "type": "checkbox",
+          "id": "background",
+          "label": "t:settings.background",
+          "default": false
+        },
+        {
+          "type": "color",
+          "id": "background_color",
+          "label": "t:settings.background_color",
+          "alpha": true,
+          "default": "#00000026",
+          "visible_if": "{{ block.settings.background }}"
+        },
+        {
+          "type": "range",
+          "id": "corner_radius",
+          "label": "t:settings.corner_radius",
+          "default": 0,
+          "min": 0,
+          "max": 50,
+          "step": 1,
+          "visible_if": "{{ block.settings.background }}"
+        },
+        {
+          "type": "header",
+          "content": "t:content.padding"
+        },
+        {
+          "type": "range",
+          "id": "padding-block-start",
+          "label": "t:settings.top",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "px",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "padding-block-end",
+          "label": "t:settings.bottom",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "px",
+          "default": 8
+        },
+        {
+          "type": "range",
+          "id": "padding-inline-start",
+          "label": "t:settings.left",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "px",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "padding-inline-end",
+          "label": "t:settings.right",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "px",
+          "default": 0
+        }
+      ]
     },
+    {
+      "type": "circle_collection",
+      "name": "圆形集合",
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "集合",
+          "info": "决定链接与默认标题，未上传自定义图时使用集合封面"
+        },
+        {
+          "type": "image_picker",
+          "id": "custom_image",
+          "label": "自定义图片",
+          "info": "覆盖集合封面，建议正方形图片"
+        },
+        {
+          "type": "video",
+          "id": "custom_video",
+          "label": "自定义视频",
+          "info": "设置后优先于图片展示（自动静音循环播放）"
+        },
+        {
+          "type": "text",
+          "id": "custom_title",
+          "label": "自定义标题",
+          "info": "覆盖集合名称"
+        }
+      ]
+    }
+  ],
+  "settings": [
     {
       "type": "header",
       "content": "布局"
@@ -496,68 +874,59 @@
       "name": "圆形集合轮播",
       "category": "t:categories.collections",
       "blocks": {
-        "group_header": {
-          "type": "group",
-          "name": "t:names.header",
+        "heading_title": {
+          "type": "heading",
           "settings": {
-            "content_direction": "column",
-            "vertical_on_mobile": true,
-            "horizontal_alignment": "flex-start",
-            "vertical_alignment": "center",
-            "horizontal_alignment_flex_direction_column": "center",
-            "vertical_alignment_flex_direction_column": "center",
-            "gap": 12,
-            "width": "fill",
-            "custom_width": 100,
-            "width_mobile": "fill",
-            "custom_width_mobile": 100,
-            "height": "fit",
-            "custom_height": 100,
-            "background_media": "none",
-            "video_position": "cover",
-            "background_image_position": "cover",
-            "border": "none",
-            "border_width": 1,
-            "border_opacity": 100,
-            "border_radius": 0,
+            "text": "<h2>Shop by Color</h2>",
+            "width": "fit-content",
+            "max_width": "normal",
+            "alignment": "center",
+            "type_preset": "rte",
+            "font": "var(--font-heading--family)",
+            "font_size": "",
+            "line_height": "normal",
+            "letter_spacing": "normal",
+            "case": "none",
+            "wrap": "pretty",
+            "background": false,
+            "background_color": "#00000026",
+            "corner_radius": 0,
             "padding-block-start": 0,
             "padding-block-end": 16,
             "padding-inline-start": 0,
             "padding-inline-end": 0
-          },
-          "blocks": {
-            "text_title": {
-              "type": "text",
-              "name": "t:names.text",
-              "settings": {
-                "text": "<h2>Shop by Color</h2>",
-                "width": "fit-content",
-                "max_width": "normal",
-                "alignment": "center",
-                "type_preset": "rte",
-                "font": "var(--font-heading--family)",
-                "font_size": "",
-                "line_height": "normal",
-                "letter_spacing": "normal",
-                "case": "none",
-                "wrap": "pretty",
-                "background": false,
-                "background_color": "#00000026",
-                "corner_radius": 0,
-                "padding-block-start": 0,
-                "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
-              },
-              "blocks": {}
-            }
-          },
-          "block_order": ["text_title"]
+          }
+        },
+        "circle_collection_1": {
+          "type": "circle_collection",
+          "settings": {}
+        },
+        "circle_collection_2": {
+          "type": "circle_collection",
+          "settings": {}
+        },
+        "circle_collection_3": {
+          "type": "circle_collection",
+          "settings": {}
+        },
+        "circle_collection_4": {
+          "type": "circle_collection",
+          "settings": {}
+        },
+        "circle_collection_5": {
+          "type": "circle_collection",
+          "settings": {}
         }
       },
-      "block_order": ["group_header"],
+      "block_order": [
+        "heading_title",
+        "circle_collection_1",
+        "circle_collection_2",
+        "circle_collection_3",
+        "circle_collection_4",
+        "circle_collection_5"
+      ],
       "settings": {
-        "collection_list": [],
         "columns": 5,
         "mobile_columns": "2",
         "circle_gap": 16,
