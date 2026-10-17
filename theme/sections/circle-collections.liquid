@@ -1,29 +1,46 @@
 {%- comment -%}
-  Circular collection list carousel. Rounds each collection image into a circle with the
-  collection title below, paged one screen at a time with the theme's slideshow arrows.
+  Circular collection list carousel.
+  - Each circle is a "circle_collection" block: pick a collection, optionally override
+    with a custom image / video and title.
+  - "heading" blocks render above the carousel.
+  - Paged one screen at a time with theme slideshow arrows, laid out in their own
+    grid columns beside the circles (never overlapping them), vertically centered
+    on the circle row.
 {%- endcomment -%}
 
 {% liquid
-  assign section_collections = section.settings.collection_list
-
   assign circle_gap = section.settings.circle_gap | default: 16
   assign columns = section.settings.columns | default: 5
   assign mobile_columns = section.settings.mobile_columns | default: '2'
 
-  assign slide_count = section_collections.size
-  if slide_count == 0
-    assign slide_count = columns
-  endif
-
-  assign show_arrows = false
-  if section.settings.icons_style != 'none'
-    assign show_arrows = true
-  endif
+  assign slide_count = 0
+  for block in section.blocks
+    if block.type == 'circle_collection'
+      assign slide_count = slide_count | plus: 1
+    endif
+  endfor
 
   if section.settings.background_color != blank
     render 'contrast-override', background_color: section.settings.background_color, section_id: section.id
   endif
 -%}
+
+{%- capture header_html -%}
+  {%- for block in section.blocks -%}
+    {%- if block.type == 'heading' -%}
+      <div
+        class="circle-collections__heading-wrapper"
+        style="
+          --circle-heading-size: {{ block.settings.heading_size | default: '1.5rem' }};
+          --circle-heading-align: {{ block.settings.alignment | default: 'center' }};
+        "
+        {{ block.shopify_attributes }}
+      >
+        <h2 class="circle-collections__heading">{{ block.settings.heading }}</h2>
+      </div>
+    {%- endif -%}
+  {%- endfor -%}
+{%- endcapture -%}
 
 <div
   class="
@@ -44,17 +61,50 @@
     {% if section.settings.title_color != blank %}--circle-title-color: {{ section.settings.title_color }};{% endif %}
   "
 >
-  {%- content_for 'blocks' -%}
+  {{ header_html }}
 
   {%- capture slides -%}
-    {%- if section_collections != blank -%}
-      {%- for collection in section_collections -%}
+    {%- assign circle_index = 0 -%}
+    {%- for block in section.blocks -%}
+      {%- if block.type == 'circle_collection' -%}
+        {%- liquid
+          assign col = block.settings.collection
+          assign item_link = '#'
+          if col != blank
+            assign item_link = col.url
+          endif
+          assign item_title = block.settings.custom_title
+          if item_title == blank and col != blank
+            assign item_title = col.title
+          endif
+        -%}
         {%- capture slide_content -%}
-          <a class="circle-collections__item" href="{{ collection.url }}">
+          <a class="circle-collections__item" href="{{ item_link }}">
             <div class="circle-collections__media">
-              {%- if collection.featured_image -%}
+              {%- if block.settings.custom_video != blank -%}
                 {{
-                  collection.featured_image
+                  block.settings.custom_video
+                  | video_tag:
+                    image_size: '600x',
+                    muted: true,
+                    loop: true,
+                    autoplay: true,
+                    controls: false,
+                    class: 'circle-collections__image circle-collections__video'
+                }}
+              {%- elsif block.settings.custom_image != blank -%}
+                {{
+                  block.settings.custom_image
+                  | image_url: width: 600
+                  | image_tag:
+                    loading: 'lazy',
+                    sizes: '(max-width: 749px) 44vw, 20vw',
+                    widths: '150, 300, 450, 600',
+                    class: 'circle-collections__image'
+                }}
+              {%- elsif col != blank and col.featured_image -%}
+                {{
+                  col.featured_image
                   | image_url: width: 600
                   | image_tag:
                     loading: 'lazy',
@@ -66,43 +116,48 @@
                 {{ 'collection-1' | placeholder_svg_tag: 'circle-collections__image placeholder-svg' }}
               {%- endif -%}
             </div>
-            <span class="circle-collections__title">{{ collection.title }}</span>
+            {%- if item_title != blank -%}
+              <span class="circle-collections__title">{{ item_title }}</span>
+            {%- endif -%}
           </a>
         {%- endcapture -%}
         {%- render 'slideshow-slide',
-          index: forloop.index0,
+          index: circle_index,
           class: 'circle-collections__slide',
-          children: slide_content
+          children: slide_content,
+          attributes: block.shopify_attributes
         -%}
-      {%- endfor -%}
-    {%- else -%}
-      {%- for i in (1..columns) -%}
-        {%- capture placeholder_index -%}{% cycle '1', '2', '3', '4', '5', '6' %}{%- endcapture -%}
-        {%- capture slide_content -%}
-          <div class="circle-collections__item">
-            <div class="circle-collections__media">
-              {{ 'collection-' | append: placeholder_index | placeholder_svg_tag: 'circle-collections__image placeholder-svg' }}
-            </div>
-            <span class="circle-collections__title">{{ 'placeholders.collection_title' | t }}</span>
-          </div>
-        {%- endcapture -%}
-        {%- render 'slideshow-slide',
-          index: forloop.index0,
-          class: 'circle-collections__slide',
-          children: slide_content
-        -%}
-      {%- endfor -%}
-    {%- endif -%}
+        {%- assign circle_index = circle_index | plus: 1 -%}
+      {%- endif -%}
+    {%- endfor -%}
   {%- endcapture -%}
+
+  {%- if section.settings.icons_style != 'none' -%}
+    {%- capture custom_arrows -%}
+      <div class="circle-collections__arrows circle-collections__arrows--prev">
+        {%- render 'slideshow-arrow',
+          action: 'previous',
+          icon_style: section.settings.icons_style,
+          icon_shape: section.settings.icons_shape
+        -%}
+      </div>
+      <div class="circle-collections__arrows circle-collections__arrows--next">
+        {%- render 'slideshow-arrow',
+          action: 'next',
+          icon_style: section.settings.icons_style,
+          icon_shape: section.settings.icons_shape
+        -%}
+      </div>
+    {%- endcapture -%}
+  {%- endif -%}
 
   {%- render 'slideshow',
     ref: 'circleCollections',
     class: 'circle-collections__carousel',
     slides: slides,
     slide_count: slide_count,
-    show_arrows: show_arrows,
-    icon_style: section.settings.icons_style,
-    icon_shape: section.settings.icons_shape,
+    show_arrows: false,
+    slideshow_arrows: custom_arrows,
     infinite: false,
     initial_slide: 0
   -%}
@@ -114,16 +169,75 @@
     container-name: circle-collections;
   }
 
+  /* Heading block */
+  .circle-collections__heading-wrapper {
+    text-align: var(--circle-heading-align, center);
+    margin-block-end: 20px;
+  }
+
+  .circle-collections__heading {
+    font-family: var(--font-heading--family, var(--font-body--family));
+    font-size: var(--circle-heading-size, 1.5rem);
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin: 0;
+    color: var(--color-foreground);
+  }
+
+  /*
+   * Grid layout: [prev arrow] [slides] [next arrow]
+   * Arrows own their own columns, so they never overlap the circles, and
+   * align-items: center centers them on the circle row (not the whole section).
+   */
   .circle-collections .circle-collections__carousel {
     position: relative;
     width: 100%;
   }
 
-  /* Room for hover scale so shadows/zoom are not clipped */
-  .circle-collections slideshow-slides {
+  .circle-collections .circle-collections__carousel slideshow-container {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    grid-template-rows: 1fr;
+    align-items: center;
+    column-gap: 8px;
+  }
+
+  .circle-collections__arrows {
+    display: flex;
+    align-items: center;
+    grid-row: 1;
+  }
+
+  .circle-collections__arrows--prev {
+    grid-column: 1;
+    justify-content: flex-start;
+  }
+
+  .circle-collections__arrows--next {
+    grid-column: 3;
+    grid-column-start: 3;
+    justify-content: flex-end;
+  }
+
+  .circle-collections .circle-collections__carousel slideshow-slides {
+    grid-column: 2;
+    grid-row: 1;
     gap: var(--circle-gap);
     margin-block: -12px;
     padding-block: 12px;
+  }
+
+  /* Arrows keep a consistent tap size even when hidden on small screens */
+  .circle-collections__arrows .slideshow-control {
+    opacity: 1;
+  }
+
+  @container circle-collections (max-width: 749px) {
+    .circle-collections__arrows .slideshow-control {
+      min-width: 36px;
+      padding-inline: 0;
+    }
   }
 
   .circle-collections__slide {
@@ -193,44 +307,95 @@
 {
   "name": "圆形集合轮播",
   "class": "circle-collections-section",
+  "max_blocks": 24,
   "disabled_on": {
     "groups": ["header", "footer"]
   },
   "blocks": [
     {
-      "type": "@theme"
+      "type": "heading",
+      "name": "标题",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "标题文字",
+          "default": "Shop by Color"
+        },
+        {
+          "type": "select",
+          "id": "heading_size",
+          "label": "字号",
+          "options": [
+            {
+              "value": "1.125rem",
+              "label": "小"
+            },
+            {
+              "value": "1.5rem",
+              "label": "中"
+            },
+            {
+              "value": "2rem",
+              "label": "大"
+            }
+          ],
+          "default": "1.5rem"
+        },
+        {
+          "type": "select",
+          "id": "alignment",
+          "label": "对齐",
+          "options": [
+            {
+              "value": "left",
+              "label": "左"
+            },
+            {
+              "value": "center",
+              "label": "中"
+            },
+            {
+              "value": "right",
+              "label": "右"
+            }
+          ],
+          "default": "center"
+        }
+      ]
     },
     {
-      "type": "@app"
-    },
-    {
-      "type": "text"
-    },
-    {
-      "type": "icon"
-    },
-    {
-      "type": "image"
-    },
-    {
-      "type": "button"
-    },
-    {
-      "type": "group"
-    },
-    {
-      "type": "spacer"
-    },
-    {
-      "type": "_divider"
+      "type": "circle_collection",
+      "name": "圆形集合",
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "集合",
+          "info": "决定链接与默认标题，未上传自定义图时使用集合封面"
+        },
+        {
+          "type": "image_picker",
+          "id": "custom_image",
+          "label": "自定义图片",
+          "info": "覆盖集合封面，建议正方形图片"
+        },
+        {
+          "type": "video",
+          "id": "custom_video",
+          "label": "自定义视频",
+          "info": "设置后优先于图片展示（自动静音循环播放）"
+        },
+        {
+          "type": "text",
+          "id": "custom_title",
+          "label": "自定义标题",
+          "info": "覆盖集合名称"
+        }
+      ]
     }
   ],
   "settings": [
-    {
-      "type": "collection_list",
-      "id": "collection_list",
-      "label": "集合列表"
-    },
     {
       "type": "header",
       "content": "布局"
@@ -419,6 +584,28 @@
     {
       "name": "圆形集合轮播",
       "category": "t:categories.collections",
+      "blocks": [
+        {
+          "type": "heading",
+          "settings": {
+            "heading": "Shop by Color",
+            "heading_size": "1.5rem",
+            "alignment": "center"
+          }
+        },
+        {
+          "type": "circle_collection"
+        },
+        {
+          "type": "circle_collection"
+        },
+        {
+          "type": "circle_collection"
+        },
+        {
+          "type": "circle_collection"
+        }
+      ],
       "settings": {
         "columns": 5,
         "mobile_columns": "2",
