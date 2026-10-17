@@ -2,6 +2,7 @@
 node_modules/
 .shopify/
 *.log
+*.tmp
 
 # 系统垃圾
 .DS_Store

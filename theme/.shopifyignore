@@ -1,7 +1,4 @@
 # 推送到 Shopify 时忽略的文件（不会上传到店铺）
-node_modules/*
-.git/*
-.gitignore
-.shopifyignore
+# 注意：本文件位于 theme/ 内，路径相对于 theme/ 根目录
 *.md
 LICENSE.md
