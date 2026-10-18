@@ -255,9 +255,14 @@
   }
 
   /*
-   * Arrows are plain grid items centered with align-items: center. The grid row
-   * is exactly as tall as the circles (titles are absolutely positioned, see
-   * below), so centering lands on the circle center with no offset math.
+   * The grid row contains circle + 12px gap + title, so the row center sits
+   * (gap + title height) / 2 below the circle center. `align-items: center`
+   * centers the arrow's MARGIN box, so a negative margin only shifts the border
+   * box by half of its value - it must be doubled to land exactly on the circle
+   * center:
+   *   margin = -(gap + title height) = -(12px + font-size * 1.2)
+   * The title is single line with line-height 1.2, so its height is exact.
+   * The row keeps its full height, so section padding stays standard.
    */
   .circle-collections__arrow {
     position: relative;
@@ -267,6 +272,7 @@
     justify-content: center;
     width: var(--circle-arrow-size);
     height: var(--circle-arrow-size);
+    margin-block-start: calc(-12px - var(--circle-title-size) * 1.2);
     padding: 0;
     border: 0;
     background: transparent;
@@ -343,18 +349,15 @@
   }
 
   /*
-   * Slide content stays in normal flow (title included) so nothing gets clipped.
-   * The bottom negative margin cancels the title block (12px gap + title height)
-   * plus the 12px hover padding, so the carousel row is exactly as tall as the
-   * circles and `align-items: center` lands the arrows on the circle center.
-   *   24px = 12px gap + 12px padding-bottom
-   *   1.2  = title line-height (set above, single line)
+   * Slides keep their natural height (circle + gap + title) so the section's
+   * padding-block-end measures from the real bottom of the content, exactly like
+   * every other section. The 12px padding/margin pair only guards hover overflow.
+   * Arrow alignment is handled separately on .circle-collections__arrow.
    */
   .circle-collections .circle-collections__carousel slideshow-slides {
     gap: var(--circle-gap);
     padding-block: 12px;
-    margin-top: -12px;
-    margin-bottom: calc(-24px - var(--circle-title-size) * 1.2);
+    margin-block: -12px;
     justify-content: safe center;
   }
 
