@@ -105,6 +105,9 @@
           </div>
           {%- if item_title != blank -%}
             <span class="square-collections__title">{{ item_title }}</span>
+          {%- else -%}
+            {%- comment -%} Placeholder keeps the text style visible while configuring {%- endcomment -%}
+            <span class="square-collections__title">{{ 'placeholders.collection_title' | t }}</span>
           {%- endif -%}
         {%- if item_link != blank -%}
           </a>
