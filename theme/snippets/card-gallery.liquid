@@ -50,12 +50,20 @@
 
   assign ratio = '1'
   case block_settings.image_ratio
+    when 'portrait_3_4'
+      assign ratio = '3 / 4'
+    when 'portrait_4_5'
+      assign ratio = '4 / 5'
+    when 'portrait_2_3'
+      assign ratio = '2 / 3'
+    when 'square'
+      assign ratio = '1'
+    # Legacy values: kept so product cards saved before the ratio options changed
+    # still render correctly.
     when 'landscape'
       assign ratio = '16 / 9'
     when 'portrait'
       assign ratio = '4 / 5'
-    when 'square'
-      assign ratio = '1'
     when 'adapt'
       assign ratio = product.featured_media.preview_image.aspect_ratio | default: '1'
   endcase
