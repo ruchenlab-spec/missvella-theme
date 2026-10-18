@@ -244,7 +244,7 @@
     display: grid;
     grid-template-columns: var(--circle-arrow-size) minmax(0, 1fr) var(--circle-arrow-size);
     align-items: center;
-    column-gap: 16px;
+    column-gap: 8px;
     width: 100%;
   }
 
@@ -255,6 +255,7 @@
   }
 
   .circle-collections__arrow {
+    position: relative;
     grid-row: 1;
     display: inline-flex;
     align-items: center;
@@ -267,6 +268,13 @@
     color: var(--color-foreground);
     cursor: pointer;
     transition: opacity 0.2s ease, transform 0.2s ease, background-color 0.2s ease;
+  }
+
+  /* Keep a 44px tap target even when the visible button is smaller */
+  .circle-collections__arrow::before {
+    content: '';
+    position: absolute;
+    inset: calc((var(--minimum-touch-target, 44px) - var(--circle-arrow-size)) / -2);
   }
 
   .circle-collections__arrow--prev {
@@ -292,8 +300,8 @@
 
   .circle-collections__arrow-icon {
     display: inline-flex;
-    width: calc(var(--circle-arrow-size) * 0.42);
-    height: calc(var(--circle-arrow-size) * 0.42);
+    width: calc(var(--circle-arrow-size) * 0.45);
+    height: calc(var(--circle-arrow-size) * 0.45);
   }
 
   .circle-collections__arrow-icon svg {
@@ -317,7 +325,7 @@
 
   @container circle-collections (max-width: 749px) {
     .circle-collections .circle-collections__carousel {
-      column-gap: 8px;
+      column-gap: 4px;
     }
   }
 
@@ -933,11 +941,11 @@
       "type": "range",
       "id": "arrow_size",
       "label": "箭头大小",
-      "min": 32,
-      "max": 72,
+      "min": 24,
+      "max": 56,
       "step": 2,
       "unit": "px",
-      "default": 48
+      "default": 36
     },
     {
       "type": "header",
