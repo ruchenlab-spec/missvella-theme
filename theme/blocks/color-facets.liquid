@@ -49,12 +49,20 @@
 
 {% if color_filter != null %}
   <div
-    class="color-facets{% if block.settings.text_color != blank %} color-facets--custom-text{% endif %}"
+    class="
+      color-facets
+      color-facets--active-{{ block.settings.active_style | default: 'ring' }}
+      {% if block.settings.hover_lift %}color-facets--lift{% endif %}
+      spacing-style
+    "
     style="
-      --color-facet-size: {{ block.settings.swatch_size | default: 40 }}px;
-      --color-facet-gap: {{ block.settings.gap | default: 12 }}px;
+      {% render 'spacing-style', settings: block.settings %}
+      --color-facet-size: {{ block.settings.swatch_size | default: 44 }}px;
+      --color-facet-gap: {{ block.settings.gap | default: 14 }}px;
       --color-facet-label-size: {{ block.settings.label_size | default: 11 }}px;
       --color-facet-align: {{ block.settings.alignment | default: 'center' }};
+      --color-facet-label-transform: {{ block.settings.label_case | default: 'uppercase' }};
+      --color-facet-ring-width: {{ block.settings.ring_width | default: 2 }}px;
       {% if block.settings.text_color != blank %}--color-facet-text: {{ block.settings.text_color }};{% endif %}
     "
     {{ block.shopify_attributes }}
@@ -72,11 +80,11 @@
         >
           <span class="color-facets__dot color-facets__dot--all" aria-hidden="true">
             <svg viewBox="0 0 40 40" aria-hidden="true">
-              <circle cx="20" cy="20" r="20" fill="#F3E6EA"></circle>
-              <path d="M20 0a20 20 0 0 1 0 40Z" fill="#DFA79A"></path>
-              <path d="M20 0a20 20 0 0 1 20 20 20 20 0 0 1-20 20Z" fill="#9E9E9E" opacity=".55"></path>
-              <path d="M0 20a20 20 0 0 1 20-20v20Z" fill="#C9B6DB"></path>
-              <path d="M0 20h20v20A20 20 0 0 1 0 20Z" fill="#3B5BA5" opacity=".65"></path>
+              <circle cx="20" cy="20" r="20" fill="#F5EFE8"></circle>
+              <path d="M20 0a20 20 0 0 1 0 40Z" fill="#E3B7A6" opacity=".85"></path>
+              <path d="M20 0a20 20 0 0 1 20 20 20 20 0 0 1-20 20Z" fill="#B9AECB" opacity=".85"></path>
+              <path d="M0 20a20 20 0 0 1 20-20v20Z" fill="#DCC9C0" opacity=".9"></path>
+              <path d="M0 20h20v20A20 20 0 0 1 0 20Z" fill="#9FB2D8" opacity=".85"></path>
             </svg>
           </span>
           {% if block.settings.show_label %}
@@ -157,7 +165,7 @@
     display: flex;
     flex-direction: column;
     align-items: var(--color-facet-align, center);
-    gap: 10px;
+    gap: 14px;
     width: 100%;
     color: var(--color-facet-text, var(--color-foreground));
   }
@@ -165,9 +173,9 @@
   .color-facets__title {
     font-family: var(--font-body--family);
     font-size: 12px;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
-    opacity: 0.7;
+    opacity: 0.55;
   }
 
   .color-facets__row {
@@ -175,7 +183,8 @@
     flex-wrap: wrap;
     align-items: flex-start;
     justify-content: var(--color-facet-align, center);
-    gap: var(--color-facet-gap, 12px);
+    column-gap: var(--color-facet-gap, 14px);
+    row-gap: calc(var(--color-facet-gap, 14px) + 4px);
     width: 100%;
   }
 
@@ -183,28 +192,28 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
     text-decoration: none;
     color: inherit;
-    min-width: var(--color-facet-size, 40px);
+    min-width: var(--color-facet-size, 44px);
     cursor: pointer;
-    transition: opacity 0.2s ease;
   }
 
-  .color-facets__item:hover {
-    opacity: 0.8;
-  }
-
+  /*
+   * Swatch: soft inner hairline by default; hover lift + shadow when enabled.
+   */
   .color-facets__dot {
     display: block;
-    width: var(--color-facet-size, 40px);
-    height: var(--color-facet-size, 40px);
+    width: var(--color-facet-size, 44px);
+    height: var(--color-facet-size, 44px);
     border-radius: 50%;
     background-color: #e5e5e5;
     background-size: cover;
     background-position: center;
-    box-shadow: inset 0 0 0 1px rgb(0 0 0 / 12%);
-    transition: box-shadow 0.2s ease, transform 0.2s ease;
+    box-shadow: inset 0 0 0 1px rgb(0 0 0 / 7%);
+    transition:
+      box-shadow 0.25s ease,
+      transform 0.25s ease;
   }
 
   .color-facets__dot--pattern {
@@ -223,26 +232,56 @@
     display: block;
   }
 
-  .color-facets__item.is-active .color-facets__dot {
+  .color-facets--lift .color-facets__item:hover .color-facets__dot {
+    transform: translateY(-2px);
     box-shadow:
-      0 0 0 2px var(--color-background, #fff),
-      0 0 0 4px var(--color-facet-text, var(--color-foreground));
-    transform: scale(1.03);
+      inset 0 0 0 1px rgb(0 0 0 / 9%),
+      0 6px 16px rgb(0 0 0 / 14%);
+  }
+
+  /*
+   * Selected state:
+   * - ring: a soft outer ring separated from the swatch by the page background
+   * - label: a small dot under the bold label, swatch stays plain (reference style)
+   * - both: ring + bold label
+   */
+  .color-facets--active-ring .color-facets__item.is-active .color-facets__dot,
+  .color-facets--active-both .color-facets__item.is-active .color-facets__dot {
+    box-shadow:
+      0 0 0 calc(var(--color-facet-ring-width, 2px) + 1px) var(--color-background, #fff),
+      0 0 0 calc((var(--color-facet-ring-width, 2px) + 1px) * 2) var(--color-facet-text, var(--color-foreground));
+  }
+
+  .color-facets--active-label .color-facets__item.is-active::after {
+    content: '';
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: var(--color-facet-text, var(--color-foreground));
+    margin-top: 2px;
   }
 
   .color-facets__label {
     font-family: var(--font-body--family);
     font-size: var(--color-facet-label-size, 11px);
-    line-height: 1.3;
-    letter-spacing: 0.02em;
+    line-height: 1.35;
+    letter-spacing: 0.08em;
+    text-transform: var(--color-facet-label-transform, uppercase);
     text-align: center;
-    max-width: calc(var(--color-facet-size, 40px) + 24px);
+    opacity: 0.62;
+    max-width: calc(var(--color-facet-size, 44px) + 28px);
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
+    transition: opacity 0.2s ease;
   }
 
-  .color-facets__item.is-active .color-facets__label {
+  .color-facets .color-facets__item:hover .color-facets__label {
+    opacity: 1;
+  }
+
+  .color-facets .color-facets__item.is-active .color-facets__label {
+    opacity: 1;
     font-weight: 600;
   }
 
@@ -251,7 +290,7 @@
       flex-wrap: nowrap;
       overflow-x: auto;
       justify-content: flex-start;
-      padding-bottom: 6px;
+      padding-bottom: 8px;
       scrollbar-width: none;
     }
 
@@ -316,7 +355,108 @@
       "max": 32,
       "step": 2,
       "unit": "px",
-      "default": 12
+      "default": 14
+    },
+    {
+      "type": "header",
+      "content": "色板样式"
+    },
+    {
+      "type": "select",
+      "id": "active_style",
+      "label": "选中样式",
+      "options": [
+        {
+          "value": "ring",
+          "label": "外环描边"
+        },
+        {
+          "value": "label",
+          "label": "名称加粗 + 圆点"
+        },
+        {
+          "value": "both",
+          "label": "外环 + 名称加粗"
+        }
+      ],
+      "default": "ring"
+    },
+    {
+      "type": "range",
+      "id": "ring_width",
+      "label": "描边宽度",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "unit": "px",
+      "default": 2,
+      "visible_if": "{{ block.settings.active_style != 'label' }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "hover_lift",
+      "label": "悬停上浮效果",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "label_case",
+      "label": "名称大小写",
+      "options": [
+        {
+          "value": "uppercase",
+          "label": "大写"
+        },
+        {
+          "value": "none",
+          "label": "默认"
+        }
+      ],
+      "default": "uppercase"
+    },
+    {
+      "type": "header",
+      "content": "内边距"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "上边距",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "下边距",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-start",
+      "label": "左边距",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-end",
+      "label": "右边距",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
     },
     {
       "type": "range",
