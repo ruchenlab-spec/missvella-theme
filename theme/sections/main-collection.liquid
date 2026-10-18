@@ -35,7 +35,12 @@
 <collection-component view-event-payload="{{ collection | standard_event_data: 'view' | escape }}">
   <results-list
     class="section product-grid-container{% if section.settings.background_color != blank %} color-custom-{{ section.id }}{% endif %}"
-    style="--padding-block-start: {{ section.settings.padding-block-start }}px; --padding-block-end: {{ section.settings.padding-block-end }}px;"
+    style="
+      --padding-block-start: {{ section.settings.padding-block-start }}px;
+      --padding-block-end: {{ section.settings.padding-block-end }}px;
+      --grid-padding-inline-start: {{ section.settings.padding-inline-start | default: 40 }}px;
+      --grid-padding-inline-end: {{ section.settings.padding-inline-end | default: 40 }}px;
+    "
     section-id="{{ section.id }}"
     infinite-scroll="{{ section.settings.enable_infinite_scroll }}"
   >
@@ -219,22 +224,26 @@
     {
       "type": "range",
       "id": "padding-inline-start",
-      "label": "t:settings.left_padding",
+      "label": "左边距",
+      "info": "网格全宽时生效，移动端自动减半",
       "min": 0,
       "max": 100,
       "step": 1,
       "unit": "px",
-      "default": 0
+      "default": 40,
+      "visible_if": "{{ section.settings.product_grid_width == 'full-width' }}"
     },
     {
       "type": "range",
       "id": "padding-inline-end",
-      "label": "t:settings.right_padding",
+      "label": "右边距",
+      "info": "网格全宽时生效，移动端自动减半",
       "min": 0,
       "max": 100,
       "step": 1,
       "unit": "px",
-      "default": 0
+      "default": 40,
+      "visible_if": "{{ section.settings.product_grid_width == 'full-width' }}"
     },
     {
       "type": "header",

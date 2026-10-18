@@ -29,6 +29,21 @@
     }
   }
 
+  /*
+   * Full-width product grid: side gutters from the section's left/right padding
+   * settings (default 40px, halved on mobile) so content does not touch the edges.
+   */
+  .collection-wrapper--grid-full-width {
+    padding-inline: var(--grid-padding-inline-start, 40px) var(--grid-padding-inline-end, 40px);
+  }
+
+  @media screen and (max-width: 749px) {
+    .collection-wrapper--grid-full-width {
+      padding-inline: calc(var(--grid-padding-inline-start, 40px) * 0.5)
+        calc(var(--grid-padding-inline-end, 40px) * 0.5);
+    }
+  }
+
   .collection-wrapper:has(.facets-block-wrapper--full-width),
   .collection-wrapper:has(.collection-wrapper--full-width) {
     @media screen and (min-width: 750px) {
