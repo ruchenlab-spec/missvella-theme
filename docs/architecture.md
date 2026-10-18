@@ -134,7 +134,15 @@ scripts/push-live.ps1（只推代码）
 live 主题更新 → 编辑器刷新可见 → 前台即时生效
 ```
 
-## 六、依赖关系要点
+## 六、横向（左右）边距能力
+
+- 全局页面宽度仍由「主题设置 → 布局 → 页面宽度」控制（narrow 1440px / normal 1920px / wide 2400px）。
+- **全宽模式下的左右留白**：以下 16 个 section 已支持「左/右边距」独立设置（0–100px，默认 0），走主题原生 `spacing-style` → `.spacing-style` 的 `padding-inline`：
+  `carousel, collection-links, collection-list, featured-blog-posts, footer-utilities, footer, hero, logo, main-404, main-cart, main-collection-list, media-with-content, password, product-hotspots, product-list, product-recommendations`
+- `circle-collections` 单独实现：左右边距设置默认 40px，且**仅在 full-width 模式生效**（page-width 模式保持 0，避免与 `--page-margin` 双重留白）。
+- 不支持该设置的 section（`header`、`header-announcements`、`slideshow`、`layered-slideshow`、`section`、`custom-liquid`、`divider`、`_blocks`）未使用 `spacing-style`，全宽边距需单独改 CSS；其中 header / slideshow 的全宽铺满属于设计意图。
+
+## 七、依赖关系要点
 
 - `circle-collections` 依赖：`snippets/slideshow.liquid`、`slideshow-slide`、`slideshow-styles`、`snippets/text.liquid`、`snippets/spacing-style.liquid`、`slideshow.js`（Web Component）。
 - 箭头按钮必须位于 `<slideshow-component>` 内且带 `ref="previous" / "next"` + `on:click="/previous"`，否则不会与轮播组件绑定。
