@@ -11,6 +11,7 @@
   - 日常只推代码：`.\scripts\push-live.ps1`（仅 `assets/ sections/ snippets/ blocks/ layout/ locales/`）
   - 改模板结构：先 `theme pull --only "templates/*.json" --only "config/settings_data.json" --path theme`，再改再推
   - 已误覆盖时：无法从本地找回，只能重新在编辑器配置（本地应保持 pull 后的版本）
+  - **不要为了修改某个设置值去推 `templates/*.json`**：拉取到的快照在你改动之后就已经过期，推回去会连带覆盖商家在这期间做的其他修改（文案、图片、区块）。默认值请改 schema，实例值请商家在编辑器里调整。
 
 ### P2 · 模板推送失败：`设置"video"值未指向适用的 Shopify 托管的视频资源`
 - **症状**：整个模板（如 `index.json`）上传失败，其他文件正常。
