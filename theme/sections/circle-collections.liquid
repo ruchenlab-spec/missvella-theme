@@ -246,7 +246,6 @@
     align-items: center;
     column-gap: 8px;
     width: 100%;
-    container-type: inline-size;
   }
 
   .circle-collections .circle-collections__carousel slideshow-container {
@@ -256,29 +255,20 @@
   }
 
   /*
-   * The arrow must be centered on the CIRCLE only. A slide is circle + title below,
-   * so centering in the whole slide row would sit too low. Calculate the circle
-   * diameter (column width capped by --circle-size) and offset the arrow by half
-   * the difference.
+   * The arrow must be centered on the CIRCLE only, but the slide row is
+   * circle + 12px gap + title below. Centering in the row therefore sits the
+   * arrow too low by half of (gap + title height). Pull it back up by exactly
+   * that amount, using the configured title size so it adapts to the settings.
    */
   .circle-collections__arrow {
-    --circle-media-size: min(
-      var(--circle-size),
-      calc(
-        (100cqw - 2 * (var(--circle-arrow-size) + 8px) - (var(--circle-gap) * (var(--circle-columns) - 1))) /
-          var(--circle-columns)
-      )
-    );
-
     position: relative;
     grid-row: 1;
-    align-self: start;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     width: var(--circle-arrow-size);
     height: var(--circle-arrow-size);
-    margin-block-start: calc((var(--circle-media-size) - var(--circle-arrow-size)) / 2);
+    margin-block-start: calc(-1 * (12px + var(--circle-title-size) * 1.2) / 2);
     padding: 0;
     border: 0;
     background: transparent;
@@ -343,16 +333,6 @@
   @container circle-collections (max-width: 749px) {
     .circle-collections .circle-collections__carousel {
       column-gap: 4px;
-    }
-
-    .circle-collections__arrow {
-      --circle-media-size: min(
-        var(--circle-size),
-        calc(
-          (100cqw - 2 * (var(--circle-arrow-size) + 4px) - (var(--circle-gap) * (var(--circle-columns-mobile) - 1))) /
-            var(--circle-columns-mobile)
-        )
-      );
     }
   }
 
@@ -429,6 +409,11 @@
     text-align: center;
     text-transform: var(--circle-title-transform, uppercase);
     color: var(--circle-title-color, var(--color-foreground));
+    /* Single line keeps the slide height stable so the arrow offset stays exact */
+    max-width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
   }
 {% endstylesheet %}
 
