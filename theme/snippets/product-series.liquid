@@ -7,25 +7,14 @@
 {%- enddoc -%}
 
 {% liquid
-  assign series_value = ''
+  # series_text is a plain text setting that supports dynamic sources, so merchants
+  # pick the product metafield from the editor's dynamic source picker instead of
+  # typing a namespace.key.
+  assign series_value = settings.series_text | strip
 
-  case settings.series_source
-    when 'vendor'
-      assign series_value = product.vendor
-    when 'type'
-      assign series_value = product.type
-    else
-      assign mf_key = settings.series_metafield | default: 'custom.series_title'
-      assign mf_parts = mf_key | split: '.'
-      if mf_parts.size >= 2
-        assign series_value = product.metafields[mf_parts[0]][mf_parts[1]].value
-      endif
-      if series_value == blank and settings.series_fallback_vendor
-        assign series_value = product.vendor
-      endif
-  endcase
-
-  assign series_value = series_value | strip
+  if series_value == blank and settings.series_fallback_vendor
+    assign series_value = product.vendor | strip
+  endif
 
   assign sku = product.selected_or_first_available_variant.sku
   if sku == blank
@@ -55,11 +44,6 @@
   >
     {% if show_series %}
       <span class="product-series__label">
-        {% if settings.series_icon %}
-          <span class="product-series__icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.2 2.2 4 13.4h6.1L9 21.8l9.3-11.2h-6.1l1-8.4Z"/></svg>
-          </span>
-        {% endif %}
         <span class="product-series__text">{{ series_value }}</span>
       </span>
     {% endif %}
@@ -97,20 +81,6 @@
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
-  }
-
-  .product-series__icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 0.9em;
-    height: 0.9em;
-    flex: 0 0 auto;
-  }
-
-  .product-series__icon svg {
-    width: 100%;
-    height: 100%;
   }
 
   .product-series__sku {

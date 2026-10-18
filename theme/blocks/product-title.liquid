@@ -35,45 +35,16 @@
       "default": false
     },
     {
-      "type": "select",
-      "id": "series_source",
-      "label": "数据源",
-      "options": [
-        {
-          "value": "metafield",
-          "label": "元字段"
-        },
-        {
-          "value": "vendor",
-          "label": "供应商"
-        },
-        {
-          "value": "type",
-          "label": "产品类型"
-        }
-      ],
-      "default": "metafield",
-      "visible_if": "{{ block.settings.show_series }}"
-    },
-    {
       "type": "text",
-      "id": "series_metafield",
-      "label": "元字段键",
-      "info": "格式：命名空间.键，如 custom.series_title（需先在后台 设置 → 自定义数据 → 产品 中创建）",
-      "default": "custom.series_title",
-      "visible_if": "{{ block.settings.show_series and block.settings.series_source == 'metafield' }}"
+      "id": "series_text",
+      "label": "系列标题",
+      "info": "点击输入框右侧的数据库图标即可选择产品元字段；留空时按下方回退规则显示",
+      "visible_if": "{{ block.settings.show_series }}"
     },
     {
       "type": "checkbox",
       "id": "series_fallback_vendor",
-      "label": "元字段为空时使用供应商",
-      "default": true,
-      "visible_if": "{{ block.settings.show_series and block.settings.series_source == 'metafield' }}"
-    },
-    {
-      "type": "checkbox",
-      "id": "series_icon",
-      "label": "显示图标",
+      "label": "留空时使用供应商",
       "default": true,
       "visible_if": "{{ block.settings.show_series }}"
     },
