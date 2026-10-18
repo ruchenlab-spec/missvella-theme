@@ -334,6 +334,14 @@
     }
   }
 
+  /* This section writes raw pixel gutters (not scaled by spacing-style), so use
+     0.5 - instead of the shared 0.7 - to land at the same ~20px on mobile. */
+  @media screen and (max-width: 749px) {
+    .circle-collections.section--full-width.spacing-style[style*='--padding-inline-start'] {
+      padding-inline: calc(var(--padding-inline-start, 40px) * 0.5) calc(var(--padding-inline-end, 40px) * 0.5);
+    }
+  }
+
   /*
    * Slide content stays in normal flow (title included) so nothing gets clipped.
    * The bottom negative margin cancels the title block (12px gap + title height)

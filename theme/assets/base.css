@@ -1121,8 +1121,10 @@ summary:hover {
 }
 
 @media screen and (max-width: 749px) {
+  /* spacing-style already scales values > 20px to ~70% on mobile, so 0.7 here
+     lands the gutter at roughly half of the configured value (40px -> ~20px). */
   .section--full-width.spacing-style[style*='--padding-inline-start'] {
-    padding-inline: calc(var(--padding-inline-start, 40px) * 0.5) calc(var(--padding-inline-end, 40px) * 0.5);
+    padding-inline: calc(var(--padding-inline-start, 40px) * 0.7) calc(var(--padding-inline-end, 40px) * 0.7);
   }
 }
 
