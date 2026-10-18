@@ -1105,6 +1105,27 @@ summary:hover {
   margin-inline: var(--margin-inline-start) var(--margin-inline-end);
 }
 
+/*
+ * Side gutters for full-width sections.
+ * Sections that expose the left/right padding settings output --padding-inline-start,
+ * which is used here as the full-width gutter (default 40px). Page-width sections keep
+ * only --page-margin, so their content is not inset twice. On mobile the gutter is
+ * halved so it does not eat the narrow viewport.
+ */
+.section--full-width.spacing-style[style*='--padding-inline-start'] {
+  padding-inline: var(--padding-inline-start, 40px) var(--padding-inline-end, 40px);
+}
+
+.section--page-width.spacing-style[style*='--padding-inline-start'] {
+  padding-inline: 0;
+}
+
+@media screen and (max-width: 749px) {
+  .section--full-width.spacing-style[style*='--padding-inline-start'] {
+    padding-inline: calc(var(--padding-inline-start, 40px) * 0.5) calc(var(--padding-inline-end, 40px) * 0.5);
+  }
+}
+
 /* Size style */
 .size-style {
   width: var(--size-style-width-mobile, var(--size-style-width));
