@@ -146,7 +146,9 @@
     }
   ],
   "enabled_on": {
-    "groups": ["footer"]
+    "groups": [
+      "footer"
+    ]
   },
   "settings": [
     {
@@ -204,6 +206,26 @@
       "step": 1,
       "unit": "px",
       "default": 20
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-start",
+      "label": "t:settings.left_padding",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-end",
+      "label": "t:settings.right_padding",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
     }
   ],
   "presets": [
@@ -246,7 +268,10 @@
               }
             }
           },
-          "block_order": ["newsletter-heading", "newsletter-text"]
+          "block_order": [
+            "newsletter-heading",
+            "newsletter-text"
+          ]
         },
         "newsletter-form": {
           "type": "email-signup",
@@ -255,7 +280,10 @@
           }
         }
       },
-      "block_order": ["newsletter-group", "newsletter-form"]
+      "block_order": [
+        "newsletter-group",
+        "newsletter-form"
+      ]
     }
   ]
 }

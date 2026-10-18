@@ -796,7 +796,9 @@
     }
   ],
   "disabled_on": {
-    "groups": ["header"]
+    "groups": [
+      "header"
+    ]
   },
   "settings": [
     {
@@ -1256,6 +1258,26 @@
       "step": 1,
       "unit": "px",
       "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-start",
+      "label": "t:settings.left_padding",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-end",
+      "label": "t:settings.right_padding",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
     }
   ],
   "presets": [
@@ -1288,7 +1310,11 @@
           }
         }
       },
-      "block_order": ["text_1", "text_2", "button"],
+      "block_order": [
+        "text_1",
+        "text_2",
+        "button"
+      ],
       "settings": {
         "horizontal_alignment_flex_direction_column": "center",
         "gap": 16,
@@ -1321,7 +1347,9 @@
               }
             }
           },
-          "block_order": ["text"]
+          "block_order": [
+            "text"
+          ]
         },
         "button": {
           "type": "button",
@@ -1331,7 +1359,11 @@
           }
         }
       },
-      "block_order": ["spacer", "marquee", "button"],
+      "block_order": [
+        "spacer",
+        "marquee",
+        "button"
+      ],
       "settings": {
         "horizontal_alignment_flex_direction_column": "center",
         "vertical_alignment_flex_direction_column": "space-between",
@@ -1452,7 +1484,10 @@
                   }
                 }
               },
-              "block_order": ["text_intro", "text_main"]
+              "block_order": [
+                "text_intro",
+                "text_main"
+              ]
             },
             "text_description": {
               "type": "text",
@@ -1476,10 +1511,15 @@
               }
             }
           },
-          "block_order": ["content_group", "text_description"]
+          "block_order": [
+            "content_group",
+            "text_description"
+          ]
         }
       },
-      "block_order": ["group_main"],
+      "block_order": [
+        "group_main"
+      ],
       "settings": {
         "media_type_1": "image",
         "horizontal_alignment_flex_direction_column": "center",

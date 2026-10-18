@@ -207,7 +207,9 @@
 {
   "name": "t:names.media_with_text",
   "disabled_on": {
-    "groups": ["header"]
+    "groups": [
+      "header"
+    ]
   },
   "settings": [
     {
@@ -326,6 +328,26 @@
       "step": 1,
       "unit": "px",
       "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-start",
+      "label": "t:settings.left_padding",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-end",
+      "label": "t:settings.right_padding",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
     }
   ],
   "presets": [
@@ -380,7 +402,10 @@
                   }
                 }
               },
-              "block_order": ["heading", "text"]
+              "block_order": [
+                "heading",
+                "text"
+              ]
             },
             "button": {
               "type": "button",
@@ -391,7 +416,11 @@
               }
             }
           },
-          "block_order": ["caption", "group", "button"]
+          "block_order": [
+            "caption",
+            "group",
+            "button"
+          ]
         }
       }
     },
@@ -429,7 +458,9 @@
               }
             }
           },
-          "block_order": ["caption"]
+          "block_order": [
+            "caption"
+          ]
         }
       }
     }

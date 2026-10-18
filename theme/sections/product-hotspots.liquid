@@ -471,7 +471,10 @@
 {
   "name": "t:names.product_hotspots",
   "disabled_on": {
-    "groups": ["header", "footer"]
+    "groups": [
+      "header",
+      "footer"
+    ]
   },
   "blocks": [
     {
@@ -694,6 +697,26 @@
       "step": 1,
       "unit": "px",
       "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-start",
+      "label": "t:settings.left_padding",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-end",
+      "label": "t:settings.right_padding",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0
     }
   ],
   "presets": [
@@ -731,7 +754,10 @@
           }
         }
       },
-      "block_order": ["hotspot-1", "hotspot-2"]
+      "block_order": [
+        "hotspot-1",
+        "hotspot-2"
+      ]
     }
   ]
 }
