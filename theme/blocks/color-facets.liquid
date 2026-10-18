@@ -47,6 +47,14 @@
   endif
 %}
 
+{% liquid
+  # Defaults for blocks created before the padding settings existed
+  assign pad_block_start = block.settings['padding-block-start'] | default: 12
+  assign pad_block_end = block.settings['padding-block-end'] | default: 20
+  assign pad_inline_start = block.settings['padding-inline-start'] | default: 0
+  assign pad_inline_end = block.settings['padding-inline-end'] | default: 0
+-%}
+
 {% if color_filter != null %}
   <div
     class="
@@ -57,6 +65,10 @@
     "
     style="
       {% render 'spacing-style', settings: block.settings %}
+      --padding-block-start: {{ pad_block_start }}px;
+      --padding-block-end: {{ pad_block_end }}px;
+      --padding-inline-start: {{ pad_inline_start }}px;
+      --padding-inline-end: {{ pad_inline_end }}px;
       --color-facet-size: {{ block.settings.swatch_size | default: 44 }}px;
       --color-facet-gap: {{ block.settings.gap | default: 14 }}px;
       --color-facet-label-size: {{ block.settings.label_size | default: 11 }}px;
@@ -426,7 +438,7 @@
       "max": 100,
       "step": 1,
       "unit": "px",
-      "default": 8
+      "default": 12
     },
     {
       "type": "range",
@@ -436,7 +448,7 @@
       "max": 100,
       "step": 1,
       "unit": "px",
-      "default": 16
+      "default": 20
     },
     {
       "type": "range",
