@@ -1,0 +1,376 @@
+{%- doc -%}
+  Colour quick-filter row.
+
+  Renders the colour option filter of the current collection/search as a row of
+  round swatches with labels (and an "All" reset). Links use the native filter
+  value URLs (url_to_add / url_to_remove), so it stays in sync with the theme's
+  built-in Filters & Sort block: the same query parameters are used, other active
+  filters are preserved, and the native panel shows the same selection.
+
+  Swatch colours come from value.swatch when Shopify provides one, then from the
+  built-in colour-name map, then from the merchant's optional custom map.
+{%- enddoc -%}
+
+{% liquid
+  assign source = collection
+  if source == blank
+    assign source = search
+  endif
+
+  assign color_filter = null
+  assign active_color_count = 0
+
+  for filter in source.filters
+    assign param_name_down = filter.param_name | downcase
+    # Shopify's taxonomy colour filter is filter.v.t.shopify.color-pattern; custom
+    # option filters can be filter.v.option.color / .colour / .颜色
+    if param_name_down contains 'color-pattern'
+      assign color_filter = filter
+      assign active_color_count = filter.active_values | size
+      break
+    endif
+    if param_name_down contains 'option.color' or param_name_down contains 'option.colour' or param_name_down contains '颜色'
+      assign color_filter = filter
+      assign active_color_count = filter.active_values | size
+      break
+    endif
+  endfor
+
+  # Built-in colour-name map: "name:#hex" pairs. Matched against the option value
+  # lowercased, so "Rose gold", "rose-gold" and "ROSE GOLD" all match.
+  assign builtin_map = 'pink:#F4B8C8,navy:#1F2A5A,beige:#E8DCC8,rose gold:#DFA79A,rosegold:#DFA79A,blue:#3B5BA5,red:#C0392B,black:#111111,white:#FFFFFF,yellow:#F4D35E,purple:#7D5BA6,green:#3E8E5A,orange:#E4783C,brown:#8B5E3C,grey:#9E9E9E,gray:#9E9E9E,silver:#D9D9D9,gold:#C9A227,champagne:#F0E2C8,ivory:#F7F1E3,burgundy:#7B1E3A,wine:#6B1F35,apricot:#F5C6A5,lavender:#C9B6DB,lilac:#C9B6DB,khaki:#C3B091,dusty rose:#C98E96,floral:#F3E6EA,multicolor:#FFFFFF'
+  assign builtin_pairs = builtin_map | split: ','
+
+  assign custom_pairs = ''
+  if block.settings.custom_map != blank
+    assign custom_pairs = block.settings.custom_map | newline_to_br | split: '<br />'
+  endif
+%}
+
+{% if color_filter != null %}
+  <div
+    class="color-facets{% if block.settings.text_color != blank %} color-facets--custom-text{% endif %}"
+    style="
+      --color-facet-size: {{ block.settings.swatch_size | default: 40 }}px;
+      --color-facet-gap: {{ block.settings.gap | default: 12 }}px;
+      --color-facet-label-size: {{ block.settings.label_size | default: 11 }}px;
+      --color-facet-align: {{ block.settings.alignment | default: 'center' }};
+      {% if block.settings.text_color != blank %}--color-facet-text: {{ block.settings.text_color }};{% endif %}
+    "
+    {{ block.shopify_attributes }}
+  >
+    {% if block.settings.title != blank %}
+      <span class="color-facets__title">{{ block.settings.title }}</span>
+    {% endif %}
+
+    <div class="color-facets__row">
+      {% if block.settings.show_all %}
+        <a
+          class="color-facets__item{% if active_color_count == 0 %} is-active{% endif %}"
+          href="{{ source.url }}"
+          aria-label="{{ block.settings.all_label | default: 'All' }}"
+        >
+          <span class="color-facets__dot color-facets__dot--all" aria-hidden="true">
+            <svg viewBox="0 0 40 40" aria-hidden="true">
+              <circle cx="20" cy="20" r="20" fill="#F3E6EA"></circle>
+              <path d="M20 0a20 20 0 0 1 0 40Z" fill="#DFA79A"></path>
+              <path d="M20 0a20 20 0 0 1 20 20 20 20 0 0 1-20 20Z" fill="#9E9E9E" opacity=".55"></path>
+              <path d="M0 20a20 20 0 0 1 20-20v20Z" fill="#C9B6DB"></path>
+              <path d="M0 20h20v20A20 20 0 0 1 0 20Z" fill="#3B5BA5" opacity=".65"></path>
+            </svg>
+          </span>
+          {% if block.settings.show_label %}
+            <span class="color-facets__label">{{ block.settings.all_label | default: 'All' }}</span>
+          {% endif %}
+        </a>
+      {% endif %}
+
+      {% for value in color_filter.values %}
+        {% liquid
+          assign swatch_hex = ''
+          assign value_key = value.label | downcase | strip
+
+          # Priority: merchant custom map > Shopify swatch > built-in name map
+          if custom_pairs != blank
+            for pair in custom_pairs
+              assign trimmed = pair | strip
+              if trimmed == blank
+                continue
+              endif
+              assign key_part = trimmed | split: ':'
+              assign key_name = key_part[0] | downcase | strip
+              if key_name == value_key and key_part[1] != blank
+                assign swatch_hex = key_part[1] | strip
+                break
+              endif
+            endfor
+          endif
+
+          if swatch_hex == blank and value.swatch.color != blank
+            assign swatch_hex = value.swatch.color
+          endif
+
+          if swatch_hex == blank
+            for pair in builtin_pairs
+              assign key_part = pair | split: ':'
+              if key_part[0] == value_key
+                assign swatch_hex = key_part[1]
+                break
+              endif
+            endfor
+          endif
+
+          assign is_floral = false
+          if value_key contains 'floral' or value_key contains 'print' or value_key contains 'multi'
+            assign is_floral = true
+          endif
+
+          assign link_url = value.url_to_add
+          if value.active
+            assign link_url = value.url_to_remove
+          endif
+        %}
+        <a
+          class="color-facets__item{% if value.active %} is-active{% endif %}"
+          href="{{ link_url }}"
+          aria-label="{{ value.label }}{% if value.count != blank %} ({{ value.count }}){% endif %}"
+          {% if value.active %}aria-current="true"{% endif %}
+        >
+          <span
+            class="color-facets__dot{% if is_floral %} color-facets__dot--pattern{% endif %}"
+            style="{% if swatch_hex != blank %}background: {{ swatch_hex }};{% endif %}"
+            aria-hidden="true"
+          ></span>
+          {% if block.settings.show_label %}
+            <span class="color-facets__label">{{ value.label }}</span>
+          {% endif %}
+        </a>
+      {% endfor %}
+    </div>
+  </div>
+{% endif %}
+
+{% stylesheet %}
+  .color-facets {
+    /* The collection page renders blocks inside a grid; span the full row */
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    align-items: var(--color-facet-align, center);
+    gap: 10px;
+    width: 100%;
+    color: var(--color-facet-text, var(--color-foreground));
+  }
+
+  .color-facets__title {
+    font-family: var(--font-body--family);
+    font-size: 12px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    opacity: 0.7;
+  }
+
+  .color-facets__row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    justify-content: var(--color-facet-align, center);
+    gap: var(--color-facet-gap, 12px);
+    width: 100%;
+  }
+
+  .color-facets__item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    text-decoration: none;
+    color: inherit;
+    min-width: var(--color-facet-size, 40px);
+    cursor: pointer;
+    transition: opacity 0.2s ease;
+  }
+
+  .color-facets__item:hover {
+    opacity: 0.8;
+  }
+
+  .color-facets__dot {
+    display: block;
+    width: var(--color-facet-size, 40px);
+    height: var(--color-facet-size, 40px);
+    border-radius: 50%;
+    background-color: #e5e5e5;
+    background-size: cover;
+    background-position: center;
+    box-shadow: inset 0 0 0 1px rgb(0 0 0 / 12%);
+    transition: box-shadow 0.2s ease, transform 0.2s ease;
+  }
+
+  .color-facets__dot--pattern {
+    background-image: linear-gradient(135deg, #f3e6ea 25%, #dfa79a 25%, #dfa79a 50%, #c9b6db 50%, #c9b6db 75%, #3b5ba5 75%);
+    background-size: 200% 200%;
+  }
+
+  .color-facets__dot--all {
+    overflow: hidden;
+    background: #fff;
+  }
+
+  .color-facets__dot--all svg {
+    width: 100%;
+    height: 100%;
+    display: block;
+  }
+
+  .color-facets__item.is-active .color-facets__dot {
+    box-shadow:
+      0 0 0 2px var(--color-background, #fff),
+      0 0 0 4px var(--color-facet-text, var(--color-foreground));
+    transform: scale(1.03);
+  }
+
+  .color-facets__label {
+    font-family: var(--font-body--family);
+    font-size: var(--color-facet-label-size, 11px);
+    line-height: 1.3;
+    letter-spacing: 0.02em;
+    text-align: center;
+    max-width: calc(var(--color-facet-size, 40px) + 24px);
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .color-facets__item.is-active .color-facets__label {
+    font-weight: 600;
+  }
+
+  @media screen and (max-width: 749px) {
+    .color-facets__row {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      justify-content: flex-start;
+      padding-bottom: 6px;
+      scrollbar-width: none;
+    }
+
+    .color-facets__row::-webkit-scrollbar {
+      display: none;
+    }
+
+    .color-facets__item {
+      flex: 0 0 auto;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "颜色快捷筛选",
+  "tag": null,
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "读取当前系列的颜色选项筛选，渲染为一排圆形色板。链接使用原生筛选参数，与「筛选和排序」区块共享状态，可同时使用。"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "标题",
+      "info": "可留空"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_all",
+      "label": "显示「全部」按钮",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "all_label",
+      "label": "「全部」文字",
+      "default": "All"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_label",
+      "label": "显示颜色名称",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "swatch_size",
+      "label": "色板直径",
+      "min": 24,
+      "max": 64,
+      "step": 2,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "label": "色板间距",
+      "min": 4,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "label_size",
+      "label": "名称字号",
+      "min": 9,
+      "max": 16,
+      "step": 1,
+      "unit": "px",
+      "default": 11
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "对齐",
+      "options": [
+        {
+          "value": "flex-start",
+          "label": "左"
+        },
+        {
+          "value": "center",
+          "label": "中"
+        },
+        {
+          "value": "flex-end",
+          "label": "右"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "文字颜色",
+      "placeholder": "默认"
+    },
+    {
+      "type": "header",
+      "content": "自定义颜色映射"
+    },
+    {
+      "type": "textarea",
+      "id": "custom_map",
+      "label": "颜色名:色值",
+      "info": "每行一条，例如 rose gold:#DFA79A。优先于内置颜色表，也优先于 Shopify 返回的色板值。",
+      "default": "rose gold:#DFA79A\nnavy:#1F2A5A\nbeige:#E8DCC8"
+    }
+  ],
+  "presets": [
+    {
+      "name": "颜色快捷筛选",
+      "category": "t:categories.collection"
+    }
+  ]
+}
+{% endschema %}
