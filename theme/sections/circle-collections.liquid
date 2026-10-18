@@ -335,16 +335,18 @@
   }
 
   /*
-   * Slides are only as tall as the circle. The title sits below in the slides'
-   * bottom padding (which is cancelled out by a negative margin), so the
-   * carousel row height equals the circle height exactly.
+   * Slide content stays in normal flow (title included) so nothing gets clipped.
+   * The bottom negative margin cancels the title block (12px gap + title height)
+   * plus the 12px hover padding, so the carousel row is exactly as tall as the
+   * circles and `align-items: center` lands the arrows on the circle center.
+   *   24px = 12px gap + 12px padding-bottom
+   *   1.2  = title line-height (set above, single line)
    */
   .circle-collections .circle-collections__carousel slideshow-slides {
     gap: var(--circle-gap);
-    padding-top: 12px;
+    padding-block: 12px;
     margin-top: -12px;
-    padding-bottom: 44px;
-    margin-bottom: -44px;
+    margin-bottom: calc(-24px - var(--circle-title-size) * 1.2);
     justify-content: safe center;
   }
 
@@ -368,8 +370,10 @@
   }
 
   .circle-collections__item {
-    position: relative;
-    display: block;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
     text-decoration: none;
     color: var(--color-foreground);
   }
@@ -405,15 +409,9 @@
   }
 
   .circle-collections__title {
-    /* Out of the layout flow so the slide (and therefore the arrow row) is exactly
-       as tall as the circle; sits in the slides' bottom padding instead. */
-    position: absolute;
-    top: 100%;
-    inset-inline: 0;
-    margin-top: 12px;
-
     font-family: var(--font-body--family);
     font-size: var(--circle-title-size);
+    line-height: 1.2;
     font-weight: 500;
     letter-spacing: var(--circle-title-spacing);
     text-align: center;

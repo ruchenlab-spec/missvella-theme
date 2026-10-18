@@ -1,0 +1,825 @@
+{%- comment -%}
+  Square collection grid.
+
+  Same idea as the circle-collections section, but laid out as a static square grid.
+  Every item is a section-scoped block, so its cover image and title are configured
+  in the theme editor instead of being pulled from the collection object.
+
+  Blocks
+  - heading: renders through the theme's native `text` snippet (full native text
+    settings: richtext, width, typography preset, color, background, padding).
+  - square_collection: collection (link + fallback title) with an optional custom
+    image / custom title override. No collection image is used - when no custom
+    image is set a placeholder is shown.
+{%- endcomment -%}
+
+{% liquid
+  assign column_gap = section.settings.column_gap | default: 16
+  assign row_gap = section.settings.row_gap | default: 24
+  assign columns = section.settings.columns | default: 4
+  assign mobile_columns = section.settings.mobile_columns | default: '2'
+
+  assign item_count = 0
+  for block in section.blocks
+    if block.type == 'square_collection'
+      assign item_count = item_count | plus: 1
+    endif
+  endfor
+
+  if section.settings.background_color != blank
+    render 'contrast-override', background_color: section.settings.background_color, section_id: section.id
+  endif
+-%}
+
+<div
+  class="
+    section
+    section--{{ section.settings.section_width }}
+    square-collections
+    spacing-style
+    {% if section.settings.background_color != blank %}color-custom-{{ section.id }}{% endif %}
+  "
+  style="
+    {% render 'spacing-style', settings: section.settings %}
+    --square-columns: {{ columns }};
+    --square-columns-mobile: {{ mobile_columns }};
+    --square-column-gap: {{ column_gap }}px;
+    --square-row-gap: {{ row_gap }}px;
+    --square-radius: {{ section.settings.image_radius | default: 0 }}px;
+    --square-title-size: {{ section.settings.title_font_size | default: 14 }}px;
+    --square-title-spacing: {{ section.settings.title_letter_spacing | default: 0 }}px;
+    --square-title-transform: {{ section.settings.title_case | default: 'none' }};
+    --square-title-align: {{ section.settings.title_alignment | default: 'center' }};
+    {% if section.settings.title_color != blank %}--square-title-color: {{ section.settings.title_color }};{% endif %}
+  "
+>
+  {%- comment -%} Header: heading blocks rendered with the native text snippet {%- endcomment -%}
+  {%- for block in section.blocks -%}
+    {%- if block.type == 'heading' -%}
+      <div class="square-collections__header">
+        {%- render 'text', block: block -%}
+      </div>
+    {%- endif -%}
+  {%- endfor -%}
+
+  <div class="square-collections__grid">
+    {%- assign square_index = 0 -%}
+    {%- for block in section.blocks -%}
+      {%- if block.type != 'square_collection' -%}
+        {%- continue -%}
+      {%- endif -%}
+
+      {%- liquid
+        assign item_collection = block.settings.collection
+        assign item_link = ''
+        if item_collection != blank
+          assign item_link = item_collection.url
+        endif
+
+        assign item_title = block.settings.custom_title
+        if item_title == blank and item_collection != blank
+          assign item_title = item_collection.title
+        endif
+      -%}
+
+      <div class="square-collections__item" {{ block.shopify_attributes }}>
+        {%- if item_link != blank -%}
+          <a class="square-collections__link" href="{{ item_link }}">
+        {%- else -%}
+          <div class="square-collections__link">
+        {%- endif -%}
+          <div class="square-collections__media">
+            {%- if block.settings.custom_image != blank -%}
+              {{
+                block.settings.custom_image
+                | image_url: width: 800
+                | image_tag:
+                  loading: 'lazy',
+                  sizes: '(max-width: 749px) 44vw, 25vw',
+                  widths: '150, 300, 450, 600, 800',
+                  class: 'square-collections__image'
+              }}
+            {%- else -%}
+              {{ 'collection-1' | placeholder_svg_tag: 'square-collections__image placeholder-svg' }}
+            {%- endif -%}
+          </div>
+          {%- if item_title != blank -%}
+            <span class="square-collections__title">{{ item_title }}</span>
+          {%- endif -%}
+        {%- if item_link != blank -%}
+          </a>
+        {%- else -%}
+          </div>
+        {%- endif -%}
+      </div>
+
+      {%- assign square_index = square_index | plus: 1 -%}
+    {%- endfor -%}
+
+    {%- if item_count == 0 -%}
+      {%- for i in (1..columns) -%}
+        <div class="square-collections__item">
+          <div class="square-collections__link">
+            <div class="square-collections__media">
+              {{ 'collection-1' | placeholder_svg_tag: 'square-collections__image placeholder-svg' }}
+            </div>
+            <span class="square-collections__title">{{ 'placeholders.collection_title' | t }}</span>
+          </div>
+        </div>
+      {%- endfor -%}
+    {%- endif -%}
+  </div>
+</div>
+
+{% stylesheet %}
+  .square-collections {
+    container-type: inline-size;
+    container-name: square-collections;
+  }
+
+  .square-collections__header {
+    margin-block-end: 20px;
+  }
+
+  .square-collections__grid {
+    display: grid;
+    grid-template-columns: repeat(var(--square-columns-mobile, 2), minmax(0, 1fr));
+    column-gap: var(--square-column-gap, 16px);
+    row-gap: var(--square-row-gap, 24px);
+  }
+
+  @container square-collections (min-width: 750px) {
+    .square-collections__grid {
+      grid-template-columns: repeat(var(--square-columns, 4), minmax(0, 1fr));
+    }
+  }
+
+  .square-collections__item {
+    min-width: 0;
+  }
+
+  .square-collections__link {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    text-decoration: none;
+    color: var(--color-foreground);
+  }
+
+  .square-collections__media {
+    width: 100%;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    border-radius: var(--square-radius, 0);
+    background-color: var(--color-background);
+  }
+
+  .square-collections__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: scale var(--hover-transition-duration, 0.25s) var(--hover-transition-timing, ease-out);
+  }
+
+  .square-collections__link:hover .square-collections__image {
+    scale: 1.04;
+  }
+
+  .square-collections__media .placeholder-svg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    padding: 30%;
+    fill: var(--color-foreground);
+    opacity: 0.3;
+  }
+
+  .square-collections__title {
+    font-family: var(--font-body--family);
+    font-size: var(--square-title-size);
+    line-height: 1.3;
+    font-weight: 500;
+    letter-spacing: var(--square-title-spacing);
+    text-align: var(--square-title-align, center);
+    text-transform: var(--square-title-transform, none);
+    color: var(--square-title-color, var(--color-foreground));
+    max-width: 100%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "方形集合网格",
+  "class": "square-collections-section",
+  "max_blocks": 32,
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "blocks": [
+    {
+      "type": "heading",
+      "name": "标题",
+      "settings": [
+        {
+          "type": "richtext",
+          "id": "text",
+          "label": "t:settings.text"
+        },
+        {
+          "type": "header",
+          "content": "t:content.layout"
+        },
+        {
+          "type": "select",
+          "id": "width",
+          "label": "t:settings.width",
+          "options": [
+            {
+              "value": "fit-content",
+              "label": "t:options.fit"
+            },
+            {
+              "value": "100%",
+              "label": "t:options.fill"
+            }
+          ],
+          "default": "fit-content"
+        },
+        {
+          "type": "select",
+          "id": "max_width",
+          "label": "t:settings.max_width",
+          "options": [
+            {
+              "value": "narrow",
+              "label": "t:options.narrow"
+            },
+            {
+              "value": "normal",
+              "label": "t:options.normal"
+            },
+            {
+              "value": "none",
+              "label": "t:options.none"
+            }
+          ],
+          "default": "normal"
+        },
+        {
+          "type": "text_alignment",
+          "id": "alignment",
+          "label": "t:settings.alignment",
+          "default": "center",
+          "visible_if": "{{ block.settings.width == '100%' }}"
+        },
+        {
+          "type": "header",
+          "content": "t:content.typography"
+        },
+        {
+          "type": "select",
+          "id": "type_preset",
+          "label": "t:settings.preset",
+          "options": [
+            {
+              "value": "rte",
+              "label": "t:options.default"
+            },
+            {
+              "value": "paragraph",
+              "label": "t:options.paragraph"
+            },
+            {
+              "value": "h1",
+              "label": "t:options.h1"
+            },
+            {
+              "value": "h2",
+              "label": "t:options.h2"
+            },
+            {
+              "value": "h3",
+              "label": "t:options.h3"
+            },
+            {
+              "value": "h4",
+              "label": "t:options.h4"
+            },
+            {
+              "value": "h5",
+              "label": "t:options.h5"
+            },
+            {
+              "value": "h6",
+              "label": "t:options.h6"
+            },
+            {
+              "value": "custom",
+              "label": "t:options.custom"
+            }
+          ],
+          "default": "rte",
+          "info": "t:info.edit_presets_in_theme_settings"
+        },
+        {
+          "type": "select",
+          "id": "font",
+          "label": "t:settings.font",
+          "options": [
+            {
+              "value": "var(--font-body--family)",
+              "label": "t:options.body"
+            },
+            {
+              "value": "var(--font-subheading--family)",
+              "label": "t:options.subheading"
+            },
+            {
+              "value": "var(--font-heading--family)",
+              "label": "t:options.heading"
+            },
+            {
+              "value": "var(--font-accent--family)",
+              "label": "t:options.accent"
+            }
+          ],
+          "default": "var(--font-heading--family)",
+          "visible_if": "{{ block.settings.type_preset == 'custom' }}"
+        },
+        {
+          "type": "select",
+          "id": "font_size",
+          "label": "t:settings.size",
+          "options": [
+            {
+              "value": "",
+              "label": "t:options.default"
+            },
+            {
+              "value": "0.75rem",
+              "label": "12px"
+            },
+            {
+              "value": "0.875rem",
+              "label": "14px"
+            },
+            {
+              "value": "1rem",
+              "label": "16px"
+            },
+            {
+              "value": "1.125rem",
+              "label": "18px"
+            },
+            {
+              "value": "1.25rem",
+              "label": "20px"
+            },
+            {
+              "value": "1.5rem",
+              "label": "24px"
+            },
+            {
+              "value": "2rem",
+              "label": "32px"
+            },
+            {
+              "value": "2.5rem",
+              "label": "40px"
+            }
+          ],
+          "default": "1rem",
+          "visible_if": "{{ block.settings.type_preset == 'custom' }}"
+        },
+        {
+          "type": "select",
+          "id": "line_height",
+          "label": "t:settings.line_height",
+          "options": [
+            {
+              "value": "tight",
+              "label": "t:options.tight"
+            },
+            {
+              "value": "normal",
+              "label": "t:options.normal"
+            },
+            {
+              "value": "loose",
+              "label": "t:options.loose"
+            }
+          ],
+          "default": "normal",
+          "visible_if": "{{ block.settings.type_preset == 'custom' }}"
+        },
+        {
+          "type": "select",
+          "id": "letter_spacing",
+          "label": "t:settings.letter_spacing",
+          "options": [
+            {
+              "value": "tight",
+              "label": "t:options.tight"
+            },
+            {
+              "value": "normal",
+              "label": "t:options.normal"
+            },
+            {
+              "value": "loose",
+              "label": "t:options.loose"
+            }
+          ],
+          "default": "normal",
+          "visible_if": "{{ block.settings.type_preset == 'custom' }}"
+        },
+        {
+          "type": "select",
+          "id": "case",
+          "label": "t:settings.case",
+          "options": [
+            {
+              "value": "none",
+              "label": "t:options.default"
+            },
+            {
+              "value": "uppercase",
+              "label": "t:options.uppercase"
+            }
+          ],
+          "default": "none",
+          "visible_if": "{{ block.settings.type_preset == 'custom' }}"
+        },
+        {
+          "type": "select",
+          "id": "wrap",
+          "label": "t:settings.wrap",
+          "options": [
+            {
+              "value": "pretty",
+              "label": "t:options.pretty"
+            },
+            {
+              "value": "balance",
+              "label": "t:options.balance"
+            },
+            {
+              "value": "nowrap",
+              "label": "t:options.none"
+            }
+          ],
+          "default": "pretty",
+          "visible_if": "{{ block.settings.type_preset == 'custom' }}"
+        },
+        {
+          "type": "header",
+          "content": "t:content.appearance"
+        },
+        {
+          "type": "color",
+          "id": "text_color",
+          "label": "t:settings.text_color",
+          "placeholder": "t:settings.default"
+        },
+        {
+          "type": "checkbox",
+          "id": "background",
+          "label": "t:settings.background",
+          "default": false
+        },
+        {
+          "type": "color",
+          "id": "background_color",
+          "label": "t:settings.background_color",
+          "alpha": true,
+          "default": "#00000026",
+          "visible_if": "{{ block.settings.background }}"
+        },
+        {
+          "type": "range",
+          "id": "corner_radius",
+          "label": "t:settings.corner_radius",
+          "default": 0,
+          "min": 0,
+          "max": 50,
+          "step": 1,
+          "visible_if": "{{ block.settings.background }}"
+        },
+        {
+          "type": "header",
+          "content": "t:content.padding"
+        },
+        {
+          "type": "range",
+          "id": "padding-block-start",
+          "label": "t:settings.top",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "px",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "padding-block-end",
+          "label": "t:settings.bottom",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "px",
+          "default": 16
+        },
+        {
+          "type": "range",
+          "id": "padding-inline-start",
+          "label": "t:settings.left",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "px",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "padding-inline-end",
+          "label": "t:settings.right",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "px",
+          "default": 0
+        }
+      ]
+    },
+    {
+      "type": "square_collection",
+      "name": "方形集合",
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "集合",
+          "info": "决定链接，未填自定义标题时使用集合名称"
+        },
+        {
+          "type": "image_picker",
+          "id": "custom_image",
+          "label": "自定义封面图片",
+          "info": "不使用集合封面，建议正方形图片"
+        },
+        {
+          "type": "text",
+          "id": "custom_title",
+          "label": "自定义标题",
+          "info": "覆盖集合名称"
+        }
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "type": "header",
+      "content": "布局"
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "label": "桌面每行数量",
+      "min": 1,
+      "max": 6,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "select",
+      "id": "mobile_columns",
+      "label": "移动每行数量",
+      "options": [
+        {
+          "value": "1",
+          "label": "1"
+        },
+        {
+          "value": "2",
+          "label": "2"
+        }
+      ],
+      "default": "2"
+    },
+    {
+      "type": "range",
+      "id": "column_gap",
+      "label": "横向间距",
+      "min": 0,
+      "max": 64,
+      "step": 1,
+      "unit": "px",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "row_gap",
+      "label": "纵向间距",
+      "min": 0,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "image_radius",
+      "label": "图片圆角",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "标题文字"
+    },
+    {
+      "type": "select",
+      "id": "title_alignment",
+      "label": "对齐",
+      "options": [
+        {
+          "value": "left",
+          "label": "左"
+        },
+        {
+          "value": "center",
+          "label": "中"
+        },
+        {
+          "value": "right",
+          "label": "右"
+        }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "title_case",
+      "label": "大小写",
+      "options": [
+        {
+          "value": "none",
+          "label": "默认"
+        },
+        {
+          "value": "uppercase",
+          "label": "大写"
+        }
+      ],
+      "default": "none"
+    },
+    {
+      "type": "range",
+      "id": "title_font_size",
+      "label": "字号",
+      "min": 10,
+      "max": 28,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "title_letter_spacing",
+      "label": "字距",
+      "min": 0,
+      "max": 4,
+      "step": 0.5,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "文字颜色",
+      "placeholder": "默认"
+    },
+    {
+      "type": "header",
+      "content": "区块"
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "宽度",
+      "options": [
+        {
+          "value": "page-width",
+          "label": "页面宽"
+        },
+        {
+          "value": "full-width",
+          "label": "全宽"
+        }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "背景色",
+      "placeholder": "默认"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "上边距",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 36
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "下边距",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 36
+    }
+  ],
+  "presets": [
+    {
+      "name": "方形集合网格",
+      "category": "t:categories.collections",
+      "blocks": {
+        "heading_title": {
+          "type": "heading",
+          "settings": {
+            "text": "<h2>Shop by Collection</h2>",
+            "width": "fit-content",
+            "max_width": "normal",
+            "alignment": "center",
+            "type_preset": "rte",
+            "font": "var(--font-heading--family)",
+            "font_size": "",
+            "line_height": "normal",
+            "letter_spacing": "normal",
+            "case": "none",
+            "wrap": "pretty",
+            "background": false,
+            "background_color": "#00000026",
+            "corner_radius": 0,
+            "padding-block-start": 0,
+            "padding-block-end": 16,
+            "padding-inline-start": 0,
+            "padding-inline-end": 0
+          }
+        },
+        "square_collection_1": {
+          "type": "square_collection",
+          "settings": {}
+        },
+        "square_collection_2": {
+          "type": "square_collection",
+          "settings": {}
+        },
+        "square_collection_3": {
+          "type": "square_collection",
+          "settings": {}
+        },
+        "square_collection_4": {
+          "type": "square_collection",
+          "settings": {}
+        }
+      },
+      "block_order": [
+        "heading_title",
+        "square_collection_1",
+        "square_collection_2",
+        "square_collection_3",
+        "square_collection_4"
+      ],
+      "settings": {
+        "columns": 4,
+        "mobile_columns": "2",
+        "column_gap": 16,
+        "row_gap": 24,
+        "image_radius": 0,
+        "title_alignment": "center",
+        "title_case": "none",
+        "title_font_size": 14,
+        "title_letter_spacing": 0,
+        "section_width": "page-width",
+        "padding-block-start": 36,
+        "padding-block-end": 36
+      }
+    }
+  ]
+}
+{% endschema %}
