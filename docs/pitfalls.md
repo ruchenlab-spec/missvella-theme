@@ -33,6 +33,14 @@
   JSON.parse(raw.replace(/^\s*\/\*[\s\S]*?\*\/\s*/, ''))
   ```
 
+### P26 · 推送 `templates/*.json` 后线上设置没变
+- **症状**：修改 `templates/index.json` 里的某个设置值并推送成功，但 `theme pull` 回来发现线上仍是旧值。
+- **原因**：主题编辑器保持打开时，编辑器会用自己内存里的模型自动保存并写回线上，覆盖 CLI 刚推送的值（并发写）。
+- **解决**：
+  - 推送模板前让商家在编辑器里完成保存并退出编辑状态（或关闭编辑器标签页）；
+  - 推送后**立即** `theme pull` 校验；
+  - 对单个数值型设置，直接让商家在编辑器里调整最可靠（编辑器是最后写入方）。
+
 ## 二、Shopify 主题架构限制
 
 ### P5 · `content_for 'block'` 报 `The 'id' argument should be a string`
