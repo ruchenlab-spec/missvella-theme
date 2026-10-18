@@ -255,10 +255,9 @@
   }
 
   /*
-   * The arrow must be centered on the CIRCLE only, but the slide row is
-   * circle + 12px gap + title below. Centering in the row therefore sits the
-   * arrow too low by half of (gap + title height). Pull it back up by exactly
-   * that amount, using the configured title size so it adapts to the settings.
+   * Arrows are plain grid items centered with align-items: center. The grid row
+   * is exactly as tall as the circles (titles are absolutely positioned, see
+   * below), so centering lands on the circle center with no offset math.
    */
   .circle-collections__arrow {
     position: relative;
@@ -268,7 +267,6 @@
     justify-content: center;
     width: var(--circle-arrow-size);
     height: var(--circle-arrow-size);
-    margin-block-start: calc(-1 * (12px + var(--circle-title-size) * 1.2) / 2);
     padding: 0;
     border: 0;
     background: transparent;
@@ -336,10 +334,17 @@
     }
   }
 
+  /*
+   * Slides are only as tall as the circle. The title sits below in the slides'
+   * bottom padding (which is cancelled out by a negative margin), so the
+   * carousel row height equals the circle height exactly.
+   */
   .circle-collections .circle-collections__carousel slideshow-slides {
     gap: var(--circle-gap);
-    margin-block: -12px;
-    padding-block: 12px;
+    padding-top: 12px;
+    margin-top: -12px;
+    padding-bottom: 44px;
+    margin-bottom: -44px;
     justify-content: safe center;
   }
 
@@ -363,10 +368,8 @@
   }
 
   .circle-collections__item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
+    position: relative;
+    display: block;
     text-decoration: none;
     color: var(--color-foreground);
   }
@@ -402,6 +405,13 @@
   }
 
   .circle-collections__title {
+    /* Out of the layout flow so the slide (and therefore the arrow row) is exactly
+       as tall as the circle; sits in the slides' bottom padding instead. */
+    position: absolute;
+    top: 100%;
+    inset-inline: 0;
+    margin-top: 12px;
+
     font-family: var(--font-body--family);
     font-size: var(--circle-title-size);
     font-weight: 500;
@@ -409,7 +419,6 @@
     text-align: center;
     text-transform: var(--circle-title-transform, uppercase);
     color: var(--circle-title-color, var(--color-foreground));
-    /* Single line keeps the slide height stable so the arrow offset stays exact */
     max-width: 100%;
     overflow: hidden;
     white-space: nowrap;
