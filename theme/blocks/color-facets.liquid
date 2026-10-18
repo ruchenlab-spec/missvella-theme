@@ -1,14 +1,18 @@
 {%- doc -%}
   Colour quick-filter row.
 
-  Renders the colour option filter of the current collection/search as a row of
-  round swatches with labels (and an "All" reset). Links use the native filter
-  value URLs (url_to_add / url_to_remove), so it stays in sync with the theme's
-  built-in Filters & Sort block: the same query parameters are used, other active
-  filters are preserved, and the native panel shows the same selection.
+  Two modes (block.settings.grouping):
+  - flat: one row of round swatches with labels
+  - family: swatches auto-grouped into colour families (Blue, Pink, Neutral...) with
+    a two-step interaction: family pill -> its child swatches -> back
 
-  Swatch colours come from value.swatch when Shopify provides one, then from the
-  built-in colour-name map, then from the merchant's optional custom map.
+  Both modes drive the theme's native colour filter (url_to_add / url_to_remove),
+  so they stay in sync with the built-in Filters & Sort block and preserve other
+  active filters.
+
+  Family grouping is automatic via a built-in colour-name map - no metaobjects
+  required. Custom swatch colours and custom family members can be added through
+  the block settings.
 {%- enddoc -%}
 
 {% liquid
@@ -36,19 +40,24 @@
     endif
   endfor
 
+  assign grouping = block.settings.grouping | default: 'family'
+
   # Built-in colour-name map: "name:#hex" pairs. Matched against the option value
   # lowercased, so "Rose gold", "rose-gold" and "ROSE GOLD" all match.
-  assign builtin_map = 'pink:#F4B8C8,navy:#1F2A5A,beige:#E8DCC8,rose gold:#DFA79A,rosegold:#DFA79A,blue:#3B5BA5,red:#C0392B,black:#111111,white:#FFFFFF,yellow:#F4D35E,purple:#7D5BA6,green:#3E8E5A,orange:#E4783C,brown:#8B5E3C,grey:#9E9E9E,gray:#9E9E9E,silver:#D9D9D9,gold:#C9A227,champagne:#F0E2C8,ivory:#F7F1E3,burgundy:#7B1E3A,wine:#6B1F35,apricot:#F5C6A5,lavender:#C9B6DB,lilac:#C9B6DB,khaki:#C3B091,dusty rose:#C98E96,floral:#F3E6EA,multicolor:#FFFFFF'
+  assign builtin_map = 'pink:#F4B8C8,navy:#1F2A5A,beige:#E8DCC8,rose gold:#DFA79A,rosegold:#DFA79A,blue:#3B5BA5,red:#C0392B,black:#111111,white:#FFFFFF,yellow:#F4D35E,purple:#7D5BA6,green:#3E8E5A,orange:#E4783C,brown:#8B5E3C,grey:#9E9E9E,gray:#9E9E9E,silver:#D9D9D9,gold:#C9A227,champagne:#F0E2C8,ivory:#F7F1E3,burgundy:#7B1E3A,wine:#6B1F35,apricot:#F5C6A5,lavender:#C9B6DB,lilac:#C9B6DB,khaki:#C3B091,dusty rose:#C98E96,teal:#2E8B8B,turquoise:#40C9C9,cobalt:#2242A8,royal blue:#2242A8,sky blue:#8FC1E9,denim:#4F6D8F,aqua:#7FDBDA,emerald:#2E9E6B,sage:#9CAF88,olive:#808000,mint:#B7E4C7,fuchsia:#DE3163,magenta:#D0417E,blush:#F2C6C2,coral:#FF7F50,peach:#F7C59F,rust:#B7410E,tan:#D2B48C,chocolate:#5C3A21,cream:#FFF5E1,multi:#FFFFFF'
+
   assign builtin_pairs = builtin_map | split: ','
 
   assign custom_pairs = ''
   if block.settings.custom_map != blank
     assign custom_pairs = block.settings.custom_map | newline_to_br | split: '<br />'
   endif
-%}
 
-{% liquid
-  # Defaults for blocks created before the padding settings existed
+  # Built-in colour families: "Family:member,member|Family:..." matched against
+  # the option value lowercased. Values that match no family fall into "Other".
+  assign family_map = 'Blue:Navy,Blue,Cobalt,Royal blue,Sky blue,Teal,Turquoise,Denim,Aqua|Pink:Pink,Rose,Rose gold,Blush,Fuchsia,Magenta,Dusty rose|Red:Red,Burgundy,Wine,Maroon,Coral,Cherry|Purple:Purple,Lavender,Lilac,Violet,Plum|Green:Green,Emerald,Sage,Olive,Mint|Yellow:Yellow,Gold,Mustard,Champagne|Orange:Orange,Apricot,Peach,Rust|Brown:Brown,Tan,Khaki,Beige,Chocolate|Neutrals:White,Ivory,Cream,Grey,Gray,Silver|Black:Black|Pattern:Floral,Print,Multi,Striped'
+  assign family_groups = family_map | split: '|'
+
   assign pad_block_start = block.settings['padding-block-start'] | default: 12
   assign pad_block_end = block.settings['padding-block-end'] | default: 20
   assign pad_inline_start = block.settings['padding-inline-start'] | default: 0
@@ -59,10 +68,12 @@
   <div
     class="
       color-facets
+      color-facets--grouping-{{ grouping }}
       color-facets--active-{{ block.settings.active_style | default: 'ring' }}
       {% if block.settings.hover_lift %}color-facets--lift{% endif %}
       spacing-style
     "
+    data-color-facets
     style="
       {% render 'spacing-style', settings: block.settings %}
       --padding-block-start: {{ pad_block_start }}px;
@@ -83,90 +94,205 @@
       <span class="color-facets__title">{{ block.settings.title }}</span>
     {% endif %}
 
-    <div class="color-facets__row">
-      {% if block.settings.show_all %}
+    {% if grouping == 'family' %}
+      {%- comment -%} ===== Layer 1: colour family pills ===== {%- endcomment -%}
+      <div class="color-facets__row color-facets__row--families">
         <a
-          class="color-facets__item{% if active_color_count == 0 %} is-active{% endif %}"
+          class="color-facets__pill{% if active_color_count == 0 %} is-active{% endif %}"
           href="{{ source.url }}"
-          aria-label="{{ block.settings.all_label | default: 'All' }}"
         >
-          <span class="color-facets__dot color-facets__dot--all" aria-hidden="true">
-            <svg viewBox="0 0 40 40" aria-hidden="true">
-              <circle cx="20" cy="20" r="20" fill="#F5EFE8"></circle>
-              <path d="M20 0a20 20 0 0 1 0 40Z" fill="#E3B7A6" opacity=".85"></path>
-              <path d="M20 0a20 20 0 0 1 20 20 20 20 0 0 1-20 20Z" fill="#B9AECB" opacity=".85"></path>
-              <path d="M0 20a20 20 0 0 1 20-20v20Z" fill="#DCC9C0" opacity=".9"></path>
-              <path d="M0 20h20v20A20 20 0 0 1 0 20Z" fill="#9FB2D8" opacity=".85"></path>
-            </svg>
-          </span>
-          {% if block.settings.show_label %}
-            <span class="color-facets__label">{{ block.settings.all_label | default: 'All' }}</span>
-          {% endif %}
+          <span class="color-facets__pill-name">{{ block.settings.all_label | default: 'All' }}</span>
         </a>
-      {% endif %}
 
-      {% for value in color_filter.values %}
-        {% liquid
-          assign swatch_hex = ''
-          assign value_key = value.label | downcase | strip
+        {%- for group in family_groups -%}
+          {%- assign parts = group | split: ':' -%}
+          {%- assign fam_name = parts[0] -%}
+          {%- assign fam_members = parts[1] | split: ',' -%}
+          {%- assign fam_valid = 0 -%}
+          {%- assign fam_active = 0 -%}
+          {%- assign fam_hex = '' -%}
+          {%- for value in color_filter.values -%}
+            {%- assign vkey = value.label | downcase | strip -%}
+            {%- for m in fam_members -%}
+              {%- assign mkey = m | downcase | strip -%}
+              {%- if mkey == vkey -%}
+                {%- assign fam_valid = fam_valid | plus: 1 -%}
+                {%- if value.active -%}
+                  {%- assign fam_active = fam_active | plus: 1 -%}
+                {%- endif -%}
+                {%- if fam_hex == blank -%}
+                  {%- capture fam_hex -%}{%- render 'color-facet-swatch', value: value, custom_pairs: custom_pairs, builtin_pairs: builtin_pairs -%}{%- endcapture -%}
+                {%- endif -%}
+                {%- break -%}
+              {%- endif -%}
+            {%- endfor -%}
+          {%- endfor -%}
+          {%- if fam_valid > 0 -%}
+            <button
+              type="button"
+              class="color-facets__pill{% if fam_active > 0 %} has-selection{% endif %}"
+              data-family-open="{{ fam_name | handle }}"
+            >
+              <span class="color-facets__dot" style="background: {{ fam_hex | default: '#ddd' }};" aria-hidden="true"></span>
+              <span class="color-facets__pill-name">
+                {{- fam_name -}}
+                {%- if fam_active > 0 %} <em>({{ fam_active }})</em>{% endif -%}
+              </span>
+            </button>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
 
-          # Priority: merchant custom map > Shopify swatch > built-in name map
-          if custom_pairs != blank
-            for pair in custom_pairs
-              assign trimmed = pair | strip
-              if trimmed == blank
-                continue
-              endif
-              assign key_part = trimmed | split: ':'
-              assign key_name = key_part[0] | downcase | strip
-              if key_name == value_key and key_part[1] != blank
-                assign swatch_hex = key_part[1] | strip
-                break
-              endif
-            endfor
-          endif
+      {%- comment -%} ===== Layer 2: child swatches per family ===== {%- endcomment -%}
+      {%- for group in family_groups -%}
+        {%- assign parts = group | split: ':' -%}
+        {%- assign fam_name = parts[0] -%}
+        {%- assign fam_members = parts[1] | split: ',' -%}
+        {%- assign fam_valid = 0 -%}
+        {%- assign fam_active = 0 -%}
+        {%- for value in color_filter.values -%}
+          {%- assign vkey = value.label | downcase | strip -%}
+          {%- for m in fam_members -%}
+            {%- assign mkey = m | downcase | strip -%}
+            {%- if mkey == vkey -%}
+              {%- assign fam_valid = fam_valid | plus: 1 -%}
+              {%- if value.active -%}
+                {%- assign fam_active = fam_active | plus: 1 -%}
+              {%- endif -%}
+              {%- break -%}
+            {%- endif -%}
+          {%- endfor -%}
+        {%- endfor -%}
+        {%- if fam_valid > 0 -%}
+          <div class="color-facets__row color-facets__row--children" data-family-layer="{{ fam_name | handle }}" hidden>
+            <button type="button" class="color-facets__back" data-family-back aria-label="{{ block.settings.back_label | default: 'Back' }}">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
+            </button>
+            <span class="color-facets__context">
+              <span class="color-facets__context-name">{{ fam_name }}</span>
+              <span class="color-facets__context-meta">
+                {%- if fam_active > 0 -%}{{ fam_active }} / {%- endif -%}{{ fam_valid }}
+              </span>
+            </span>
+            <span class="color-facets__divider" aria-hidden="true"></span>
 
-          if swatch_hex == blank and value.swatch.color != blank
-            assign swatch_hex = value.swatch.color
-          endif
+            {%- for value in color_filter.values -%}
+              {%- assign vkey = value.label | downcase | strip -%}
+              {%- assign in_family = false -%}
+              {%- for m in fam_members -%}
+                {%- assign mkey = m | downcase | strip -%}
+                {%- if mkey == vkey -%}
+                  {%- assign in_family = true -%}
+                  {%- break -%}
+                {%- endif -%}
+              {%- endfor -%}
+              {%- if in_family -%}
+                {%- capture value_hex -%}{%- render 'color-facet-swatch', value: value, custom_pairs: custom_pairs, builtin_pairs: builtin_pairs -%}{%- endcapture -%}
+                {%- liquid
+                  assign link_url = value.url_to_add
+                  if value.active
+                    assign link_url = value.url_to_remove
+                  endif
+                  assign is_disabled = false
+                  if value.count == 0 and value.active == false
+                    assign is_disabled = true
+                  endif
+                -%}
+                <a
+                  class="color-facets__item{% if value.active %} is-active{% endif %}{% if is_disabled %} is-disabled{% endif %}"
+                  href="{{ link_url }}"
+                  aria-label="{{ value.label }}"
+                  {% if value.active %}aria-current="true"{% endif %}
+                >
+                  <span class="color-facets__dot" style="background: {{ value_hex | default: '#ddd' }};" aria-hidden="true"></span>
+                  {% if block.settings.show_label %}
+                    <span class="color-facets__label">{{ value.label }}</span>
+                  {% endif %}
+                </a>
+              {%- endif -%}
+            {%- endfor -%}
+          </div>
+        {%- endif -%}
+      {%- endfor -%}
 
-          if swatch_hex == blank
-            for pair in builtin_pairs
-              assign key_part = pair | split: ':'
-              if key_part[0] == value_key
-                assign swatch_hex = key_part[1]
-                break
-              endif
-            endfor
-          endif
+      <script>
+        document.querySelectorAll('[data-color-facets]').forEach((bar) => {
+          if (bar.dataset.colorFacetsInit) return;
+          bar.dataset.colorFacetsInit = 'true';
+          bar.addEventListener('click', (e) => {
+            const opener = e.target.closest('[data-family-open]');
+            if (opener) {
+              e.preventDefault();
+              const name = opener.getAttribute('data-family-open');
+              bar.querySelector('.color-facets__row--families')?.classList.add('is-hidden');
+              bar.querySelectorAll('.color-facets__row--children').forEach((layer) => {
+                layer.hidden = layer.getAttribute('data-family-layer') !== name;
+              });
+              return;
+            }
+            if (e.target.closest('[data-family-back]')) {
+              e.preventDefault();
+              bar.querySelectorAll('.color-facets__row--children').forEach((layer) => (layer.hidden = true));
+              bar.querySelector('.color-facets__row--families')?.classList.remove('is-hidden');
+            }
+          });
+        });
+      </script>
+    {% else %}
+      {%- comment -%} ===== Flat mode: single row of swatches ===== {%- endcomment -%}
+      <div class="color-facets__row">
+        {% if block.settings.show_all %}
+          <a
+            class="color-facets__item{% if active_color_count == 0 %} is-active{% endif %}"
+            href="{{ source.url }}"
+            aria-label="{{ block.settings.all_label | default: 'All' }}"
+          >
+            <span class="color-facets__dot color-facets__dot--all" aria-hidden="true">
+              <svg viewBox="0 0 40 40" aria-hidden="true">
+                <circle cx="20" cy="20" r="20" fill="#F5EFE8"></circle>
+                <path d="M20 0a20 20 0 0 1 0 40Z" fill="#E3B7A6" opacity=".85"></path>
+                <path d="M20 0a20 20 0 0 1 20 20 20 20 0 0 1-20 20Z" fill="#B9AECB" opacity=".85"></path>
+                <path d="M0 20a20 20 0 0 1 20-20v20Z" fill="#DCC9C0" opacity=".9"></path>
+                <path d="M0 20h20v20A20 20 0 0 1 0 20Z" fill="#9FB2D8" opacity=".85"></path>
+              </svg>
+            </span>
+            {% if block.settings.show_label %}
+              <span class="color-facets__label">{{ block.settings.all_label | default: 'All' }}</span>
+            {% endif %}
+          </a>
+        {% endif %}
 
-          assign is_floral = false
-          if value_key contains 'floral' or value_key contains 'print' or value_key contains 'multi'
-            assign is_floral = true
-          endif
-
-          assign link_url = value.url_to_add
-          if value.active
-            assign link_url = value.url_to_remove
-          endif
-        %}
-        <a
-          class="color-facets__item{% if value.active %} is-active{% endif %}"
-          href="{{ link_url }}"
-          aria-label="{{ value.label }}{% if value.count != blank %} ({{ value.count }}){% endif %}"
-          {% if value.active %}aria-current="true"{% endif %}
-        >
-          <span
-            class="color-facets__dot{% if is_floral %} color-facets__dot--pattern{% endif %}"
-            style="{% if swatch_hex != blank %}background: {{ swatch_hex }};{% endif %}"
-            aria-hidden="true"
-          ></span>
-          {% if block.settings.show_label %}
-            <span class="color-facets__label">{{ value.label }}</span>
-          {% endif %}
-        </a>
-      {% endfor %}
-    </div>
+        {% for value in color_filter.values %}
+          {% capture value_hex %}{% render 'color-facet-swatch', value: value, custom_pairs: custom_pairs, builtin_pairs: builtin_pairs %}{% endcapture %}
+          {% liquid
+            assign link_url = value.url_to_add
+            if value.active
+              assign link_url = value.url_to_remove
+            endif
+            assign is_floral = false
+            assign value_key = value.label | downcase | strip
+            if value_key contains 'floral' or value_key contains 'print' or value_key contains 'multi'
+              assign is_floral = true
+            endif
+          %}
+          <a
+            class="color-facets__item{% if value.active %} is-active{% endif %}"
+            href="{{ link_url }}"
+            aria-label="{{ value.label }}{% if value.count != blank %} ({{ value.count }}){% endif %}"
+            {% if value.active %}aria-current="true"{% endif %}
+          >
+            <span
+              class="color-facets__dot{% if is_floral %} color-facets__dot--pattern{% endif %}"
+              style="{% if value_hex != blank %}background: {{ value_hex }};{% endif %}"
+              aria-hidden="true"
+            ></span>
+            {% if block.settings.show_label %}
+              <span class="color-facets__label">{{ value.label }}</span>
+            {% endif %}
+          </a>
+        {% endfor %}
+      </div>
+    {% endif %}
   </div>
 {% endif %}
 
@@ -211,9 +337,6 @@
     cursor: pointer;
   }
 
-  /*
-   * Swatch: soft inner hairline by default; hover lift + shadow when enabled.
-   */
   .color-facets__dot {
     display: block;
     width: var(--color-facet-size, 44px);
@@ -251,12 +374,6 @@
       0 6px 16px rgb(0 0 0 / 14%);
   }
 
-  /*
-   * Selected state:
-   * - ring: a soft outer ring separated from the swatch by the page background
-   * - label: a small dot under the bold label, swatch stays plain (reference style)
-   * - both: ring + bold label
-   */
   .color-facets--active-ring .color-facets__item.is-active .color-facets__dot,
   .color-facets--active-both .color-facets__item.is-active .color-facets__dot {
     box-shadow:
@@ -294,7 +411,127 @@
 
   .color-facets .color-facets__item.is-active .color-facets__label {
     opacity: 1;
+  }
+
+  .color-facets--active-label .color-facets__item.is-active .color-facets__label,
+  .color-facets--active-both .color-facets__item.is-active .color-facets__label {
     font-weight: 600;
+  }
+
+  /* ===== Family (two-step) mode ===== */
+  .color-facets__row--families.is-hidden {
+    display: none;
+  }
+
+  .color-facets__row--children[hidden] {
+    display: none;
+  }
+
+  .color-facets__row--children {
+    align-items: center;
+    row-gap: 0;
+    animation: color-facets-fade 0.25s ease;
+  }
+
+  .color-facets__pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    border: 1px solid rgb(0 0 0 / 12%);
+    border-radius: 999px;
+    background: transparent;
+    color: inherit;
+    font-family: var(--font-body--family);
+    font-size: calc(var(--color-facet-label-size, 11px) + 1px);
+    letter-spacing: 0.06em;
+    text-transform: var(--color-facet-label-transform, uppercase);
+    cursor: pointer;
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease;
+  }
+
+  .color-facets__pill:hover {
+    border-color: rgb(0 0 0 / 35%);
+  }
+
+  .color-facets__pill .color-facets__dot {
+    width: calc(var(--color-facet-size, 44px) * 0.5);
+    height: calc(var(--color-facet-size, 44px) * 0.5);
+  }
+
+  .color-facets__pill.is-active,
+  .color-facets__pill.has-selection {
+    background: var(--color-facet-text, var(--color-foreground));
+    color: var(--color-background, #fff);
+    border-color: var(--color-facet-text, var(--color-foreground));
+  }
+
+  .color-facets__pill em {
+    font-style: normal;
+    opacity: 0.75;
+  }
+
+  .color-facets__back {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: 1px solid rgb(0 0 0 / 12%);
+    border-radius: 50%;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .color-facets__back:hover {
+    border-color: rgb(0 0 0 / 35%);
+  }
+
+  .color-facets__back svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .color-facets__context {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: var(--font-body--family);
+    font-size: calc(var(--color-facet-label-size, 11px) + 2px);
+  }
+
+  .color-facets__context-name {
+    font-weight: 600;
+  }
+
+  .color-facets__context-meta {
+    opacity: 0.6;
+  }
+
+  .color-facets__divider {
+    width: 1px;
+    height: 20px;
+    background: rgb(0 0 0 / 12%);
+  }
+
+  .color-facets__item.is-disabled {
+    opacity: 0.35;
+    pointer-events: none;
+  }
+
+  @keyframes color-facets-fade {
+    from {
+      opacity: 0;
+      transform: translateX(10px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
   }
 
   @media screen and (max-width: 749px) {
@@ -326,6 +563,31 @@
       "content": "读取当前系列的颜色选项筛选，渲染为一排圆形色板。链接使用原生筛选参数，与「筛选和排序」区块共享状态，可同时使用。"
     },
     {
+      "type": "header",
+      "content": "编组"
+    },
+    {
+      "type": "select",
+      "id": "grouping",
+      "label": "编组方式",
+      "options": [
+        {
+          "value": "family",
+          "label": "按色系编组（两层）"
+        },
+        {
+          "value": "none",
+          "label": "平铺（不编组）"
+        }
+      ],
+      "default": "family",
+      "info": "按色系编组：先显示色系（Blue/Pink/...），点击后展开该色系的颜色，带返回按钮。色系归类按内置颜色名称表自动完成。"
+    },
+    {
+      "type": "header",
+      "content": "内容"
+    },
+    {
       "type": "text",
       "id": "title",
       "label": "标题",
@@ -344,10 +606,21 @@
       "default": "All"
     },
     {
+      "type": "text",
+      "id": "back_label",
+      "label": "返回按钮文字",
+      "default": "Back",
+      "visible_if": "{{ block.settings.grouping == 'family' }}"
+    },
+    {
       "type": "checkbox",
       "id": "show_label",
       "label": "显示颜色名称",
       "default": true
+    },
+    {
+      "type": "header",
+      "content": "布局"
     },
     {
       "type": "range",
@@ -357,7 +630,7 @@
       "max": 64,
       "step": 2,
       "unit": "px",
-      "default": 40
+      "default": 44
     },
     {
       "type": "range",
@@ -368,6 +641,36 @@
       "step": 2,
       "unit": "px",
       "default": 14
+    },
+    {
+      "type": "range",
+      "id": "label_size",
+      "label": "名称字号",
+      "min": 9,
+      "max": 16,
+      "step": 1,
+      "unit": "px",
+      "default": 11
+    },
+    {
+      "type": "select",
+      "id": "alignment",
+      "label": "对齐",
+      "options": [
+        {
+          "value": "flex-start",
+          "label": "左"
+        },
+        {
+          "value": "center",
+          "label": "中"
+        },
+        {
+          "value": "flex-end",
+          "label": "右"
+        }
+      ],
+      "default": "center"
     },
     {
       "type": "header",
@@ -471,34 +774,8 @@
       "default": 0
     },
     {
-      "type": "range",
-      "id": "label_size",
-      "label": "名称字号",
-      "min": 9,
-      "max": 16,
-      "step": 1,
-      "unit": "px",
-      "default": 11
-    },
-    {
-      "type": "select",
-      "id": "alignment",
-      "label": "对齐",
-      "options": [
-        {
-          "value": "flex-start",
-          "label": "左"
-        },
-        {
-          "value": "center",
-          "label": "中"
-        },
-        {
-          "value": "flex-end",
-          "label": "右"
-        }
-      ],
-      "default": "center"
+      "type": "header",
+      "content": "颜色"
     },
     {
       "type": "color",

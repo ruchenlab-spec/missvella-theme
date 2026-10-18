@@ -1,0 +1,45 @@
+{%- doc -%}
+  Resolves the swatch hex colour for a single filter value.
+
+  Priority: merchant custom map > Shopify swatch > built-in colour-name map.
+
+  @param {object} value - Filter value object
+  @param custom_pairs - Merchant "name:#hex" pairs (optional)
+  @param builtin_pairs - Built-in "name:#hex" pairs
+{%- enddoc -%}
+
+{% liquid
+  assign swatch_hex = ''
+  assign value_key = value.label | downcase | strip
+
+  if custom_pairs != blank
+    for pair in custom_pairs
+      assign trimmed = pair | strip
+      if trimmed == blank
+        continue
+      endif
+      assign key_part = trimmed | split: ':'
+      assign key_name = key_part[0] | downcase | strip
+      if key_name == value_key and key_part[1] != blank
+        assign swatch_hex = key_part[1] | strip
+        break
+      endif
+    endfor
+  endif
+
+  if swatch_hex == blank and value.swatch.color != blank
+    assign swatch_hex = value.swatch.color
+  endif
+
+  if swatch_hex == blank
+    for pair in builtin_pairs
+      assign key_part = pair | split: ':'
+      if key_part[0] == value_key
+        assign swatch_hex = key_part[1]
+        break
+      endif
+    endfor
+  endif
+-%}
+
+{{ swatch_hex }}
