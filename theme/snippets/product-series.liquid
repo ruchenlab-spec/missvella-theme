@@ -1,0 +1,125 @@
+{%- doc -%}
+  Renders the product "series" heading (e.g. IVELLA / HESSA) with an optional
+  inline SKU on the right, used above product titles on cards and product pages.
+
+  @param {object} product - Product resource
+  @param {object} settings - Block settings containing the series/SKU options
+{%- enddoc -%}
+
+{% liquid
+  assign series_value = ''
+
+  case settings.series_source
+    when 'vendor'
+      assign series_value = product.vendor
+    when 'type'
+      assign series_value = product.type
+    else
+      assign mf_key = settings.series_metafield | default: 'custom.series_title'
+      assign mf_parts = mf_key | split: '.'
+      if mf_parts.size >= 2
+        assign series_value = product.metafields[mf_parts[0]][mf_parts[1]].value
+      endif
+      if series_value == blank and settings.series_fallback_vendor
+        assign series_value = product.vendor
+      endif
+  endcase
+
+  assign series_value = series_value | strip
+
+  assign sku = product.selected_or_first_available_variant.sku
+  if sku == blank
+    assign sku = product.variants.first.sku
+  endif
+  assign sku = sku | strip
+
+  assign show_series = false
+  if settings.show_series and series_value != blank
+    assign show_series = true
+  endif
+
+  assign show_sku = false
+  if settings.show_sku and sku != blank
+    assign show_sku = true
+  endif
+-%}
+
+{% if show_series or show_sku %}
+  <div
+    class="product-series"
+    style="
+      --series-size: {{ settings.series_font_size | default: 12 }}px;
+      --series-case: {{ settings.series_case | default: 'none' }};
+      {% if settings.series_color != blank %}--series-color: {{ settings.series_color }};{% endif %}
+    "
+  >
+    {% if show_series %}
+      <span class="product-series__label">
+        {% if settings.series_icon %}
+          <span class="product-series__icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M13.2 2.2 4 13.4h6.1L9 21.8l9.3-11.2h-6.1l1-8.4Z"/></svg>
+          </span>
+        {% endif %}
+        <span class="product-series__text">{{ series_value }}</span>
+      </span>
+    {% endif %}
+    {% if show_sku %}
+      <span class="product-series__sku">{{ settings.sku_prefix | default: 'SKU:' }} {{ sku }}</span>
+    {% endif %}
+  </div>
+{% endif %}
+
+{% stylesheet %}
+  .product-series {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
+    width: 100%;
+    margin-block-end: 4px;
+  }
+
+  .product-series__label {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-body--family);
+    font-size: var(--series-size, 12px);
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    line-height: 1.3;
+    text-transform: var(--series-case, none);
+    color: var(--series-color, var(--color-foreground));
+    max-width: 60%;
+  }
+
+  .product-series__text {
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .product-series__icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 0.9em;
+    height: 0.9em;
+    flex: 0 0 auto;
+  }
+
+  .product-series__icon svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .product-series__sku {
+    font-family: var(--font-body--family);
+    font-size: var(--series-size, 12px);
+    line-height: 1.3;
+    color: var(--series-color, var(--color-foreground));
+    opacity: 0.7;
+    white-space: nowrap;
+    margin-inline-start: auto;
+  }
+{% endstylesheet %}

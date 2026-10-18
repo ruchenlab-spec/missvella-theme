@@ -17,6 +17,7 @@
   {% endif %}
 >
   {% capture children %}
+    {% render 'product-series', product: closest.product, settings: block_settings %}
     <div class="view-product-title">
       <a
         href="{{ closest.product.selected_or_first_available_variant.url }}"
@@ -139,6 +140,109 @@
   ],
   "tag": null,
   "settings": [
+    {
+      "type": "header",
+      "content": "系列标题与 SKU"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_series",
+      "label": "显示系列标题",
+      "info": "显示在产品标题上方",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "series_source",
+      "label": "数据源",
+      "options": [
+        {
+          "value": "metafield",
+          "label": "元字段"
+        },
+        {
+          "value": "vendor",
+          "label": "供应商"
+        },
+        {
+          "value": "type",
+          "label": "产品类型"
+        }
+      ],
+      "default": "metafield",
+      "visible_if": "{{ block.settings.show_series }}"
+    },
+    {
+      "type": "text",
+      "id": "series_metafield",
+      "label": "元字段键",
+      "info": "格式：命名空间.键，如 custom.series_title（需先在后台 设置 → 自定义数据 → 产品 中创建）",
+      "default": "custom.series_title",
+      "visible_if": "{{ block.settings.show_series and block.settings.series_source == 'metafield' }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "series_fallback_vendor",
+      "label": "元字段为空时使用供应商",
+      "default": true,
+      "visible_if": "{{ block.settings.show_series and block.settings.series_source == 'metafield' }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "series_icon",
+      "label": "显示图标",
+      "default": true,
+      "visible_if": "{{ block.settings.show_series }}"
+    },
+    {
+      "type": "select",
+      "id": "series_case",
+      "label": "大小写",
+      "options": [
+        {
+          "value": "none",
+          "label": "默认"
+        },
+        {
+          "value": "uppercase",
+          "label": "大写"
+        }
+      ],
+      "default": "none",
+      "visible_if": "{{ block.settings.show_series }}"
+    },
+    {
+      "type": "range",
+      "id": "series_font_size",
+      "label": "字号",
+      "min": 10,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 14,
+      "visible_if": "{{ block.settings.show_series }}"
+    },
+    {
+      "type": "color",
+      "id": "series_color",
+      "label": "颜色",
+      "placeholder": "默认",
+      "visible_if": "{{ block.settings.show_series }}"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_sku",
+      "label": "显示 SKU",
+      "info": "显示在系列标题行右侧（未显示系列标题时单独一行）",
+      "default": false
+    },
+    {
+      "type": "text",
+      "id": "sku_prefix",
+      "label": "SKU 前缀",
+      "default": "SKU:",
+      "visible_if": "{{ block.settings.show_sku }}"
+    },
     {
       "type": "header",
       "content": "t:content.size"
