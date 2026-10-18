@@ -18,6 +18,7 @@
   assign row_gap = section.settings.row_gap | default: 24
   assign columns = section.settings.columns | default: 4
   assign mobile_columns = section.settings.mobile_columns | default: '2'
+  assign image_ratio = section.settings.image_ratio | default: 'square'
 
   assign item_count = 0
   for block in section.blocks
@@ -88,7 +89,7 @@
         {%- else -%}
           <div class="square-collections__link">
         {%- endif -%}
-          <div class="square-collections__media">
+          <div class="square-collections__media" data-ratio="{{ image_ratio }}">
             {%- if block.settings.custom_image != blank -%}
               {{
                 block.settings.custom_image
@@ -123,7 +124,7 @@
       {%- for i in (1..columns) -%}
         <div class="square-collections__item">
           <div class="square-collections__link">
-            <div class="square-collections__media">
+            <div class="square-collections__media" data-ratio="{{ image_ratio }}">
               {{ 'collection-1' | placeholder_svg_tag: 'square-collections__image placeholder-svg' }}
             </div>
             <span class="square-collections__title">{{ 'placeholders.collection_title' | t }}</span>
@@ -171,10 +172,31 @@
 
   .square-collections__media {
     width: 100%;
-    aspect-ratio: 1 / 1;
     overflow: hidden;
     border-radius: var(--square-radius, 0);
     background-color: var(--color-background);
+  }
+
+  /* Aspect ratios mirror the theme's native image ratio options */
+  .square-collections__media[data-ratio='square'] {
+    aspect-ratio: 1 / 1;
+  }
+
+  .square-collections__media[data-ratio='portrait'] {
+    aspect-ratio: 4 / 5;
+  }
+
+  .square-collections__media[data-ratio='landscape'] {
+    aspect-ratio: 16 / 9;
+  }
+
+  /* Adapt: no forced ratio, the image keeps its own proportions */
+  .square-collections__media[data-ratio='adapt'] {
+    aspect-ratio: auto;
+  }
+
+  .square-collections__media[data-ratio='adapt'] .square-collections__image {
+    height: auto;
   }
 
   .square-collections__image {
@@ -632,6 +654,31 @@
       "step": 1,
       "unit": "px",
       "default": 24
+    },
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "label": "图片宽高比",
+      "options": [
+        {
+          "value": "adapt",
+          "label": "自动"
+        },
+        {
+          "value": "portrait",
+          "label": "纵向"
+        },
+        {
+          "value": "square",
+          "label": "方形"
+        },
+        {
+          "value": "landscape",
+          "label": "横向"
+        }
+      ],
+      "default": "square",
+      "info": "自动 = 保持图片原比例；其余按比例裁切填充"
     },
     {
       "type": "range",
