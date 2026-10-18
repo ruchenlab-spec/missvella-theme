@@ -246,6 +246,7 @@
     align-items: center;
     column-gap: 8px;
     width: 100%;
+    container-type: inline-size;
   }
 
   .circle-collections .circle-collections__carousel slideshow-container {
@@ -254,14 +255,30 @@
     min-width: 0;
   }
 
+  /*
+   * The arrow must be centered on the CIRCLE only. A slide is circle + title below,
+   * so centering in the whole slide row would sit too low. Calculate the circle
+   * diameter (column width capped by --circle-size) and offset the arrow by half
+   * the difference.
+   */
   .circle-collections__arrow {
+    --circle-media-size: min(
+      var(--circle-size),
+      calc(
+        (100cqw - 2 * (var(--circle-arrow-size) + 8px) - (var(--circle-gap) * (var(--circle-columns) - 1))) /
+          var(--circle-columns)
+      )
+    );
+
     position: relative;
     grid-row: 1;
+    align-self: start;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     width: var(--circle-arrow-size);
     height: var(--circle-arrow-size);
+    margin-block-start: calc((var(--circle-media-size) - var(--circle-arrow-size)) / 2);
     padding: 0;
     border: 0;
     background: transparent;
@@ -326,6 +343,16 @@
   @container circle-collections (max-width: 749px) {
     .circle-collections .circle-collections__carousel {
       column-gap: 4px;
+    }
+
+    .circle-collections__arrow {
+      --circle-media-size: min(
+        var(--circle-size),
+        calc(
+          (100cqw - 2 * (var(--circle-arrow-size) + 4px) - (var(--circle-gap) * (var(--circle-columns-mobile) - 1))) /
+            var(--circle-columns-mobile)
+        )
+      );
     }
   }
 
