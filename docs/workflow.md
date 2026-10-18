@@ -61,11 +61,19 @@ shopify theme push --store ... --theme 167137378374 --allow-live --path theme --
 
 ## 四、禁止事项
 
-1. ❌ **不要执行全量 `shopify theme push`**（无 `--only`）——会覆盖商家配置。必须全量时用 `.\scripts\push-live.ps1 -PullContent` 或 `-IncludeContent`。
-2. ❌ 不要在主题编辑器里改**代码**（`sections/`、`snippets/` 等），后台改动不会回流本地，下次推送即覆盖。
-3. ❌ 不要把 `theme_export_*.zip`、临时脚本提交进仓库。
-4. ❌ 不要在没有 `--allow-live` 的情况下对 live 主题执行 `theme dev/push`（CLI 会拒绝，属保护机制）。
-5. ⚠️ 推送前先 `shopify theme check --path theme`，确认没有新增错误。
+1. ❌ **不要推送 `theme/templates/*.json` 与 `theme/config/settings_data.json`**——它们保存商家在编辑器里配置的文案/图片/区块，本地副本永远是过期快照，推送即覆盖。
+2. ❌ **不要用「pull → 改一个值 → push」修改实例设置**——拉取到推送之间商家的改动会一并被旧快照覆盖。默认值改 schema，实例值让商家在编辑器调。
+3. ❌ 不要执行全量 `shopify theme push`（无 `--only`）——同样会覆盖商家配置。
+4. ❌ 不要在主题编辑器里改**代码**（`sections/`、`snippets/` 等），后台改动不会回流本地，下次推送即覆盖。
+5. ❌ 不要把 `theme_export_*.zip`、临时脚本提交进仓库。
+6. ⚠️ 推送前先 `shopify theme check --path theme`，确认没有新增错误。
+
+## 四之二、推送前检查清单（每次推送都要过一遍）
+
+- [ ] 本次推送的 `--only` 列表**不含** `templates/` 与 `config/`
+- [ ] 商家在编辑器里的改动已保存（推送会触发热重载，可能打断未保存的编辑）
+- [ ] 没有为了改某个设置值而拉取/推送模板
+- [ ] 推送后用 `theme pull --only templates/index.json` 抽查商家文案是否仍在（发现异常立即停止后续推送并告知）
 
 ## 五、开发习惯
 

@@ -2,7 +2,9 @@
 
 基于 Shopify 官方 **Horizon** 主题的深度定制，服务于 Missvella 店铺（`6icwx6-yv.myshopify.com`）。
 
-> **新会话接手必读**：按顺序阅读 `docs/` 下的文档，尤其是 `docs/project.md`（现状与决策）和 `docs/workflow.md`（推送流程与禁止事项）。
+> **新会话接手必读**：
+> 1. 先读根目录 `AGENTS.md`（硬性规则：永不推送 templates/config，否则会覆盖商家在编辑器里的文案与图片）
+> 2. 再读 `docs/project.md`（现状与决策）与 `docs/workflow.md`（推送流程与禁止事项）
 
 ## 目录结构
 
