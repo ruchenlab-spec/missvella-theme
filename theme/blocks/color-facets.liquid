@@ -95,13 +95,25 @@
     {% endif %}
 
     {% if grouping == 'family' %}
-      {%- comment -%} ===== Layer 1: colour family pills ===== {%- endcomment -%}
+      {%- comment -%} ===== Layer 1: colour families (same swatch+label look as children) ===== {%- endcomment -%}
       <div class="color-facets__row color-facets__row--families">
         <a
-          class="color-facets__pill{% if active_color_count == 0 %} is-active{% endif %}"
+          class="color-facets__item{% if active_color_count == 0 %} is-active{% endif %}"
           href="{{ source.url }}"
+          aria-label="{{ block.settings.all_label | default: 'All' }}"
         >
-          <span class="color-facets__pill-name">{{ block.settings.all_label | default: 'All' }}</span>
+          <span class="color-facets__dot color-facets__dot--all" aria-hidden="true">
+            <svg viewBox="0 0 40 40" aria-hidden="true">
+              <circle cx="20" cy="20" r="20" fill="#F5EFE8"></circle>
+              <path d="M20 0a20 20 0 0 1 0 40Z" fill="#E3B7A6" opacity=".85"></path>
+              <path d="M20 0a20 20 0 0 1 20 20 20 20 0 0 1-20 20Z" fill="#B9AECB" opacity=".85"></path>
+              <path d="M0 20a20 20 0 0 1 20-20v20Z" fill="#DCC9C0" opacity=".9"></path>
+              <path d="M0 20h20v20A20 20 0 0 1 0 20Z" fill="#9FB2D8" opacity=".85"></path>
+            </svg>
+          </span>
+          {% if block.settings.show_label %}
+            <span class="color-facets__label">{{ block.settings.all_label | default: 'All' }}</span>
+          {% endif %}
         </a>
 
         {%- for group in family_groups -%}
@@ -130,14 +142,17 @@
           {%- if fam_valid > 0 -%}
             <button
               type="button"
-              class="color-facets__pill{% if fam_active > 0 %} has-selection{% endif %}"
+              class="color-facets__item color-facets__item--family{% if fam_active > 0 %} is-active{% endif %}"
               data-family-open="{{ fam_name | handle }}"
+              aria-label="{{ fam_name }}"
             >
               <span class="color-facets__dot" style="background: {{ fam_hex | default: '#ddd' }};" aria-hidden="true"></span>
-              <span class="color-facets__pill-name">
-                {{- fam_name -}}
-                {%- if fam_active > 0 %} <em>({{ fam_active }})</em>{% endif -%}
-              </span>
+              {% if block.settings.show_label %}
+                <span class="color-facets__label">
+                  {{- fam_name -}}
+                  {%- if fam_active > 0 %} <em class="color-facets__count">({{ fam_active }})</em>{% endif -%}
+                </span>
+              {% endif %}
             </button>
           {%- endif -%}
         {%- endfor -%}
@@ -433,44 +448,28 @@
     animation: color-facets-fade 0.25s ease;
   }
 
-  .color-facets__pill {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 14px;
-    border: 1px solid rgb(0 0 0 / 12%);
-    border-radius: 999px;
-    background: transparent;
-    color: inherit;
-    font-family: var(--font-body--family);
-    font-size: calc(var(--color-facet-label-size, 11px) + 1px);
-    letter-spacing: 0.06em;
-    text-transform: var(--color-facet-label-transform, uppercase);
+  /*
+   * Family entries look exactly like the child swatches (round dot + label below),
+   * just slightly smaller, so both layers share one visual language. Selection
+   * reuses the same ring / bold-label styles chosen in the block settings.
+   */
+  .color-facets__item--family {
     cursor: pointer;
-    transition:
-      background-color 0.2s ease,
-      border-color 0.2s ease;
+    border: 0;
+    background: transparent;
+    padding: 0;
+    font: inherit;
   }
 
-  .color-facets__pill:hover {
-    border-color: rgb(0 0 0 / 35%);
+  .color-facets__item--family .color-facets__dot {
+    width: calc(var(--color-facet-size, 44px) * 0.72);
+    height: calc(var(--color-facet-size, 44px) * 0.72);
   }
 
-  .color-facets__pill .color-facets__dot {
-    width: calc(var(--color-facet-size, 44px) * 0.5);
-    height: calc(var(--color-facet-size, 44px) * 0.5);
-  }
-
-  .color-facets__pill.is-active,
-  .color-facets__pill.has-selection {
-    background: var(--color-facet-text, var(--color-foreground));
-    color: var(--color-background, #fff);
-    border-color: var(--color-facet-text, var(--color-foreground));
-  }
-
-  .color-facets__pill em {
+  .color-facets__count {
     font-style: normal;
-    opacity: 0.75;
+    font-weight: 400;
+    opacity: 0.7;
   }
 
   .color-facets__back {
