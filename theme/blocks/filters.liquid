@@ -231,7 +231,7 @@
                         else
                           assign should_render_clear = false
                         endif
-                        render 'list-filter', filter: filter, filter_style: block_settings.filter_style, active_value_count: active_value_count, should_render_clear: should_render_clear, show_swatch_label: block_settings.show_swatch_label, sectionId: section.id
+                        render 'list-filter', filter: filter, filter_style: block_settings.filter_style, active_value_count: active_value_count, should_render_clear: should_render_clear, show_swatch_label: block_settings.show_swatch_label, sectionId: section.id, color_groups: block_settings.color_group_map
                       %}
                   {% endcase %}
                 {%- endfor -%}
@@ -490,7 +490,7 @@
 
                         assign active_value_count = filter.active_values | size
                         assign total_active_values = total_active_values | plus: active_value_count
-                        render 'list-filter', filter: filter, filter_style: 'vertical', active_value_count: active_value_count, should_render_clear: false, in_drawer: true, sectionId: section.id
+                        render 'list-filter', filter: filter, filter_style: 'vertical', active_value_count: active_value_count, should_render_clear: false, in_drawer: true, sectionId: section.id, color_groups: block_settings.color_group_map
                       %}
                   {% endcase %}
                 {%- endfor -%}
@@ -1417,6 +1417,13 @@
       ],
       "default": "centered",
       "visible_if": "{{ block.settings.enable_filtering == true and block.settings.filter_style == 'horizontal' }}"
+    },
+    {
+      "type": "textarea",
+      "id": "color_group_map",
+      "label": "颜色分组",
+      "info": "每行一组，格式：组名:代表色hex:所含色值（逗号分隔）。示例：Blues:#3B5BA5:Navy,Royal Blue,Sky Blue。色值需与筛选值名称一致。留空则平铺不分组。",
+      "visible_if": "{{ block.settings.enable_filtering == true }}"
     },
     {
       "type": "select",
