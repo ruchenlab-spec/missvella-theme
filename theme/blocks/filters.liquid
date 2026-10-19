@@ -28,6 +28,17 @@
   assign sort_by = results.sort_by | default: results.default_sort_by
   assign filters = filters | default: results.filters
   assign total_active_values = 0
+-%}
+{%- comment -%} Colour groups: fall back to the built-in colour card standard when the
+merchant has not customized (or has cleared) the setting {%- endcomment -%}
+{%- capture color_group_map_value -%}{%- if block.settings.color_group_map != blank -%}{{ block.settings.color_group_map }}{%- else -%}Blues:#cee7f5:Sky Blue,Mist,Dusty Blue,Steel Blue,Slate Blue,Royal Blue,Stormy,Navy Blue,Deep Sea,Teal,Peacock Blue
+Greens:#174d4b:Peacock,Mint Green,Seafoam,Dusty Sage,Matcha,Sage Green,Agave,Forest Green,Olive Green,Hunter Green,Emerald,Dark Green
+Purples:#FF00FF:Fuchsia,Mulberry,Lilac,Wisteria,Lavender,Dusty Lavender,Mauve,Plum
+Pinks & Reds:#d87f03:Marigold,Blushing Pink,Petal,Coral,Dusty Rose,orange,Sunset,Rose Gold,Canyon Rose,Cinnamon,Terracotta,Burnt Orange,Rust,Cabernet,Burgundy,Paprika,Wine,Rosewood
+Yellow:#fff27b:Lemon,Daffodil,Butter
+Neutrals:#FAFAFA:White,Ivory,Sand,Champagne,Fog,Gold,Silver,grey,Mocha,Toffee
+Darks:#52443b:Espresso,Dark Navy,Black{%- endif -%}{%- endcapture -%}
+{%- liquid
 
   # Calculate facets margin style
   capture facets_margin_style
@@ -231,7 +242,7 @@
                         else
                           assign should_render_clear = false
                         endif
-                        render 'list-filter', filter: filter, filter_style: block_settings.filter_style, active_value_count: active_value_count, should_render_clear: should_render_clear, show_swatch_label: block_settings.show_swatch_label, sectionId: section.id, color_groups: block_settings.color_group_map
+                        render 'list-filter', filter: filter, filter_style: block_settings.filter_style, active_value_count: active_value_count, should_render_clear: should_render_clear, show_swatch_label: block_settings.show_swatch_label, sectionId: section.id, color_groups: color_group_map_value
                       %}
                   {% endcase %}
                 {%- endfor -%}
@@ -490,7 +501,7 @@
 
                         assign active_value_count = filter.active_values | size
                         assign total_active_values = total_active_values | plus: active_value_count
-                        render 'list-filter', filter: filter, filter_style: 'vertical', active_value_count: active_value_count, should_render_clear: false, in_drawer: true, sectionId: section.id, color_groups: block_settings.color_group_map
+                        render 'list-filter', filter: filter, filter_style: 'vertical', active_value_count: active_value_count, should_render_clear: false, in_drawer: true, sectionId: section.id, color_groups: color_group_map_value
                       %}
                   {% endcase %}
                 {%- endfor -%}
@@ -1422,7 +1433,8 @@
       "type": "textarea",
       "id": "color_group_map",
       "label": "颜色分组",
-      "info": "每行一组，格式：组名:代表色hex:所含色值（逗号分隔）。示例：Blues:#3B5BA5:Navy,Royal Blue,Sky Blue。色值需与筛选值名称一致。留空则平铺不分组。",
+      "default": "Blues:#cee7f5:Sky Blue,Mist,Dusty Blue,Steel Blue,Slate Blue,Royal Blue,Stormy,Navy Blue,Deep Sea,Teal,Peacock Blue\nGreens:#174d4b:Peacock,Mint Green,Seafoam,Dusty Sage,Matcha,Sage Green,Agave,Forest Green,Olive Green,Hunter Green,Emerald,Dark Green\nPurples:#FF00FF:Fuchsia,Mulberry,Lilac,Wisteria,Lavender,Dusty Lavender,Mauve,Plum\nPinks & Reds:#d87f03:Marigold,Blushing Pink,Petal,Coral,Dusty Rose,orange,Sunset,Rose Gold,Canyon Rose,Cinnamon,Terracotta,Burnt Orange,Rust,Cabernet,Burgundy,Paprika,Wine,Rosewood\nYellow:#fff27b:Lemon,Daffodil,Butter\nNeutrals:#FAFAFA:White,Ivory,Sand,Champagne,Fog,Gold,Silver,grey,Mocha,Toffee\nDarks:#52443b:Espresso,Dark Navy,Black",
+      "info": "每行一组，格式：组名:代表色hex:所含色值（逗号分隔）。色值需与筛选值名称一致。清空则平铺不分组。",
       "visible_if": "{{ block.settings.enable_filtering == true }}"
     },
     {

@@ -230,7 +230,8 @@
             name="{{ filter.label }}"
           >
           {% if is_color_filter and has_groups %}
-            {%- comment -%} Grouped swatch rendering (merchant colour groups) {%- endcomment -%}
+            {%- comment -%} Grouped swatch rendering (merchant colour groups); each value belongs to its FIRST matching group {%- endcomment -%}
+            {%- assign assigned_keys = ';' -%}
             {%- for line in group_lines -%}
               {%- assign gl = line | strip -%}
               {%- if gl == blank -%}{%- continue -%}{%- endif -%}
@@ -243,7 +244,7 @@
                 {%- assign av_key = av.label | downcase | strip -%}
                 {%- for m in members -%}
                   {%- assign m_key = m | downcase | strip -%}
-                  {%- if m_key == av_key -%}
+                  {%- if m_key contains av_key or av_key contains m_key -%}
                     {%- assign group_active = group_active | plus: 1 -%}
                     {%- break -%}
                   {%- endif -%}
@@ -261,14 +262,20 @@
                   {%- for value in filter.values -%}
                     {%- assign value_key = value.label | downcase | strip -%}
                     {%- assign in_group = false -%}
-                    {%- for m in members -%}
-                      {%- assign m_key = m | downcase | strip -%}
-                      {%- if m_key == value_key -%}
-                        {%- assign in_group = true -%}
-                        {%- break -%}
-                      {%- endif -%}
-                    {%- endfor -%}
+                    {%- if assigned_keys contains value_key -%}
+                      {%- assign already = true -%}
+                    {%- else -%}
+                      {%- assign already = false -%}
+                      {%- for m in members -%}
+                        {%- assign m_key = m | downcase | strip -%}
+                        {%- if m_key contains value_key or value_key contains m_key -%}
+                          {%- assign in_group = true -%}
+                          {%- break -%}
+                        {%- endif -%}
+                      {%- endfor -%}
+                    {%- endif -%}
                     {%- if in_group -%}
+                      {%- assign assigned_keys = assigned_keys | append: value_key | append: ';' -%}
                       {%- liquid
                         assign input_id = 'Filter-' | append: filter.param_name | escape | append: '-' | append: value.label | handleize | append: '-' | append: filter_style | append: '-' | append: in_drawer
                         assign is_disabled = false
@@ -287,6 +294,9 @@
               {%- for value in filter.values -%}
                 {%- assign value_key = value.label | downcase | strip -%}
                 {%- assign matched = false -%}
+                {%- if assigned_keys contains value_key -%}
+                  {%- assign matched = true -%}
+                {%- endif -%}
                 {%- for line in group_lines -%}
                   {%- assign gl2 = line | strip -%}
                   {%- if gl2 == blank -%}{%- continue -%}{%- endif -%}
@@ -294,7 +304,7 @@
                   {%- assign gm_members = gm_members[2] | split: ',' -%}
                   {%- for m in gm_members -%}
                     {%- assign m_key = m | downcase | strip -%}
-                    {%- if m_key == value_key -%}
+                    {%- if m_key contains value_key or value_key contains m_key -%}
                       {%- assign matched = true -%}
                       {%- break -%}
                     {%- endif -%}
