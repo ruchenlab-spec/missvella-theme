@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Custom Size Demo 1 · Atelier Rose（分步向导）</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: 'Inter', 'PingFang SC', sans-serif; background: #F7EFEA; color: #2C1B22; padding: 36px 24px 80px; }
+  .wrap { max-width: 1180px; margin: 0 auto; }
+  h1 { font-family: 'Playfair Display', serif; font-size: 26px; margin: 0 0 6px; }
+  .desc { font-size: 13px; color: #9b7d86; line-height: 1.7; margin: 0 0 8px; }
+  .hint { font-size: 12px; color: #c0a4ad; margin: 0 0 24px; }
+  .hint b { color: #6B2D3F; }
+
+  .mode-switch { display: inline-flex; gap: 10px; margin-bottom: 28px; }
+  .mode-switch button { padding: 10px 22px; border-radius: 999px; border: 1.5px solid #6B2D3F; background: none; color: #6B2D3F; font-size: 12.5px; font-weight: 600; cursor: pointer; letter-spacing: .04em; transition: all .22s ease; }
+  .mode-switch button.on { background: #6B2D3F; color: #F7EFEA; }
+
+  .page-layout { display: grid; grid-template-columns: 440px minmax(0, 1fr); gap: 44px; align-items: start; }
+  .page-layout[hidden], .modal-layout[hidden] { display: none; }
+
+  .htm-panel { background: #fff; border-radius: 20px; overflow: hidden; box-shadow: 0 24px 60px rgb(107 45 63 / 10%); }
+  .htm-panel__img { position: relative; aspect-ratio: 3/4.2; background: linear-gradient(165deg, #F3E3DC, #E8D3CB); }
+  .ph { position: absolute; inset: 0; display: grid; place-items: center; color: #C9A9A0; font-size: 12px; letter-spacing: .14em; }
+  .hotspot { position: absolute; width: 26px; height: 26px; border-radius: 50%; background: #6B2D3F; color: #F7EFEA; font-size: 11px; font-weight: 600; display: grid; place-items: center; cursor: pointer; box-shadow: 0 0 0 4px rgb(107 45 63 / 22%); transform: translate(-50%, -50%); transition: all .25s ease; }
+  .hotspot::after { content: ''; position: absolute; inset: -6px; border-radius: 50%; border: 1.5px solid rgb(107 45 63 / 45%); animation: pulse 2.2s ease infinite; }
+  @keyframes pulse { 0% { transform: scale(.85); opacity: 1; } 100% { transform: scale(1.4); opacity: 0; } }
+  .hotspot.on { background: #C9A227; box-shadow: 0 0 0 4px rgb(201 162 39 / 30%); }
+  .htm-panel__cap { padding: 14px 20px; font-size: 11px; color: #9b7d86; letter-spacing: .06em; text-transform: uppercase; border-top: 1px solid #F1E4DD; }
+
+  .steps-note { display: grid; gap: 10px; margin-top: 16px; }
+  .step-note { display: flex; gap: 12px; align-items: flex-start; padding: 13px 16px; background: #fff; border-radius: 14px; border: 1px solid #F1E4DD; cursor: pointer; transition: all .22s ease; }
+  .step-note:hover { border-color: #6B2D3F; }
+  .step-note.on { border-color: #C9A227; background: #FFFBF3; }
+  .step-note .n { width: 22px; height: 22px; border-radius: 50%; flex: 0 0 auto; display: grid; place-items: center; font-size: 11px; font-weight: 600; background: #F1E4DD; color: #6B2D3F; transition: all .22s ease; }
+  .step-note.on .n { background: #6B2D3F; color: #F7EFEA; }
+  .step-note .t { font-size: 12.5px; color: #6b5a60; line-height: 1.55; }
+  .step-note.on .t { color: #2C1B22; }
+
+  .form-card { background: #fff; border-radius: 20px; overflow: hidden; box-shadow: 0 24px 60px rgb(107 45 63 / 10%); }
+  .fc-top { padding: 26px 32px 0; }
+  .fc-kicker { font-size: 10.5px; letter-spacing: .22em; text-transform: uppercase; color: #C9A227; font-weight: 600; }
+  .fc-title { font-family: 'Playfair Display', serif; font-size: 24px; margin: 6px 0 4px; }
+  .fc-sub { font-size: 12.5px; color: #9b7d86; }
+  .stepper { display: flex; margin: 22px 32px 0; border-bottom: 1px solid #F1E4DD; }
+  .stepper span { flex: 1; text-align: center; padding: 12px 0; font-size: 11.5px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #c0a4ad; border-bottom: 2px solid transparent; margin-bottom: -1px; transition: all .25s ease; }
+  .stepper span.on { color: #6B2D3F; border-color: #6B2D3F; }
+  .fc-body { padding: 26px 32px 30px; }
+
+  .unit-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+  .unit-row .lbl { font-size: 12px; color: #9b7d86; }
+  .unit-seg { display: inline-flex; background: #F7EFEA; border-radius: 999px; padding: 3px; }
+  .unit-seg button { border: 0; background: none; padding: 7px 18px; border-radius: 999px; font-size: 11.5px; font-weight: 600; cursor: pointer; color: #9b7d86; transition: all .2s ease; }
+  .unit-seg button.on { background: #6B2D3F; color: #F7EFEA; }
+
+  .fields { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .field { display: flex; flex-direction: column; gap: 7px; }
+  .field.wide { grid-column: 1 / -1; }
+  .field__head { display: flex; align-items: baseline; justify-content: space-between; }
+  .field__label { font-size: 12px; font-weight: 600; color: #2C1B22; }
+  .field__label i { font-style: normal; color: #C9A227; margin-right: 4px; }
+  .field__opt { font-size: 10px; color: #c0a4ad; text-transform: uppercase; letter-spacing: .06em; }
+  .input { position: relative; }
+  .input input { width: 100%; padding: 13px 44px 13px 14px; border-radius: 12px; border: 1.5px solid #E9DCD5; background: #FDFAF8; font: inherit; font-size: 14px; color: #2C1B22; transition: all .2s ease; outline: none; }
+  .input input:focus { border-color: #6B2D3F; background: #fff; box-shadow: 0 0 0 3.5px rgb(107 45 63 / 10%); }
+  .input input::placeholder { color: #cbb5ad; }
+  .input .u { position: absolute; right: 13px; top: 50%; transform: translateY(-50%); font-size: 11px; color: #b08f9a; pointer-events: none; }
+
+  .actions { display: flex; gap: 12px; margin-top: 24px; }
+  .btn-primary { flex: 2; padding: 15px; border-radius: 999px; border: 0; cursor: pointer; background: linear-gradient(135deg, #6B2D3F, #8E3A52); color: #F7EFEA; font-size: 13px; font-weight: 600; letter-spacing: .05em; box-shadow: 0 12px 26px rgb(107 45 63 / 28%); transition: all .22s ease; }
+  .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 16px 32px rgb(107 45 63 / 34%); }
+  .btn-ghost { flex: 1; padding: 15px; border-radius: 999px; cursor: pointer; background: none; border: 1.5px solid #E0CCC3; color: #9b7d86; font-size: 13px; font-weight: 500; transition: all .22s ease; }
+  .btn-ghost:hover { border-color: #6B2D3F; color: #6B2D3F; }
+
+  .review { display: none; }
+  .review.on { display: block; }
+  .review-tag { display: flex; align-items: baseline; justify-content: space-between; padding: 13px 4px; border-bottom: 1px dashed #E9DCD5; font-size: 13px; }
+  .review-tag .k { color: #9b7d86; }
+  .review-tag .v { font-weight: 600; }
+  .cart-line { margin-top: 20px; padding: 14px 18px; border-radius: 14px; background: #FFFBF3; border: 1px dashed #C9A227; font-size: 12px; color: #6b5a60; line-height: 1.7; }
+  .cart-line code { font-family: Consolas, monospace; font-size: 11px; color: #6B2D3F; background: #F7EFEA; padding: 2px 6px; border-radius: 6px; word-break: break-all; }
+
+  .modal-layout { position: relative; }
+  .modal-demo { position: relative; min-height: 620px; border-radius: 24px; overflow: hidden; background: linear-gradient(150deg, #F3E3DC, #E5CFC6); border: 1px solid #F1E4DD; }
+  .fake-product { position: absolute; inset: 0; display: grid; place-items: center; color: #C9A9A0; font-size: 12px; letter-spacing: .14em; text-transform: uppercase; }
+  .center-modal { position: absolute; inset: 0; margin: auto; width: min(560px, calc(100% - 48px)); height: fit-content; max-height: calc(100% - 48px); background: #fff; border-radius: 24px; box-shadow: 0 40px 90px rgb(60 20 32 / 30%); overflow: hidden; }
+  .cm-head { padding: 22px 30px 0; display: flex; align-items: flex-start; justify-content: space-between; }
+  .cm-close { width: 34px; height: 34px; border-radius: 50%; border: 1px solid #E9DCD5; background: none; cursor: pointer; color: #9b7d86; transition: all .2s ease; }
+  .cm-close:hover { border-color: #6B2D3F; color: #6B2D3F; transform: rotate(90deg); }
+  .cm-body { padding: 0 30px 28px; }
+  .cm-body .stepper { margin: 20px 0 0; }
+  .cm-body .fc-body { padding: 22px 0 0; }
+  .saved-face { padding: 46px 20px; text-align: center; }
+  .saved-face .ok { font-size: 36px; color: #3E6B45; }
+  .saved-face .t { font-family: 'Playfair Display', serif; font-size: 19px; margin: 10px 0 6px; }
+  .saved-face .s { font-size: 12px; color: #9b7d86; }
+
+  @media (max-width: 900px) { .page-layout { grid-template-columns: 1fr; } }
+  @media (max-width: 640px) { .fields { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Custom Size Demo 1 · Atelier Rose</h1>
+  <p class="desc">裸粉 × 深梅 × 金线。页面版为二级详情页双栏布局（测量图 + 分步表单）；弹窗版为居中模态。数据流与线上模块一致：properties[Custom Size] 行项目属性。</p>
+  <p class="hint"><b>看什么：</b>CM/IN 自动换算 · 必填校验（Bust/Waist/Hips/Hollow to Floor）· 保存后 Review 显示 properties 写入格式 · 热点与步骤联动 · 切换 <b>页面/弹窗</b></p>
+
+  <div class="mode-switch">
+    <button class="on" data-mode="page">二级页面版</button>
+    <button data-mode="modal">弹窗版</button>
+  </div>
+
+  <div class="page-layout" id="pageView">
+    <div>
+      <div class="htm-panel">
+        <div class="htm-panel__img">
+          <div class="ph">HOW TO MEASURE · MODEL IMAGE</div>
+          <div class="hotspot" data-h="1" style="left:28%;top:24%">1</div>
+          <div class="hotspot" data-h="2" style="left:26%;top:36%">2</div>
+          <div class="hotspot" data-h="3" style="left:30%;top:52%">3</div>
+          <div class="hotspot" data-h="4" style="left:22%;top:66%">4</div>
+          <div class="hotspot" data-h="5" style="left:74%;top:48%">5</div>
+        </div>
+        <div class="htm-panel__cap">How to Measure · Tap a number</div>
+      </div>
+      <div class="steps-note" id="stepsNote"></div>
+    </div>
+
+    <div class="form-card">
+      <div class="fc-top">
+        <div class="fc-kicker">Made to Measure</div>
+        <div class="fc-title">Your Custom Size</div>
+        <div class="fc-sub">Crafted to your exact measurements · Included free</div>
+      </div>
+      <div class="stepper">
+        <span class="on" data-step="m">1 · Measurements</span>
+        <span data-step="r">2 · Review</span>
+      </div>
+      <div class="fc-body">
+        <div id="measureStep">
+          <div class="unit-row">
+            <span class="lbl">Measurement unit</span>
+            <span class="unit-seg" data-unitseg><button class="on" data-u="cm">CM</button><button data-u="in">IN</button></span>
+          </div>
+          <div class="fields" id="fields"></div>
+          <div class="actions">
+            <button class="btn-ghost" id="clearBtn">Clear</button>
+            <button class="btn-primary" id="nextBtn">Continue to Review →</button>
+          </div>
+        </div>
+        <div class="review" id="reviewStep">
+          <div id="reviewTags"></div>
+          <div class="cart-line">加购时写入购物车的行项目属性：<br><code>properties[Custom Size] = <span id="propVal"></span></code></div>
+          <div class="actions">
+            <button class="btn-ghost" id="backBtn">← Back</button>
+            <button class="btn-primary" id="saveBtn">Confirm &amp; Keep</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-layout" id="modalView" hidden>
+    <div class="modal-demo">
+      <div class="fake-product">Product Page Background</div>
+      <div class="center-modal">
+        <div class="cm-head">
+          <div>
+            <div class="fc-kicker">Made to Measure</div>
+            <div class="fc-title" style="font-size:20px;">Custom Size</div>
+          </div>
+          <div style="display:flex;gap:10px;align-items:center;">
+            <span class="unit-seg" data-unitseg><button class="on" data-u="cm">CM</button><button data-u="in">IN</button></span>
+            <button class="cm-close">✕</button>
+          </div>
+        </div>
+        <div class="cm-body">
+          <div class="stepper"><span class="on">1 · Measurements</span><span>2 · Review</span></div>
+          <div class="fc-body">
+            <div class="fields" id="fieldsModal"></div>
+            <div class="actions">
+              <button class="btn-ghost" style="flex:1">Clear</button>
+              <button class="btn-primary" style="flex:2" id="saveModal">Save Measurements</button>
+            </div>
+            <div class="cart-line" style="margin-top:18px"><code>properties[Custom Size] = "Bust 88cm / Waist 70cm / Hips 96cm / Hollow to Floor 150cm / Height 170cm"</code></div>
+          </div>
+        </div>
+        <div class="saved-face" id="savedFace" hidden>
+          <div class="ok">✓</div>
+          <div class="t">Measurements Saved</div>
+          <div class="s">properties[Custom Size] attached to the line item · Custom Sizes variant selected</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const FIELDS = [
+  { k: 'bust', label: 'Bust', cm: 88, inch: 34.6, req: true },
+  { k: 'waist', label: 'Waist', cm: 70, inch: 27.6, req: true },
+  { k: 'hips', label: 'Hips', cm: 96, inch: 37.8, req: true },
+  { k: 'hollow', label: 'Hollow to Floor', cm: 150, inch: 59.1, req: true, wide: true },
+  { k: 'height', label: 'Height', cm: 170, inch: 67, req: false, wide: true },
+];
+const NOTES = {
+  1: 'Bust — measure around the fullest part of your bust.',
+  2: 'Waist — measure around the narrowest part of your natural waistline.',
+  3: 'Hips — measure the fullest part, about 8 inches below the waist.',
+  4: 'Hollow to Floor — from the throat hollow straight down to the floor.',
+  5: 'Height — from the top of your head straight down to the floor.',
+};
+const state = { unit: 'cm', values: {} };
+
+function buildFields(id) {
+  const box = document.getElementById(id);
+  box.innerHTML = '';
+  FIELDS.forEach((f) => {
+    const d = document.createElement('div');
+    d.className = 'field' + (f.wide ? ' wide' : '');
+    d.innerHTML = '<div class="field__head"><label class="field__label"><i>' + (f.req ? '✦' : '·') + '</i>' + f.label + '</label>' + (f.req ? '' : '<span class="field__opt">optional</span>') + '</div><div class="input"><input type="number" step="0.1" min="0" data-k="' + f.k + '" placeholder="e.g. ' + f.cm + '"><span class="u">cm</span></div>';
+    box.appendChild(d);
+  });
+}
+buildFields('fields');
+buildFields('fieldsModal');
+
+document.addEventListener('click', (e) => {
+  const uBtn = e.target.closest('[data-u]');
+  if (uBtn) {
+    const u = uBtn.dataset.u;
+    state.unit = u;
+    document.querySelectorAll('[data-unitseg] button').forEach((x) => x.classList.toggle('on', x.dataset.u === u));
+    document.querySelectorAll('input[type="number"][data-k]').forEach((inp) => {
+      const f = FIELDS.find((x) => x.k === inp.dataset.k);
+      inp.placeholder = 'e.g. ' + (u === 'cm' ? f.cm : f.inch);
+      inp.parentElement.querySelector('.u').textContent = u;
+      if (inp.value) { const v = parseFloat(inp.value); if (!isNaN(v)) inp.value = u === 'cm' ? (v * 2.54).toFixed(1) : (v / 2.54).toFixed(1); }
+    });
+  }
+  const hs = e.target.closest('.hotspot');
+  if (hs) focusStep(hs.dataset.h);
+  const sn = e.target.closest('.step-note');
+  if (sn) focusStep(sn.dataset.h);
+});
+
+function focusStep(n) {
+  document.querySelectorAll('.hotspot').forEach((h) => h.classList.toggle('on', h.dataset.h === n));
+  document.querySelectorAll('.step-note').forEach((s) => s.classList.toggle('on', s.dataset.h === n));
+}
+const noteBox = document.getElementById('stepsNote');
+Object.entries(NOTES).forEach(([n, t]) => {
+  const d = document.createElement('div');
+  d.className = 'step-note'; d.dataset.h = n;
+  d.innerHTML = '<span class="n">' + n + '</span><span class="t">' + t + '</span>';
+  noteBox.appendChild(d);
+});
+
+function propString() {
+  const u = state.unit;
+  return FIELDS.filter((f) => state.values[f.k]).map((f) => f.label + ' ' + state.values[f.k] + u).join(' / ');
+}
+
+document.getElementById('nextBtn').onclick = () => {
+  let valid = true;
+  document.querySelectorAll('#fields input').forEach((inp) => {
+    const f = FIELDS.find((x) => x.k === inp.dataset.k);
+    const v = inp.value.trim();
+    inp.style.borderColor = '';
+    if (f.req && (!v || isNaN(v) || +v <= 0)) { inp.style.borderColor = '#B4465E'; valid = false; }
+    if (v && !isNaN(v)) state.values[f.k] = +v;
+  });
+  if (!valid) return;
+  document.getElementById('reviewTags').innerHTML = FIELDS.filter((f) => state.values[f.k]).map((f) => '<div class="review-tag"><span class="k">' + f.label + '</span><span class="v">' + state.values[f.k] + ' ' + state.unit + '</span></div>').join('');
+  document.getElementById('propVal').textContent = propString();
+  document.querySelectorAll('.stepper span').forEach((s) => s.classList.toggle('on', s.dataset.step === 'r'));
+  document.getElementById('measureStep').style.display = 'none';
+  document.getElementById('reviewStep').classList.add('on');
+};
+document.getElementById('backBtn').onclick = () => {
+  document.querySelectorAll('.stepper span').forEach((s) => s.classList.toggle('on', s.dataset.step === 'm'));
+  document.getElementById('reviewStep').classList.remove('on');
+  document.getElementById('measureStep').style.display = 'block';
+};
+document.getElementById('saveBtn').onclick = () => {
+  document.getElementById('doneNote') || document.querySelector('#reviewStep').insertAdjacentHTML('beforeend', '<div class="cart-line" style="background:#EDF5EA;border-color:#9CBF9F;color:#3E6B45">✓ Measurements saved — the “Custom Sizes” variant has been selected.</div>');
+};
+document.getElementById('clearBtn').onclick = () => { state.values = {}; document.querySelectorAll('#fields input').forEach((i) => i.value = ''); };
+document.getElementById('saveModal').onclick = () => {
+  document.querySelector('#modalView .cm-body').innerHTML = '<div class="saved-face"><div class="ok">✓</div><div class="t">Measurements Saved</div><div class="s">properties[Custom Size] attached to the line item · Custom Sizes variant selected</div></div>';
+};
+
+document.querySelectorAll('.mode-switch button').forEach((b) => {
+  b.onclick = () => {
+    document.querySelectorAll('.mode-switch button').forEach((x) => x.classList.remove('on'));
+    b.classList.add('on');
+    const modal = b.dataset.mode === 'modal';
+    document.getElementById('pageView').hidden = modal;
+    document.getElementById('modalView').hidden = !modal;
+  };
+});
+</script>
+</body>
+</html>

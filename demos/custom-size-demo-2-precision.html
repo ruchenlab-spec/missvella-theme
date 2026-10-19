@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Custom Size Demo 2 · Mono Precision（工程制图）</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: 'Archivo', 'PingFang SC', sans-serif; background: #E8EBEA; color: #1A1D1C; padding: 36px 24px 80px; }
+  .wrap { max-width: 1240px; margin: 0 auto; }
+  h1 { font-size: 22px; margin: 0 0 6px; }
+  .desc { font-size: 13px; color: #5e6a66; line-height: 1.7; margin: 0 0 8px; }
+  .hint { font-size: 12px; color: #8a9793; margin: 0 0 26px; }
+  .hint b { color: #1A1D1C; }
+
+  .mode-switch { display: inline-flex; border: 1.5px solid #1A1D1C; margin-bottom: 26px; }
+  .mode-switch button { border: 0; background: none; padding: 10px 24px; font-size: 12px; font-weight: 600; letter-spacing: .1em; text-transform: uppercase; cursor: pointer; color: #5e6a66; transition: all .2s ease; }
+  .mode-switch button.on { background: #1A1D1C; color: #D7F25A; }
+
+  .sheet { background: #F4F6F5; background-image: linear-gradient(rgb(26 29 28 / 5%) 1px, transparent 1px), linear-gradient(90deg, rgb(26 29 28 / 5%) 1px, transparent 1px); background-size: 22px 22px; border: 1.5px solid #1A1D1C; }
+
+  .page-layout { display: grid; grid-template-columns: 400px minmax(0, 1fr); }
+  .page-layout[hidden], .drawer-layout[hidden] { display: none; }
+
+  .left-col { border-right: 1.5px solid #1A1D1C; padding: 26px; }
+  .doc-tag { display: inline-block; font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .14em; padding: 4px 10px; border: 1px solid #1A1D1C; margin-bottom: 14px; }
+  .doc-title { font-size: 20px; font-weight: 700; margin: 0 0 4px; }
+  .doc-sub { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #5e6a66; margin-bottom: 20px; }
+  .doc-img { position: relative; aspect-ratio: 3/4.3; background: #fff; border: 1.5px solid #1A1D1C; overflow: hidden; }
+  .grid-lines { position: absolute; inset: 0; background-image: linear-gradient(rgb(26 29 28 / 6%) 1px, transparent 1px), linear-gradient(90deg, rgb(26 29 28 / 6%) 1px, transparent 1px); background-size: 26px 26px; }
+  .mannequin { position: absolute; inset: 0; display: grid; place-items: center; font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: #9aa5a1; letter-spacing: .1em; }
+  .hp { position: absolute; width: 30px; height: 30px; border: 1.5px solid #1A1D1C; background: #D7F25A; font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; display: grid; place-items: center; cursor: pointer; transform: translate(-50%, -50%); transition: all .18s ease; z-index: 2; }
+  .hp:hover, .hp.on { background: #1A1D1C; color: #D7F25A; }
+
+  .step-list { margin-top: 20px; border-top: 1.5px solid #1A1D1C; }
+  .srow { display: flex; gap: 12px; align-items: center; padding: 12px 4px; border-bottom: 1px solid rgb(26 29 28 / 14%); cursor: pointer; transition: all .18s ease; }
+  .srow:hover { background: rgb(215 242 90 / 25%); }
+  .srow.on { background: #D7F25A; }
+  .srow .n { font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; width: 24px; }
+  .srow .t { font-size: 12.5px; flex: 1; }
+  .srow .arrow { font-family: 'IBM Plex Mono', monospace; color: #8a9793; }
+
+  .right-col { padding: 26px; }
+  .rc-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 22px; gap: 14px; flex-wrap: wrap; }
+  .rc-title { font-size: 17px; font-weight: 700; }
+  .unit-seg { display: inline-flex; border: 1.5px solid #1A1D1C; }
+  .unit-seg button { border: 0; background: none; padding: 8px 20px; font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; cursor: pointer; color: #5e6a66; transition: all .18s ease; }
+  .unit-seg button.on { background: #1A1D1C; color: #D7F25A; }
+
+  .measure-table { border: 1.5px solid #1A1D1C; }
+  .mrow { display: grid; grid-template-columns: 52px 1fr 150px 84px; border-bottom: 1px solid rgb(26 29 28 / 14%); }
+  .mrow:last-child { border-bottom: 0; }
+  .mrow.head { background: #1A1D1C; color: #D7F25A; font-family: 'IBM Plex Mono', monospace; font-size: 10px; letter-spacing: .12em; text-transform: uppercase; }
+  .mrow.head > div { padding: 9px 14px; }
+  .mcell { padding: 13px 14px; display: flex; align-items: center; gap: 8px; }
+  .mrow:not(.head):hover { background: rgb(215 242 90 / 18%); }
+  .mnum { font-family: 'IBM Plex Mono', monospace; font-size: 11px; font-weight: 600; }
+  .mlabel { font-size: 13px; font-weight: 600; }
+  .mlabel small { display: block; font-size: 10.5px; color: #8a9793; font-weight: 400; margin-top: 2px; }
+  .mrow.req-miss .mlabel::after { content: 'REQUIRED'; font-family: 'IBM Plex Mono', monospace; font-size: 9px; color: #B4465E; margin-left: 8px; }
+  .minput { position: relative; flex: 1; }
+  .minput input { width: 100%; padding: 9px 34px 9px 10px; font-family: 'IBM Plex Mono', monospace; font-size: 13px; border: 1.5px solid #1A1D1C; background: #fff; outline: none; transition: all .15s ease; }
+  .minput input:focus { background: #D7F25A; box-shadow: 3px 3px 0 #1A1D1C; }
+  .minput input::placeholder { color: #a9b3af; }
+  .minput .u { position: absolute; right: 9px; top: 50%; transform: translateY(-50%); font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #5e6a66; }
+  .mopt { font-family: 'IBM Plex Mono', monospace; font-size: 10px; color: #8a9793; }
+
+  .actions { display: flex; border: 1.5px solid #1A1D1C; border-top: 0; }
+  .actions button { flex: 1; border: 0; padding: 15px; font-family: 'Archivo', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; cursor: pointer; transition: all .18s ease; }
+  .actions .primary { background: #1A1D1C; color: #D7F25A; }
+  .actions .primary:hover { background: #D7F25A; color: #1A1D1C; }
+  .actions .secondary { background: #F4F6F5; color: #1A1D1C; border-right: 1.5px solid #1A1D1C; }
+  .actions .secondary:hover { background: #fff; }
+
+  .prop-echo { margin-top: 18px; padding: 14px 16px; border: 1px dashed #1A1D1C; font-family: 'IBM Plex Mono', monospace; font-size: 11px; line-height: 1.8; color: #3d4a46; background: rgb(215 242 90 / 20%); }
+  .prop-echo b { color: #1A1D1C; }
+
+  .drawer-stage { position: relative; min-height: 640px; background: #DDE2E0; border: 1.5px solid #1A1D1C; overflow: hidden; }
+  .stage-bg { position: absolute; inset: 0; display: grid; place-items: center; font-family: 'IBM Plex Mono', monospace; font-size: 11px; letter-spacing: .14em; color: #8a9793; }
+  .drawer { position: absolute; top: 0; right: 0; bottom: 0; width: min(520px, 100%); background: #F4F6F5; border-left: 1.5px solid #1A1D1C; box-shadow: -30px 0 70px rgb(26 29 28 / 25%); display: flex; flex-direction: column; }
+  .drawer-head { display: flex; align-items: center; justify-content: space-between; padding: 18px 22px; border-bottom: 1.5px solid #1A1D1C; background: #1A1D1C; color: #D7F25A; }
+  .drawer-head .t { font-size: 13px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; }
+  .drawer-head .close { border: 0; background: none; color: #D7F25A; font-family: 'IBM Plex Mono', monospace; font-size: 16px; cursor: pointer; }
+  .drawer-body { flex: 1; overflow-y: auto; padding: 22px; }
+  .drawer-note { padding: 12px 22px; border-top: 1.5px solid #1A1D1C; font-family: 'IBM Plex Mono', monospace; font-size: 10.5px; color: #5e6a66; background: rgb(215 242 90 / 30%); }
+
+  @media (max-width: 980px) { .page-layout { grid-template-columns: 1fr; } .left-col { border-right: 0; border-bottom: 1.5px solid #1A1D1C; } }
+  @media (max-width: 640px) { .mrow { grid-template-columns: 40px 1fr 110px; } .mcell.u-cell { display: none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Custom Size Demo 2 · Mono Precision（工程制图）</h1>
+  <p class="desc">炭黑 × 荧光绿 × 等宽数字的制图美学：网格纸背景、表格化测量输入、十字准星热点。页面版为「图纸双栏」；弹窗版为右侧深色抽屉。</p>
+  <p class="hint"><b>看什么：</b>表格化输入（聚焦投影弹出）· 十字准星热点与步骤行联动 · 保存后 properties[Custom Size] 写入预览 · 切换 <b>页面/抽屉</b></p>
+
+  <div class="mode-switch">
+    <button class="on" data-mode="page">二级页面版</button>
+    <button data-mode="drawer">抽屉弹窗版</button>
+  </div>
+
+  <div class="page-layout" id="pageView">
+    <div class="sheet left-col">
+      <span class="doc-tag">SPEC · CS-2026</span>
+      <div class="doc-title">How to Measure</div>
+      <div class="doc-sub">REF: BRIDESMAID-DRESS / 5 MEASUREMENTS</div>
+      <div class="doc-img">
+        <div class="grid-lines"></div>
+        <div class="mannequin">MANNEQUIN · FRONT VIEW</div>
+        <div class="hp" data-h="1" style="left:26%;top:24%">01</div>
+        <div class="hp" data-h="2" style="left:24%;top:37%">02</div>
+        <div class="hp" data-h="3" style="left:28%;top:53%">03</div>
+        <div class="hp" data-h="4" style="left:20%;top:67%">04</div>
+        <div class="hp" data-h="5" style="left:78%;top:46%">05</div>
+      </div>
+      <div class="step-list" id="stepList"></div>
+    </div>
+
+    <div class="right-col">
+      <div class="rc-head">
+        <div class="rc-title">Enter Measurements</div>
+        <span class="unit-seg" data-unitseg><button class="on" data-u="cm">CM</button><button data-u="in">IN</button></span>
+      </div>
+      <div class="measure-table" id="mtable"></div>
+      <div class="actions">
+        <button class="secondary" id="clearBtn">Clear All</button>
+        <button class="primary" id="saveBtn">Save Measurements → Cart</button>
+      </div>
+      <div class="prop-echo" id="propEcho"><b>LINE ITEM PROPERTY PREVIEW</b><br>properties[Custom Size] = (empty — fill the required fields and save)</div>
+    </div>
+  </div>
+
+  <div class="drawer-layout" id="drawerView" hidden>
+    <div class="drawer-stage">
+      <div class="stage-bg">PRODUCT PAGE BACKGROUND</div>
+      <div class="drawer">
+        <div class="drawer-head">
+          <span class="t">Custom Size · Spec</span>
+          <button class="close">[X]</button>
+        </div>
+        <div class="drawer-body">
+          <div class="measure-table" id="mtableDrawer"></div>
+          <div class="actions" style="margin-top:16px">
+            <button class="secondary" id="clearBtn2">Clear</button>
+            <button class="primary" id="saveBtn2">Save → Cart</button>
+          </div>
+          <div class="prop-echo" id="propEcho2" style="margin-top:16px"><b>LINE ITEM PROPERTY</b><br>properties[Custom Size] = (empty)</div>
+        </div>
+        <div class="drawer-note">ADD "CUSTOM SIZES" OPTION VALUE IN SHOPIFY SO THE MEASUREMENT CAN MAP TO ITS VARIANT.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const FIELDS = [
+  { k: 'bust', label: 'Bust', sub: 'fullest part', cm: 88, inch: 34.6, req: true },
+  { k: 'waist', label: 'Waist', sub: 'natural waistline', cm: 70, inch: 27.6, req: true },
+  { k: 'hips', label: 'Hips', sub: '8" below waist', cm: 96, inch: 37.8, req: true },
+  { k: 'hollow', label: 'Hollow to Floor', sub: 'throat to floor', cm: 150, inch: 59.1, req: true },
+  { k: 'height', label: 'Height', sub: 'head to floor', cm: 170, inch: 67, req: false },
+];
+const NOTES = {
+  1: 'Bust — around the fullest part of your bust.',
+  2: 'Waist — around the narrowest part of the natural waistline.',
+  3: 'Hips — the fullest part, about 8 inches below the waist.',
+  4: 'Hollow to Floor — throat hollow straight down to the floor, barefoot.',
+  5: 'Height — top of the head straight down to the floor.',
+};
+const state = { unit: 'cm', values: {} };
+
+function buildTable(id) {
+  const t = document.getElementById(id);
+  let html = '<div class="mrow head"><div>#</div><div>Measurement</div><div>Value</div><div class="u-cell">Unit</div></div>';
+  FIELDS.forEach((f, i) => {
+    html += '<div class="mrow" data-k="' + f.k + '">'
+      + '<div class="mcell mnum">' + String(i + 1).padStart(2, '0') + '</div>'
+      + '<div class="mcell"><div class="mlabel">' + f.label + '<small>' + f.sub + '</small></div></div>'
+      + '<div class="mcell"><div class="minput"><input type="number" step="0.1" min="0" data-k="' + f.k + '" placeholder="' + f.cm + '"><span class="u">cm</span></div></div>'
+      + '<div class="mcell"><span class="mopt">' + (f.req ? 'REQUIRED' : 'OPTIONAL') + '</span></div></div>';
+  });
+  t.innerHTML = html;
+}
+buildTable('mtable');
+buildTable('mtableDrawer');
+
+function refreshUnits() {
+  document.querySelectorAll('[data-unitseg] button').forEach((b) => b.classList.toggle('on', b.dataset.u === state.unit));
+  document.querySelectorAll('.minput input').forEach((inp) => {
+    const f = FIELDS.find((x) => x.k === inp.dataset.k);
+    inp.placeholder = state.unit === 'cm' ? f.cm : f.inch;
+    inp.parentElement.querySelector('.u').textContent = state.unit;
+    if (inp.value) { const v = parseFloat(inp.value); if (!isNaN(v)) inp.value = state.unit === 'cm' ? (v * 2.54).toFixed(1) : (v / 2.54).toFixed(1); }
+  });
+}
+
+function propStr() {
+  const u = state.unit === 'cm' ? 'cm' : 'in';
+  return FIELDS.filter((f) => state.values[f.k]).map((f) => f.label + ' ' + state.values[f.k] + u).join(' / ');
+}
+function echo() {
+  const s = propStr() || '(empty — fill the required fields and save)';
+  const a = document.getElementById('propEcho');
+  if (a) a.innerHTML = '<b>LINE ITEM PROPERTY PREVIEW</b><br>properties[Custom Size] = ' + s;
+  const b2 = document.getElementById('propEcho2');
+  if (b2) b2.innerHTML = '<b>LINE ITEM PROPERTY</b><br>properties[Custom Size] = ' + (propStr() || '(empty)');
+}
+
+document.addEventListener('input', (e) => {
+  if (!e.target.matches('.minput input')) return;
+  const v = e.target.value.trim();
+  const f = FIELDS.find((x) => x.k === e.target.dataset.k);
+  if (v && !isNaN(v) && +v > 0) state.values[f.k] = +v; else delete state.values[f.k];
+  e.target.closest('.mrow').classList.toggle('req-miss', f.req && (!v || isNaN(v) || +v <= 0));
+  echo();
+});
+document.addEventListener('click', (e) => {
+  const ub = e.target.closest('[data-unitseg] button');
+  if (ub) { state.unit = ub.dataset.u; refreshUnits(); echo(); return; }
+  const hp = e.target.closest('.hp');
+  if (hp) return focus(hp.dataset.h);
+  const sr = e.target.closest('.srow');
+  if (sr) focus(sr.dataset.h);
+  if (e.target.id === 'clearBtn' || e.target.id === 'clearBtn2') {
+    state.values = {};
+    document.querySelectorAll('.minput input').forEach((i) => i.value = '');
+    document.querySelectorAll('.mrow').forEach((r) => r.classList.remove('req-miss'));
+    echo();
+  }
+  if (e.target.id === 'saveBtn' || e.target.id === 'saveBtn2') {
+    const scope = e.target.id === 'saveBtn' ? 'mtable' : 'mtableDrawer';
+    let valid = true;
+    document.querySelectorAll('#' + scope + ' .minput input').forEach((inp) => {
+      const f = FIELDS.find((x) => x.k === inp.dataset.k);
+      const v = inp.value.trim();
+      if (f.req && (!v || isNaN(v) || +v <= 0)) { inp.closest('.mrow').classList.add('req-miss'); valid = false; }
+    });
+    if (valid) {
+      const box = e.target.closest('.right-col, .drawer-body');
+      const note = box.querySelector('.prop-echo');
+      note.style.background = '#D7F25A';
+      note.innerHTML = '<b>✓ SAVED</b><br>properties[Custom Size] = ' + propStr() + '<br>→ the "Custom Sizes" variant is selected for the line item.';
+    }
+  }
+});
+function focus(n) {
+  document.querySelectorAll('.hp').forEach((h) => h.classList.toggle('on', h.dataset.h === n));
+  document.querySelectorAll('.srow').forEach((s) => s.classList.toggle('on', s.dataset.h === n));
+}
+const sl = document.getElementById('stepList');
+Object.entries(NOTES).forEach(([n, t]) => {
+  const d = document.createElement('div');
+  d.className = 'srow'; d.dataset.h = n;
+  d.innerHTML = '<span class="n">' + String(n).padStart(2, '0') + '</span><span class="t">' + t + '</span><span class="arrow">-></span>';
+  sl.appendChild(d);
+});
+
+document.querySelectorAll('.mode-switch button').forEach((b) => {
+  b.onclick = () => {
+    document.querySelectorAll('.mode-switch button').forEach((x) => x.classList.remove('on'));
+    b.classList.add('on');
+    const drawer = b.dataset.mode === 'drawer';
+    document.getElementById('pageView').hidden = drawer;
+    document.getElementById('drawerView').hidden = !drawer;
+  };
+});
+</script>
+</body>
+</html>
