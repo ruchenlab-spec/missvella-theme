@@ -87,6 +87,14 @@
       --color-facet-label-transform: {{ block.settings.label_case | default: 'uppercase' }};
       --color-facet-ring-width: {{ block.settings.ring_width | default: 2 }}px;
       {% if block.settings.text_color != blank %}--color-facet-text: {{ block.settings.text_color }};{% endif %}
+      {% comment %} Block background: full-bleed behind the swatches; padding keeps
+         the content inside the gutters so the background is never clipped {% endcomment %}
+      {% if block.settings.bg_color != blank %}background-color: {{ block.settings.bg_color }};{% endif %}
+      {% if block.settings.bg_image != blank %}
+        background-image: linear-gradient(rgb(0 0 0 / {{ block.settings.bg_overlay | default: 0 }}%), rgb(0 0 0 / {{ block.settings.bg_overlay | default: 0 }}%)), url({{ block.settings.bg_image | image_url: width: 1800 }});
+        background-size: cover;
+        background-position: center;
+      {% endif %}
     "
     {{ block.shopify_attributes }}
   >
@@ -158,21 +166,10 @@
               </button>
 
               {%- comment -%} Hover flyout: child swatches of this family {%- endcomment -%}
-              {%- liquid
-                assign flyout_bg = block.settings.flyout_bg_color | default: '#FFFFFF'
-                assign flyout_overlay = block.settings.flyout_bg_overlay | default: 0
-              -%}
               <div
                 class="color-facets__flyout"
                 data-family-flyout
-                style="
-                  background-color: {{ flyout_bg }};
-                  {% if block.settings.flyout_bg_image != blank %}
-                    background-image: linear-gradient(rgb(0 0 0 / {{ flyout_overlay }}%), rgb(0 0 0 / {{ flyout_overlay }}%)), url({{ block.settings.flyout_bg_image | image_url: width: 900 }});
-                    background-size: cover;
-                    background-position: center;
-                  {% endif %}
-                "
+                style="background-color: {{ block.settings.flyout_bg_color | default: '#FFFFFF' }};"
               >
                 {%- for value in color_filter.values -%}
                   {%- assign vkey = value.label | downcase | strip -%}
@@ -308,9 +305,29 @@
 {% endif %}
 
 {% stylesheet %}
+  /*
+   * Background layout:
+   * - centered grid: the block spans only the content columns (2 / -2), so its
+   *   background aligns exactly with the sections' content area
+   * - full-width grid: the block spans the whole row (1 / -1) so the background
+   *   bleeds edge to edge, while the swatches keep gutters of at least 40px
+   *   (a merchant-set larger value wins; spacing-style already scales it on mobile)
+   * - mobile: single grid column, page-margin gutters
+   */
+  @media screen and (min-width: 750px) {
+    .collection-wrapper:not(.collection-wrapper--grid-full-width) .color-facets {
+      grid-column: 2 / -2;
+      padding-inline: 0;
+    }
+
+    .collection-wrapper--grid-full-width .color-facets {
+      grid-column: 1 / -1;
+      padding-inline: max(var(--padding-inline-start, 0px), 40px) max(var(--padding-inline-end, 0px), 40px);
+    }
+  }
+
   .color-facets {
-    /* The collection page renders blocks inside a grid; span the full row.
-       z-index lifts this block above the native filters bar that follows it in
+    /* z-index lifts this block above the native filters bar that follows it in
        the DOM, so the flyout is never covered. */
     grid-column: 1 / -1;
     position: relative;
@@ -321,6 +338,13 @@
     gap: 14px;
     width: 100%;
     color: var(--color-facet-text, var(--color-foreground));
+  }
+
+  @media screen and (max-width: 749px) {
+    .collection-wrapper .color-facets {
+      grid-column: 1 / -1;
+      padding-inline: var(--page-margin, 20px);
+    }
   }
 
   .color-facets__title {
@@ -782,25 +806,25 @@
     },
     {
       "type": "header",
-      "content": "浮层背景"
+      "content": "区块背景"
     },
     {
       "type": "color",
-      "id": "flyout_bg_color",
+      "id": "bg_color",
       "label": "背景颜色",
-      "default": "#FFFFFF"
+      "info": "留空则跟随主题背景"
     },
     {
       "type": "image_picker",
-      "id": "flyout_bg_image",
+      "id": "bg_image",
       "label": "背景图片",
-      "info": "可选。上传后覆盖在背景颜色之上，平铺填满浮层"
+      "info": "可选。上传后铺满整个区块，全宽模式下背景同样铺满视口宽度"
     },
     {
       "type": "range",
-      "id": "flyout_bg_overlay",
+      "id": "bg_overlay",
       "label": "背景遮罩",
-      "info": "在背景图上叠加黑色遮罩，保证文字可读。无背景图时不生效",
+      "info": "在背景图上叠加黑色遮罩，保证色板名称可读。无背景图时不生效",
       "min": 0,
       "max": 80,
       "step": 5,
