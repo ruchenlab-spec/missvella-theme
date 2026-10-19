@@ -16,15 +16,14 @@
 {%- enddoc -%}
 
 {% liquid
-  assign source = collection
-  if source == blank
-    assign source = search
-  endif
+  # `results` is passed in from main-collection (static content_for 'block') and
+  # carries the full filter set - do NOT rely on closest.collection here, its
+  # filters are incomplete inside nested contexts.
 
   assign color_filter = null
   assign active_color_count = 0
 
-  for filter in source.filters
+  for filter in results.filters
     assign param_name_down = filter.param_name | downcase
     # Shopify's taxonomy colour filter is filter.v.t.shopify.color-pattern; custom
     # option filters can be filter.v.option.color / .colour / .颜色
@@ -68,6 +67,7 @@
   <div
     class="
       color-facets
+      {% if block.settings.layout == 'vertical' %}color-facets--vertical{% endif %}
       color-facets--grouping-{{ grouping }}
       color-facets--active-{{ block.settings.active_style | default: 'ring' }}
       {% if block.settings.hover_lift %}color-facets--lift{% endif %}
@@ -107,7 +107,7 @@
       <div class="color-facets__row color-facets__row--families">
         <a
           class="color-facets__item{% if active_color_count == 0 %} is-active{% endif %}"
-          href="{{ source.url }}"
+          href="{{ results.url | default: routes.root_url }}"
           aria-label="{{ block.settings.all_label | default: 'All' }}"
         >
           <span class="color-facets__dot color-facets__dot--all" aria-hidden="true">
@@ -252,7 +252,7 @@
         {% if block.settings.show_all %}
           <a
             class="color-facets__item{% if active_color_count == 0 %} is-active{% endif %}"
-            href="{{ source.url }}"
+            href="{{ results.url | default: routes.root_url }}"
             aria-label="{{ block.settings.all_label | default: 'All' }}"
           >
             <span class="color-facets__dot color-facets__dot--all" aria-hidden="true">
@@ -467,6 +467,94 @@
     font-weight: 600;
   }
 
+  /* ===== Vertical (left sidebar) layout ===== */
+  @media screen and (min-width: 750px) {
+    .collection-wrapper:has(.color-facets--vertical) {
+      /* Two columns: swatch sidebar + everything else (filters bar, product grid) */
+      grid-template-columns: minmax(200px, 260px) minmax(0, 1fr) !important;
+    }
+
+    .collection-wrapper:has(.color-facets--vertical) > div:has(> .color-facets) {
+      grid-column: 1;
+      grid-row: 1 / span 12;
+    }
+
+    .collection-wrapper:has(.color-facets--vertical) > *:not(:has(> .color-facets)) {
+      grid-column: 2;
+    }
+  }
+
+  .color-facets--vertical {
+    align-items: flex-start;
+    gap: 18px;
+    align-self: start;
+    position: sticky;
+    top: calc(var(--header-height, 80px) + 16px);
+    max-height: calc(100vh - var(--header-height, 80px) - 32px);
+    overflow-y: auto;
+    scrollbar-width: none;
+  }
+
+  .color-facets--vertical::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Sidebar items: dot + label side by side, stacked vertically */
+  .color-facets--vertical .color-facets__row {
+    flex-direction: column;
+    flex-wrap: nowrap;
+    overflow: visible;
+    align-items: stretch;
+    gap: 4px;
+    padding-bottom: 0;
+  }
+
+  .color-facets--vertical .color-facets__item {
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    padding: 4px 6px;
+    border-radius: 8px;
+    transition: background-color 0.2s ease;
+  }
+
+  .color-facets--vertical .color-facets__item:hover {
+    background: rgb(0 0 0 / 4%);
+  }
+
+  .color-facets--vertical .color-facets__item--family .color-facets__dot {
+    width: 26px;
+    height: 26px;
+  }
+
+  .color-facets--vertical .color-facets__dot {
+    width: 22px;
+    height: 22px;
+    flex: 0 0 auto;
+  }
+
+  .color-facets--vertical .color-facets__label {
+    opacity: 0.75;
+    max-width: none;
+    white-space: normal;
+    text-transform: none;
+    letter-spacing: 0.02em;
+    font-size: calc(var(--color-facet-label-size, 11px) + 1px);
+  }
+
+  .color-facets--vertical .color-facets__item:hover .color-facets__label,
+  .color-facets--vertical .color-facets__item.is-active .color-facets__label {
+    opacity: 1;
+  }
+
+  /* Flyout opens to the RIGHT of the sidebar */
+  .color-facets--vertical .color-facets__flyout {
+    left: calc(100% + 12px);
+    top: 0;
+    translate: none;
+  }
+
   /* ===== Family (hover flyout) mode ===== */
   .color-facets__family {
     position: relative;
@@ -557,6 +645,43 @@
   }
 
   @media screen and (max-width: 749px) {
+    /* Vertical layout falls back to the standard top row on mobile */
+    .color-facets--vertical {
+      position: static;
+      max-height: none;
+      overflow: visible;
+    }
+
+    .color-facets--vertical .color-facets__row {
+      flex-direction: row;
+      align-items: flex-start;
+    }
+
+    .color-facets--vertical .color-facets__item {
+      flex-direction: column;
+      padding: 0;
+    }
+
+    .color-facets--vertical .color-facets__item--family .color-facets__dot {
+      width: calc(var(--color-facet-size, 44px) * 0.72);
+      height: calc(var(--color-facet-size, 44px) * 0.72);
+    }
+
+    .color-facets--vertical .color-facets__dot {
+      width: var(--color-facet-size, 44px);
+      height: var(--color-facet-size, 44px);
+    }
+
+    .color-facets--vertical .color-facets__label {
+      text-transform: var(--color-facet-label-transform, uppercase);
+      letter-spacing: 0.08em;
+    }
+
+    .color-facets--vertical .color-facets__flyout {
+      left: 0;
+      top: calc(100% + 10px);
+    }
+
     /* Keep the flyout inside a narrow viewport */
     .color-facets__flyout {
       left: 0;
@@ -592,6 +717,27 @@
     {
       "type": "paragraph",
       "content": "读取当前系列的颜色选项筛选，渲染为一排圆形色板。链接使用原生筛选参数，与「筛选和排序」区块共享状态，可同时使用。"
+    },
+    {
+      "type": "header",
+      "content": "布局"
+    },
+    {
+      "type": "select",
+      "id": "layout",
+      "label": "布局方向",
+      "options": [
+        {
+          "value": "horizontal",
+          "label": "顶部横排"
+        },
+        {
+          "value": "vertical",
+          "label": "左侧垂直栏"
+        }
+      ],
+      "default": "horizontal",
+      "info": "左侧垂直栏：色板显示在产品列表左侧（桌面两列，移动端回退为顶部横排）。建议「筛选和排序」使用水平模式。"
     },
     {
       "type": "header",
