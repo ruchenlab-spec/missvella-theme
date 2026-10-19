@@ -306,24 +306,28 @@
 
 {% stylesheet %}
   /*
-   * Background layout:
-   * - centered grid: the block spans only the content columns (2 / -2), so its
-   *   background aligns exactly with the sections' content area
-   * - full-width grid: the block spans the whole row (1 / -1) so the background
-   *   bleeds edge to edge, while the swatches keep gutters of at least 40px
-   *   (a merchant-set larger value wins; spacing-style already scales it on mobile)
-   * - mobile: single grid column, page-margin gutters
+   * Background ALWAYS bleeds the full viewport width (100vw breakout, same
+   * technique as the reference implementation) - the gutters only inset the
+   * swatch row:
+   * - centered grid: gutters = page margin (aligns with the sections' content)
+   * - full-width grid: gutters = the block's left/right padding settings,
+   *   floored at 40px (a larger merchant value wins; spacing-style already
+   *   scales it on mobile, and 20px is the mobile floor)
    */
   @media screen and (min-width: 750px) {
     .collection-wrapper:not(.collection-wrapper--grid-full-width) .color-facets {
-      grid-column: 2 / -2;
-      padding-inline: 0;
+      padding-inline: var(--page-margin, 40px);
     }
 
     .collection-wrapper--grid-full-width .color-facets {
-      grid-column: 1 / -1;
       padding-inline: max(var(--padding-inline-start, 0px), 40px) max(var(--padding-inline-end, 0px), 40px);
     }
+  }
+
+  /* The 100vw breakout can trigger a horizontal scrollbar from the classic
+     scrollbar-width caveat - clip it at the page level. */
+  body {
+    overflow-x: clip;
   }
 
   .color-facets {
@@ -332,18 +336,24 @@
     grid-column: 1 / -1;
     position: relative;
     z-index: 10;
+    /* Full-bleed breakout from any nesting depth inside a centered column */
+    width: 100vw;
+    margin-inline: calc(50% - 50vw);
     display: flex;
     flex-direction: column;
     align-items: var(--color-facet-align, center);
     gap: 14px;
-    width: 100%;
     color: var(--color-facet-text, var(--color-foreground));
   }
 
   @media screen and (max-width: 749px) {
-    .collection-wrapper .color-facets {
-      grid-column: 1 / -1;
-      padding-inline: var(--page-margin, 20px);
+    .collection-wrapper:not(.collection-wrapper--grid-full-width) .color-facets {
+      padding-inline: var(--page-margin, 16px);
+    }
+
+    .collection-wrapper--grid-full-width .color-facets {
+      padding-inline: max(calc(var(--padding-inline-start, 40px) * 0.7), 20px)
+        max(calc(var(--padding-inline-end, 40px) * 0.7), 20px);
     }
   }
 
