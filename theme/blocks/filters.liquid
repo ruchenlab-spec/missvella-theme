@@ -171,7 +171,7 @@
   >
     <div
       class="facets facets--{{ block_settings.filter_style }} spacing-style"
-      style="{% render 'spacing-style', settings: block_settings %}{% if block_settings.text_label_case == 'uppercase' %} --facet-label-transform: uppercase;{% endif %}"
+      style="{% render 'spacing-style', settings: block_settings %}{% if block_settings.text_label_case == 'uppercase' %} --facet-label-transform: uppercase;{% endif %}{% if block_settings.filter_style == 'horizontal' and block_settings.filter_width == 'full-width' %} --padding-inline-start: {{ block.settings['padding-inline-start'] | default: 40 }}px; --padding-inline-end: {{ block.settings['padding-inline-end'] | default: 40 }}px;{% endif %}"
       aria-label="{{ 'accessibility.filters' | t }}"
     >
       <facets-form-component
@@ -1437,7 +1437,7 @@
       "max": 100,
       "step": 1,
       "unit": "px",
-      "default": 0
+      "default": 40
     },
     {
       "type": "range",
@@ -1447,7 +1447,7 @@
       "max": 100,
       "step": 1,
       "unit": "px",
-      "default": 0
+      "default": 40
     },
     {
       "type": "header",

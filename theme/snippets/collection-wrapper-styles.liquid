@@ -57,6 +57,26 @@
     }
   }
 
+  /*
+   * Full-width filter bar: use the block's left/right padding settings as side
+   * gutters (default 40px). Centered mode resets to 0 so the page margin is not
+   * doubled. Mobile scales by 0.7 on top of spacing-style's own scaling, landing
+   * at roughly half the configured value - same as the section gutters.
+   */
+  .facets-block-wrapper--full-width .facets.spacing-style[style*='--padding-inline-start'] {
+    padding-inline: var(--padding-inline-start, 40px) var(--padding-inline-end, 40px);
+  }
+
+  .facets-block-wrapper--horizontal:not(.facets-block-wrapper--full-width) .facets.spacing-style[style*='--padding-inline-start'] {
+    padding-inline: 0;
+  }
+
+  @media screen and (max-width: 749px) {
+    .facets-block-wrapper--full-width .facets.spacing-style[style*='--padding-inline-start'] {
+      padding-inline: calc(var(--padding-inline-start, 40px) * 0.7) calc(var(--padding-inline-end, 40px) * 0.7);
+    }
+  }
+
   .collection-wrapper:has(.facets--vertical) .facets-block-wrapper--vertical:not(.hidden) ~ .main-collection-grid {
     @media screen and (min-width: 750px) {
       grid-column: var(--facets-vertical-col-width) / var(--full-width-column-number);
