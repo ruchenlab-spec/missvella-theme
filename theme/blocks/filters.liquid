@@ -1298,6 +1298,78 @@
     height: var(--font-paragraph--size);
     position: absolute;
   }
+
+  /* ===== Soft Minimal UI polish (dropdown panels, checkboxes, sorting, price) ===== */
+
+  /* Dropdown panels: white card, larger radius, soft shadow */
+  .facets .facets__panel-content.color-custom-popover {
+    border-radius: 14px;
+    border: 1px solid rgb(var(--color-foreground-rgb) / 10%);
+    box-shadow: 0 20px 50px rgb(var(--color-foreground-rgb) / 12%);
+  }
+
+  .facets--vertical .facets__panel-content {
+    border-radius: 14px;
+  }
+
+  /* Summary labels: slightly refined tracking */
+  .facets__summary .facets__label {
+    letter-spacing: 0.02em;
+  }
+
+  /* Checkbox: rounded square that fills on check */
+  .facets .checkbox .icon-checkmark {
+    border-radius: 5px;
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease;
+  }
+
+  .facets .checkbox__input:checked + .checkbox__label .icon-checkmark {
+    border-radius: 5px;
+  }
+
+  .facets .checkbox__input:checked + .checkbox__label .icon-checkmark svg :is(path, polyline, line) {
+    stroke: var(--color-background);
+  }
+
+  /* Sorting select: pill with custom caret */
+  .facets .sorting-filter__select {
+    appearance: none;
+    -webkit-appearance: none;
+    border-radius: 999px;
+    border: 1px solid rgb(var(--color-foreground-rgb) / 20%);
+    background: var(--color-background);
+    padding-inline-end: 34px;
+    transition: border-color 0.2s ease;
+  }
+
+  .facets .sorting-filter__select:hover {
+    border-color: rgb(var(--color-foreground-rgb) / 60%);
+  }
+
+  .facets .sorting-filter__select-wrapper {
+    position: relative;
+  }
+
+  .facets .sorting-filter__select-wrapper .icon-caret {
+    position: absolute;
+    right: 14px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+
+  /* Price inputs: refined fields */
+  .facets .price-facet__input {
+    border-radius: 10px;
+    border: 1px solid rgb(var(--color-foreground-rgb) / 18%);
+    transition: border-color 0.2s ease;
+  }
+
+  .facets .price-facet__input:focus {
+    border-color: rgb(var(--color-foreground-rgb) / 70%);
+  }
 {% endstylesheet %}
 
 {% schema %}

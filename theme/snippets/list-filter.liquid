@@ -35,6 +35,17 @@
     assign is_vertical = true
   endif
   assign filter_param_name = filter.param_name | escape | replace: '.', '-'
+
+  # Colour-option recognition: render swatch-grid UI for colour-named filters
+  assign filter_label_down = filter.label | downcase
+  assign is_color_filter = false
+  if filter_label_down contains 'color' or filter_label_down contains 'colour' or filter_label_down contains '颜色'
+    assign is_color_filter = true
+  endif
+
+  # Built-in colour-name fallback map (same as the colour facets block)
+  assign builtin_pairs = 'pink:#F4B8C8,navy:#1F2A5A,beige:#E8DCC8,rose gold:#DFA79A,rosegold:#DFA79A,blue:#3B5BA5,red:#C0392B,black:#111111,white:#FFFFFF,yellow:#F4D35E,purple:#7D5BA6,green:#3E8E5A,orange:#E4783C,brown:#8B5E3C,grey:#9E9E9E,gray:#9E9E9E,silver:#D9D9D9,gold:#C9A227,champagne:#F0E2C8,ivory:#F7F1E3,burgundy:#7B1E3A,wine:#6B1F35,apricot:#F5C6A5,lavender:#C9B6DB,lilac:#C9B6DB,khaki:#C3B091,dusty rose:#C98E96,teal:#2E8B8B,turquoise:#40C9C9,cobalt:#2242A8,royal blue:#2242A8,sky blue:#8FC1E9,denim:#4F6D8F,aqua:#7FDBDA,emerald:#2E9E6B,sage:#9CAF88,olive:#808000,mint:#B7E4C7,fuchsia:#DE3163,magenta:#D0417E,blush:#F2C6C2,coral:#FF7F50,peach:#F7C59F,rust:#B7410E,tan:#D2B48C,chocolate:#5C3A21,cream:#FFF5E1,multi:#FFFFFF'
+  assign builtin_pairs = builtin_pairs | split: ','
 -%}
 {% capture accordion_children %}
   <details
@@ -51,7 +62,7 @@
       <span class="facets__label">{{ filter.label }}</span>
 
       <div class="facets__status-wrapper">
-        {% if is_swatch %}
+        {% if is_swatch and is_color_filter == false %}
           <facet-status-component
             class="facets__status facets__status--swatches"
             facet-type="swatches"
@@ -124,6 +135,9 @@
           if is_swatch
             assign inital_visible_values = 22
           endif
+          if is_color_filter
+            assign inital_visible_values = 99
+          endif
           if is_image
             assign inital_visible_values = 6
           endif
@@ -191,7 +205,7 @@
           %}
           <ul
             id="filters-list-{{ sectionId }}-{{ filter.param_name | escape | replace: '.', '-' }}"
-            class="facets__inputs-list{% if should_use_pills %} facets__inputs-list--grid{% endif %} list-unstyled{% if is_swatch %} facets__inputs-list--swatches{% if show_swatch_label %} facets__inputs-list--swatches-grid{% endif %}{% endif %}{% if is_image %} facets__inputs-list--images{% endif %}"
+            class="facets__inputs-list{% if should_use_pills %} facets__inputs-list--grid{% endif %} list-unstyled{% if is_swatch %} facets__inputs-list--swatches{% if show_swatch_label %} facets__inputs-list--swatches-grid{% endif %}{% endif %}{% if is_image %} facets__inputs-list--images{% endif %}{% if is_color_filter %} cf2-swatches{% endif %}"
             {% if is_swatch %}
               style="--swatch-columns: {{ swatch_columns }};"
             {% endif %}
@@ -229,7 +243,42 @@
                 {% if value.active %}
                   {% assign has_active_values = true %}
                 {% endif %}
-                {% if is_image %}
+                {% if is_color_filter %}
+                  {%- liquid
+                    if value.swatch.image != blank
+                      assign swatch_img = value.swatch.image | image_url: width: 80
+                    endif
+                  -%}
+                  {%- capture swatch_hex -%}{%- render 'color-facet-swatch', value: value, builtin_pairs: builtin_pairs -%}{%- endcapture -%}
+                  <div
+                    class="cf2-item{% if is_disabled %} cf2-item--disabled{% endif %}"
+                    on:keydown="#facet-inputs-component-{{ filter.param_name | escape | replace: '.', '-' }}/handleKeyDown"
+                  >
+                    <input
+                      type="checkbox"
+                      name="{{ value.param_name }}"
+                      value="{{ value.value }}"
+                      aria-label="{{ value.label }}"
+                      id="{{ input_id }}"
+                      {% if value.active %}
+                        checked
+                      {% endif %}
+                      {% if is_disabled %}
+                        disabled
+                      {% endif %}
+                      ref="facetInputs[]"
+                      tabindex="-1"
+                    >
+                    <label class="cf2-item__label" for="{{ input_id }}" tabindex="-1">
+                      <span
+                        class="cf2-item__dot"
+                        style="{% if swatch_img %}background: center / cover no-repeat url({{ swatch_img }});{% elsif swatch_hex != blank %}background: {{ swatch_hex }};{% else %}background: #D9D9D9;{% endif %}"
+                      >
+                      </span>
+                      <span class="cf2-item__name">{{ value.label }}</span>
+                    </label>
+                  </div>
+                {% elsif is_image %}
                   <fieldset
                     class="variant-option variant-option--buttons variant-option--images"
                     aria-label="{{ value.label }}"
@@ -965,5 +1014,76 @@
       background-color: transparent;
       display: inherit;
     }
+  }
+
+  /* ===== Soft Minimal colour swatch grid (label-matched colour filters) ===== */
+  .facets__inputs-list.cf2-swatches {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px 14px;
+  }
+
+  .cf2-item {
+    position: relative;
+  }
+
+  .cf2-item input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+
+  .cf2-item--disabled {
+    opacity: 0.3;
+    pointer-events: none;
+  }
+
+  .cf2-item__label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+  }
+
+  .cf2-item__dot {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    box-shadow: inset 0 0 0 1px rgb(var(--color-foreground-rgb) / 12%);
+    transition:
+      transform 0.22s ease,
+      box-shadow 0.22s ease;
+  }
+
+  .cf2-item:hover .cf2-item__dot {
+    transform: scale(1.1);
+  }
+
+  .cf2-item input:checked + .cf2-item__label .cf2-item__dot {
+    box-shadow:
+      0 0 0 2.5px var(--color-background),
+      0 0 0 4px var(--color-foreground);
+  }
+
+  .cf2-item__name {
+    max-width: 64px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: var(--font-size--xs, 10px);
+    letter-spacing: 0.05em;
+    color: var(--color-foreground-subdued);
+    text-align: center;
+    transition: color 0.2s ease;
+  }
+
+  .cf2-item input:checked + .cf2-item__label .cf2-item__name {
+    color: var(--color-foreground);
+    font-weight: 600;
   }
 {% endstylesheet %}
