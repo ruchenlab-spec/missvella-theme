@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Demo 1 · 悬停浮层 · 精致版</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: 'Inter', -apple-system, 'Segoe UI', 'PingFang SC', sans-serif;
+    background: #faf9f7; color: #2a2823; padding: 48px 24px 80px;
+  }
+  .wrap { max-width: 1200px; margin: 0 auto; }
+  h1 { font-size: 22px; letter-spacing: .02em; margin: 0 0 6px; }
+  .desc { font-size: 13px; color: #8a857c; line-height: 1.7; margin: 0 0 8px; }
+  .hint { font-size: 12px; color: #b0aa9f; margin: 0 0 32px; }
+  .hint b { color: #6f6a60; font-weight: 600; }
+
+  .card {
+    background: #fff; border: 1px solid #ece9e2; border-radius: 16px;
+    padding: 28px 32px 32px; box-shadow: 0 1px 3px rgb(42 40 35 / 4%);
+  }
+
+  /* ===== 色系行 ===== */
+  .families {
+    display: flex; flex-wrap: wrap; justify-content: center;
+    gap: 8px 22px;
+  }
+  .family { position: relative; }
+  .fam-btn {
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    background: none; border: 0; padding: 0; cursor: pointer;
+    font: inherit; color: inherit; min-width: 56px;
+  }
+  .dot {
+    width: 48px; height: 48px; border-radius: 50%;
+    box-shadow: inset 0 0 0 1px rgb(0 0 0 / 7%);
+    transition: box-shadow .25s ease, transform .25s ease;
+  }
+  .fam-btn:hover .dot, .fam-btn:focus-visible .dot {
+    transform: translateY(-2px);
+    box-shadow: inset 0 0 0 1px rgb(0 0 0 / 9%), 0 8px 18px rgb(42 40 35 / 16%);
+  }
+  .fam-btn.is-active .dot {
+    box-shadow: 0 0 0 3px #fff, 0 0 0 5px #2a2823;
+  }
+  .fam-name {
+    font-size: 11px; letter-spacing: .1em; text-transform: uppercase;
+    color: #2a2823; opacity: .62; transition: opacity .2s ease;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .fam-btn:hover .fam-name, .fam-btn.is-active .fam-name { opacity: 1; }
+  .fam-btn.is-active .fam-name { font-weight: 600; }
+  .fam-count {
+    font-weight: 400; font-size: 10px; color: #8a857c;
+  }
+
+  /* ===== 浮层 ===== */
+  .flyout {
+    position: absolute; top: calc(100% + 12px); left: 50%;
+    translate: -50% 0;
+    display: flex; gap: 18px;
+    padding: 20px 24px;
+    background: #fff; border: 1px solid #ece9e2; border-radius: 14px;
+    box-shadow: 0 18px 44px rgb(42 40 35 / 16%);
+    opacity: 0; visibility: hidden;
+    transform: translateY(-6px) scale(.98);
+    transition: opacity .22s ease, transform .22s cubic-bezier(.22,.61,.36,1), visibility .22s;
+    z-index: 20;
+  }
+  .flyout::before {
+    content: ''; position: absolute; top: -6px; left: 50%; translate: -50% 0;
+    width: 12px; height: 12px; background: #fff;
+    border-left: 1px solid #ece9e2; border-top: 1px solid #ece9e2;
+    rotate: 45deg;
+  }
+  .family:hover .flyout, .family:focus-within .flyout, .family.is-open .flyout {
+    opacity: 1; visibility: visible; transform: translateY(0) scale(1);
+  }
+  .child {
+    display: flex; flex-direction: column; align-items: center; gap: 7px;
+    background: none; border: 0; padding: 0; cursor: pointer; font: inherit; color: inherit;
+  }
+  .child .dot { width: 52px; height: 52px; }
+  .child:hover .dot { transform: scale(1.08); }
+  .child.is-active .dot { box-shadow: 0 0 0 2.5px #fff, 0 0 0 4.5px #2a2823; }
+  .child .name { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; opacity: .62; }
+  .child.is-active .name { opacity: 1; font-weight: 600; }
+  .child.is-disabled { opacity: .3; pointer-events: none; }
+
+  .dot--pattern {
+    background: conic-gradient(from 20deg, #f3e6ea, #dfa79a, #c9b6db, #8fc1e9, #f3e6ea);
+  }
+
+  /* ===== 已选状态条 ===== */
+  .status {
+    display: flex; align-items: center; flex-wrap: wrap; gap: 8px;
+    margin-top: 22px; padding-top: 18px; border-top: 1px solid #f0ede6;
+    min-height: 34px; font-size: 12px;
+  }
+  .status__label { color: #b0aa9f; letter-spacing: .06em; text-transform: uppercase; font-size: 10px; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 6px 4px 10px; border-radius: 999px;
+    background: #f4f2ec; font-size: 11px; letter-spacing: .04em;
+  }
+  .chip i { width: 12px; height: 12px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgb(0 0 0 / 8%); }
+  .chip button {
+    border: 0; background: none; cursor: pointer; color: #8a857c;
+    font-size: 13px; line-height: 1; padding: 2px 4px; border-radius: 50%;
+  }
+  .chip button:hover { color: #2a2823; background: #e8e5dc; }
+  .status__clear {
+    border: 0; background: none; cursor: pointer; color: #2a2823;
+    font-size: 11px; letter-spacing: .06em; text-transform: uppercase;
+    text-decoration: underline; text-underline-offset: 3px; opacity: .7;
+  }
+  .status__clear:hover { opacity: 1; }
+
+  /* ===== 产品网格（模拟筛选反馈） ===== */
+  .grid-title { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #b0aa9f; margin: 40px 0 16px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 20px; }
+  .pcard { background: #fff; border: 1px solid #ece9e2; border-radius: 12px; overflow: hidden; }
+  .pcard__img { aspect-ratio: 3/4; background: linear-gradient(160deg, #f4f2ec, #e8e5dc); }
+  .pcard__body { padding: 12px 14px 16px; }
+  .pcard__name { font-size: 13px; margin: 0 0 4px; }
+  .pcard__price { font-size: 12px; color: #8a857c; margin: 0 0 8px; }
+  .pcard__colors { display: flex; gap: 5px; }
+  .pcard__colors i { width: 14px; height: 14px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgb(0 0 0 / 10%); }
+  .empty { padding: 40px; text-align: center; color: #b0aa9f; font-size: 13px; border: 1px dashed #e0dcd2; border-radius: 12px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Demo 1 · 悬停浮层</h1>
+  <p class="desc">色系常驻一行（圆形 + 名称），悬停即浮出该色系的全部颜色，点选后立即生效。适合颜色较多、希望保持页面紧凑的场景。</p>
+  <p class="hint"><b>交互：</b>悬停色系 → 浮层展开 → 点选颜色（可多选）→ 下方产品实时筛选 · 点击浮层外关闭 · Esc 关闭</p>
+
+  <div class="card">
+    <div class="families" id="families"></div>
+    <div class="status" id="status"><span class="status__label">已选颜色</span></div>
+  </div>
+
+  <div class="grid-title">Products</div>
+  <div class="grid" id="grid"></div>
+</div>
+
+<script>
+const FAMILIES = [
+  { name: 'Blue',   hex: '#3B5BA5', children: [ { name: 'Navy', hex: '#1F2A5A' }, { name: 'Royal Blue', hex: '#2242A8' }, { name: 'Sky Blue', hex: '#8FC1E9' } ] },
+  { name: 'Pink',   hex: '#F4B8C8', children: [ { name: 'Pink', hex: '#F4B8C8' }, { name: 'Rose Gold', hex: '#DFA79A' }, { name: 'Blush', hex: '#F2C6C2' } ] },
+  { name: 'Neutral',hex: '#E8DCC8', children: [ { name: 'Beige', hex: '#E8DCC8' }, { name: 'Ivory', hex: '#F7F1E3' }, { name: 'Grey', hex: '#D9D9D9' } ] },
+  { name: 'Pattern',hex: 'pattern', children: [ { name: 'Floral', pattern: true }, { name: 'Multi', pattern: true } ] },
+];
+const PRODUCTS = [
+  { name: 'Navy Satin Sheath Dress', price: '$128', colors: ['Navy'] },
+  { name: 'Royal Blue A-Line Gown', price: '$156', colors: ['Royal Blue'] },
+  { name: 'Sky Blue Slip Dress', price: '$102', colors: ['Sky Blue'] },
+  { name: 'Pink Chiffon Mini', price: '$96', colors: ['Pink'] },
+  { name: 'Rose Gold Sequin Midi', price: '$189', colors: ['Rose Gold'] },
+  { name: 'Blush Tulle Ball Gown', price: '$175', colors: ['Blush'] },
+  { name: 'Beige Tulle Overlay', price: '$118', colors: ['Beige'] },
+  { name: 'Ivory Column Dress', price: '$142', colors: ['Ivory'] },
+  { name: 'Grey Velvet Bodycon', price: '$110', colors: ['Grey'] },
+  { name: 'Floral Print Wrap Dress', price: '$134', colors: ['Floral'] },
+];
+const selected = new Set();
+
+const bgStyle = (c) => c.pattern
+  ? 'background: conic-gradient(from 20deg, #f3e6ea, #dfa79a, #c9b6db, #8fc1e9, #f3e6ea)'
+  : `background: ${c.hex}`;
+
+function hexOf(name) {
+  for (const f of FAMILIES) { const c = f.children.find((x) => x.name === name); if (c) return c; }
+  return null;
+}
+
+function renderFamilies() {
+  const root = document.getElementById('families');
+  root.innerHTML = '';
+  FAMILIES.forEach((fam) => {
+    const activeCount = [...selected].filter((s) => fam.children.some((c) => c.name === s)).length;
+    const wrap = document.createElement('div');
+    wrap.className = 'family';
+    const btn = document.createElement('button');
+    btn.className = 'fam-btn' + (activeCount ? ' is-active' : '');
+    btn.innerHTML = `<span class="dot" style="${fam.hex === 'pattern' ? 'background: conic-gradient(from 20deg, #f3e6ea, #dfa79a, #c9b6db, #8fc1e9, #f3e6ea)' : `background: ${fam.hex}`}"></span>
+      <span class="fam-name">${fam.name}${activeCount ? ` <span class="fam-count">(${activeCount})</span>` : ''}</span>`;
+    const fly = document.createElement('div');
+    fly.className = 'flyout';
+    fam.children.forEach((c) => {
+      const b = document.createElement('button');
+      b.className = 'child' + (selected.has(c.name) ? ' is-active' : '');
+      b.innerHTML = `<span class="dot" style="${bgStyle(c)}"></span><span class="name">${c.name}</span>`;
+      b.onclick = (e) => { e.stopPropagation(); toggleColor(c.name); };
+      fly.appendChild(b);
+    });
+    btn.onclick = () => { wrap.classList.toggle('is-open'); };
+    wrap.append(btn, fly);
+    root.appendChild(wrap);
+  });
+}
+
+function renderStatus() {
+  const el = document.getElementById('status');
+  el.innerHTML = '<span class="status__label">已选颜色</span>';
+  selected.forEach((name) => {
+    const c = hexOf(name);
+    const chip = document.createElement('span');
+    chip.className = 'chip';
+    chip.innerHTML = `<i style="${c ? bgStyle(c) : ''}"></i>${name}<button title="移除">×</button>`;
+    chip.querySelector('button').onclick = () => toggleColor(name);
+    el.appendChild(chip);
+  });
+  if (selected.size) {
+    const clear = document.createElement('button');
+    clear.className = 'status__clear';
+    clear.textContent = '清除全部';
+    clear.onclick = () => { selected.clear(); refresh(); };
+    el.appendChild(clear);
+  }
+}
+
+function toggleColor(name) {
+  selected.has(name) ? selected.delete(name) : selected.add(name);
+  refresh();
+}
+
+function renderGrid() {
+  const grid = document.getElementById('grid');
+  const list = selected.size ? PRODUCTS.filter((p) => p.colors.some((c) => selected.has(c))) : PRODUCTS;
+  grid.innerHTML = '';
+  if (!list.length) { grid.innerHTML = '<div class="empty" style="grid-column:1/-1">没有匹配的商品</div>'; return; }
+  list.forEach((p) => {
+    const d = document.createElement('div');
+    d.className = 'pcard';
+    d.innerHTML = `<div class="pcard__img"></div><div class="pcard__body"><p class="pcard__name">${p.name}</p><p class="pcard__price">${p.price}</p>
+      <div class="pcard__colors">${p.colors.map((c) => { const h = hexOf(c); return `<i style="${h ? bgStyle(h) : ''}"></i>`; }).join('')}</div></div>`;
+    grid.appendChild(d);
+  });
+}
+
+function refresh() { renderFamilies(); renderStatus(); renderGrid(); }
+
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.family')) document.querySelectorAll('.family.is-open').forEach((f) => f.classList.remove('is-open'));
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') document.querySelectorAll('.family.is-open').forEach((f) => f.classList.remove('is-open'));
+});
+
+refresh();
+</script>
+</body>
+</html>

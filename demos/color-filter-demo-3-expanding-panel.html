@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Demo 3 · 展开面板 · 单手流</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: 'Inter', -apple-system, 'Segoe UI', 'PingFang SC', sans-serif;
+    background: #faf9f7; color: #2a2823; padding: 48px 24px 80px;
+  }
+  .wrap { max-width: 1200px; margin: 0 auto; }
+  h1 { font-size: 22px; letter-spacing: .02em; margin: 0 0 6px; }
+  .desc { font-size: 13px; color: #8a857c; line-height: 1.7; margin: 0 0 8px; }
+  .hint { font-size: 12px; color: #b0aa9f; margin: 0 0 32px; }
+  .hint b { color: #6f6a60; font-weight: 600; }
+
+  .card {
+    background: #fff; border: 1px solid #ece9e2; border-radius: 16px;
+    padding: 28px 32px 0; box-shadow: 0 1px 3px rgb(42 40 35 / 4%);
+    overflow: hidden;
+  }
+
+  /* ===== 色系行 ===== */
+  .tabs {
+    display: flex; flex-wrap: wrap; justify-content: center;
+    gap: 8px 20px; padding-bottom: 24px;
+  }
+  .tab {
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    background: none; border: 0; padding: 0; cursor: pointer; font: inherit; color: inherit;
+    min-width: 56px; opacity: .55; transition: opacity .25s ease;
+  }
+  .tab:hover { opacity: .85; }
+  .tab.is-open, .tab.has-selection { opacity: 1; }
+  .tab .dot {
+    width: 48px; height: 48px; border-radius: 50%;
+    box-shadow: inset 0 0 0 1px rgb(0 0 0 / 7%);
+    transition: box-shadow .25s ease, transform .25s ease;
+  }
+  .tab:hover .dot { transform: translateY(-2px); }
+  .tab.is-open .dot { box-shadow: 0 0 0 3px #fff, 0 0 0 5px #2a2823; }
+  .tab.has-selection:not(.is-open) .dot { box-shadow: 0 0 0 2.5px #fff, 0 0 0 4px #c9c4b8; }
+  .tab .name {
+    font-size: 11px; letter-spacing: .1em; text-transform: uppercase;
+    display: flex; align-items: center; gap: 4px;
+  }
+  .tab.is-open .name { font-weight: 600; }
+  .tab .fam-count { font-weight: 400; font-size: 10px; color: #8a857c; }
+  .tab .chev {
+    width: 9px; height: 9px; border-right: 1.5px solid #b0aa9f; border-bottom: 1.5px solid #b0aa9f;
+    transform: rotate(45deg) translateY(-2px); transition: transform .3s ease; opacity: .6;
+  }
+  .tab.is-open .chev { transform: rotate(225deg) translateY(-2px); }
+
+  /* ===== 展开面板 ===== */
+  .panel-wrap {
+    display: grid; grid-template-rows: 0fr;
+    transition: grid-template-rows .38s cubic-bezier(.22,.61,.36,1);
+  }
+  .panel-wrap.is-open { grid-template-rows: 1fr; }
+  .panel {
+    overflow: hidden; margin-inline: -32px;
+    background: #fbfaf7; border-top: 1px solid #f0ede6;
+  }
+  .panel__inner {
+    padding: 22px 32px 26px;
+    display: flex; flex-direction: column; gap: 16px;
+    opacity: 0; transform: translateY(6px);
+    transition: opacity .3s ease .08s, transform .3s ease .08s;
+  }
+  .panel-wrap.is-open .panel__inner { opacity: 1; transform: none; }
+
+  .panel__head { display: flex; align-items: center; justify-content: space-between; }
+  .panel__title { font-size: 13px; font-weight: 600; letter-spacing: .04em; }
+  .panel__meta { font-size: 11px; color: #8a857c; margin-left: 8px; font-weight: 400; }
+  .select-all {
+    border: 1px solid #dcd8cc; background: #fff; border-radius: 999px;
+    padding: 5px 14px; font-size: 11px; letter-spacing: .06em; cursor: pointer;
+    color: #2a2823; transition: all .2s ease; text-transform: uppercase;
+  }
+  .select-all:hover { border-color: #2a2823; }
+
+  .children { display: flex; flex-wrap: wrap; gap: 16px 20px; }
+  .child {
+    display: flex; flex-direction: column; align-items: center; gap: 7px;
+    background: none; border: 0; padding: 0; cursor: pointer; font: inherit; color: inherit;
+  }
+  .child .dot { width: 56px; height: 56px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgb(0 0 0 / 7%); transition: box-shadow .22s ease, transform .22s ease; }
+  .child:hover .dot { transform: scale(1.08); }
+  .child.is-active .dot { box-shadow: 0 0 0 2.5px #fff, 0 0 0 4.5px #2a2823; }
+  .child .name { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; opacity: .62; }
+  .child.is-active .name { opacity: 1; font-weight: 600; }
+  .child.is-disabled { opacity: .3; pointer-events: none; }
+
+  .dot--pattern { background: conic-gradient(from 20deg, #f3e6ea, #dfa79a, #c9b6db, #8fc1e9, #f3e6ea); }
+
+  /* ===== 状态条 ===== */
+  .status {
+    display: flex; align-items: center; flex-wrap: wrap; gap: 8px;
+    padding: 16px 32px 22px; border-top: 1px solid #f0ede6;
+    min-height: 34px; font-size: 12px; background: #fff; margin-inline: -32px;
+  }
+  .status__label { color: #b0aa9f; letter-spacing: .06em; text-transform: uppercase; font-size: 10px; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 6px 4px 10px; border-radius: 999px;
+    background: #f4f2ec; font-size: 11px; letter-spacing: .04em;
+  }
+  .chip i { width: 12px; height: 12px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgb(0 0 0 / 8%); }
+  .chip button { border: 0; background: none; cursor: pointer; color: #8a857c; font-size: 13px; line-height: 1; padding: 2px 4px; }
+  .chip button:hover { color: #2a2823; }
+  .status__clear { border: 0; background: none; cursor: pointer; color: #2a2823; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; text-decoration: underline; text-underline-offset: 3px; opacity: .7; }
+
+  /* ===== 产品网格 ===== */
+  .grid-title { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #b0aa9f; margin: 40px 0 16px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 20px; }
+  .pcard { background: #fff; border: 1px solid #ece9e2; border-radius: 12px; overflow: hidden; }
+  .pcard__img { aspect-ratio: 3/4; background: linear-gradient(160deg, #f4f2ec, #e8e5dc); }
+  .pcard__body { padding: 12px 14px 16px; }
+  .pcard__name { font-size: 13px; margin: 0 0 4px; }
+  .pcard__price { font-size: 12px; color: #8a857c; margin: 0 0 8px; }
+  .pcard__colors { display: flex; gap: 5px; }
+  .pcard__colors i { width: 14px; height: 14px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgb(0 0 0 / 10%); }
+  .empty { padding: 40px; text-align: center; color: #b0aa9f; font-size: 13px; border: 1px dashed #e0dcd2; border-radius: 12px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Demo 3 · 展开面板</h1>
+  <p class="desc">点击色系，其下方平滑展开一条全宽面板，子色以大尺寸呈现并支持「一键全选该色系」。面板收纳在同色系行内，页面始终整洁。</p>
+  <p class="hint"><b>交互：</b>点击色系 → 展开面板 → 点选颜色或「全选该色系」→ 再次点击色系或选其他色系自动收起 · 面板内实时显示已选计数</p>
+
+  <div class="card">
+    <div class="tabs" id="tabs"></div>
+    <div id="panels"></div>
+    <div class="status" id="status"><span class="status__label">已选颜色</span></div>
+  </div>
+
+  <div class="grid-title">Products</div>
+  <div class="grid" id="grid"></div>
+</div>
+
+<script>
+const FAMILIES = [
+  { name: 'Blue',   hex: '#3B5BA5', children: [ { name: 'Navy', hex: '#1F2A5A' }, { name: 'Royal Blue', hex: '#2242A8' }, { name: 'Sky Blue', hex: '#8FC1E9' } ] },
+  { name: 'Pink',   hex: '#F4B8C8', children: [ { name: 'Pink', hex: '#F4B8C8' }, { name: 'Rose Gold', hex: '#DFA79A' }, { name: 'Blush', hex: '#F2C6C2' } ] },
+  { name: 'Neutral',hex: '#E8DCC8', children: [ { name: 'Beige', hex: '#E8DCC8' }, { name: 'Ivory', hex: '#F7F1E3' }, { name: 'Grey', hex: '#D9D9D9' } ] },
+  { name: 'Pattern',hex: 'pattern', children: [ { name: 'Floral', pattern: true }, { name: 'Multi', pattern: true } ] },
+];
+const PRODUCTS = [
+  { name: 'Navy Satin Sheath Dress', price: '$128', colors: ['Navy'] },
+  { name: 'Royal Blue A-Line Gown', price: '$156', colors: ['Royal Blue'] },
+  { name: 'Sky Blue Slip Dress', price: '$102', colors: ['Sky Blue'] },
+  { name: 'Pink Chiffon Mini', price: '$96', colors: ['Pink'] },
+  { name: 'Rose Gold Sequin Midi', price: '$189', colors: ['Rose Gold'] },
+  { name: 'Blush Tulle Ball Gown', price: '$175', colors: ['Blush'] },
+  { name: 'Beige Tulle Overlay', price: '$118', colors: ['Beige'] },
+  { name: 'Ivory Column Dress', price: '$142', colors: ['Ivory'] },
+  { name: 'Grey Velvet Bodycon', price: '$110', colors: ['Grey'] },
+  { name: 'Floral Print Wrap Dress', price: '$134', colors: ['Floral'] },
+];
+const selected = new Set();
+let openFamily = null;
+
+const bgStyle = (c) => c.pattern ? 'background: conic-gradient(from 20deg, #f3e6ea, #dfa79a, #c9b6db, #8fc1e9, #f3e6ea)' : `background: ${c.hex}`;
+const hexOf = (name) => { for (const f of FAMILIES) { const c = f.children.find((x) => x.name === name); if (c) return c; } return null; };
+
+function renderTabs() {
+  const tabs = document.getElementById('tabs');
+  tabs.innerHTML = '';
+  FAMILIES.forEach((fam) => {
+    const activeCount = [...selected].filter((s) => fam.children.some((c) => c.name === s)).length;
+    const t = document.createElement('button');
+    t.className = 'tab' + (openFamily === fam.name ? ' is-open' : '') + (activeCount ? ' has-selection' : '');
+    t.innerHTML = `<span class="dot" style="${bgStyle(fam)}"></span>
+      <span class="name">${fam.name}${activeCount ? ` <span class="fam-count">(${activeCount})</span>` : ''}<span class="chev"></span></span>`;
+    t.onclick = () => { openFamily = openFamily === fam.name ? null : fam.name; refresh(); };
+    tabs.appendChild(t);
+  });
+}
+
+function renderPanels() {
+  const root = document.getElementById('panels');
+  root.innerHTML = '';
+  FAMILIES.forEach((fam) => {
+    const activeCount = [...selected].filter((s) => fam.children.some((c) => c.name === s)).length;
+    const allSelected = activeCount === fam.children.length;
+    const wrap = document.createElement('div');
+    wrap.className = 'panel-wrap' + (openFamily === fam.name ? ' is-open' : '');
+    const panel = document.createElement('div');
+    panel.className = 'panel';
+    panel.innerHTML = `<div class="panel__inner">
+      <div class="panel__head">
+        <span class="panel__title">${fam.name}<span class="panel__meta">${fam.children.length} 色</span></span>
+        <button class="select-all">${allSelected ? '取消全选' : '全选该色系'}</button>
+      </div>
+      <div class="children"></div>
+    </div>`;
+    const kids = panel.querySelector('.children');
+    fam.children.forEach((c) => {
+      const b = document.createElement('button');
+      b.className = 'child' + (selected.has(c.name) ? ' is-active' : '');
+      b.innerHTML = `<span class="dot" style="${bgStyle(c)}"></span><span class="name">${c.name}</span>`;
+      b.onclick = () => toggleColor(c.name);
+      kids.appendChild(b);
+    });
+    panel.querySelector('.select-all').onclick = () => {
+      if (allSelected) fam.children.forEach((c) => selected.delete(c.name));
+      else fam.children.forEach((c) => selected.add(c.name));
+      refresh();
+    };
+    wrap.appendChild(panel);
+    root.appendChild(wrap);
+  });
+}
+
+function renderStatus() {
+  const el = document.getElementById('status');
+  el.innerHTML = '<span class="status__label">已选颜色</span>';
+  selected.forEach((name) => {
+    const c = hexOf(name);
+    const chip = document.createElement('span');
+    chip.className = 'chip';
+    chip.innerHTML = `<i style="${c ? bgStyle(c) : ''}"></i>${name}<button title="移除">×</button>`;
+    chip.querySelector('button').onclick = () => toggleColor(name);
+    el.appendChild(chip);
+  });
+  if (selected.size) {
+    const clear = document.createElement('button');
+    clear.className = 'status__clear';
+    clear.textContent = '清除全部';
+    clear.onclick = () => { selected.clear(); refresh(); };
+    el.appendChild(clear);
+  }
+}
+
+function toggleColor(name) { selected.has(name) ? selected.delete(name) : selected.add(name); refresh(); }
+
+function renderGrid() {
+  const grid = document.getElementById('grid');
+  const list = selected.size ? PRODUCTS.filter((p) => p.colors.some((c) => selected.has(c))) : PRODUCTS;
+  grid.innerHTML = '';
+  if (!list.length) { grid.innerHTML = '<div class="empty" style="grid-column:1/-1">没有匹配的商品</div>'; return; }
+  list.forEach((p) => {
+    const d = document.createElement('div');
+    d.className = 'pcard';
+    d.innerHTML = `<div class="pcard__img"></div><div class="pcard__body"><p class="pcard__name">${p.name}</p><p class="pcard__price">${p.price}</p>
+      <div class="pcard__colors">${p.colors.map((c) => { const h = hexOf(c); return `<i style="${h ? bgStyle(h) : ''}"></i>`; }).join('')}</div></div>`;
+    grid.appendChild(d);
+  });
+}
+
+function refresh() { renderTabs(); renderPanels(); renderStatus(); renderGrid(); }
+refresh();
+</script>
+</body>
+</html>

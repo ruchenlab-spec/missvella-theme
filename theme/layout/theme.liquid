@@ -158,9 +158,11 @@
         data-product-transition="{{ settings.transition_to_main_product }}"
         data-template="{{ template }}"
       >
-        {%- unless template.name == 'index' or template.name == 'password' -%}
-          {% render 'breadcrumbs' %}
-        {%- endunless -%}
+        {%- if settings.breadcrumbs_enabled -%}
+          {%- unless template.name == 'index' or template.name == 'password' -%}
+            {% render 'breadcrumbs' %}
+          {%- endunless -%}
+        {%- endif -%}
         {{ content_for_layout }}
       </main>
 

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Demo 2 · 全览分组条 · 零点击</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: 'Inter', -apple-system, 'Segoe UI', 'PingFang SC', sans-serif;
+    background: #faf9f7; color: #2a2823; padding: 48px 24px 80px;
+  }
+  .wrap { max-width: 1200px; margin: 0 auto; }
+  h1 { font-size: 22px; letter-spacing: .02em; margin: 0 0 6px; }
+  .desc { font-size: 13px; color: #8a857c; line-height: 1.7; margin: 0 0 8px; }
+  .hint { font-size: 12px; color: #b0aa9f; margin: 0 0 32px; }
+  .hint b { color: #6f6a60; font-weight: 600; }
+
+  .card {
+    background: #fff; border: 1px solid #ece9e2; border-radius: 16px;
+    padding: 24px 28px; box-shadow: 0 1px 3px rgb(42 40 35 / 4%);
+  }
+
+  /* ===== 分组平铺条 ===== */
+  .bar {
+    display: flex; flex-wrap: wrap; align-items: flex-start;
+    justify-content: center; row-gap: 18px;
+  }
+  .group { display: flex; flex-direction: column; gap: 10px; }
+  .group + .group { border-left: 1px solid #ece9e2; margin-left: 26px; padding-left: 26px; }
+  .group__label {
+    font-size: 10px; letter-spacing: .16em; text-transform: uppercase;
+    color: #b0aa9f; text-align: center; cursor: pointer;
+    display: inline-flex; align-items: center; gap: 5px; justify-content: center;
+    transition: color .2s ease; user-select: none;
+  }
+  .group__label:hover { color: #2a2823; }
+  .group__label .tick {
+    width: 12px; height: 12px; border-radius: 50%; border: 1px solid #c9c4b8;
+    display: none; place-items: center;
+  }
+  .group__label .tick svg { width: 8px; height: 8px; }
+  .group__label:hover .tick { display: grid; }
+  .group.is-partial .tick, .group.is-full .tick { display: grid; background: #2a2823; border-color: #2a2823; }
+  .group.is-partial .tick svg { opacity: .35; }
+  .group__label .tick svg { stroke: #fff; }
+  .group__dots { display: flex; gap: 12px; }
+  .swatch {
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    background: none; border: 0; padding: 0; cursor: pointer; font: inherit; color: inherit;
+    transition: opacity .25s ease;
+  }
+  .swatch .dot {
+    width: 42px; height: 42px; border-radius: 50%;
+    box-shadow: inset 0 0 0 1px rgb(0 0 0 / 7%);
+    transition: box-shadow .22s ease, transform .22s ease;
+  }
+  .swatch:hover .dot { transform: scale(1.1); }
+  .swatch.is-active .dot { box-shadow: 0 0 0 2.5px #fff, 0 0 0 4.5px #2a2823; }
+  .swatch .name { font-size: 10px; letter-spacing: .06em; text-transform: uppercase; opacity: .55; }
+  .swatch.is-active .name { opacity: 1; font-weight: 600; }
+
+  /* hover 聚焦：其他组淡化 */
+  .bar:focus-within .group:not(:hover):not(:focus-within),
+  .bar:hover .group:not(:hover) { opacity: .3; transition: opacity .3s ease; }
+  .bar:hover .group:hover, .bar:focus-within .group:focus-within { opacity: 1; }
+
+  .dot--pattern { background: conic-gradient(from 20deg, #f3e6ea, #dfa79a, #c9b6db, #8fc1e9, #f3e6ea); }
+
+  /* ===== 状态条 ===== */
+  .status {
+    display: flex; align-items: center; flex-wrap: wrap; gap: 8px;
+    margin-top: 22px; padding-top: 18px; border-top: 1px solid #f0ede6;
+    min-height: 34px; font-size: 12px;
+  }
+  .status__label { color: #b0aa9f; letter-spacing: .06em; text-transform: uppercase; font-size: 10px; }
+  .chip {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 6px 4px 10px; border-radius: 999px;
+    background: #f4f2ec; font-size: 11px; letter-spacing: .04em;
+  }
+  .chip i { width: 12px; height: 12px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgb(0 0 0 / 8%); }
+  .chip button { border: 0; background: none; cursor: pointer; color: #8a857c; font-size: 13px; line-height: 1; padding: 2px 4px; }
+  .chip button:hover { color: #2a2823; }
+  .status__clear { border: 0; background: none; cursor: pointer; color: #2a2823; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; text-decoration: underline; text-underline-offset: 3px; opacity: .7; }
+
+  /* ===== 产品网格 ===== */
+  .grid-title { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #b0aa9f; margin: 40px 0 16px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); gap: 20px; }
+  .pcard { background: #fff; border: 1px solid #ece9e2; border-radius: 12px; overflow: hidden; }
+  .pcard__img { aspect-ratio: 3/4; background: linear-gradient(160deg, #f4f2ec, #e8e5dc); }
+  .pcard__body { padding: 12px 14px 16px; }
+  .pcard__name { font-size: 13px; margin: 0 0 4px; }
+  .pcard__price { font-size: 12px; color: #8a857c; margin: 0 0 8px; }
+  .pcard__colors { display: flex; gap: 5px; }
+  .pcard__colors i { width: 14px; height: 14px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgb(0 0 0 / 10%); }
+  .empty { padding: 40px; text-align: center; color: #b0aa9f; font-size: 13px; border: 1px dashed #e0dcd2; border-radius: 12px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Demo 2 · 全览分组条</h1>
+  <p class="desc">全部颜色一屏平铺，按色系分组、竖线分隔。悬停时自动聚焦当前组，其余组淡化——零点击、零展开，所有颜色一目了然。</p>
+  <p class="hint"><b>交互：</b>点选颜色（可跨组多选）· 悬停组名出现 ✓ 按钮 = 一键全选/取消该组 · 悬停任意颜色时其他组自动淡化聚焦</p>
+
+  <div class="card">
+    <div class="bar" id="bar"></div>
+    <div class="status" id="status"><span class="status__label">已选颜色</span></div>
+  </div>
+
+  <div class="grid-title">Products</div>
+  <div class="grid" id="grid"></div>
+</div>
+
+<script>
+const FAMILIES = [
+  { name: 'Blue',   children: [ { name: 'Navy', hex: '#1F2A5A' }, { name: 'Royal Blue', hex: '#2242A8' }, { name: 'Sky Blue', hex: '#8FC1E9' } ] },
+  { name: 'Pink',   children: [ { name: 'Pink', hex: '#F4B8C8' }, { name: 'Rose Gold', hex: '#DFA79A' }, { name: 'Blush', hex: '#F2C6C2' } ] },
+  { name: 'Neutral',children: [ { name: 'Beige', hex: '#E8DCC8' }, { name: 'Ivory', hex: '#F7F1E3' }, { name: 'Grey', hex: '#D9D9D9' } ] },
+  { name: 'Pattern',children: [ { name: 'Floral', pattern: true }, { name: 'Multi', pattern: true } ] },
+];
+const PRODUCTS = [
+  { name: 'Navy Satin Sheath Dress', price: '$128', colors: ['Navy'] },
+  { name: 'Royal Blue A-Line Gown', price: '$156', colors: ['Royal Blue'] },
+  { name: 'Sky Blue Slip Dress', price: '$102', colors: ['Sky Blue'] },
+  { name: 'Pink Chiffon Mini', price: '$96', colors: ['Pink'] },
+  { name: 'Rose Gold Sequin Midi', price: '$189', colors: ['Rose Gold'] },
+  { name: 'Blush Tulle Ball Gown', price: '$175', colors: ['Blush'] },
+  { name: 'Beige Tulle Overlay', price: '$118', colors: ['Beige'] },
+  { name: 'Ivory Column Dress', price: '$142', colors: ['Ivory'] },
+  { name: 'Grey Velvet Bodycon', price: '$110', colors: ['Grey'] },
+  { name: 'Floral Print Wrap Dress', price: '$134', colors: ['Floral'] },
+];
+const selected = new Set();
+
+const bgStyle = (c) => c.pattern ? 'background: conic-gradient(from 20deg, #f3e6ea, #dfa79a, #c9b6db, #8fc1e9, #f3e6ea)' : `background: ${c.hex}`;
+const hexOf = (name) => { for (const f of FAMILIES) { const c = f.children.find((x) => x.name === name); if (c) return c; } return null; };
+
+function renderBar() {
+  const bar = document.getElementById('bar');
+  bar.innerHTML = '';
+  FAMILIES.forEach((fam) => {
+    const g = document.createElement('div');
+    g.className = 'group';
+    const members = fam.children.map((c) => c.name);
+    const activeInGroup = members.filter((m) => selected.has(m)).length;
+    g.classList.toggle('is-full', activeInGroup === members.length);
+    g.classList.toggle('is-partial', activeInGroup > 0 && activeInGroup < members.length);
+
+    const label = document.createElement('span');
+    label.className = 'group__label';
+    label.innerHTML = `<span class="tick"><svg viewBox="0 0 12 12" fill="none" stroke-width="2"><polyline points="2,6 5,9 10,3"/></svg></span>${fam.name}`;
+    label.title = '点击全选 / 取消该色系';
+    label.onclick = () => {
+      if (activeInGroup === members.length) members.forEach((m) => selected.delete(m));
+      else members.forEach((m) => selected.add(m));
+      refresh();
+    };
+
+    const dots = document.createElement('div');
+    dots.className = 'group__dots';
+    fam.children.forEach((c) => {
+      const s = document.createElement('button');
+      s.className = 'swatch' + (selected.has(c.name) ? ' is-active' : '');
+      s.innerHTML = `<span class="dot" style="${bgStyle(c)}"></span><span class="name">${c.name}</span>`;
+      s.onclick = () => toggleColor(c.name);
+      dots.appendChild(s);
+    });
+
+    g.append(label, dots);
+    bar.appendChild(g);
+  });
+}
+
+function renderStatus() {
+  const el = document.getElementById('status');
+  el.innerHTML = '<span class="status__label">已选颜色</span>';
+  selected.forEach((name) => {
+    const c = hexOf(name);
+    const chip = document.createElement('span');
+    chip.className = 'chip';
+    chip.innerHTML = `<i style="${c ? bgStyle(c) : ''}"></i>${name}<button title="移除">×</button>`;
+    chip.querySelector('button').onclick = () => toggleColor(name);
+    el.appendChild(chip);
+  });
+  if (selected.size) {
+    const clear = document.createElement('button');
+    clear.className = 'status__clear';
+    clear.textContent = '清除全部';
+    clear.onclick = () => { selected.clear(); refresh(); };
+    el.appendChild(clear);
+  }
+}
+
+function toggleColor(name) { selected.has(name) ? selected.delete(name) : selected.add(name); refresh(); }
+
+function renderGrid() {
+  const grid = document.getElementById('grid');
+  const list = selected.size ? PRODUCTS.filter((p) => p.colors.some((c) => selected.has(c))) : PRODUCTS;
+  grid.innerHTML = '';
+  if (!list.length) { grid.innerHTML = '<div class="empty" style="grid-column:1/-1">没有匹配的商品</div>'; return; }
+  list.forEach((p) => {
+    const d = document.createElement('div');
+    d.className = 'pcard';
+    d.innerHTML = `<div class="pcard__img"></div><div class="pcard__body"><p class="pcard__name">${p.name}</p><p class="pcard__price">${p.price}</p>
+      <div class="pcard__colors">${p.colors.map((c) => { const h = hexOf(c); return `<i style="${h ? bgStyle(h) : ''}"></i>`; }).join('')}</div></div>`;
+    grid.appendChild(d);
+  });
+}
+
+function refresh() { renderBar(); renderStatus(); renderGrid(); }
+refresh();
+</script>
+</body>
+</html>

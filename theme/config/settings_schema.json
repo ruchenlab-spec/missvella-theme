@@ -2116,5 +2116,56 @@
         "default": "equal-width-buttons"
       }
     ]
+  },
+  {
+    "name": "面包屑",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "breadcrumbs_enabled",
+        "label": "显示面包屑",
+        "info": "首页与密码页不显示",
+        "default": true
+      },
+      {
+        "type": "select",
+        "id": "breadcrumbs_width",
+        "label": "宽度",
+        "options": [
+          {
+            "value": "page",
+            "label": "页面宽"
+          },
+          {
+            "value": "full",
+            "label": "全宽"
+          }
+        ],
+        "default": "page",
+        "info": "页面宽与下方 section 的内容区对齐"
+      },
+      {
+        "type": "range",
+        "id": "breadcrumbs_padding_inline_start",
+        "label": "左边距",
+        "min": 0,
+        "max": 120,
+        "step": 2,
+        "unit": "px",
+        "default": 40,
+        "info": "全宽模式生效，移动端自动减半"
+      },
+      {
+        "type": "range",
+        "id": "breadcrumbs_padding_inline_end",
+        "label": "右边距",
+        "min": 0,
+        "max": 120,
+        "step": 2,
+        "unit": "px",
+        "default": 40,
+        "info": "全宽模式生效，移动端自动减半"
+      }
+    ]
   }
 ]
