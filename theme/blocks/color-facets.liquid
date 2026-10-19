@@ -23,7 +23,7 @@
   assign color_filter = null
   assign active_color_count = 0
 
-  for filter in results.filters
+  for filter in closest.collection.filters
     assign param_name_down = filter.param_name | downcase
     # Shopify's taxonomy colour filter is filter.v.t.shopify.color-pattern; custom
     # option filters can be filter.v.option.color / .colour / .颜色
@@ -107,7 +107,7 @@
       <div class="color-facets__row color-facets__row--families">
         <a
           class="color-facets__item{% if active_color_count == 0 %} is-active{% endif %}"
-          href="{{ results.url | default: routes.root_url }}"
+          href="{{ closest.collection.url | default: routes.root_url }}"
           aria-label="{{ block.settings.all_label | default: 'All' }}"
         >
           <span class="color-facets__dot color-facets__dot--all" aria-hidden="true">
@@ -252,7 +252,7 @@
         {% if block.settings.show_all %}
           <a
             class="color-facets__item{% if active_color_count == 0 %} is-active{% endif %}"
-            href="{{ results.url | default: routes.root_url }}"
+            href="{{ closest.collection.url | default: routes.root_url }}"
             aria-label="{{ block.settings.all_label | default: 'All' }}"
           >
             <span class="color-facets__dot color-facets__dot--all" aria-hidden="true">
