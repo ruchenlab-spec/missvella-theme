@@ -551,6 +551,18 @@
     }
   }
 
+  /*
+   * Full-width filter bar spans the WHOLE row (1 / -1), so its inner padding
+   * (40px) lines up with the breadcrumbs and the product grid gutters. The
+   * default --grid-column--desktop only spans the content columns, which made
+   * the bar sit 40px further right than everything else.
+   */
+  .facets-block-wrapper--full-width {
+    @media screen and (min-width: 750px) {
+      grid-column: 1 / -1;
+    }
+  }
+
   .facets-block-wrapper--vertical {
     @media screen and (min-width: 750px) {
       grid-column: var(--grid-column--desktop);
