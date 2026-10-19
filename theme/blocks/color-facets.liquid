@@ -158,7 +158,22 @@
               </button>
 
               {%- comment -%} Hover flyout: child swatches of this family {%- endcomment -%}
-              <div class="color-facets__flyout" data-family-flyout>
+              {%- liquid
+                assign flyout_bg = block.settings.flyout_bg_color | default: '#FFFFFF'
+                assign flyout_overlay = block.settings.flyout_bg_overlay | default: 0
+              -%}
+              <div
+                class="color-facets__flyout"
+                data-family-flyout
+                style="
+                  background-color: {{ flyout_bg }};
+                  {% if block.settings.flyout_bg_image != blank %}
+                    background-image: linear-gradient(rgb(0 0 0 / {{ flyout_overlay }}%), rgb(0 0 0 / {{ flyout_overlay }}%)), url({{ block.settings.flyout_bg_image | image_url: width: 900 }});
+                    background-size: cover;
+                    background-position: center;
+                  {% endif %}
+                "
+              >
                 {%- for value in color_filter.values -%}
                   {%- assign vkey = value.label | downcase | strip -%}
                   {%- assign in_family = false -%}
@@ -294,8 +309,12 @@
 
 {% stylesheet %}
   .color-facets {
-    /* The collection page renders blocks inside a grid; span the full row */
+    /* The collection page renders blocks inside a grid; span the full row.
+       z-index lifts this block above the native filters bar that follows it in
+       the DOM, so the flyout is never covered. */
     grid-column: 1 / -1;
+    position: relative;
+    z-index: 10;
     display: flex;
     flex-direction: column;
     align-items: var(--color-facet-align, center);
@@ -422,27 +441,56 @@
   /*
    * Flyout opens on hover / keyboard focus on desktop; on touch devices the
    * family button toggles it via .is-open (see the inline script).
+   * Opacity/visibility/scale transition instead of display so the open/close
+   * animates smoothly; background (solid colour or uploaded image) is set
+   * inline from the block settings.
    */
   .color-facets__flyout {
     position: absolute;
-    top: calc(100% + 10px);
+    top: calc(100% + 12px);
     left: 50%;
     translate: -50% 0;
-    display: none;
+    display: flex;
     align-items: flex-start;
     gap: var(--color-facet-gap, 14px);
-    padding: 16px 20px;
-    background: var(--color-background, #fff);
+    padding: 18px 22px;
     border: 1px solid rgb(0 0 0 / 10%);
-    border-radius: 12px;
-    box-shadow: 0 12px 32px rgb(0 0 0 / 14%);
+    border-radius: 14px;
+    box-shadow: 0 18px 44px rgb(0 0 0 / 16%);
     z-index: 6;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-6px) scale(0.98);
+    transition:
+      opacity 0.22s ease,
+      transform 0.22s cubic-bezier(0.22, 0.61, 0.36, 1),
+      visibility 0.22s;
+  }
+
+  .color-facets__flyout::before {
+    content: '';
+    position: absolute;
+    top: -6px;
+    left: 50%;
+    translate: -50% 0;
+    width: 12px;
+    height: 12px;
+    background: inherit;
+    border-left: 1px solid rgb(0 0 0 / 10%);
+    border-top: 1px solid rgb(0 0 0 / 10%);
+    rotate: 45deg;
   }
 
   .color-facets__family:hover .color-facets__flyout,
   .color-facets__family:focus-within .color-facets__flyout,
   .color-facets__family.is-open .color-facets__flyout {
-    display: flex;
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0) scale(1);
+  }
+
+  .color-facets__flyout .color-facets__item:hover .color-facets__dot {
+    transform: scale(1.08);
   }
 
   /*
@@ -483,7 +531,7 @@
       overflow-x: auto;
       padding: 12px 16px;
     }
-  }
+
     .color-facets__row {
       flex-wrap: nowrap;
       overflow-x: auto;
@@ -731,6 +779,33 @@
       "id": "text_color",
       "label": "文字颜色",
       "placeholder": "默认"
+    },
+    {
+      "type": "header",
+      "content": "浮层背景"
+    },
+    {
+      "type": "color",
+      "id": "flyout_bg_color",
+      "label": "背景颜色",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "image_picker",
+      "id": "flyout_bg_image",
+      "label": "背景图片",
+      "info": "可选。上传后覆盖在背景颜色之上，平铺填满浮层"
+    },
+    {
+      "type": "range",
+      "id": "flyout_bg_overlay",
+      "label": "背景遮罩",
+      "info": "在背景图上叠加黑色遮罩，保证文字可读。无背景图时不生效",
+      "min": 0,
+      "max": 80,
+      "step": 5,
+      "unit": "%",
+      "default": 0
     },
     {
       "type": "header",
