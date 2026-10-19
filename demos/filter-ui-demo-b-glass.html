@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>筛选器 Demo B · Dark Glass（暗色玻璃）</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: 'Inter', -apple-system, 'Segoe UI', 'PingFang SC', sans-serif;
+    background: #141210; color: #ece9e2; padding: 40px 24px 80px;
+  }
+  .wrap { max-width: 1240px; margin: 0 auto; }
+  h1 { font-size: 22px; margin: 0 0 6px; color: #f2efe9; }
+  .desc { font-size: 13px; color: #8f887a; line-height: 1.7; margin: 0 0 10px; }
+  .hint { font-size: 12px; color: #6f685c; margin: 0 0 28px; }
+  .hint b { color: #a89f8d; }
+
+  .mode-switch { display: inline-flex; background: rgb(255 255 255 / 6%); border-radius: 999px; padding: 4px; margin-bottom: 26px; }
+  .mode-switch button { border: 0; background: none; padding: 8px 20px; border-radius: 999px; font-size: 12px; letter-spacing: .06em; cursor: pointer; color: #8f887a; transition: all .25s ease; }
+  .mode-switch button.on { background: rgb(255 255 255 / 12%); color: #f2efe9; font-weight: 600; }
+
+  .shop { display: grid; gap: 24px; }
+  .shop.vertical { grid-template-columns: 280px minmax(0, 1fr); align-items: start; }
+
+  .glass {
+    background: rgb(30 27 22 / 72%);
+    backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+    border: 1px solid rgb(255 255 255 / 9%);
+    border-radius: 18px;
+    box-shadow: 0 24px 60px rgb(0 0 0 / 40%);
+  }
+
+  .fc-head { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; border-bottom: 1px solid rgb(255 255 255 / 8%); }
+  .fc-head__title { font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: #c9a227; }
+  .fc-clear { border: 0; background: none; cursor: pointer; font-size: 11px; letter-spacing: .06em; text-transform: uppercase; color: #8f887a; text-decoration: underline; text-underline-offset: 3px; }
+  .fc-clear:hover { color: #f2efe9; }
+  .fc-body { padding: 18px 20px 22px; display: grid; gap: 22px; }
+  .shop:not(.vertical) .fc-body { grid-template-columns: 1.2fr 1fr 1fr; gap: 26px; }
+
+  .fg__title { font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: #8f887a; margin: 0 0 12px; font-weight: 600; }
+
+  .fam-row { display: flex; flex-wrap: wrap; gap: 8px; }
+  .fam { position: relative; }
+  .fam-pill {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 7px 14px 7px 7px; border-radius: 999px;
+    border: 1px solid rgb(255 255 255 / 14%); background: rgb(255 255 255 / 4%);
+    cursor: pointer; font-size: 12px; color: #ece9e2; transition: all .2s ease;
+  }
+  .fam-pill:hover { border-color: rgb(201 162 39 / 60%); background: rgb(201 162 39 / 10%); }
+  .fam-pill .fam-dot { width: 22px; height: 22px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgb(255 255 255 / 15%); }
+  .fam-pill .fam-count { color: #c9a227; font-size: 10px; }
+  .flyout {
+    position: absolute; top: calc(100% + 10px); left: 0; z-index: 30;
+    display: none; flex-wrap: wrap; gap: 14px;
+    padding: 16px 18px; border-radius: 14px;
+    background: rgb(24 22 18 / 88%);
+    backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgb(201 162 39 / 35%);
+    box-shadow: 0 24px 60px rgb(0 0 0 / 55%);
+  }
+  .fam:hover .flyout, .fam:focus-within .flyout, .fam.is-open .flyout { display: flex; }
+  .child {
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    background: none; border: 0; padding: 0; cursor: pointer; font: inherit; color: inherit;
+  }
+  .child .dot { width: 44px; height: 44px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgb(255 255 255 / 18%); transition: transform .2s ease, box-shadow .2s ease; }
+  .child:hover .dot { transform: scale(1.1); }
+  .child.is-active .dot { box-shadow: 0 0 0 2.5px #141210, 0 0 0 4.5px #c9a227; }
+  .child .name { font-size: 10px; letter-spacing: .06em; text-transform: uppercase; color: #8f887a; }
+  .child.is-active .name { color: #c9a227; }
+  .dot--pattern { background: conic-gradient(from 20deg, #f3e6ea, #dfa79a, #c9b6db, #8fc1e9, #f3e6ea); }
+
+  .checks { display: flex; flex-direction: column; gap: 10px; }
+  .chk { display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 13px; user-select: none; }
+  .chk input { display: none; }
+  .chk .box { width: 18px; height: 18px; border-radius: 5px; border: 1.5px solid rgb(255 255 255 / 25%); display: grid; place-items: center; transition: all .2s ease; flex: 0 0 auto; }
+  .chk .box svg { width: 10px; height: 10px; stroke: #141210; stroke-width: 2.5; fill: none; opacity: 0; transform: scale(.5); transition: all .2s ease; }
+  .chk input:checked + .box { background: #c9a227; border-color: #c9a227; }
+  .chk input:checked + .box svg { opacity: 1; transform: scale(1); }
+  .chk .cnt { color: #6f685c; font-size: 11px; margin-left: auto; }
+
+  .price-track { position: relative; height: 4px; border-radius: 4px; background: rgb(255 255 255 / 12%); margin: 10px 6px 8px; }
+  .price-fill { position: absolute; height: 100%; background: linear-gradient(90deg, #8a6f1d, #c9a227); border-radius: 4px; }
+  .price-track input[type='range'] { position: absolute; inset: -8px 0; width: 100%; margin: 0; -webkit-appearance: none; appearance: none; background: none; pointer-events: none; height: 20px; }
+  .price-track input[type='range']::-webkit-slider-thumb { -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%; background: #c9a227; border: 2px solid #141210; cursor: pointer; pointer-events: auto; box-shadow: 0 0 0 1px rgb(201 162 39 / 40%); }
+  .price-vals { display: flex; justify-content: space-between; font-size: 12px; color: #8f887a; }
+  .price-vals b { color: #f2efe9; font-weight: 500; }
+
+  .pills { display: flex; flex-wrap: wrap; gap: 8px; }
+  .pill { min-width: 40px; padding: 7px 12px; border-radius: 999px; border: 1px solid rgb(255 255 255 / 18%); background: rgb(255 255 255 / 4%); cursor: pointer; font-size: 12px; text-align: center; transition: all .2s ease; color: #ece9e2; }
+  .pill:hover { border-color: #c9a227; }
+  .pill.is-active { background: #c9a227; color: #141210; border-color: #c9a227; font-weight: 600; }
+
+  .topbar { display: none; align-items: center; gap: 14px; padding: 12px 18px; }
+  .shop:not(.vertical) .topbar { display: flex; }
+  .filter-toggle { display: inline-flex; align-items: center; gap: 8px; border: 1px solid rgb(255 255 255 / 20%); background: rgb(255 255 255 / 5%); border-radius: 999px; padding: 8px 16px; font-size: 13px; cursor: pointer; color: #f2efe9; transition: all .2s ease; }
+  .filter-toggle:hover { border-color: #c9a227; }
+  .filter-toggle .badge { background: #c9a227; color: #141210; border-radius: 999px; font-size: 10px; padding: 1px 7px; font-weight: 600; }
+  .topbar__spacer { flex: 1; }
+  .items-count { font-size: 12px; color: #8f887a; }
+  .sort-wrap { position: relative; }
+  .sort-wrap select { appearance: none; -webkit-appearance: none; border: 1px solid rgb(255 255 255 / 20%); background: rgb(255 255 255 / 5%); border-radius: 999px; padding: 8px 34px 8px 16px; font-size: 13px; cursor: pointer; color: #f2efe9; }
+  .sort-wrap select option { background: #1e1b16; }
+  .sort-wrap::after { content: ''; position: absolute; right: 14px; top: 50%; width: 7px; height: 7px; border-right: 1.5px solid #c9a227; border-bottom: 1.5px solid #c9a227; transform: translateY(-65%) rotate(45deg); pointer-events: none; }
+
+  .shop:not(.vertical) .filter-card { position: absolute; top: calc(100% + 10px); left: 0; right: 0; z-index: 30; opacity: 0; visibility: hidden; transform: translateY(-8px); transition: all .25s cubic-bezier(.22,.61,.36,1), visibility .25s; }
+  .shop:not(.vertical) .filter-card.is-open { opacity: 1; visibility: visible; transform: none; }
+  .filter-anchor { position: relative; }
+
+  .grid-title { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #6f685c; margin: 0 0 16px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 18px; }
+  .pcard { background: rgb(255 255 255 / 4%); border: 1px solid rgb(255 255 255 / 8%); border-radius: 12px; overflow: hidden; }
+  .pcard__img { aspect-ratio: 3/4; background: linear-gradient(160deg, #2a2620, #1a1713); }
+  .pcard__body { padding: 12px 14px 16px; }
+  .pcard__name { font-size: 13px; margin: 0 0 4px; color: #f2efe9; }
+  .pcard__price { font-size: 12px; color: #8f887a; margin: 0 0 8px; }
+  .pcard__colors { display: flex; gap: 5px; }
+  .pcard__colors i { width: 14px; height: 14px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgb(255 255 255 / 15%); }
+  .empty { padding: 40px; text-align: center; color: #6f685c; font-size: 13px; border: 1px dashed rgb(255 255 255 / 15%); border-radius: 12px; }
+
+  @media (max-width: 860px) { .shop:not(.vertical) .fc-body { grid-template-columns: 1fr 1fr; } }
+  @media (max-width: 640px) { .shop:not(.vertical) .fc-body { grid-template-columns: 1fr; } .shop.vertical { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Demo B · Dark Glass（暗色玻璃）</h1>
+  <p class="desc">深色毛玻璃面板 + 金色强调。颜色筛选采用<b>色系胶囊 → 悬停展开子色浮层</b>的两步交互，浮层同为毛玻璃质感。</p>
+  <p class="hint"><b>看什么：</b>悬停色系胶囊（Blues/Pinks/Neutrals）→ 毛玻璃浮层展开子色 → 点选筛选 · 复选框/金色滑块/pills · 切换 <b>水平/垂直</b></p>
+
+  <div class="mode-switch">
+    <button class="on" data-mode="horizontal">水平布局</button>
+    <button data-mode="vertical">垂直布局</button>
+  </div>
+
+  <div class="shop" id="shop">
+    <div class="filter-anchor">
+      <div class="topbar glass">
+        <button class="filter-toggle" id="filterToggle">筛选 <span class="badge" id="selBadge">0</span></button>
+        <span class="items-count" id="itemsCount"></span>
+        <span class="topbar__spacer"></span>
+        <span class="sort-wrap"><select id="sortSel"><option>Featured</option><option>Price, low to high</option><option>Price, high to low</option></select></span>
+      </div>
+      <div class="filter-card glass">
+        <div class="fc-head"><span class="fc-head__title">Refine</span><button class="fc-clear" id="clearAll">Clear all</button></div>
+        <div class="fc-body" id="fcBody"></div>
+      </div>
+    </div>
+    <div>
+      <div class="grid-title">Products</div>
+      <div class="grid" id="grid"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const FAMILIES = [
+  { name: 'Blues', swatch: '#3B5BA5', children: [ { name: 'Navy', hex: '#1F2A5A' }, { name: 'Royal Blue', hex: '#2242A8' }, { name: 'Sky Blue', hex: '#8FC1E9' } ] },
+  { name: 'Pinks', swatch: '#F4B8C8', children: [ { name: 'Pink', hex: '#F4B8C8' }, { name: 'Rose Gold', hex: '#DFA79A' }, { name: 'Blush', hex: '#F2C6C2' } ] },
+  { name: 'Neutrals', swatch: '#E8DCC8', children: [ { name: 'Beige', hex: '#E8DCC8' }, { name: 'Ivory', hex: '#F7F1E3' }, { name: 'Grey', hex: '#D9D9D9' } ] },
+];
+const OTHERS = [
+  { label: 'Availability', type: 'checks', values: [ { name: 'In stock', count: 9 }, { name: 'Out of stock', count: 2 } ] },
+  { label: 'Price', type: 'price', min: 80, max: 200 },
+  { label: 'Size', type: 'pills', values: ['XS', 'S', 'M', 'L', 'XL'] },
+];
+const PRODUCTS = [
+  { name: 'Navy Satin Sheath Dress', price: 128, colors: ['Navy'], sizes: ['S', 'M'], oos: false },
+  { name: 'Royal Blue A-Line Gown', price: 156, colors: ['Royal Blue'], sizes: ['M', 'L'], oos: false },
+  { name: 'Sky Blue Slip Dress', price: 102, colors: ['Sky Blue'], sizes: ['XS', 'S'], oos: false },
+  { name: 'Pink Chiffon Mini', price: 96, colors: ['Pink'], sizes: ['XS', 'S'], oos: false },
+  { name: 'Rose Gold Sequin Midi', price: 189, colors: ['Rose Gold'], sizes: ['M'], oos: true },
+  { name: 'Blush Tulle Ball Gown', price: 175, colors: ['Blush'], sizes: ['L', 'XL'], oos: false },
+  { name: 'Beige Tulle Overlay', price: 118, colors: ['Beige'], sizes: ['S', 'M'], oos: false },
+  { name: 'Ivory Column Dress', price: 142, colors: ['Ivory'], sizes: ['M'], oos: false },
+  { name: 'Grey Velvet Bodycon', price: 110, colors: ['Grey'], sizes: ['L'], oos: false },
+];
+const state = { colors: new Set(), avail: new Set(), sizes: new Set(), price: [80, 200] };
+const hexOf = (n) => { for (const f of FAMILIES) { const c = f.children.find((x) => x.name === n); if (c) return c; } return null; };
+
+function renderFilters() {
+  const body = document.getElementById('fcBody');
+  body.innerHTML = '';
+
+  const cg = document.createElement('div');
+  cg.className = 'fg';
+  cg.innerHTML = '<p class="fg__title">Colour family</p>';
+  const row = document.createElement('div');
+  row.className = 'fam-row';
+  FAMILIES.forEach((fam) => {
+    const active = fam.children.filter((c) => state.colors.has(c.name)).length;
+    const w = document.createElement('div');
+    w.className = 'fam';
+    const pill = document.createElement('button');
+    pill.className = 'fam-pill';
+    pill.innerHTML = '<span class="fam-dot" style="background:' + fam.swatch + '"></span>' + fam.name + (active ? ' <span class="fam-count">(' + active + ')</span>' : '');
+    const fly = document.createElement('div');
+    fly.className = 'flyout';
+    fam.children.forEach((c) => {
+      const btn = document.createElement('button');
+      btn.className = 'child' + (state.colors.has(c.name) ? ' is-active' : '');
+      btn.innerHTML = '<span class="dot" style="background:' + c.hex + '"></span><span class="name">' + c.name + '</span>';
+      btn.onclick = () => { state.colors.has(c.name) ? state.colors.delete(c.name) : state.colors.add(c.name); refresh(); };
+      fly.appendChild(btn);
+    });
+    w.append(pill, fly);
+    row.appendChild(w);
+  });
+  cg.appendChild(row);
+  body.appendChild(cg);
+
+  OTHERS.forEach((f) => {
+    const g = document.createElement('div');
+    g.className = 'fg';
+    g.innerHTML = '<p class="fg__title">' + f.label + '</p>';
+    if (f.type === 'checks') {
+      const box = document.createElement('div'); box.className = 'checks';
+      f.values.forEach((v) => {
+        const l = document.createElement('label'); l.className = 'chk';
+        l.innerHTML = '<input type="checkbox"' + (state.avail.has(v.name) ? ' checked' : '') + '><span class="box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span>' + v.name + '<span class="cnt">' + v.count + '</span>';
+        l.querySelector('input').onchange = () => { state.avail.has(v.name) ? state.avail.delete(v.name) : state.avail.add(v.name); refresh(); };
+        box.appendChild(l);
+      });
+      g.appendChild(box);
+    }
+    if (f.type === 'price') {
+      const w = document.createElement('div'); w.className = 'price-slider';
+      w.innerHTML = '<div class="price-track"><div class="price-fill"></div><input type="range" class="lo" min="' + f.min + '" max="' + f.max + '" step="2" value="' + state.price[0] + '"><input type="range" class="hi" min="' + f.min + '" max="' + f.max + '" step="2" value="' + state.price[1] + '"></div><div class="price-vals"><span>Min <b class="lov">$' + state.price[0] + '</b></span><span>Max <b class="hiv">$' + state.price[1] + '</b></span></div>';
+      g.appendChild(w);
+      const lo = w.querySelector('.lo'), hi = w.querySelector('.hi');
+      const upd = () => {
+        let a = +lo.value, b2 = +hi.value; if (a > b2) { const t = a; a = b2; b2 = t; }
+        state.price = [a, b2];
+        const span = f.max - f.min;
+        w.querySelector('.price-fill').style.left = ((a - f.min) / span) * 100 + '%';
+        w.querySelector('.price-fill').style.right = (100 - ((b2 - f.min) / span) * 100) + '%';
+        w.querySelector('.lov').textContent = '$' + a; w.querySelector('.hiv').textContent = '$' + b2;
+      };
+      lo.oninput = () => { upd(); renderGrid(); };
+      hi.oninput = () => { upd(); renderGrid(); };
+      requestAnimationFrame(upd);
+    }
+    if (f.type === 'pills') {
+      const p = document.createElement('div'); p.className = 'pills';
+      f.values.forEach((v) => {
+        const btn = document.createElement('button'); btn.className = 'pill' + (state.sizes.has(v) ? ' is-active' : ''); btn.textContent = v;
+        btn.onclick = () => { state.sizes.has(v) ? state.sizes.delete(v) : state.sizes.add(v); refresh(); };
+        p.appendChild(btn);
+      });
+      g.appendChild(p);
+    }
+    body.appendChild(g);
+  });
+}
+
+function renderGrid() {
+  let list = PRODUCTS.slice();
+  if (state.colors.size) list = list.filter((p) => p.colors.some((c) => state.colors.has(c)));
+  if (state.avail.has('In stock')) list = list.filter((p) => !p.oos);
+  if (state.sizes.size) list = list.filter((p) => p.sizes.some((s) => state.sizes.has(s)));
+  list = list.filter((p) => p.price >= state.price[0] && p.price <= state.price[1]);
+  if (state.sort === 'Price, low to high') list.sort((a, b) => a.price - b.price);
+  if (state.sort === 'Price, high to low') list.sort((a, b) => b.price - a.price);
+
+  const count = state.colors.size + state.avail.size + state.sizes.size;
+  document.getElementById('selBadge').textContent = count;
+  document.getElementById('itemsCount').textContent = list.length + ' items';
+
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+  if (!list.length) { grid.innerHTML = '<div class="empty" style="grid-column:1/-1">没有匹配的商品</div>'; return; }
+  list.forEach((p) => {
+    const d = document.createElement('div'); d.className = 'pcard';
+    d.innerHTML = '<div class="pcard__img"></div><div class="pcard__body"><p class="pcard__name">' + p.name + '</p><p class="pcard__price">$' + p.price + '</p><div class="pcard__colors">' + p.colors.map((c) => { const v = hexOf(c); return '<i style="background:' + (v ? v.hex : '#888') + '"></i>'; }).join('') + '</div></div>';
+    grid.appendChild(d);
+  });
+}
+
+function refresh() { renderFilters(); renderGrid(); }
+
+document.getElementById('filterToggle').onclick = () => document.getElementById('filterCard').classList.toggle('is-open');
+document.getElementById('clearAll').onclick = () => { state.colors.clear(); state.avail.clear(); state.sizes.clear(); state.price = [80, 200]; refresh(); };
+document.getElementById('sortSel').onchange = (e) => { state.sort = e.target.value; renderGrid(); };
+document.querySelectorAll('.mode-switch button').forEach((b) => {
+  b.onclick = () => {
+    document.querySelectorAll('.mode-switch button').forEach((x) => x.classList.remove('on'));
+    b.classList.add('on');
+    document.getElementById('shop').className = 'shop' + (b.dataset.mode === 'vertical' ? ' vertical' : '');
+  };
+});
+
+refresh();
+</script>
+</body>
+</html>

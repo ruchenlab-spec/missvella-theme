@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>筛选器 Demo C · Editorial Lines（编辑风细线）</title>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; font-family: 'Inter', -apple-system, 'Segoe UI', 'PingFang SC', sans-serif; background: #fff; color: #1a1a1a; padding: 40px 24px 80px; }
+  .wrap { max-width: 1240px; margin: 0 auto; }
+  h1 { font-size: 22px; margin: 0 0 6px; }
+  .desc { font-size: 13px; color: #888; line-height: 1.7; margin: 0 0 10px; }
+  .hint { font-size: 12px; color: #b5b5b5; margin: 0 0 28px; }
+  .hint b { color: #555; }
+  .mode-switch { display: inline-flex; border-bottom: 1px solid #e5e5e5; margin-bottom: 30px; }
+  .mode-switch button { border: 0; background: none; padding: 10px 22px; font-size: 13px; cursor: pointer; color: #999; position: relative; }
+  .mode-switch button.on { color: #1a1a1a; font-weight: 600; }
+  .mode-switch button.on::after { content: ''; position: absolute; bottom: -1px; left: 0; right: 0; height: 2px; background: #1a1a1a; }
+
+  .shop { display: grid; gap: 40px; }
+  .shop.vertical { grid-template-columns: 240px minmax(0, 1fr); gap: 48px; align-items: start; }
+
+  .acc { border-bottom: 1px solid #e5e5e5; }
+  .acc summary { list-style: none; display: flex; align-items: center; justify-content: space-between; padding: 16px 0; cursor: pointer; font-size: 13px; font-weight: 500; letter-spacing: .06em; text-transform: uppercase; }
+  .acc summary::-webkit-details-marker { display: none; }
+  .acc summary .chev { width: 9px; height: 9px; border-right: 1.5px solid #999; border-bottom: 1.5px solid #999; transform: rotate(45deg); transition: transform .3s ease; }
+  .acc[open] summary .chev { transform: rotate(225deg); }
+  .acc__body { padding: 0 0 20px; }
+
+  .swatches { display: flex; flex-wrap: wrap; gap: 14px 18px; }
+  .sw { display: flex; flex-direction: column; align-items: center; gap: 7px; background: none; border: 0; padding: 0; cursor: pointer; font: inherit; color: inherit; transition: opacity .3s ease; }
+  .sw .dot { width: 68px; height: 68px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgb(0 0 0 / 8%); transition: transform .25s ease, box-shadow .25s ease; }
+  .sw:hover .dot { transform: scale(1.06); }
+  .sw.is-active .dot { box-shadow: 0 0 0 2px #fff, 0 0 0 3.5px #1a1a1a; }
+  .sw .name { font-size: 10px; letter-spacing: .1em; text-transform: uppercase; color: #888; }
+  .sw.is-active .name { color: #1a1a1a; font-weight: 600; }
+  .swatches:hover .sw:not(:hover) { opacity: .35; }
+  .sw .dot--pattern { background: conic-gradient(from 20deg, #f3e6ea, #dfa79a, #c9b6db, #8fc1e9, #f3e6ea); }
+
+  .checks { display: flex; flex-direction: column; gap: 12px; }
+  .chk { display: flex; align-items: center; justify-content: space-between; cursor: pointer; font-size: 13px; user-select: none; }
+  .chk input { display: none; }
+  .chk .lbl { display: flex; align-items: center; gap: 10px; }
+  .chk .lbl::before { content: ''; width: 16px; height: 1.5px; background: #1a1a1a; transform: scaleX(0); transform-origin: left; transition: transform .25s ease; }
+  .chk input:checked + .lbl::before { transform: scaleX(1); }
+  .chk input:checked + .lbl { font-weight: 600; }
+  .chk .cnt { color: #bbb; font-size: 11px; }
+
+  .price-track { position: relative; height: 1.5px; background: #e5e5e5; margin: 14px 4px 10px; }
+  .price-fill { position: absolute; height: 100%; background: #1a1a1a; }
+  .price-track input[type='range'] { position: absolute; inset: -9px 0; width: 100%; margin: 0; -webkit-appearance: none; appearance: none; background: none; pointer-events: none; height: 20px; }
+  .price-track input[type='range']::-webkit-slider-thumb { -webkit-appearance: none; width: 14px; height: 14px; border-radius: 50%; background: #fff; border: 1.5px solid #1a1a1a; cursor: pointer; pointer-events: auto; }
+  .price-vals { display: flex; justify-content: space-between; font-size: 12px; color: #888; }
+  .price-vals b { color: #1a1a1a; font-weight: 500; }
+
+  .pills { display: flex; flex-wrap: wrap; gap: 6px 14px; }
+  .pill { background: none; border: 0; padding: 4px 2px; cursor: pointer; font-size: 13px; color: #999; position: relative; transition: color .2s ease; }
+  .pill::after { content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: 1.5px; background: #1a1a1a; transform: scaleX(0); transition: transform .25s ease; }
+  .pill:hover { color: #1a1a1a; }
+  .pill.is-active { color: #1a1a1a; font-weight: 600; }
+  .pill.is-active::after { transform: scaleX(1); }
+
+  .topbar { display: none; align-items: center; justify-content: space-between; padding: 14px 0; border-bottom: 1px solid #e5e5e5; margin-bottom: 30px; }
+  .shop:not(.vertical) .topbar { display: flex; }
+  .filter-btn { background: none; border: 0; cursor: pointer; font-size: 13px; font-weight: 500; letter-spacing: .04em; padding: 0; }
+  .filter-btn .badge { font-weight: 400; color: #888; }
+  .sort { display: flex; align-items: center; gap: 6px; font-size: 13px; color: #888; }
+  .sort select { appearance: none; -webkit-appearance: none; border: 0; background: none; font-size: 13px; cursor: pointer; color: #1a1a1a; font-family: inherit; }
+  .items-count { font-size: 12px; color: #bbb; }
+
+  .shop:not(.vertical) .acc-wrap { position: absolute; left: 0; right: 0; top: calc(100% + 1px); z-index: 30; background: #fff; box-shadow: 0 30px 60px rgb(0 0 0 / 10%); display: none; }
+  .shop:not(.vertical) .acc-wrap.is-open { display: block; }
+  .shop:not(.vertical) .acc-wrap .acc__body { display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 30px; padding: 20px 0 26px; }
+  .filter-anchor { position: relative; }
+
+  .grid-title { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #bbb; margin: 0 0 16px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 24px 18px; }
+  .pcard__img { aspect-ratio: 3/4; background: linear-gradient(160deg, #f7f7f7, #ececec); }
+  .pcard__body { padding: 10px 2px 0; }
+  .pcard__name { font-size: 13px; margin: 0 0 3px; }
+  .pcard__price { font-size: 12px; color: #888; margin: 0; }
+  .pcard__colors { display: flex; gap: 5px; margin-top: 6px; }
+  .pcard__colors i { width: 13px; height: 13px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgb(0 0 0 / 10%); }
+  .empty { padding: 40px; text-align: center; color: #b5b5b5; font-size: 13px; border: 1px dashed #e0e0e0; border-radius: 4px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Demo C · Editorial Lines（编辑风细线）</h1>
+  <p class="desc">无卡片、无圆角、无阴影——细线分隔的手风琴筛选 + 大尺寸色板平铺（68px，babaroni 式），悬停自动聚焦、点选下划线标记。</p>
+  <p class="hint"><b>看什么：</b>点开「颜色 / Color」手风琴 → 大色板平铺（悬停聚焦）→ 点选下划线标记 · 复选框=短横线、尺寸=下划线、价格=细线滑块 · 切换 <b>水平/垂直</b></p>
+
+  <div class="mode-switch">
+    <button class="on" data-mode="horizontal">水平布局</button>
+    <button data-mode="vertical">垂直布局</button>
+  </div>
+
+  <div class="shop" id="shop">
+    <div class="filter-anchor">
+      <div class="topbar">
+        <button class="filter-btn" id="filterToggle">筛选 <span class="badge" id="selBadge">（0）</span></button>
+        <span class="items-count" id="itemsCount"></span>
+        <span class="sort">排序 <select id="sortSel"><option>Featured</option><option>Price, low to high</option><option>Price, high to low</option></select></span>
+      </div>
+      <div class="acc-wrap" id="accWrap">
+        <details class="acc" open>
+          <summary>颜色 / Color <span class="chev"></span></summary>
+          <div class="acc__body"><div class="swatches" id="swatches"></div></div>
+        </details>
+        <details class="acc">
+          <summary>Availability <span class="chev"></span></summary>
+          <div class="acc__body"><div class="checks" id="availBox"></div></div>
+        </details>
+        <details class="acc">
+          <summary>Price <span class="chev"></span></summary>
+          <div class="acc__body" id="priceBox"></div>
+        </details>
+        <details class="acc">
+          <summary>Size <span class="chev"></span></summary>
+          <div class="acc__body"><div class="pills" id="sizePills"></div></div>
+        </details>
+      </div>
+    </div>
+    <div>
+      <div class="grid-title">Products</div>
+      <div class="grid" id="grid"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const COLORS = [
+  { name: 'Navy', hex: '#1F2A5A' }, { name: 'Royal Blue', hex: '#2242A8' }, { name: 'Sky Blue', hex: '#8FC1E9' },
+  { name: 'Pink', hex: '#F4B8C8' }, { name: 'Rose Gold', hex: '#DFA79A' }, { name: 'Blush', hex: '#F2C6C2' },
+  { name: 'Beige', hex: '#E8DCC8' }, { name: 'Ivory', hex: '#F7F1E3' }, { name: 'Floral', pattern: true },
+];
+const AVAIL = [ { name: 'In stock', count: 9 }, { name: 'Out of stock', count: 2 } ];
+const SIZES = ['XS', 'S', 'M', 'L', 'XL'];
+const PRODUCTS = [
+  { name: 'Navy Satin Sheath Dress', price: 128, colors: ['Navy'], sizes: ['S', 'M'], oos: false },
+  { name: 'Royal Blue A-Line Gown', price: 156, colors: ['Royal Blue'], sizes: ['M', 'L'], oos: false },
+  { name: 'Sky Blue Slip Dress', price: 102, colors: ['Sky Blue'], sizes: ['XS', 'S'], oos: false },
+  { name: 'Pink Chiffon Mini', price: 96, colors: ['Pink'], sizes: ['XS', 'S'], oos: false },
+  { name: 'Rose Gold Sequin Midi', price: 189, colors: ['Rose Gold'], sizes: ['M'], oos: true },
+  { name: 'Blush Tulle Ball Gown', price: 175, colors: ['Blush'], sizes: ['L', 'XL'], oos: false },
+  { name: 'Beige Tulle Overlay', price: 118, colors: ['Beige'], sizes: ['S', 'M'], oos: false },
+  { name: 'Ivory Column Dress', price: 142, colors: ['Ivory'], sizes: ['M'], oos: false },
+  { name: 'Floral Print Wrap Dress', price: 134, colors: ['Floral'], sizes: ['M', 'L'], oos: false },
+];
+const state = { colors: new Set(), avail: new Set(), sizes: new Set(), price: [80, 200] };
+const hexOf = (n) => COLORS.find((c) => c.name === n) || {};
+const bg = (v) => v.pattern ? 'background: conic-gradient(from 20deg, #f3e6ea, #dfa79a, #c9b6db, #8fc1e9, #f3e6ea)' : 'background:' + v.hex;
+
+function renderStatic() {
+  const sw = document.getElementById('swatches');
+  COLORS.forEach((c) => {
+    const b = document.createElement('button');
+    b.className = 'sw' + (state.colors.has(c.name) ? ' is-active' : '');
+    b.innerHTML = '<span class="dot' + (c.pattern ? ' dot--pattern' : '') + '" style="' + (c.pattern ? '' : bg(c)) + '"></span><span class="name">' + c.name + '</span>';
+    b.onclick = () => { state.colors.has(c.name) ? state.colors.delete(c.name) : state.colors.add(c.name); refresh(); };
+    sw.appendChild(b);
+  });
+  const ab = document.getElementById('availBox');
+  AVAIL.forEach((v) => {
+    const l = document.createElement('label'); l.className = 'chk';
+    l.innerHTML = '<input type="checkbox"' + (state.avail.has(v.name) ? ' checked' : '') + '><span class="lbl">' + v.name + '</span><span class="cnt">' + v.count + '</span>';
+    l.querySelector('input').onchange = () => { state.avail.has(v.name) ? state.avail.delete(v.name) : state.avail.add(v.name); refresh(); };
+    ab.appendChild(l);
+  });
+  const pb = document.getElementById('priceBox');
+  pb.innerHTML = '<div class="price-track"><div class="price-fill"></div><input type="range" class="lo" min="80" max="200" step="2" value="' + state.price[0] + '"><input type="range" class="hi" min="80" max="200" step="2" value="' + state.price[1] + '"></div><div class="price-vals"><span>Min <b class="lov">$' + state.price[0] + '</b></span><span>Max <b class="hiv">$' + state.price[1] + '</b></span></div>';
+  const lo = pb.querySelector('.lo'), hi = pb.querySelector('.hi');
+  const upd = () => {
+    let a = +lo.value, b2 = +hi.value; if (a > b2) { const t = a; a = b2; b2 = t; }
+    state.price = [a, b2];
+    pb.querySelector('.price-fill').style.left = ((a - 80) / 120) * 100 + '%';
+    pb.querySelector('.price-fill').style.right = (100 - ((b2 - 80) / 120) * 100) + '%';
+    pb.querySelector('.lov').textContent = '$' + a; pb.querySelector('.hiv').textContent = '$' + b2;
+  };
+  lo.oninput = () => { upd(); renderGrid(); };
+  hi.oninput = () => { upd(); renderGrid(); };
+  requestAnimationFrame(upd);
+  const sp = document.getElementById('sizePills');
+  SIZES.forEach((v) => {
+    const b = document.createElement('button'); b.className = 'pill' + (state.sizes.has(v) ? ' is-active' : ''); b.textContent = v;
+    b.onclick = () => { state.sizes.has(v) ? state.sizes.delete(v) : state.sizes.add(v); refresh(); };
+    sp.appendChild(b);
+  });
+}
+
+function renderGrid() {
+  let list = PRODUCTS.slice();
+  if (state.colors.size) list = list.filter((p) => p.colors.some((c) => state.colors.has(c)));
+  if (state.avail.has('In stock')) list = list.filter((p) => !p.oos);
+  if (state.sizes.size) list = list.filter((p) => p.sizes.some((s) => state.sizes.has(s)));
+  list = list.filter((p) => p.price >= state.price[0] && p.price <= state.price[1]);
+  if (state.sort === 'Price, low to high') list.sort((a, b) => a.price - b.price);
+  if (state.sort === 'Price, high to low') list.sort((a, b) => b.price - a.price);
+
+  const count = state.colors.size + state.avail.size + state.sizes.size;
+  document.getElementById('selBadge').textContent = '（' + count + '）';
+  document.getElementById('itemsCount').textContent = list.length + ' items';
+
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+  if (!list.length) { grid.innerHTML = '<div class="empty" style="grid-column:1/-1">没有匹配的商品</div>'; return; }
+  list.forEach((p) => {
+    const d = document.createElement('div');
+    d.innerHTML = '<div class="pcard__img"></div><div class="pcard__body"><p class="pcard__name">' + p.name + '</p><p class="pcard__price">$' + p.price + '</p><div class="pcard__colors">' + p.colors.map((c) => { const v = hexOf(c); return '<i style="' + (v ? bg(v) : '') + '"></i>'; }).join('') + '</div></div>';
+    grid.appendChild(d);
+  });
+}
+
+function refresh() { renderStatic(); renderGrid(); }
+
+document.getElementById('filterToggle').onclick = () => document.getElementById('accWrap').classList.toggle('is-open');
+document.getElementById('sortSel').onchange = (e) => { state.sort = e.target.value; renderGrid(); };
+document.querySelectorAll('.mode-switch button').forEach((b) => {
+  b.onclick = () => {
+    document.querySelectorAll('.mode-switch button').forEach((x) => x.classList.remove('on'));
+    b.classList.add('on');
+    document.getElementById('shop').className = 'shop' + (b.dataset.mode === 'vertical' ? ' vertical' : '');
+  };
+});
+
+refresh();
+</script>
+</body>
+</html>

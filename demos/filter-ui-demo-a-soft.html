@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>筛选器 Demo A · Soft Minimal（柔和轻奢）</title>
+<style>
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; font-family: 'Inter', -apple-system, 'Segoe UI', 'PingFang SC', sans-serif;
+    background: #faf9f7; color: #2a2823; padding: 40px 24px 80px;
+  }
+  .wrap { max-width: 1240px; margin: 0 auto; }
+  h1 { font-size: 22px; margin: 0 0 6px; }
+  .desc { font-size: 13px; color: #8a857c; line-height: 1.7; margin: 0 0 10px; }
+  .hint { font-size: 12px; color: #b0aa9f; margin: 0 0 28px; }
+  .hint b { color: #6f6a60; }
+
+  /* ===== 布局切换 ===== */
+  .mode-switch {
+    display: inline-flex; background: #f0eee8; border-radius: 999px; padding: 4px; margin-bottom: 26px;
+  }
+  .mode-switch button {
+    border: 0; background: none; padding: 8px 20px; border-radius: 999px;
+    font-size: 12px; letter-spacing: .06em; cursor: pointer; color: #8a857c;
+    transition: all .25s ease;
+  }
+  .mode-switch button.on { background: #fff; color: #2a2823; box-shadow: 0 2px 8px rgb(0 0 0 / 8%); font-weight: 600; }
+
+  /* ===== 页面骨架 ===== */
+  .shop { display: grid; gap: 24px; }
+  .shop.vertical { grid-template-columns: 260px minmax(0, 1fr); align-items: start; }
+  .shop.vertical .filter-card { position: sticky; top: 20px; max-height: calc(100vh - 40px); overflow-y: auto; scrollbar-width: none; }
+  .shop.vertical .filter-card::-webkit-scrollbar { display: none; }
+
+  /* ===== 筛选卡片 ===== */
+  .filter-card {
+    background: #fff; border: 1px solid #ece9e2; border-radius: 16px;
+    box-shadow: 0 1px 3px rgb(42 40 35 / 4%);
+  }
+  .fc-head {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 20px; border-bottom: 1px solid #f0ede6;
+  }
+  .fc-head__title { font-size: 13px; font-weight: 600; letter-spacing: .04em; }
+  .fc-clear {
+    border: 0; background: none; cursor: pointer; font-size: 11px;
+    letter-spacing: .06em; text-transform: uppercase; color: #8a857c;
+    text-decoration: underline; text-underline-offset: 3px;
+  }
+  .fc-clear:hover { color: #2a2823; }
+  .fc-body { padding: 18px 20px 22px; display: grid; gap: 22px; }
+  .shop:not(.vertical) .fc-body { grid-template-columns: 1.2fr 1fr 1fr; gap: 26px; }
+
+  /* ===== 筛选组 ===== */
+  .fg__title {
+    font-size: 10px; letter-spacing: .16em; text-transform: uppercase;
+    color: #b0aa9f; margin: 0 0 12px; font-weight: 600;
+  }
+
+  /* --- 颜色色板 --- */
+  .swatches { display: flex; flex-wrap: wrap; gap: 12px 14px; }
+  .sw {
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
+    background: none; border: 0; padding: 0; cursor: pointer; font: inherit; color: inherit;
+  }
+  .sw .dot {
+    width: 40px; height: 40px; border-radius: 50%;
+    box-shadow: inset 0 0 0 1px rgb(0 0 0 / 7%);
+    transition: box-shadow .22s ease, transform .22s ease;
+  }
+  .sw:hover .dot { transform: scale(1.1); }
+  .sw.is-active .dot { box-shadow: 0 0 0 2.5px #fff, 0 0 0 4.5px #2a2823; }
+  .sw .name { font-size: 10px; letter-spacing: .05em; color: #8a857c; }
+  .sw.is-active .name { color: #2a2823; font-weight: 600; }
+  .sw .dot--pattern { background: conic-gradient(from 20deg, #f3e6ea, #dfa79a, #c9b6db, #8fc1e9, #f3e6ea); }
+
+  /* --- 自定义复选框 --- */
+  .checks { display: flex; flex-direction: column; gap: 10px; }
+  .chk { display: flex; align-items: center; gap: 10px; cursor: pointer; font-size: 13px; user-select: none; }
+  .chk input { display: none; }
+  .chk .box {
+    width: 18px; height: 18px; border-radius: 5px;
+    border: 1.5px solid #c9c4b8; display: grid; place-items: center;
+    transition: all .2s ease; flex: 0 0 auto;
+  }
+  .chk .box svg { width: 10px; height: 10px; stroke: #fff; stroke-width: 2.5; fill: none; opacity: 0; transform: scale(.5); transition: all .2s ease; }
+  .chk input:checked + .box { background: #2a2823; border-color: #2a2823; }
+  .chk input:checked + .box svg { opacity: 1; transform: scale(1); }
+  .chk .cnt { color: #b0aa9f; font-size: 11px; margin-left: auto; }
+
+  /* --- 双滑块价格 --- */
+  .price-slider { padding-top: 4px; }
+  .price-track { position: relative; height: 4px; border-radius: 4px; background: #ece9e2; margin: 10px 6px 8px; }
+  .price-fill { position: absolute; height: 100%; background: #2a2823; border-radius: 4px; }
+  .price-track input[type='range'] {
+    position: absolute; inset: -8px 0; width: 100%; margin: 0;
+    -webkit-appearance: none; appearance: none; background: none; pointer-events: none; height: 20px;
+  }
+  .price-track input[type='range']::-webkit-slider-thumb {
+    -webkit-appearance: none; width: 16px; height: 16px; border-radius: 50%;
+    background: #fff; border: 2px solid #2a2823; cursor: pointer; pointer-events: auto;
+    box-shadow: 0 1px 4px rgb(0 0 0 / 20%);
+  }
+  .price-vals { display: flex; justify-content: space-between; font-size: 12px; color: #8a857c; }
+  .price-vals b { color: #2a2823; font-weight: 500; }
+
+  /* --- 尺寸 pills --- */
+  .pills { display: flex; flex-wrap: wrap; gap: 8px; }
+  .pill {
+    min-width: 40px; padding: 7px 12px; border-radius: 999px;
+    border: 1px solid #dcd8cc; background: #fff; cursor: pointer;
+    font-size: 12px; text-align: center; transition: all .2s ease;
+  }
+  .pill:hover { border-color: #2a2823; }
+  .pill.is-active { background: #2a2823; color: #fff; border-color: #2a2823; }
+
+  /* ===== 顶栏（水平模式专用）===== */
+  .topbar {
+    display: none; align-items: center; gap: 14px;
+    background: #fff; border: 1px solid #ece9e2; border-radius: 14px;
+    padding: 10px 18px; box-shadow: 0 1px 3px rgb(42 40 35 / 4%);
+  }
+  .shop:not(.vertical) .topbar { display: flex; }
+  .filter-toggle {
+    display: inline-flex; align-items: center; gap: 8px;
+    border: 1px solid #dcd8cc; background: #fff; border-radius: 999px;
+    padding: 8px 16px; font-size: 13px; cursor: pointer; transition: all .2s ease;
+  }
+  .filter-toggle:hover { border-color: #2a2823; }
+  .filter-toggle .badge {
+    background: #2a2823; color: #fff; border-radius: 999px;
+    font-size: 10px; padding: 1px 7px;
+  }
+  .topbar__spacer { flex: 1; }
+  .items-count { font-size: 12px; color: #8a857c; }
+  .sort-wrap { position: relative; }
+  .sort-wrap select {
+    appearance: none; -webkit-appearance: none;
+    border: 1px solid #dcd8cc; background: #fff; border-radius: 999px;
+    padding: 8px 34px 8px 16px; font-size: 13px; cursor: pointer; color: #2a2823;
+    transition: border-color .2s ease;
+  }
+  .sort-wrap select:hover { border-color: #2a2823; }
+  .sort-wrap::after {
+    content: ''; position: absolute; right: 14px; top: 50%;
+    width: 7px; height: 7px; border-right: 1.5px solid #2a2823; border-bottom: 1.5px solid #2a2823;
+    transform: translateY(-65%) rotate(45deg); pointer-events: none;
+  }
+  /* 水平模式：筛选面板为下拉 */
+  .shop:not(.vertical) .filter-card {
+    position: absolute; top: calc(100% + 10px); left: 0; right: 0; z-index: 30;
+    box-shadow: 0 20px 50px rgb(42 40 35 / 14%);
+    opacity: 0; visibility: hidden; transform: translateY(-8px);
+    transition: opacity .25s ease, transform .25s cubic-bezier(.22,.61,.36,1), visibility .25s;
+  }
+  .shop:not(.vertical) .filter-card.is-open {
+    opacity: 1; visibility: visible; transform: none;
+  }
+  .filter-anchor { position: relative; }
+
+  /* ===== 产品网格 ===== */
+  .grid-title { font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: #b0aa9f; margin: 0 0 16px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 18px; }
+  .pcard { background: #fff; border: 1px solid #ece9e2; border-radius: 12px; overflow: hidden; }
+  .pcard__img { aspect-ratio: 3/4; background: linear-gradient(160deg, #f4f2ec, #e8e5dc); }
+  .pcard__body { padding: 12px 14px 16px; }
+  .pcard__name { font-size: 13px; margin: 0 0 4px; }
+  .pcard__price { font-size: 12px; color: #8a857c; margin: 0 0 8px; }
+  .pcard__colors { display: flex; gap: 5px; }
+  .pcard__colors i { width: 14px; height: 14px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgb(0 0 0 / 10%); }
+  .empty { padding: 40px; text-align: center; color: #b0aa9f; font-size: 13px; border: 1px dashed #e0dcd2; border-radius: 12px; }
+
+  @media (max-width: 860px) {
+    .shop:not(.vertical) .fc-body { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 640px) {
+    .shop:not(.vertical) .fc-body { grid-template-columns: 1fr; }
+    .shop.vertical { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Demo A · Soft Minimal（柔和轻奢）</h1>
+  <p class="desc">白色浮起卡片 + 精致的自定义组件：圆角复选框、双滑块价格、色板网格、胶囊 pills。水平模式筛选器收纳进下拉面板；垂直模式为左侧 sticky 侧栏。</p>
+  <p class="hint"><b>看什么：</b>顶栏的筛选按钮与排序下拉（水平）、色板多选、双滑块价格、组名一键全选（颜色组 hover 标题）· 切换 <b>水平/垂直</b> 对比两种形态</p>
+
+  <div class="mode-switch">
+    <button class="on" data-mode="horizontal">水平布局（顶栏 + 下拉面板）</button>
+    <button data-mode="vertical">垂直布局（左侧栏）</button>
+  </div>
+
+  <div class="shop" id="shop">
+    <div class="filter-anchor">
+      <div class="topbar">
+        <button class="filter-toggle" id="filterToggle">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="7" x2="20" y2="7"/><line x1="7" y1="12" x2="17" y2="12"/><line x1="10" y1="17" x2="14" y2="17"/></svg>
+          筛选 <span class="badge" id="selBadge">0</span>
+        </button>
+        <span class="items-count" id="itemsCount"></span>
+        <span class="topbar__spacer"></span>
+        <span class="sort-wrap">
+          <select id="sortSel">
+            <option>Featured</option><option>Price, low to high</option>
+            <option>Price, high to low</option><option>Alphabetically, A-Z</option>
+          </select>
+        </span>
+      </div>
+      <div class="filter-card" id="filterCard">
+        <div class="fc-head">
+          <span class="fc-head__title">筛选</span>
+          <button class="fc-clear" id="clearAll">清除全部</button>
+        </div>
+        <div class="fc-body" id="fcBody"></div>
+      </div>
+    </div>
+    <div>
+      <div class="grid-title">Products</div>
+      <div class="grid" id="grid"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ===== 数据（颜色组按名称自动识别）===== */
+const COLOR_FILTER = {
+  label: '颜色 / Color',
+  values: [
+    { name: 'Navy', hex: '#1F2A5A' }, { name: 'Royal Blue', hex: '#2242A8' }, { name: 'Sky Blue', hex: '#8FC1E9' },
+    { name: 'Pink', hex: '#F4B8C8' }, { name: 'Rose Gold', hex: '#DFA79A' }, { name: 'Blush', hex: '#F2C6C2' },
+    { name: 'Beige', hex: '#E8DCC8' }, { name: 'Ivory', hex: '#F7F1E3' }, { name: 'Grey', hex: '#D9D9D9' },
+    { name: 'Floral', pattern: true },
+  ],
+};
+const OTHER_FILTERS = [
+  { label: 'Availability', type: 'checks', values: [ { name: 'In stock', count: 9 }, { name: 'Out of stock', count: 2 } ] },
+  { label: 'Price', type: 'price', min: 80, max: 200 },
+  { label: 'Size', type: 'pills', values: ['XS', 'S', 'M', 'L', 'XL'] },
+];
+const PRODUCTS = [
+  { name: 'Navy Satin Sheath Dress', price: 128, colors: ['Navy'], sizes: ['S', 'M'], oos: false },
+  { name: 'Royal Blue A-Line Gown', price: 156, colors: ['Royal Blue'], sizes: ['M', 'L'], oos: false },
+  { name: 'Sky Blue Slip Dress', price: 102, colors: ['Sky Blue'], sizes: ['XS', 'S'], oos: false },
+  { name: 'Pink Chiffon Mini', price: 96, colors: ['Pink'], sizes: ['XS', 'S', 'M'], oos: false },
+  { name: 'Rose Gold Sequin Midi', price: 189, colors: ['Rose Gold'], sizes: ['M'], oos: true },
+  { name: 'Blush Tulle Ball Gown', price: 175, colors: ['Blush'], sizes: ['L', 'XL'], oos: false },
+  { name: 'Beige Tulle Overlay', price: 118, colors: ['Beige'], sizes: ['S', 'M', 'L'], oos: false },
+  { name: 'Ivory Column Dress', price: 142, colors: ['Ivory'], sizes: ['M', 'XL'], oos: false },
+  { name: 'Grey Velvet Bodycon', price: 110, colors: ['Grey'], sizes: ['S', 'L'], oos: false },
+  { name: 'Floral Print Wrap Dress', price: 134, colors: ['Floral'], sizes: ['M', 'L'], oos: false },
+];
+
+const state = { colors: new Set(), avail: new Set(), sizes: new Set(), price: [80, 200], sort: 'Featured' };
+
+const hexOf = (n) => COLOR_FILTER.values.find((v) => v.name === n) || {};
+const bg = (v) => v.pattern ? 'conic-gradient(from 20deg, #f3e6ea, #dfa79a, #c9b6db, #8fc1e9, #f3e6ea)' : `background:${v.hex}`;
+
+/* ===== 渲染筛选体 ===== */
+function renderFilters() {
+  const body = document.getElementById('fcBody');
+  body.innerHTML = '';
+
+  // 颜色组（识别：label 含 color/颜色 → 色板 UI）
+  const colorGroup = document.createElement('div');
+  colorGroup.className = 'fg';
+  colorGroup.innerHTML = `<p class="fg__title">${COLOR_FILTER.label}</p>`;
+  const sw = document.createElement('div');
+  sw.className = 'swatches';
+  COLOR_FILTER.values.forEach((v) => {
+    const b = document.createElement('button');
+    b.className = 'sw' + (state.colors.has(v.name) ? ' is-active' : '');
+    b.innerHTML = `<span class="dot${v.pattern ? ' dot--pattern' : ''}" style="${v.pattern ? '' : `background:${v.hex}`}"></span><span class="name">${v.name}</span>`;
+    b.onclick = () => { state.colors.has(v.name) ? state.colors.delete(v.name) : state.colors.add(v.name); refresh(); };
+    sw.appendChild(b);
+  });
+  colorGroup.appendChild(sw);
+  body.appendChild(colorGroup);
+
+  OTHER_FILTERS.forEach((f) => {
+    const g = document.createElement('div');
+    g.className = 'fg';
+    g.innerHTML = `<p class="fg__title">${f.label}</p>`;
+    if (f.type === 'checks') {
+      const box = document.createElement('div');
+      box.className = 'checks';
+      f.values.forEach((v) => {
+        const l = document.createElement('label');
+        l.className = 'chk';
+        l.innerHTML = `<input type="checkbox" ${state.avail.has(v.name) ? 'checked' : ''}><span class="box"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></span>${v.name}<span class="cnt">${v.count}</span>`;
+        l.querySelector('input').onchange = () => { state.avail.has(v.name) ? state.avail.delete(v.name) : state.avail.add(v.name); refresh(); };
+        box.appendChild(l);
+      });
+      g.appendChild(box);
+    }
+    if (f.type === 'price') {
+      const w = document.createElement('div');
+      w.className = 'price-slider';
+      w.innerHTML = `<div class="price-track"><div class="price-fill" id="pFill"></div>
+        <input type="range" id="pMin" min="${f.min}" max="${f.max}" step="2" value="${state.price[0]}">
+        <input type="range" id="pMax" min="${f.min}" max="${f.max}" step="2" value="${state.price[1]}"></div>
+        <div class="price-vals"><span>Min <b id="pMinV">$${state.price[0]}</b></span><span>Max <b id="pMaxV">$${state.price[1]}</b></span></div>`;
+      g.appendChild(w);
+      const lo = w.querySelector('#pMin'), hi = w.querySelector('#pMax');
+      const upd = () => {
+        let a = +lo.value, b2 = +hi.value;
+        if (a > b2) [a, b2] = [b2, a];
+        state.price = [a, b2];
+        const track = w.querySelector('.price-track');
+        const span = f.max - f.min;
+        track.querySelector('#pFill').style.left = ((a - f.min) / span) * 100 + '%';
+        track.querySelector('#pFill').style.right = (100 - ((b2 - f.min) / span) * 100) + '%';
+        w.querySelector('#pMinV').textContent = '$' + a;
+        w.querySelector('#pMaxV').textContent = '$' + b2;
+        refresh();
+      };
+      lo.oninput = upd; hi.oninput = upd;
+      requestAnimationFrame(upd);
+    }
+    if (f.type === 'pills') {
+      const p = document.createElement('div');
+      p.className = 'pills';
+      f.values.forEach((v) => {
+        const b = document.createElement('button');
+        b.className = 'pill' + (state.sizes.has(v) ? ' is-active' : '');
+        b.textContent = v;
+        b.onclick = () => { state.sizes.has(v) ? state.sizes.delete(v) : state.sizes.add(v); refresh(); };
+        p.appendChild(b);
+      });
+      g.appendChild(p);
+    }
+    body.appendChild(g);
+  });
+}
+
+/* ===== 产品网格 ===== */
+function renderGrid() {
+  let list = [...PRODUCTS];
+  if (state.colors.size) list = list.filter((p) => p.colors.some((c) => state.colors.has(c)));
+  if (state.avail.has('In stock')) list = list.filter((p) => !p.oos);
+  if (state.avail.has('Out of stock')) list = list.filter((p) => p.oos);
+  if (state.sizes.size) list = list.filter((p) => p.sizes.some((s) => state.sizes.has(s)));
+  list = list.filter((p) => p.price >= state.price[0] && p.price <= state.price[1]);
+  if (state.sort === 'Price, low to high') list.sort((a, b) => a.price - b.price);
+  if (state.sort === 'Price, high to low') list.sort((a, b) => b.price - a.price);
+  if (state.sort === 'Alphabetically, A-Z') list.sort((a, b) => a.name.localeCompare(b.name));
+
+  const count = state.colors.size + state.avail.size + state.sizes.size;
+  document.getElementById('selBadge').textContent = count;
+  document.getElementById('itemsCount').textContent = list.length + ' items';
+
+  const grid = document.getElementById('grid');
+  grid.innerHTML = '';
+  if (!list.length) { grid.innerHTML = '<div class="empty" style="grid-column:1/-1">没有匹配的商品</div>'; return; }
+  list.forEach((p) => {
+    const d = document.createElement('div');
+    d.className = 'pcard' + (p.oos ? '' : '');
+    d.innerHTML = `<div class="pcard__img"></div><div class="pcard__body"><p class="pcard__name">${p.name}${p.oos ? ' · Sold out' : ''}</p><p class="pcard__price">$${p.price}</p>
+      <div class="pcard__colors">${p.colors.map((c) => { const v = hexOf(c); return `<i style="${v ? bg(v) : ''}"></i>`; }).join('')}</div></div>`;
+    grid.appendChild(d);
+  });
+}
+
+function refresh() { renderFilters(); renderGrid(); }
+
+/* ===== 交互 ===== */
+document.getElementById('filterToggle').onclick = () => document.getElementById('filterCard').classList.toggle('is-open');
+document.getElementById('clearAll').onclick = () => { state.colors.clear(); state.avail.clear(); state.sizes.clear(); state.price = [80, 200]; refresh(); };
+document.getElementById('sortSel').onchange = (e) => { state.sort = e.target.value; renderGrid(); };
+document.querySelectorAll('.mode-switch button').forEach((b) => {
+  b.onclick = () => {
+    document.querySelectorAll('.mode-switch button').forEach((x) => x.classList.remove('on'));
+    b.classList.add('on');
+    document.getElementById('shop').className = 'shop ' + (b.dataset.mode === 'vertical' ? 'vertical' : '');
+  };
+});
+document.addEventListener('click', (e) => {
+  if (!e.target.closest('.filter-anchor')) document.getElementById('filterCard').classList.remove('is-open');
+});
+
+refresh();
+</script>
+</body>
+</html>
