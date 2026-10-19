@@ -552,12 +552,16 @@
   }
 
   /*
-   * Full-width filter bar spans the WHOLE row (1 / -1), so its inner padding
-   * (40px) lines up with the breadcrumbs and the product grid gutters. The
+   * Full-width filter bar uses the same full-bleed breakout as the colour
+   * facets block (width 100vw + negative margins), so its 40px inner padding
+   * lines up exactly with the breadcrumbs and the product grid gutters. The
    * default --grid-column--desktop only spans the content columns, which made
-   * the bar sit 40px further right than everything else.
+   * the bar sit further right than everything else.
    */
   .facets-block-wrapper--full-width {
+    width: 100vw;
+    margin-inline: calc(50% - 50vw);
+
     @media screen and (min-width: 750px) {
       grid-column: 1 / -1;
     }
