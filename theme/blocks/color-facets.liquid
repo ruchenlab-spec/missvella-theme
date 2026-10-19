@@ -140,115 +140,96 @@
             {%- endfor -%}
           {%- endfor -%}
           {%- if fam_valid > 0 -%}
-            <button
-              type="button"
-              class="color-facets__item color-facets__item--family{% if fam_active > 0 %} is-active{% endif %}"
-              data-family-open="{{ fam_name | handle }}"
-              aria-label="{{ fam_name }}"
-            >
-              <span class="color-facets__dot" style="background: {{ fam_hex | default: '#ddd' }};" aria-hidden="true"></span>
-              {% if block.settings.show_label %}
-                <span class="color-facets__label">
-                  {{- fam_name -}}
-                  {%- if fam_active > 0 %} <em class="color-facets__count">({{ fam_active }})</em>{% endif -%}
-                </span>
-              {% endif %}
-            </button>
+            <div class="color-facets__family">
+              <button
+                type="button"
+                class="color-facets__item color-facets__item--family{% if fam_active > 0 %} is-active{% endif %}"
+                data-family-toggle
+                aria-expanded="false"
+                aria-haspopup="true"
+              >
+                <span class="color-facets__dot" style="background: {{ fam_hex | default: '#ddd' }};" aria-hidden="true"></span>
+                {% if block.settings.show_label %}
+                  <span class="color-facets__label">
+                    {{- fam_name -}}
+                    {%- if fam_active > 0 %} <em class="color-facets__count">({{ fam_active }})</em>{% endif -%}
+                  </span>
+                {% endif %}
+              </button>
+
+              {%- comment -%} Hover flyout: child swatches of this family {%- endcomment -%}
+              <div class="color-facets__flyout" data-family-flyout>
+                {%- for value in color_filter.values -%}
+                  {%- assign vkey = value.label | downcase | strip -%}
+                  {%- assign in_family = false -%}
+                  {%- for m in fam_members -%}
+                    {%- assign mkey = m | downcase | strip -%}
+                    {%- if mkey == vkey -%}
+                      {%- assign in_family = true -%}
+                      {%- break -%}
+                    {%- endif -%}
+                  {%- endfor -%}
+                  {%- if in_family -%}
+                    {%- capture value_hex -%}{%- render 'color-facet-swatch', value: value, custom_pairs: custom_pairs, builtin_pairs: builtin_pairs -%}{%- endcapture -%}
+                    {%- liquid
+                      assign link_url = value.url_to_add
+                      if value.active
+                        assign link_url = value.url_to_remove
+                      endif
+                      assign is_disabled = false
+                      if value.count == 0 and value.active == false
+                        assign is_disabled = true
+                      endif
+                    -%}
+                    <a
+                      class="color-facets__item{% if value.active %} is-active{% endif %}{% if is_disabled %} is-disabled{% endif %}"
+                      href="{{ link_url }}"
+                      aria-label="{{ value.label }}"
+                      {% if value.active %}aria-current="true"{% endif %}
+                    >
+                      <span class="color-facets__dot" style="background: {{ value_hex | default: '#ddd' }};" aria-hidden="true"></span>
+                      {% if block.settings.show_label %}
+                        <span class="color-facets__label">{{ value.label }}</span>
+                      {% endif %}
+                    </a>
+                  {%- endif -%}
+                {%- endfor -%}
+              </div>
+            </div>
           {%- endif -%}
         {%- endfor -%}
       </div>
-
-      {%- comment -%} ===== Layer 2: child swatches per family ===== {%- endcomment -%}
-      {%- for group in family_groups -%}
-        {%- assign parts = group | split: ':' -%}
-        {%- assign fam_name = parts[0] -%}
-        {%- assign fam_members = parts[1] | split: ',' -%}
-        {%- assign fam_valid = 0 -%}
-        {%- assign fam_active = 0 -%}
-        {%- for value in color_filter.values -%}
-          {%- assign vkey = value.label | downcase | strip -%}
-          {%- for m in fam_members -%}
-            {%- assign mkey = m | downcase | strip -%}
-            {%- if mkey == vkey -%}
-              {%- assign fam_valid = fam_valid | plus: 1 -%}
-              {%- if value.active -%}
-                {%- assign fam_active = fam_active | plus: 1 -%}
-              {%- endif -%}
-              {%- break -%}
-            {%- endif -%}
-          {%- endfor -%}
-        {%- endfor -%}
-        {%- if fam_valid > 0 -%}
-          <div class="color-facets__row color-facets__row--children" data-family-layer="{{ fam_name | handle }}" hidden>
-            <button type="button" class="color-facets__back" data-family-back aria-label="{{ block.settings.back_label | default: 'Back' }}">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6" /></svg>
-            </button>
-            <span class="color-facets__context">
-              <span class="color-facets__context-name">{{ fam_name }}</span>
-              <span class="color-facets__context-meta">
-                {%- if fam_active > 0 -%}{{ fam_active }} / {%- endif -%}{{ fam_valid }}
-              </span>
-            </span>
-            <span class="color-facets__divider" aria-hidden="true"></span>
-
-            {%- for value in color_filter.values -%}
-              {%- assign vkey = value.label | downcase | strip -%}
-              {%- assign in_family = false -%}
-              {%- for m in fam_members -%}
-                {%- assign mkey = m | downcase | strip -%}
-                {%- if mkey == vkey -%}
-                  {%- assign in_family = true -%}
-                  {%- break -%}
-                {%- endif -%}
-              {%- endfor -%}
-              {%- if in_family -%}
-                {%- capture value_hex -%}{%- render 'color-facet-swatch', value: value, custom_pairs: custom_pairs, builtin_pairs: builtin_pairs -%}{%- endcapture -%}
-                {%- liquid
-                  assign link_url = value.url_to_add
-                  if value.active
-                    assign link_url = value.url_to_remove
-                  endif
-                  assign is_disabled = false
-                  if value.count == 0 and value.active == false
-                    assign is_disabled = true
-                  endif
-                -%}
-                <a
-                  class="color-facets__item{% if value.active %} is-active{% endif %}{% if is_disabled %} is-disabled{% endif %}"
-                  href="{{ link_url }}"
-                  aria-label="{{ value.label }}"
-                  {% if value.active %}aria-current="true"{% endif %}
-                >
-                  <span class="color-facets__dot" style="background: {{ value_hex | default: '#ddd' }};" aria-hidden="true"></span>
-                  {% if block.settings.show_label %}
-                    <span class="color-facets__label">{{ value.label }}</span>
-                  {% endif %}
-                </a>
-              {%- endif -%}
-            {%- endfor -%}
-          </div>
-        {%- endif -%}
-      {%- endfor -%}
 
       <script>
         document.querySelectorAll('[data-color-facets]').forEach((bar) => {
           if (bar.dataset.colorFacetsInit) return;
           bar.dataset.colorFacetsInit = 'true';
-          bar.addEventListener('click', (e) => {
-            const opener = e.target.closest('[data-family-open]');
-            if (opener) {
-              e.preventDefault();
-              const name = opener.getAttribute('data-family-open');
-              bar.querySelector('.color-facets__row--families')?.classList.add('is-hidden');
-              bar.querySelectorAll('.color-facets__row--children').forEach((layer) => {
-                layer.hidden = layer.getAttribute('data-family-layer') !== name;
+
+          // Close flyouts when clicking outside the bar
+          document.addEventListener('click', (e) => {
+            if (!bar.contains(e.target)) {
+              bar.querySelectorAll('.color-facets__family.is-open').forEach((f) => {
+                f.classList.remove('is-open');
+                f.querySelector('[data-family-toggle]')?.setAttribute('aria-expanded', 'false');
               });
-              return;
             }
-            if (e.target.closest('[data-family-back]')) {
+          });
+
+          // Tap / click toggles the flyout (desktop primarily relies on :hover)
+          bar.addEventListener('click', (e) => {
+            const toggle = e.target.closest('[data-family-toggle]');
+            if (toggle) {
               e.preventDefault();
-              bar.querySelectorAll('.color-facets__row--children').forEach((layer) => (layer.hidden = true));
-              bar.querySelector('.color-facets__row--families')?.classList.remove('is-hidden');
+              const fam = toggle.closest('.color-facets__family');
+              const wasOpen = fam.classList.contains('is-open');
+              bar.querySelectorAll('.color-facets__family.is-open').forEach((f) => {
+                f.classList.remove('is-open');
+                f.querySelector('[data-family-toggle]')?.setAttribute('aria-expanded', 'false');
+              });
+              if (!wasOpen) {
+                fam.classList.add('is-open');
+                toggle.setAttribute('aria-expanded', 'true');
+              }
             }
           });
         });
@@ -433,19 +414,35 @@
     font-weight: 600;
   }
 
-  /* ===== Family (two-step) mode ===== */
-  .color-facets__row--families.is-hidden {
-    display: none;
+  /* ===== Family (hover flyout) mode ===== */
+  .color-facets__family {
+    position: relative;
   }
 
-  .color-facets__row--children[hidden] {
+  /*
+   * Flyout opens on hover / keyboard focus on desktop; on touch devices the
+   * family button toggles it via .is-open (see the inline script).
+   */
+  .color-facets__flyout {
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 50%;
+    translate: -50% 0;
     display: none;
+    align-items: flex-start;
+    gap: var(--color-facet-gap, 14px);
+    padding: 16px 20px;
+    background: var(--color-background, #fff);
+    border: 1px solid rgb(0 0 0 / 10%);
+    border-radius: 12px;
+    box-shadow: 0 12px 32px rgb(0 0 0 / 14%);
+    z-index: 6;
   }
 
-  .color-facets__row--children {
-    align-items: center;
-    row-gap: 0;
-    animation: color-facets-fade 0.25s ease;
+  .color-facets__family:hover .color-facets__flyout,
+  .color-facets__family:focus-within .color-facets__flyout,
+  .color-facets__family.is-open .color-facets__flyout {
+    display: flex;
   }
 
   /*
@@ -472,68 +469,21 @@
     opacity: 0.7;
   }
 
-  .color-facets__back {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    border: 1px solid rgb(0 0 0 / 12%);
-    border-radius: 50%;
-    background: transparent;
-    color: inherit;
-    cursor: pointer;
-    padding: 0;
-  }
-
-  .color-facets__back:hover {
-    border-color: rgb(0 0 0 / 35%);
-  }
-
-  .color-facets__back svg {
-    width: 16px;
-    height: 16px;
-  }
-
-  .color-facets__context {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    font-family: var(--font-body--family);
-    font-size: calc(var(--color-facet-label-size, 11px) + 2px);
-  }
-
-  .color-facets__context-name {
-    font-weight: 600;
-  }
-
-  .color-facets__context-meta {
-    opacity: 0.6;
-  }
-
-  .color-facets__divider {
-    width: 1px;
-    height: 20px;
-    background: rgb(0 0 0 / 12%);
-  }
-
   .color-facets__item.is-disabled {
     opacity: 0.35;
     pointer-events: none;
   }
 
-  @keyframes color-facets-fade {
-    from {
-      opacity: 0;
-      transform: translateX(10px);
-    }
-    to {
-      opacity: 1;
-      transform: none;
+  @media screen and (max-width: 749px) {
+    /* Keep the flyout inside a narrow viewport */
+    .color-facets__flyout {
+      left: 0;
+      translate: none;
+      max-width: min(92vw, 420px);
+      overflow-x: auto;
+      padding: 12px 16px;
     }
   }
-
-  @media screen and (max-width: 749px) {
     .color-facets__row {
       flex-wrap: nowrap;
       overflow-x: auto;

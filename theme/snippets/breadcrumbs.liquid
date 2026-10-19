@@ -1,0 +1,165 @@
+{%- doc -%}
+  Breadcrumb navigation, rendered on every template except the homepage and
+  the password page (see layout/theme.liquid).
+
+  Trails:
+  - collection:  Home / {collection title}
+  - product:     Home / {first collection} / {product title}
+  - page:        Home / {page title}
+  - blog:        Home / {blog title}
+  - article:     Home / {blog title} / {article title}
+  - search:      Home / Search results
+  - cart:        Home / Cart
+  - 404:         Home / Page not found
+  - list-collections: Home / Collections
+{%- enddoc -%}
+
+{%- liquid
+  assign trail = ''
+  assign home_url = routes.root_url
+
+  case template.name
+    when 'collection'
+      assign trail = trail | append: 'collection'
+    when 'product'
+      assign trail = trail | append: 'product'
+    when 'page'
+      assign trail = trail | append: 'page'
+    when 'blog'
+      assign trail = trail | append: 'blog'
+    when 'article'
+      assign trail = trail | append: 'article'
+    when 'search'
+      assign trail = trail | append: 'search'
+    when 'cart'
+      assign trail = trail | append: 'cart'
+    when '404'
+      assign trail = trail | append: '404'
+    when 'list-collections'
+      assign trail = trail | append: 'collections'
+  endcase
+-%}
+
+{%- if trail != blank -%}
+  <nav class="breadcrumbs" aria-label="Breadcrumbs" data-testid="breadcrumbs">
+    <ol class="breadcrumbs__list page-width">
+      <li class="breadcrumbs__item">
+        <a class="breadcrumbs__link" href="{{ home_url }}">Home</a>
+      </li>
+
+      {%- case trail -%}
+        {%- when 'collection' -%}
+          <li class="breadcrumbs__item breadcrumbs__item--current" aria-current="page">
+            <span class="breadcrumbs__link">{{ collection.title }}</span>
+          </li>
+
+        {%- when 'product' -%}
+          {%- if product.collections.first -%}
+            <li class="breadcrumbs__item">
+              <a class="breadcrumbs__link" href="{{ product.collections.first.url }}">{{ product.collections.first.title }}</a>
+            </li>
+          {%- endif -%}
+          <li class="breadcrumbs__item breadcrumbs__item--current" aria-current="page">
+            <span class="breadcrumbs__link">{{ product.title }}</span>
+          </li>
+
+        {%- when 'page' -%}
+          <li class="breadcrumbs__item breadcrumbs__item--current" aria-current="page">
+            <span class="breadcrumbs__link">{{ page.title }}</span>
+          </li>
+
+        {%- when 'blog' -%}
+          <li class="breadcrumbs__item breadcrumbs__item--current" aria-current="page">
+            <span class="breadcrumbs__link">{{ blog.title }}</span>
+          </li>
+
+        {%- when 'article' -%}
+          {%- if blog != blank -%}
+            <li class="breadcrumbs__item">
+              <a class="breadcrumbs__link" href="{{ blog.url }}">{{ blog.title }}</a>
+            </li>
+          {%- endif -%}
+          <li class="breadcrumbs__item breadcrumbs__item--current" aria-current="page">
+            <span class="breadcrumbs__link">{{ article.title }}</span>
+          </li>
+
+        {%- when 'search' -%}
+          <li class="breadcrumbs__item breadcrumbs__item--current" aria-current="page">
+            <span class="breadcrumbs__link">Search results</span>
+          </li>
+
+        {%- when 'cart' -%}
+          <li class="breadcrumbs__item breadcrumbs__item--current" aria-current="page">
+            <span class="breadcrumbs__link">Cart</span>
+          </li>
+
+        {%- when '404' -%}
+          <li class="breadcrumbs__item breadcrumbs__item--current" aria-current="page">
+            <span class="breadcrumbs__link">Page not found</span>
+          </li>
+
+        {%- when 'collections' -%}
+          <li class="breadcrumbs__item breadcrumbs__item--current" aria-current="page">
+            <span class="breadcrumbs__link">Collections</span>
+          </li>
+      {%- endcase -%}
+    </ol>
+  </nav>
+{%- endif -%}
+
+{% stylesheet %}
+  .breadcrumbs {
+    width: 100%;
+  }
+
+  .breadcrumbs__list {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 4px 8px;
+    list-style: none;
+    margin: 0;
+    padding-block: 14px;
+    padding-inline: var(--page-margin, 20px);
+    font-family: var(--font-body--family);
+    font-size: 12px;
+    line-height: 1.4;
+  }
+
+  .breadcrumbs__item {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* Separator between crumbs (except before the first) */
+  .breadcrumbs__item + .breadcrumbs__item::before {
+    content: '/';
+    opacity: 0.35;
+  }
+
+  .breadcrumbs__link {
+    color: var(--color-foreground);
+    opacity: 0.62;
+    text-decoration: none;
+    transition: opacity 0.2s ease;
+  }
+
+  a.breadcrumbs__link:hover {
+    opacity: 1;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .breadcrumbs__item--current .breadcrumbs__link {
+    opacity: 1;
+    font-weight: 500;
+  }
+
+  @media screen and (max-width: 749px) {
+    .breadcrumbs__list {
+      padding-block: 10px;
+      font-size: 11px;
+    }
+  }
+{% endstylesheet %}
