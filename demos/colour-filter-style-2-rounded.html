@@ -1,0 +1,192 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>颜色筛选器 · 风格2 圆角扁平卡片</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; }
+body { margin: 0; font-family: 'Plus Jakarta Sans', 'PingFang SC', sans-serif; background: #F4F5F3; color: #14181A; padding: 34px 0 120px; }
+.wrap { max-width: 760px; margin: 0 auto; padding: 0 20px; }
+h1 { font-size: 22px; margin: 0 0 6px; }
+.desc { font-size: 12.5px; color: #7d8583; margin: 0 0 6px; }
+.hint { font-size: 11.5px; color: #a3aba8; margin: 0 0 30px; }
+.hint b { color: #14181A; }
+.card { background: #fff; border-radius: 18px; padding: 22px 24px; margin-bottom: 14px; box-shadow: 0 2px 10px rgb(20 24 26 / 4%); }
+.card-head { display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; }
+.card-title { font-size: 16px; font-weight: 700; }
+.card-val { font-size: 13px; color: #8a938f; display: flex; align-items: center; gap: 6px; }
+.card-val .arr { transition: transform .25s ease; color: #b3bab6; }
+.card.open .card-val .arr { transform: rotate(90deg); }
+.chips { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+.chip {
+  padding: 9px 16px; border-radius: 999px; border: 1.5px solid #E3E7E4; background: #fff;
+  font-size: 13px; font-weight: 600; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
+  transition: all .2s ease; color: #3d4643;
+}
+.chip:hover { border-color: #b9c2bd; }
+.chip i { width: 15px; height: 15px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgb(0 0 0 / 12%); }
+.chip.on { border-color: #14181A; background: #14181A; color: #fff; }
+.chip .n { font-weight: 400; opacity: .7; font-size: 11px; }
+.sub { display: none; margin-top: 20px; padding-top: 20px; border-top: 1px solid #EEF0EE; }
+.sub.open { display: block; animation: fade .28s ease; }
+@keyframes fade { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; } }
+.sub-row { display: flex; flex-wrap: wrap; gap: 18px 26px; }
+.sub-item { background: none; border: 0; cursor: pointer; padding: 0; font: inherit; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.sub-item i { width: 38px; height: 38px; border-radius: 50%; display: block; box-shadow: inset 0 0 0 1px rgb(0 0 0 / 10%); transition: transform .2s ease, box-shadow .2s ease; }
+.sub-item:hover i { transform: scale(1.1); }
+.sub-item.on i { box-shadow: 0 0 0 2.5px #fff, 0 0 0 4.5px #14181A; }
+.sub-item .nm { font-size: 11.5px; color: #7d8583; font-weight: 500; }
+.sub-item.on .nm { color: #14181A; font-weight: 700; }
+/* Price decoration */
+.price-curve { position: relative; height: 46px; margin: 10px 0 6px; }
+.price-curve svg { width: 100%; height: 100%; }
+.ptrack { position: relative; height: 3px; background: #E3E7E4; border-radius: 2px; margin: 0 4px; }
+.ptrack .dot { position: absolute; top: 50%; transform: translate(-50%, -50%); width: 22px; height: 22px; border-radius: 50%; background: #fff; border: 2.5px solid #14181A; box-shadow: 0 2px 6px rgb(0 0 0 / 15%); }
+.pinputs { display: flex; align-items: center; gap: 12px; margin-top: 16px; }
+.pinputs .box { flex: 1; display: flex; align-items: center; gap: 8px; border: 1.5px solid #E3E7E4; border-radius: 12px; padding: 11px 14px; font-size: 14px; }
+.pinputs .box b { color: #8a938f; font-weight: 500; }
+.pinputs .sep { color: #b3bab6; }
+/* Action bar */
+.actions { position: sticky; bottom: 18px; display: flex; gap: 12px; margin-top: 22px; z-index: 5; }
+.actions button { flex: 1; padding: 16px; border-radius: 999px; border: 0; cursor: pointer; font: inherit; font-size: 14.5px; font-weight: 700; transition: transform .18s ease, box-shadow .18s ease; }
+.actions .ghost { background: #fff; color: #14181A; visibility: hidden; box-shadow: 0 2px 10px rgb(20 24 26 / 8%); }
+.actions .ghost.show { visibility: visible; }
+.actions .primary { background: #14181A; color: #fff; flex: 1.4; box-shadow: 0 10px 24px rgb(20 24 26 / 25%); }
+.actions .primary:hover { transform: translateY(-2px); }
+/* Product grid */
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-top: 26px; }
+.pcard { background: #fff; border-radius: 18px; overflow: hidden; box-shadow: 0 2px 10px rgb(20 24 26 / 4%); }
+.pcard__ph { aspect-ratio: 3/4; background: linear-gradient(160deg, #fff, #EFF1EE); position: relative; }
+.pcard__ph::after { content: ''; position: absolute; inset: 14% 28%; border-radius: 46% 54% 50% 50% / 60% 60% 40% 40%; background: linear-gradient(150deg, var(--pc, #eee), rgb(0 0 0 / 8%)); opacity: .6; }
+.pcard__b { padding: 16px 18px 20px; }
+.pcard__nm { font-size: 14px; font-weight: 600; margin: 0 0 4px; }
+.pcard__mt { font-size: 11.5px; color: #8a938f; margin: 0 0 8px; }
+.pcard__pr { font-size: 14px; font-weight: 700; }
+.empty { grid-column: 1 / -1; background: #fff; border-radius: 18px; padding: 50px; text-align: center; font-size: 13px; color: #8a938f; }
+@media (max-width: 700px) { .grid { grid-template-columns: repeat(2, 1fr); } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>风格 2 · 圆角扁平卡片</h1>
+  <p class="desc">浅灰底 + 白色大圆角卡片组——Colour 卡内色系 chips 点击展开子色行，底部 sticky 操作条（Clear all + Show N）。</p>
+  <p class="hint"><b>看什么：</b>点 Colour 卡展开 → 点色系 chip 展开子色行 → 选色（黑双环）→ Show N 确认 → 产品圆角卡实时筛选</p>
+  <div class="card" id="colourCard">
+    <div class="card-head" id="colourHead">
+      <span class="card-title">Colour</span>
+      <span class="card-val"><span id="cv">All colours</span><span class="arr">›</span></span>
+    </div>
+    <div class="chips" id="chips"></div>
+    <div class="sub" id="subArea"></div>
+  </div>
+  <div class="card">
+    <div class="card-head">
+      <span class="card-title">Price</span>
+      <span class="card-val">$19 – $8,265</span>
+    </div>
+    <div class="price-curve">
+      <svg viewBox="0 0 300 46" preserveAspectRatio="none">
+        <path d="M0 40 C 40 38, 60 20, 90 10 C 120 2, 150 6, 180 18 C 220 34, 260 40, 300 41 L 300 46 L 0 46 Z" fill="#B8EFC4" opacity=".85"/>
+      </svg>
+    </div>
+    <div class="ptrack"><span class="dot" style="left:8%"></span><span class="dot" style="left:56%"></span></div>
+    <div class="pinputs">
+      <div class="box"><b>$</b> 19</div><span class="sep">–</span>
+      <div class="box"><b>$</b> 8,265</div>
+    </div>
+  </div>
+  <div class="actions">
+    <button class="ghost" id="clearBtn">Clear all (<span id="clearN">0</span>)</button>
+    <button class="primary" id="showBtn">Show <span id="showN">11</span></button>
+  </div>
+  <div class="grid" id="grid"></div>
+</div>
+
+<script>
+const FAMILIES = [
+  { name: 'Blues', c: '#4A6FA5', members: [['Royal Blue', '#2E4FA3'], ['Navy', '#1E2D44'], ['Sky Blue', '#CEE7F5'], ['Steel Blue', '#4682B4']] },
+  { name: 'Pinks & Reds', c: '#C4606E', members: [['Blushing Pink', '#FDE9E9'], ['Dusty Rose', '#D3B6B6'], ['Burgundy', '#7B1E3A'], ['Ruby', '#B4465E']] },
+  { name: 'Greens', c: '#5E7D5A', members: [['Dusty Sage', '#A3BF9F'], ['Emerald', '#294D2B'], ['Sage Green', '#8A9A5B'], ['Mint', '#D9E4DB']] },
+  { name: 'Neutrals', c: '#C9BBA4', members: [['Ivory', '#F6F5F0'], ['Champagne', '#F1E9D2'], ['Sand', '#EFE9E9'], ['Mocha', '#A38068']] },
+  { name: 'Darks', c: '#1A1A1A', members: [['Black', '#111111'], ['Dark Navy', '#000050'], ['Espresso', '#3E2723']] },
+];
+const PRODUCTS = [
+  { n: 'Satin Sheath Gown', fi: 0, c: 'Royal Blue', col: '#2E4FA3', pr: '$1,190' },
+  { n: 'Midnight Column Dress', fi: 0, c: 'Navy', col: '#1E2D44', pr: '$1,480' },
+  { n: 'Sky Chiffon Mini', fi: 0, c: 'Sky Blue', col: '#CEE7F5', pr: '$860' },
+  { n: 'Blush Tulle Ball Gown', fi: 1, c: 'Blushing Pink', col: '#FDE9E9', pr: '$1,650' },
+  { n: 'Ruby Sequin Midi', fi: 1, c: 'Ruby', col: '#B4465E', pr: '$1,920' },
+  { n: 'Sage Slip Dress', fi: 2, c: 'Dusty Sage', col: '#A3BF9F', pr: '$980' },
+  { n: 'Emerald Velvet Gown', fi: 2, c: 'Emerald', col: '#294D2B', pr: '$2,100' },
+  { n: 'Ivory Silk Column', fi: 3, c: 'Ivory', col: '#F6F5F0', pr: '$1,340' },
+  { n: 'Champagne Beaded Sheath', fi: 3, c: 'Champagne', col: '#F1E9D2', pr: '$1,720' },
+  { n: 'Onyx Velvet Column', fi: 4, c: 'Black', col: '#111111', pr: '$1,560' },
+  { n: 'Espresso Satin Slip', fi: 4, c: 'Espresso', col: '#3E2723', pr: '$1,240' },
+];
+const state = new Map();
+const chips = document.getElementById('chips');
+const subArea = document.getElementById('subArea');
+const grid = document.getElementById('grid');
+let openIdx = null;
+
+function renderChips() {
+  chips.innerHTML = FAMILIES.map((f, fi) => {
+    const sel = state.get(fi) || new Set();
+    return '<button class="chip' + (sel.size ? ' on' : '') + '" data-fi="' + fi + '"><i style="background:' + f.c + '"></i>' + f.name + (sel.size ? ' <span class="n">(' + sel.size + ')</span>' : '') + '</button>';
+  }).join('');
+  chips.querySelectorAll('.chip').forEach((c) => c.onclick = () => toggle(+c.dataset.fi));
+}
+function toggle(fi) {
+  if (openIdx === fi) { closeSub(); return; }
+  openIdx = fi;
+  const f = FAMILIES[fi];
+  const sel = state.get(fi) || new Set();
+  subArea.innerHTML = '<div class="sub-row">' + f.members.map((m) => '<button class="sub-item' + (sel.has(m[0]) ? ' on' : '') + '" data-c="' + m[0] + '"><i style="background:' + m[1] + '"></i><span class="nm">' + m[0] + '</span></button>').join('') + '</div>';
+  subArea.classList.add('open');
+  subArea.querySelectorAll('.sub-item').forEach((s) => s.onclick = () => {
+    const set = state.get(fi) || new Set();
+    set.has(s.dataset.c) ? set.delete(s.dataset.c) : set.add(s.dataset.c);
+    state.set(fi, set);
+    refresh(); toggle(fi); openIdx = fi;
+    subArea.innerHTML = '<div class="sub-row">' + f.members.map((m) => '<button class="sub-item' + ((state.get(fi) || new Set()).has(m[0]) ? ' on' : '') + '" data-c="' + m[0] + '"><i style="background:' + m[1] + '"></i><span class="nm">' + m[0] + '</span></button>').join('') + '</div>';
+    subArea.classList.add('open');
+    bindSub(fi);
+    refresh();
+  });
+  bindSub(fi);
+  renderChips();
+}
+function bindSub(fi) {
+  subArea.querySelectorAll('.sub-item').forEach((s) => s.onclick = () => {
+    const set = state.get(fi) || new Set();
+    set.has(s.dataset.c) ? set.delete(s.dataset.c) : set.add(s.dataset.c);
+    state.set(fi, set);
+    refresh(); renderChips();
+    s.classList.toggle('on', set.has(s.dataset.c));
+  });
+}
+function closeSub() { openIdx = null; subArea.classList.remove('open'); }
+document.getElementById('colourHead').onclick = () => {
+  const card = document.getElementById('colourCard');
+  card.classList.toggle('open');
+  if (!card.classList.contains('open')) closeSub();
+  else if (openIdx === null) toggle(0);
+};
+document.getElementById('clearBtn').onclick = () => { state.clear(); refresh(); renderChips(); closeSub(); };
+function counts() { let t = 0; state.forEach((s) => t += s.size); return t; }
+function refresh() {
+  const total = counts();
+  document.getElementById('clearN').textContent = total;
+  document.getElementById('clearBtn').classList.toggle('show', total > 0);
+  document.getElementById('cv').textContent = total ? total + ' selected' : 'All colours';
+  const list = PRODUCTS.filter((p) => total === 0 || (state.get(p.fi) || new Set()).has(p.c));
+  document.getElementById('showN').textContent = list.length;
+  grid.innerHTML = list.length ? list.map((p) => '<div class="pcard"><div class="pcard__ph" style="--pc:' + p.col + '"></div><div class="pcard__b"><p class="pcard__nm">' + p.n + '</p><p class="pcard__mt">' + p.c + '</p><p class="pcard__pr">' + p.pr + '</p></div></div>').join('') : '<div class="empty">No pieces match this selection</div>';
+}
+renderChips();
+refresh();
+</script>
+</body>
+</html>

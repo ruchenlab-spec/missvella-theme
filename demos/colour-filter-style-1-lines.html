@@ -1,0 +1,149 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>颜色筛选器 · 风格1 极简平直线条</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+* { box-sizing: border-box; }
+body { margin: 0; font-family: 'Jost', 'PingFang SC', sans-serif; background: #fff; color: #1a1a1a; padding: 34px 0 90px; }
+.wrap { max-width: 1240px; margin: 0 auto; padding: 0 40px; }
+h1 { font-family: 'Cormorant Garamond', serif; font-size: 24px; margin: 0 0 6px; }
+.desc { font-size: 12.5px; color: #999; margin: 0 0 6px; }
+.hint { font-size: 11.5px; color: #c4bfb8; margin: 0 0 34px; }
+.hint b { color: #555; }
+.nav-row { display: flex; align-items: flex-end; justify-content: center; gap: 44px; border-bottom: 1px solid #ECEAE6; flex-wrap: wrap; }
+.nav-item { background: none; border: 0; cursor: pointer; padding: 0 2px 14px; display: flex; flex-direction: column; align-items: center; gap: 10px; position: relative; font: inherit; color: inherit; }
+.nav-item .glyph { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; }
+.nav-item .glyph i { display: block; width: 14px; height: 14px; border-radius: 50%; background: var(--c, #ccc); box-shadow: inset 0 0 0 1px rgb(0 0 0 / 12%); transition: transform .25s ease, box-shadow .25s ease; }
+.nav-item .lbl { font-size: 11px; letter-spacing: .18em; text-transform: uppercase; color: #A5A09A; padding-bottom: 10px; border-bottom: 1px solid transparent; margin-bottom: -11px; transition: color .25s ease, border-color .25s ease; }
+.nav-item:hover .glyph i { transform: scale(1.18); }
+.nav-item:hover .lbl { color: #1a1a1a; }
+.nav-item.on .lbl { color: #1a1a1a; border-bottom-color: #1a1a1a; }
+.nav-item.on .glyph i { box-shadow: inset 0 0 0 1px rgb(0 0 0 / 30%), 0 0 0 3px #fff, 0 0 0 4px #1a1a1a; }
+.nav-item .cnt { position: absolute; top: -4px; right: -14px; font-size: 9.5px; color: #8a857e; }
+.line-panel { display: none; border-bottom: 1px solid #ECEAE6; padding: 26px 0 30px; }
+.line-panel.open { display: block; animation: fade .3s ease; }
+@keyframes fade { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; } }
+.lp-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 24px; }
+.lp-title { font-family: 'Cormorant Garamond', serif; font-size: 17px; }
+.lp-meta { font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: #A5A09A; }
+.lp-swatches { display: flex; gap: 34px; flex-wrap: wrap; }
+.sw { background: none; border: 0; cursor: pointer; padding: 0; font: inherit; color: inherit; display: flex; flex-direction: column; align-items: center; gap: 9px; }
+.sw i { width: 34px; height: 34px; border-radius: 50%; display: block; box-shadow: inset 0 0 0 1px rgb(0 0 0 / 10%); transition: transform .22s ease, box-shadow .22s ease; }
+.sw:hover i { transform: scale(1.12); }
+.sw.on i { box-shadow: 0 0 0 2.5px #fff, 0 0 0 4px #1a1a1a; }
+.sw .nm { font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: #A5A09A; }
+.sw.on .nm { color: #1a1a1a; }
+.meta-row { display: flex; align-items: center; justify-content: space-between; padding: 14px 2px 26px; }
+.clear-btn { background: none; border: 0; cursor: pointer; font: inherit; font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: #A5A09A; border-bottom: 1px solid transparent; padding: 0 0 2px; visibility: hidden; }
+.clear-btn.show { visibility: visible; }
+.clear-btn:hover { color: #1a1a1a; border-color: #1a1a1a; }
+.sort { font-size: 10.5px; letter-spacing: .14em; text-transform: uppercase; color: #A5A09A; }
+.grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: #EFEDE9; border-block: 1px solid #EFEDE9; }
+.pcard { background: #fff; padding: 34px 26px 28px; text-align: center; }
+.pcard__ph { aspect-ratio: 3/4; background: linear-gradient(165deg, #F7F5F1, #EFECE7); margin-bottom: 20px; position: relative; }
+.pcard__ph::after { content: ''; position: absolute; inset: 12% 30%; border-radius: 46% 54% 50% 50% / 60% 60% 40% 40%; background: linear-gradient(150deg, var(--pc, #eee), rgb(0 0 0 / 8%)); opacity: .55; }
+.pcard__nm { font-family: 'Cormorant Garamond', serif; font-size: 16px; margin: 0 0 5px; }
+.pcard__mt { font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase; color: #A5A09A; margin: 0 0 3px; }
+.pcard__pr { font-size: 12px; color: #55504b; }
+.empty { grid-column: 1 / -1; padding: 70px; text-align: center; font-size: 12px; letter-spacing: .12em; text-transform: uppercase; color: #A5A09A; background: #fff; }
+@media (max-width: 900px) { .grid { grid-template-columns: repeat(2, 1fr); } .nav-row { gap: 24px; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>风格 1 · 极简平直线条</h1>
+  <p class="desc">无卡片、无填充、无圆角——细线导航式色系行（圆点图标 + 大写字距标签 + 选中下划线），点击展开同语言的细线色板面板。</p>
+  <p class="hint"><b>看什么：</b>点击色系展开细线面板 → 选色（双环选中）→ 标签计数 → CLEAR ALL → 产品实时筛选</p>
+  <nav class="nav-row" id="navRow">
+    <button class="nav-item on" data-g="all"><span class="glyph"><i style="--c:#fff"></i></span><span class="lbl">All</span></button>
+  </nav>
+  <div class="line-panel" id="linePanel"></div>
+  <div class="meta-row">
+    <button class="clear-btn" id="clearBtn">Clear all (<span id="clearN">0</span>)</button>
+    <span class="sort">Sort — Featured</span>
+  </div>
+  <div class="grid" id="grid"></div>
+</div>
+
+<script>
+const FAMILIES = [
+  { name: 'Blues', c: '#4A6FA5', members: [['Royal Blue', '#2E4FA3'], ['Navy', '#1E2D44'], ['Sky Blue', '#CEE7F5'], ['Steel Blue', '#4682B4']] },
+  { name: 'Pinks & Reds', c: '#C4606E', members: [['Blushing Pink', '#FDE9E9'], ['Dusty Rose', '#D3B6B6'], ['Burgundy', '#7B1E3A'], ['Ruby', '#B4465E']] },
+  { name: 'Greens', c: '#5E7D5A', members: [['Dusty Sage', '#A3BF9F'], ['Emerald', '#294D2B'], ['Sage Green', '#8A9A5B'], ['Mint', '#D9E4DB']] },
+  { name: 'Neutrals', c: '#C9BBA4', members: [['Ivory', '#F6F5F0'], ['Champagne', '#F1E9D2'], ['Sand', '#EFE9E9'], ['Mocha', '#A38068']] },
+  { name: 'Darks', c: '#1A1A1A', members: [['Black', '#111111'], ['Dark Navy', '#000050'], ['Espresso', '#3E2723']] },
+];
+const PRODUCTS = [
+  { n: 'Satin Sheath Gown', fi: 0, c: 'Royal Blue', col: '#2E4FA3', pr: '$1,190' },
+  { n: 'Midnight Column Dress', fi: 0, c: 'Navy', col: '#1E2D44', pr: '$1,480' },
+  { n: 'Sky Chiffon Mini', fi: 0, c: 'Sky Blue', col: '#CEE7F5', pr: '$860' },
+  { n: 'Blush Tulle Ball Gown', fi: 1, c: 'Blushing Pink', col: '#FDE9E9', pr: '$1,650' },
+  { n: 'Ruby Sequin Midi', fi: 1, c: 'Ruby', col: '#B4465E', pr: '$1,920' },
+  { n: 'Sage Slip Dress', fi: 2, c: 'Dusty Sage', col: '#A3BF9F', pr: '$980' },
+  { n: 'Emerald Velvet Gown', fi: 2, c: 'Emerald', col: '#294D2B', pr: '$2,100' },
+  { n: 'Ivory Silk Column', fi: 3, c: 'Ivory', col: '#F6F5F0', pr: '$1,340' },
+  { n: 'Champagne Beaded Sheath', fi: 3, c: 'Champagne', col: '#F1E9D2', pr: '$1,720' },
+  { n: 'Onyx Velvet Column', fi: 4, c: 'Black', col: '#111111', pr: '$1,560' },
+  { n: 'Espresso Satin Slip', fi: 4, c: 'Espresso', col: '#3E2723', pr: '$1,240' },
+];
+const state = new Map();
+const navRow = document.getElementById('navRow');
+const panel = document.getElementById('linePanel');
+const grid = document.getElementById('grid');
+let openIdx = null;
+FAMILIES.forEach((f, fi) => {
+  const b = document.createElement('button');
+  b.className = 'nav-item'; b.dataset.g = String(fi);
+  b.innerHTML = '<span class="glyph"><i style="--c:' + f.c + '"></i></span><span class="lbl">' + f.name + '</span><span class="cnt" hidden></span>';
+  b.onclick = () => toggle(fi);
+  navRow.appendChild(b);
+});
+function renderPanel(fi) {
+  const f = FAMILIES[fi];
+  const sel = state.get(fi) || new Set();
+  panel.innerHTML = '<div class="lp-head"><span class="lp-title">' + f.name + '</span><span class="lp-meta">' + sel.size + ' selected of ' + f.members.length + '</span></div>'
+    + '<div class="lp-swatches">' + f.members.map((m) => '<button class="sw' + (sel.has(m[0]) ? ' on' : '') + '" data-c="' + m[0] + '"><i style="background:' + m[1] + '"></i><span class="nm">' + m[0] + '</span></button>').join('') + '</div>';
+  panel.classList.add("open");
+  panel.querySelectorAll(".sw").forEach((s) => s.onclick = () => {
+    const set = state.get(fi) || new Set();
+    set.has(s.dataset.c) ? set.delete(s.dataset.c) : set.add(s.dataset.c);
+    state.set(fi, set);
+    refresh(); renderPanel(fi);
+  });
+}
+function toggle(fi) {
+  document.querySelectorAll('.nav-item').forEach((n) => n.classList.toggle('on', n.dataset.g === String(fi)));
+  if (openIdx === fi) { closePanel(); return; }
+  openIdx = fi;
+  renderPanel(fi);
+}
+function closePanel() {
+  openIdx = null;
+  panel.classList.remove('open');
+  document.querySelectorAll('.nav-item').forEach((n) => n.classList.toggle('on', n.dataset.g === 'all'));
+}
+document.getElementById('clearBtn').onclick = () => { state.clear(); refresh(); closePanel(); };
+function refresh() {
+  let total = 0;
+  document.querySelectorAll('.nav-item').forEach((n) => {
+    const gi = n.dataset.g;
+    if (gi === 'all') return;
+    const sz = (state.get(+gi) || new Set()).size;
+    total += sz;
+    const cnt = n.querySelector('.cnt');
+    cnt.textContent = sz || '';
+    cnt.hidden = !sz;
+    n.classList.toggle('on', sz > 0 || (openIdx !== null && gi === String(openIdx)));
+  });
+  document.getElementById('clearN').textContent = total;
+  document.getElementById('clearBtn').classList.toggle('show', total > 0);
+  const list = PRODUCTS.filter((p) => total === 0 || (state.get(p.fi) || new Set()).has(p.c));
+  grid.innerHTML = list.map((p) => '<div class="pcard"><div class="pcard__ph" style="--pc:' + p.col + '"></div><p class="pcard__nm">' + p.n + '</p><p class="pcard__mt">' + p.c + '</p><p class="pcard__pr">' + p.pr + '</p></div>').join('') || '<div class="empty">No pieces match this selection</div>';
+}
+refresh();
+</script>
+</body>
+</html>
