@@ -1,4 +1,4 @@
-{%- doc -%}
+﻿{%- doc -%}
   Renders a single Soft Minimal colour swatch item for the filters block
   (native checkbox plumbing preserved for facet-inputs-component).
 
@@ -6,6 +6,8 @@
   @param {string} input_id - id for the checkbox input
   @param {string} facet_target - facet-inputs-component id for keydown handling
   @param {boolean} [is_disabled] - Whether the value is disabled
+  @param {boolean} [navigate] - When true, toggling navigates via
+    url_to_add/url_to_remove (used outside facet forms, e.g. the colour bar)
   @param builtin_pairs - Built-in colour-name fallback pairs
 {%- enddoc -%}
 
@@ -30,6 +32,10 @@
     {% endif %}
     {% if is_disabled %}
       disabled
+    {% endif %}
+    {% if navigate %}
+      data-url-add="{{ value.url_to_add | escape }}"
+      data-url-remove="{{ value.url_to_remove | escape }}"
     {% endif %}
     ref="facetInputs[]"
     tabindex="-1"
