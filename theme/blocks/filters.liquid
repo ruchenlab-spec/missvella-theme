@@ -29,9 +29,17 @@
   assign filters = filters | default: results.filters
   assign total_active_values = 0
 -%}
-{%- comment -%} Colour groups come from the merchant's plain-text setting
-(颜色分组 textarea in the block editor) - no code fallback. {%- endcomment -%}
-{%- assign color_group_map_value = block.settings.color_group_map -%}
+{%- comment -%} Colour groups: the merchant's 颜色分组 textarea is the source of
+truth. The built-in colour-card standard is only a runtime fallback for block
+instances saved before the default existed (editor textareas show the saved
+value, not schema defaults) - paste the text into the editor to override. {%- endcomment -%}
+{%- capture color_group_map_value -%}{%- if block.settings.color_group_map != blank -%}{{ block.settings.color_group_map }}{%- else -%}Blues:#cee7f5:Sky Blue,Mist,Dusty Blue,Steel Blue,Slate Blue,Royal Blue,Stormy,Navy Blue,Deep Sea,Teal,Peacock Blue
+Greens:#174d4b:Peacock,Mint Green,Seafoam,Dusty Sage,Matcha,Sage Green,Agave,Forest Green,Olive Green,Hunter Green,Emerald,Dark Green
+Purples:#FF00FF:Fuchsia,Mulberry,Lilac,Wisteria,Lavender,Dusty Lavender,Mauve,Plum
+Pinks & Reds:#d87f03:Marigold,Blushing Pink,Petal,Coral,Dusty Rose,orange,Sunset,Rose Gold,Canyon Rose,Cinnamon,Terracotta,Burnt Orange,Rust,Cabernet,Burgundy,Paprika,Wine,Rosewood
+Yellow:#fff27b:Lemon,Daffodil,Butter
+Neutrals:#FAFAFA:White,Ivory,Sand,Champagne,Fog,Gold,Silver,grey,Mocha,Toffee
+Darks:#52443b:Espresso,Dark Navy,Black{%- endif -%}{%- endcapture -%}
 {%- liquid
 
   # Calculate facets margin style
