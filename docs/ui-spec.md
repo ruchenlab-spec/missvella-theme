@@ -79,7 +79,7 @@
 
 - 自定义模块用 BEM-ish：`circle-collections__item`、`circle-collections__media`、`circle-collections__title`。
 - 状态/变体用后缀：`--prev` / `--next`、`--shape-circle`、`--caret`。
-- 旧包定制统一 `bq-` 前缀（如 `bq-size-chart-drawer`、`bq-shared.css`），新代码不要再使用该前缀。
+- 定制 UI 统一使用 `mv-` 前缀（如 `mv-size-chart-drawer`、`mv-shared.css`），新代码沿用同一前缀，不要再引入其他前缀。
 - 变量命名：CSS 自定义属性 `--circle-*`；Liquid 变量 snake_case。
 
 ## 六、无障碍与交互

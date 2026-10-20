@@ -4,13 +4,13 @@
 
 本主题基于 Shopify **Horizon**（新版 theme blocks 架构），并在此之上叠加三批定制：
 
-1. **jimiss 旧开发包定制**（21 个文件 + 5 处官方文件的手工合并）
+1. **旧版定制开发包**（21 个文件 + 5 处官方文件的手工合并）
 2. **原生自研模块**：`circle-collections`（圆形集合轮播）
 3. **集合页筛选重设计**（Filters 区块 + 颜色分面 + 色板条，2026-10-18 起）
 
 ```
 theme/
-├── assets/       # base.css（官方）、bq-shared.css（定制）、*.js
+├── assets/       # base.css（官方）、mv-shared.css（定制）、*.js
 ├── blocks/       # 区块：官方 ~90 个 + 定制 6 个
 ├── config/       # settings_schema.json（代码）/ settings_data.json（商家值）
 ├── layout/       # theme.liquid（含定制引用）、password.liquid
@@ -123,7 +123,7 @@ section.main-collection
 - 颜色筛选识别同时兼容 Shopify 分类法（`filter.v.t.shopify.color-pattern`）与自定义选项（`option.color` / `option.colour` / `颜色`）。
 - `filters.liquid` 内的 `closest.collection` 在嵌套上下文里 filters 不完整，颜色筛选数据取自 `results.filters`。
 
-## 四、jimiss 合并进来的模块
+## 四、旧包合并进来的模块
 
 ### 定制 Section
 
@@ -148,27 +148,24 @@ section.main-collection
 |---|---|
 | `snippets/fonts.liquid` | 字体引入（在 `theme.liquid` 中 render） |
 | `snippets/hero-slide.liquid` | Hero 单个 slide 渲染 |
-| `snippets/alireviews_aggregateRating.liquid` | AliReviews 评价结构化数据（在 `header.liquid` 末尾 include） |
 
 ### 定制资源
 
 | 文件 | 说明 |
 |---|---|
-| `assets/bq-shared.css` | 定制样式总表（尺寸表抽屉、色板、优惠券等），在 `theme.liquid` 引入 |
-| `assets/product-form copy.js` | 定制表单脚本副本（**注意：文件名含空格，未被引用，待清理或合并**） |
+| `assets/mv-shared.css` | 定制样式共享基元（`--mv-pal-*` 设计 token、加购按钮、徽标、折叠面板、热点、输入框、弹窗），在 `theme.liquid` 引入；各区块的专属样式写在自己的 `{% style %}` 里 |
 | `assets/custom-color-icon.svg` / `custom-size-icon.svg` / `size-chart-icon.svg` / `size-chart-how-to-measure.png` | 图标与尺码图 |
 
 ### 对官方文件的手工合并（5 处）
 
 | 文件 | 合并内容 |
 |---|---|
-| `layout/theme.liquid` | 加回 `{% render 'fonts' %}` 与 `{{ 'bq-shared.css' | asset_url | stylesheet_tag }}` |
+| `layout/theme.liquid` | 加回 `{% render 'fonts' %}` 与 `{{ 'mv-shared.css' | asset_url | stylesheet_tag }}` |
 | `blocks/variant-picker.liquid` | 加回「尺码表」header + `show_size_chart` 设置；render 时传 `block: block` |
 | `snippets/variant-main-picker.liquid` | **整体采用旧包版本**（尺码表抽屉、颜色选择器、自定义尺寸与该文件结构深度耦合） |
 | `assets/product-form.js` | 移植加购时捕获 `properties[...]` 并随批量加购提交 |
-| `sections/header.liquid` | 末尾追加 `{% include 'alireviews_aggregateRating' %}` |
 
-## 五、失效资源清单（jimiss 店铺资源，需在 Missvella 店重新配置）
+## 五、失效资源清单（旧店铺资源，需在 Missvella 店重新配置）
 
 > 合并时的记录。图片可在编辑器重新选择，或向 Missvella 店上传**同名文件**后自动生效。
 
@@ -177,10 +174,10 @@ section.main-collection
 | `templates/index.json` → hero-slideshow | `shop_images/Generated_Image_August_31__2026_-_4_30PM_b745783a….jpg`、`2_2_9c2e4dbe….jpg`、`hero1.jpg`、`hero1-mob.jpg` |
 | `templates/index.json` → 商品链接 | `products/blushing-pink-satin-tulle-a-line-sweetheart-mini-dress`、`products/daffodil-chiffon-a-line-sweetheart-zipper-back-floor-length-dress` |
 | `templates/index.json` → ins-media | 5 个视频（已清空引用，需在编辑器重选） |
-| `templates/page.about.json` | 3 张图（`Generated_Image…5_28PM.jpg`、`1_1_3_8506faa5….jpg`、`jimiss_hero1.jpg`）、3 个视频（已清空） |
+| `templates/page.about.json` | 3 张图（`Generated_Image…5_28PM.jpg`、`1_1_3_8506faa5….jpg`、旧站 hero 图（已清空））、3 个视频（已清空） |
 | `templates/product.json` | `shop_images/HTMSM.png`（尺码测量图）、`shop_images/coupon_1.svg`（优惠券图标） |
-| `sections/footer-group.json` | `shop_images/j-logo-w_4x-8.png`（jimiss logo） |
-| ~~`templates/product.json`~~ | ~~`shopify://apps/ali-reviews/blocks/widget-box/…`~~ → **已在编辑器移除**（提交 `651abc0`）。`snippets/alireviews_aggregateRating.liquid` 仍保留，但只在商品页输出 |
+| `sections/footer-group.json` | 旧站 logo 图片（已清空，需商家在编辑器重新上传本店 logo） |
+| ~~`templates/product.json`~~ | ~~第三方评价 app 区块~~ → **已彻底移除**（编辑器移除 + 代码清理），若需评价功能请另选方案 |
 
 ## 六、数据流
 
@@ -210,7 +207,7 @@ live 主题更新 → 编辑器刷新可见 → 前台即时生效
 
 - `circle-collections` 依赖：`snippets/slideshow.liquid`、`slideshow-slide`、`slideshow-styles`、`snippets/text.liquid`、`snippets/spacing-style.liquid`、`slideshow.js`（Web Component）。
 - 箭头按钮必须位于 `<slideshow-component>` 内且带 `ref="previous" / "next"` + `on:click="/previous"`，否则不会与轮播组件绑定。
-- `bq-shared.css` 与 `fonts.liquid` 必须在 `theme.liquid` 的 `<head>` 中被引用，否则定制样式与字体不生效。
+- `mv-shared.css` 与 `fonts.liquid` 必须在 `theme.liquid` 的 `<head>` 中被引用，否则定制样式与字体不生效。
 - 色板条依赖链：`filters.liquid` → `cf-colour-bar.liquid` → `cf2-item.liquid` → `color-facet-swatch.liquid`；`cf-colour-bar` 内的色板项又依赖 `list-filter.liquid` 传下来的 `builtin_pairs`。
 - **`cf-colour-bar.liquid` 内没有 `block` 作用域**：snippet 只能拿到显式 `render` 传入的参数，涉及 `block.settings` 的取值必须在 `filters.liquid` 侧取出后传入（见 `swatch_texture` / `enable_sorting` / `enable_grid_density` / `section_id`）。
 - `collection-wrapper-styles.liquid` 承载全部 `cf-*` 样式与集合页布局，它由 `sections/main-collection.liquid` 渲染，色板条样式依赖它先被渲染。

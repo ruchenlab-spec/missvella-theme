@@ -226,214 +226,90 @@
     }
   }
 
-  /* ===== Colour family bar components ===== */
-  .cf-bar-pills {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 12px;
-  }
-
-  /*
-   * Family pills: solid swatch-coloured tiles with white centred labels,
-   * fabric texture overlay (see .cf-texture-- rules) and a soft inner bevel.
-   * Selected = white + dark double ring.
-   */
+  /* ===== Colour family bar components (minimal lines) ===== */
+  .cf-bar-pills { display: flex; flex-wrap: wrap; gap: 0 44px; align-items: flex-end; }
   .cf-pill {
     position: relative;
-    display: inline-flex;
+    display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    gap: 6px;
-    min-width: 92px;
-    min-height: 42px;
-    padding: 10px 20px;
+    gap: 10px;
+    padding: 0 2px 14px;
+    background: none;
     border: 0;
-    border-radius: 10px;
-    color: #ffffff;
+    color: inherit;
     cursor: pointer;
     font: inherit;
-    font-size: 13px;
-    background-image: linear-gradient(155deg, rgb(255 255 255 / 22%), rgb(0 0 0 / 14%));
-    background-blend-mode: soft-light;
-    box-shadow:
-      inset 0 1px 2px rgb(255 255 255 / 35%),
-      inset 0 -2px 5px rgb(0 0 0 / 22%),
-      inset 0 0 0 1px rgb(0 0 0 / 12%),
-      0 1px 3px rgb(0 0 0 / 12%);
-    text-shadow: 0 1px 2px rgb(0 0 0 / 30%);
-    transition: box-shadow 0.22s ease, transform 0.22s ease;
   }
-
-  .cf-pill:hover {
-    transform: translateY(-2px);
-    box-shadow:
-      inset 0 1px 2px rgb(255 255 255 / 40%),
-      inset 0 -2px 5px rgb(0 0 0 / 22%),
-      inset 0 0 0 1px rgb(0 0 0 / 14%),
-      0 8px 18px rgb(0 0 0 / 22%);
-  }
-
-  .cf-pill.is-active {
-    box-shadow:
-      0 0 0 2px var(--color-background),
-      0 0 0 3.5px var(--color-foreground),
-      0 6px 16px rgb(0 0 0 / 18%);
-  }
-
+  .cf-pill__glyph { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; }
+  .cf-pill__glyph i { display: block; width: 14px; height: 14px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgb(var(--color-foreground-rgb) / 14%); transition: transform 0.25s ease, box-shadow 0.25s ease; }
+  .cf-pill:hover .cf-pill__glyph i { transform: scale(1.18); }
   .cf-pill__name {
-    font-weight: 500;
-    letter-spacing: 0.02em;
+    font-size: 11px; letter-spacing: 0.18em; text-transform: uppercase;
+    color: var(--color-foreground-subdued); padding-bottom: 10px;
+    border-bottom: 1px solid transparent; margin-bottom: -11px;
+    transition: color 0.25s ease, border-color 0.25s ease; white-space: nowrap;
   }
-
-  .cf-pill__count {
-    font-size: 10px;
-    opacity: 0.8;
+  .cf-pill:hover .cf-pill__name { color: var(--color-foreground); }
+  .cf-pill.is-active .cf-pill__name { color: var(--color-foreground); border-bottom-color: var(--color-foreground); }
+  .cf-pill.is-active .cf-pill__glyph i {
+    box-shadow: inset 0 0 0 1px rgb(var(--color-foreground-rgb) / 35%), 0 0 0 3px var(--color-background), 0 0 0 4px var(--color-foreground);
   }
-
-  /*
-   * Expanded panel: light neutral card; the swatch row runs HORIZONTALLY
-   * (dots above labels) and scrolls when a family has many colours.
-   */
-  /*
-   * Expanded panel: light neutral card that OVERLAYS the products below the
-   * pills row (absolute within the colour bar, full row width). Inline flow
-   * would push the sort controls around and stretch to the pills sub-column.
-   */
+  .cf-pill__count { position: absolute; top: -4px; right: -14px; font-size: 9.5px; color: var(--color-foreground-subdued); }
   .cf-bar-panel {
     display: none;
     position: absolute;
-    top: calc(100% + 8px);
-    left: 0;
-    right: 0;
+    top: calc(100% + 1px);
+    left: calc(-1 * var(--page-margin, 40px));
+    right: calc(-1 * var(--page-margin, 40px));
     z-index: 12;
-    padding: 20px 24px;
-    background: #f2efe6;
-    border: 1px solid rgb(0 0 0 / 6%);
-    border-radius: 12px;
-    box-shadow: 0 16px 38px rgb(0 0 0 / 14%);
+    padding: 28px 0 30px;
+    background: var(--color-background);
+    border-bottom: 1px solid rgb(var(--color-foreground-rgb) / 10%);
   }
-
-  .cf-bar-panel.open {
-    display: block;
-  }
-
-  @media screen and (max-width: 749px) {
-    .cf-bar-panel {
-      position: static;
-      box-shadow: none;
-      padding: 14px 16px;
-    }
-  }
-
+  .cf-bar-panel.open { display: block; animation: cf-panel-fade 0.3s ease; }
+  @keyframes cf-panel-fade { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+  .cf-panel-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 22px; }
+  .cf-panel-title { font-family: var(--font-heading--family, inherit); font-size: 17px; }
+  .cf-panel-meta { font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--color-foreground-subdued); }
   .cf2-panel-swatches {
-    display: flex;
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    justify-content: flex-start;
-    gap: 10px 30px;
-    scrollbar-width: none;
-    padding-bottom: 2px;
+    display: flex; flex-wrap: nowrap; overflow-x: auto; justify-content: flex-start;
+    gap: 12px 34px; scrollbar-width: none; padding-bottom: 2px;
   }
-
-  .cf2-panel-swatches::-webkit-scrollbar {
-    display: none;
+  .cf2-panel-swatches::-webkit-scrollbar { display: none; }
+  .cf2-panel-swatches .cf2-item__dot {
+    width: 34px; height: 34px;
+    box-shadow: inset 0 0 0 1px rgb(var(--color-foreground-rgb) / 10%);
+    transition: transform 0.22s ease, box-shadow 0.22s ease;
   }
-
-  /* ===== Fabric texture overlays (cf-texture-- set on the bar) ===== */
-  .cf-texture--linen .cf-pill::after,
-  .cf-texture--linen .cf2-item__dot::after,
-  .cf-texture--satin .cf-pill::after,
-  .cf-texture--satin .cf2-item__dot::after,
-  .cf-texture--mesh .cf-pill::after,
-  .cf-texture--mesh .cf2-item__dot::after,
-  .cf-texture--velvet .cf-pill::after,
-  .cf-texture--velvet .cf2-item__dot::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    pointer-events: none;
+  .cf2-panel-swatches .cf2-item:hover .cf2-item__dot {
+    transform: scale(1.12); box-shadow: inset 0 0 0 1px rgb(var(--color-foreground-rgb) / 22%);
   }
-
-  .cf-texture--linen .cf-pill::after,
+  .cf2-panel-swatches .cf2-item input:checked + .cf2-item__label .cf2-item__dot {
+    box-shadow: 0 0 0 2.5px var(--color-background), 0 0 0 4px var(--color-foreground);
+  }
+  .cf2-panel-swatches .cf2-item__name {
+    font-size: 10.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--color-foreground-subdued);
+  }
+  .cf2-panel-swatches .cf2-item input:checked + .cf2-item__label .cf2-item__name { color: var(--color-foreground); }
+  /* ===== Fabric texture overlays (dots only) ===== */
+  .cf-texture--linen .cf2-item__dot::after, .cf-texture--satin .cf2-item__dot::after,
+  .cf-texture--mesh .cf2-item__dot::after, .cf-texture--velvet .cf2-item__dot::after {
+    content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none;
+  }
   .cf-texture--linen .cf2-item__dot::after {
-    background:
-      repeating-linear-gradient(45deg, rgb(255 255 255 / 16%) 0 1px, transparent 1px 3px),
-      repeating-linear-gradient(-45deg, rgb(0 0 0 / 12%) 0 1px, transparent 1px 3px);
+    background: repeating-linear-gradient(45deg, rgb(255 255 255 / 16%) 0 1px, transparent 1px 3px), repeating-linear-gradient(-45deg, rgb(0 0 0 / 12%) 0 1px, transparent 1px 3px);
   }
-
-  .cf-texture--satin .cf-pill::after,
   .cf-texture--satin .cf2-item__dot::after {
-    background: linear-gradient(
-      135deg,
-      rgb(255 255 255 / 42%) 0%,
-      rgb(255 255 255 / 8%) 32%,
-      rgb(0 0 0 / 14%) 62%,
-      rgb(255 255 255 / 24%) 100%
-    );
+    background: linear-gradient(135deg, rgb(255 255 255 / 42%) 0%, rgb(255 255 255 / 8%) 32%, rgb(0 0 0 / 14%) 62%, rgb(255 255 255 / 24%) 100%);
   }
-
-  .cf-texture--mesh .cf-pill::after,
   .cf-texture--mesh .cf2-item__dot::after {
-    background-image:
-      radial-gradient(circle at 25% 25%, rgb(255 255 255 / 34%) 0 1.2px, transparent 2px),
-      radial-gradient(circle at 75% 75%, rgb(0 0 0 / 16%) 0 1.2px, transparent 2px);
+    background-image: radial-gradient(circle at 25% 25%, rgb(255 255 255 / 34%) 0 1.2px, transparent 2px), radial-gradient(circle at 75% 75%, rgb(0 0 0 / 16%) 0 1.2px, transparent 2px);
     background-size: 6px 6px;
   }
-
-  .cf-texture--velvet .cf-pill::after,
   .cf-texture--velvet .cf2-item__dot::after {
-    background:
-      radial-gradient(ellipse at 35% 28%, rgb(255 255 255 / 38%), transparent 58%),
-      radial-gradient(ellipse at 72% 78%, rgb(0 0 0 / 26%), transparent 62%);
+    background: radial-gradient(ellipse at 35% 28%, rgb(255 255 255 / 38%), transparent 58%), radial-gradient(ellipse at 72% 78%, rgb(0 0 0 / 26%), transparent 62%);
   }
-
-  /* Textured dots/pills need overflow hidden so the overlay follows the shape */
-  .cf-texture--linen .cf2-item__dot,
-  .cf-texture--satin .cf2-item__dot,
-  .cf-texture--mesh .cf2-item__dot,
-  .cf-texture--velvet .cf2-item__dot,
-  .cf-texture--linen .cf-pill,
-  .cf-texture--satin .cf-pill,
-  .cf-texture--mesh .cf-pill,
-  .cf-texture--velvet .cf-pill {
-    overflow: hidden;
-  }
-
-  /*
-   * Swatch refinement: larger dots, spherical bevel, layered hover / selection
-   * rings instead of a flat colour chip.
-   */
-  .cf2-item__dot {
-    width: 48px;
-    height: 48px;
-    box-shadow:
-      inset 0 2px 4px rgb(255 255 255 / 38%),
-      inset 0 -3px 6px rgb(0 0 0 / 20%),
-      inset 0 0 0 1px rgb(0 0 0 / 10%),
-      0 2px 5px rgb(0 0 0 / 16%);
-    transition:
-      transform 0.22s cubic-bezier(0.22, 0.61, 0.36, 1),
-      box-shadow 0.22s ease;
-  }
-
-  .cf2-item:hover .cf2-item__dot {
-    transform: scale(1.1);
-    box-shadow:
-      inset 0 2px 4px rgb(255 255 255 / 42%),
-      inset 0 -3px 6px rgb(0 0 0 / 22%),
-      inset 0 0 0 1px rgb(0 0 0 / 14%),
-      0 6px 14px rgb(0 0 0 / 22%);
-  }
-
-  .cf2-item input:checked + .cf2-item__label .cf2-item__dot {
-    box-shadow:
-      0 0 0 2.5px var(--color-background),
-      0 0 0 4px var(--color-foreground),
-      0 4px 10px rgb(0 0 0 / 18%);
-  }
-
-  .cf2-item:hover input:checked + .cf2-item__label .cf2-item__dot {
-    transform: scale(1.06);
-  }
+  .cf-texture--linen .cf2-item__dot, .cf-texture--satin .cf2-item__dot,
+  .cf-texture--mesh .cf2-item__dot, .cf-texture--velvet .cf2-item__dot { overflow: hidden; }
 {% endstylesheet %}

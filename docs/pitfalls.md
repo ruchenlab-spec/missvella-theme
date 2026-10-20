@@ -91,7 +91,7 @@
 1. `blocks/disclosures.liquid`：`applicable_disclosures` filter 误报
 2. `snippets/cart-disclosure-tooltip.liquid`：`applicable_disclosures` filter 误报
 
-> 曾经还有第 3 个基线错误 `templates/product.json` 的 `JSONMissingBlock`（AliReviews app 区块），已在提交 `651abc0` 随编辑器移除该区块而消失。
+> 曾经还有第 3 个基线错误 `templates/product.json` 的 `JSONMissingBlock`（第三方评价 app 区块），已在提交 `651abc0` 随编辑器移除该区块而消失。
 
 **基线告警（19 个，全部来自官方 Horizon 文件，可不处理）**
 - `ValidScopedCSSClass` × 11：官方文件之间互相引用 class
@@ -153,7 +153,7 @@
 
 ### P24 · 无法直接判断哪些文件被改过
 - **方法 1（精确）**：对比旧包与当前版本每个 liquid 的 `{% schema %}` 中 `"id"` 集合，缺失项即为用户新增设置（本项目用它定位到 `price.liquid` 的 13 个设置和 `variant-picker.liquid` 的 `show_size_chart`）。
-- **方法 2（快速）**：按业务特征词扫描 diff（`jimiss|dress|size.?guide|coupon|bq-` 等），但会误报/漏报，需配合方法 1。
+- **方法 2（快速）**：按业务特征词扫描 diff（`dress|size.?guide|coupon|mv-` 等），但会误报/漏报，需配合方法 1。
 - **方法 3（结构）**：`| 2 -` 这类极小差异多为官方版本演进，可保留新版。
 
 ### P25 · 整体覆盖某个 snippet 前先确认依赖
@@ -178,3 +178,9 @@
 - **原因**：被搬走的片段的**闭合标签在原处**，只搬了开标签那一半，标签配对被拆散。
 - **解决**：以**最外层元素的完整闭合**为边界切分，不要按"看起来是一个逻辑块"切。搬完用脚本逐行比对原文件与新文件（空白归一化后应完全一致），确认只差缩进。
 - **附带**：`{% stylesheet %}` 里的 CSS 不必跟着搬 —— Shopify 的 stylesheet 是按渲染位置生效的，样式定义留在原处仍然作用得到新位置；但注意 class 作用域告警（`ValidScopedCSSClass`）。
+
+### P29 · 注释里不要写字面的 `<script>` 标签
+- **症状**：只是在 `<script>` 内的 JS 注释里写了 "separate `<script>` tags"，`theme check` 立刻多出一个 `error: LiquidHTMLSyntaxError: Attempting to end parsing before HtmlRawNode 'script' was closed`，指向该 `<script>` 的**开标签行**，看起来像是标签没闭合。
+- **原因**：Liquid 的 HTML 解析器对 `script` / `style` 做的是**原始文本扫描**，只认 `</script>` 作为结束标记；注释里的 `<script>` 会被当成一个新的嵌套节点，于是外层节点永远等不到闭合。
+- **解决**：注释里用 "script 标签" / "separate tags" 这类不含尖括号的写法。
+- **附带**：同理，`{% style %}` / `{% stylesheet %}` 内的 CSS 注释里也不要写 `</style>`；JS 里拼接字符串用到标签时也尽量拆开写（`'<' + 'script'`）。

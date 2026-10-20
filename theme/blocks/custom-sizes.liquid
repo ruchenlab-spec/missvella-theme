@@ -47,24 +47,24 @@
 -%}
 {% style %}
 .cs-block-{{ cs_id }} {
-  --jm-accent: {{ accent_color }};
-  --jm-accent-rgb: {{ accent_r }}, {{ accent_g }}, {{ accent_b }};
-  --jm-gold: #C9A227;
-  --jm-ink: #1A1A1A;
-  --jm-surface: #FFFFFF;
-  --jm-page: #FAF9F7;
-  --jm-border: #E8E2DC;
-  --jm-muted: #8A8580;
+  --mv-pal-accent: {{ accent_color }};
+  --mv-pal-accent-rgb: {{ accent_r }}, {{ accent_g }}, {{ accent_b }};
+  --mv-pal-gold: #C9A227;
+  --mv-pal-ink: #1A1A1A;
+  --mv-pal-surface: #FFFFFF;
+  --mv-pal-page: #FAF9F7;
+  --mv-pal-border: #E8E2DC;
+  --mv-pal-muted: #8A8580;
   font-family: var(--font-body--family, 'Helvetica Neue', sans-serif);
-  color: var(--jm-ink);
+  color: var(--mv-pal-ink);
 }
 
 .cs-trigger-{{ cs_id }} {
   width: 100%;
   min-height: 62px;
   padding: 12px 16px;
-  background: var(--jm-surface);
-  border: 1px solid var(--jm-border);
+  background: var(--mv-pal-surface);
+  border: 1px solid var(--mv-pal-border);
   border-radius: 14px;
   cursor: pointer;
   display: flex;
@@ -77,8 +77,8 @@
 }
 @media (hover:hover) {
   .cs-trigger-{{ cs_id }}:hover {
-    border-color: rgb(var(--jm-accent-rgb) / 55%);
-    box-shadow: 0 10px 26px rgb(var(--jm-accent-rgb) / 10%);
+    border-color: rgb(var(--mv-pal-accent-rgb) / 55%);
+    box-shadow: 0 10px 26px rgb(var(--mv-pal-accent-rgb) / 10%);
     transform: translateY(-1px);
   }
 }
@@ -86,7 +86,7 @@
 .cs-btn-edit-{{ cs_id }}:focus-visible,
 .cs-btn-cancel-{{ cs_id }}:focus-visible,
 .cs-tab-btn-{{ cs_id }}:focus-visible {
-  outline: 2px solid var(--jm-accent);
+  outline: 2px solid var(--mv-pal-accent);
   outline-offset: 2px;
 }
 .cs-trigger-icon-{{ cs_id }} {
@@ -95,9 +95,9 @@
   border-radius: 11px;
   display: grid;
   place-items: center;
-  background: var(--jm-page);
-  border: 1px solid var(--jm-border);
-  color: var(--jm-accent);
+  background: var(--mv-pal-page);
+  border: 1px solid var(--mv-pal-border);
+  color: var(--mv-pal-accent);
   flex-shrink: 0;
   transition: background .16s ease, color .16s ease, border-color .16s ease;
 }
@@ -105,22 +105,22 @@
 .cs-trigger-icon-{{ cs_id }} img { width: 18px; height: 18px; display: block; object-fit: contain; }
 /* Keep the Custom Size service icon visually stable after measurements are saved. */
 .cs-block-{{ cs_id }}.has-data .cs-trigger-icon-{{ cs_id }} {
-  background: var(--jm-page);
-  color: var(--jm-accent);
-  border-color: var(--jm-border);
+  background: var(--mv-pal-page);
+  color: var(--mv-pal-accent);
+  border-color: var(--mv-pal-border);
 }
 .cs-trigger-body-{{ cs_id }} { flex: 1; min-width: 0; }
 .cs-trigger-title-{{ cs_id }} {
   font-family: Georgia, 'Times New Roman', serif;
   font-size: 15px;
   font-weight: 600;
-  color: var(--jm-ink);
+  color: var(--mv-pal-ink);
   letter-spacing: .01em;
   line-height: 1.25;
 }
 .cs-trigger-sub-{{ cs_id }} {
   font-size: 9.5px;
-  color: var(--jm-gold);
+  color: var(--mv-pal-gold);
   margin-top: 3px;
   line-height: 1.3;
   letter-spacing: .14em;
@@ -132,17 +132,17 @@
   align-items: center;
   gap: 8px;
   flex-shrink: 0;
-  color: var(--jm-accent);
+  color: var(--mv-pal-accent);
 }
-.cs-block-{{ cs_id }}.has-data.expanded .cs-trigger-right-{{ cs_id }} .bq-chevron { transform: rotate(180deg); }
+.cs-block-{{ cs_id }}.has-data.expanded .cs-trigger-right-{{ cs_id }} .mv-chevron { transform: rotate(180deg); }
 
 .cs-summary-{{ cs_id }} {
   display: none;
   margin-top: 8px;
   padding: 14px;
-  border: 1px solid var(--jm-border);
+  border: 1px solid var(--mv-pal-border);
   border-radius: 14px;
-  background: var(--jm-surface);
+  background: var(--mv-pal-surface);
   box-sizing: border-box;
 }
 .cs-summary-{{ cs_id }}.visible,
@@ -157,7 +157,7 @@
   justify-content: space-between;
   gap: 10px;
   padding-bottom: 11px;
-  border-bottom: 1px dashed var(--jm-border);
+  border-bottom: 1px dashed var(--mv-pal-border);
 }
 .cs-summary-title-{{ cs_id }} {
   display: inline-flex;
@@ -166,9 +166,9 @@
   font-family: Georgia, 'Times New Roman', serif;
   font-size: 13.5px;
   font-weight: 600;
-  color: var(--jm-ink);
+  color: var(--mv-pal-ink);
 }
-.cs-summary-title-{{ cs_id }} .cs-ruler-icon { width: 16px; height: 16px; color: var(--jm-accent); }
+.cs-summary-title-{{ cs_id }} .cs-ruler-icon { width: 16px; height: 16px; color: var(--mv-pal-accent); }
 .cs-summary-status-{{ cs_id }} {
   display: inline-flex;
   align-items: center;
@@ -179,15 +179,15 @@
   font-weight: 600;
   letter-spacing: .06em;
   text-transform: uppercase;
-  color: var(--jm-accent);
-  background: rgb(var(--jm-accent-rgb) / 8%);
+  color: var(--mv-pal-accent);
+  background: rgb(var(--mv-pal-accent-rgb) / 8%);
   white-space: nowrap;
 }
 .cs-status-dot-{{ cs_id }} {
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  background: var(--jm-accent);
+  background: var(--mv-pal-accent);
 }
 .cs-summary-tags-{{ cs_id }} {
   display: flex;
@@ -202,20 +202,20 @@
   min-height: 26px;
   padding: 4px 9px;
   border-radius: 999px;
-  background: var(--jm-page);
-  border: 1px solid var(--jm-border);
-  color: var(--jm-muted);
+  background: var(--mv-pal-page);
+  border: 1px solid var(--mv-pal-border);
+  color: var(--mv-pal-muted);
   font-size: 10.5px;
   white-space: nowrap;
 }
-.cs-summary-tags-{{ cs_id }} span strong { color: var(--jm-ink); font-weight: 600; }
+.cs-summary-tags-{{ cs_id }} span strong { color: var(--mv-pal-ink); font-weight: 600; }
 .cs-summary-bottom-{{ cs_id }} {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 10px;
   padding-top: 11px;
-  border-top: 1px dashed var(--jm-border);
+  border-top: 1px dashed var(--mv-pal-border);
 }
 .cs-checkbox-row-{{ cs_id }} {
   display: inline-flex;
@@ -230,7 +230,7 @@
   display: grid;
   place-items: center;
   color: #fff;
-  background: var(--jm-accent);
+  background: var(--mv-pal-accent);
   flex-shrink: 0;
   transition: background .16s ease, box-shadow .16s ease;
 }
@@ -240,8 +240,8 @@
 }
 .cs-checkbox-box-{{ cs_id }} svg { width: 12px; height: 12px; }
 .cs-checkbox-box-{{ cs_id }}.unchecked svg { display: none; }
-.cs-checkbox-label-{{ cs_id }} { font-size: 11px; color: var(--jm-ink); font-weight: 500; }
-.cs-checkbox-row-{{ cs_id }}.unchecked .cs-checkbox-label-{{ cs_id }} { color: var(--jm-muted); }
+.cs-checkbox-label-{{ cs_id }} { font-size: 11px; color: var(--mv-pal-ink); font-weight: 500; }
+.cs-checkbox-row-{{ cs_id }}.unchecked .cs-checkbox-label-{{ cs_id }} { color: var(--mv-pal-muted); }
 .cs-summary-actions-{{ cs_id }} { display: inline-flex; gap: 7px; flex-shrink: 0; }
 .cs-btn-edit-{{ cs_id }},
 .cs-btn-cancel-{{ cs_id }} {
@@ -254,11 +254,11 @@
   cursor: pointer;
   transition: transform .14s ease, background .14s ease, border-color .14s ease;
 }
-.cs-btn-edit-{{ cs_id }} { border: 1px solid var(--jm-accent); background: var(--jm-accent); color: #fff; }
-.cs-btn-cancel-{{ cs_id }} { border: 1px solid var(--jm-border); background: #fff; color: var(--jm-muted); }
+.cs-btn-edit-{{ cs_id }} { border: 1px solid var(--mv-pal-accent); background: var(--mv-pal-accent); color: #fff; }
+.cs-btn-cancel-{{ cs_id }} { border: 1px solid var(--mv-pal-border); background: #fff; color: var(--mv-pal-muted); }
 @media (hover:hover) {
-  .cs-btn-edit-{{ cs_id }}:hover { background: rgb(var(--jm-accent-rgb) / 85%); border-color: rgb(var(--jm-accent-rgb) / 85%); transform: translateY(-1px); }
-  .cs-btn-cancel-{{ cs_id }}:hover { border-color: var(--jm-accent); color: var(--jm-accent); }
+  .cs-btn-edit-{{ cs_id }}:hover { background: rgb(var(--mv-pal-accent-rgb) / 85%); border-color: rgb(var(--mv-pal-accent-rgb) / 85%); transform: translateY(-1px); }
+  .cs-btn-cancel-{{ cs_id }}:hover { border-color: var(--mv-pal-accent); color: var(--mv-pal-accent); }
 }
 
 #cs-overlay-{{ cs_id }} {
@@ -270,10 +270,10 @@
 }
 #cs-overlay-{{ cs_id }}.active { display: block; }
 #cs-modal-{{ cs_id }} {
-  --jm-ink: #1A1A1A;
-  --jm-surface: #FFFFFF;
-  --jm-border: #E8E2DC;
-  --jm-muted: #8A8580;
+  --mv-pal-ink: #1A1A1A;
+  --mv-pal-surface: #FFFFFF;
+  --mv-pal-border: #E8E2DC;
+  --mv-pal-muted: #8A8580;
   position: fixed;
   background: #FFFFFF;
   color: #1A1A1A;
@@ -332,13 +332,13 @@
 }
 .cs-modal-header-{{ cs_id }} {
   border-radius: 0;
-  border-bottom: 1px solid var(--jm-border);
+  border-bottom: 1px solid var(--mv-pal-border);
   padding: 20px 28px 0;
   background: #FFFFFF;
 }
 .cs-modal-kicker-{{ cs_id }} {
   font-size: 10px;
-  color: var(--jm-gold);
+  color: var(--mv-pal-gold);
   font-weight: 600;
   letter-spacing: .22em;
   text-transform: uppercase;
@@ -346,7 +346,7 @@
 .cs-modal-title-{{ cs_id }} {
   font-family: Georgia, 'Times New Roman', serif;
   font-size: 20px;
-  color: var(--jm-ink);
+  color: var(--mv-pal-ink);
   font-weight: 600;
   margin-top: 5px;
 }
@@ -354,13 +354,13 @@
   margin-top: 3px;
   font-size: 11px;
   line-height: 1.4;
-  color: var(--jm-muted);
+  color: var(--mv-pal-muted);
 }
 
  .cs-tabs-nav-{{ cs_id }} {
   display: flex;
   margin: 18px 28px 0;
-  border-bottom: 1px solid var(--jm-border);
+  border-bottom: 1px solid var(--mv-pal-border);
   flex-shrink: 0;
 }
 .cs-tab-btn-{{ cs_id }} {
@@ -376,7 +376,7 @@
   font-weight: 600;
   letter-spacing: .12em;
   text-transform: uppercase;
-  color: var(--jm-muted);
+  color: var(--mv-pal-muted);
   cursor: pointer;
   display: flex;
   align-items: center;
@@ -390,16 +390,16 @@
   color: currentColor;
 }
 .cs-tab-btn-{{ cs_id }}.active {
-  color: var(--jm-accent);
-  border-color: var(--jm-accent);
+  color: var(--mv-pal-accent);
+  border-color: var(--mv-pal-accent);
 }
 
 /* CM / IN segmented control */
 .cs-unit-toggle-{{ cs_id }} {
   display: inline-flex;
-  border: 1px solid var(--jm-border);
+  border: 1px solid var(--mv-pal-border);
   border-radius: 999px;
-  background: var(--jm-page);
+  background: var(--mv-pal-page);
   padding: 3px;
   box-sizing: border-box;
   flex-shrink: 0;
@@ -410,7 +410,7 @@
   border: 0;
   border-radius: 999px;
   background: transparent;
-  color: var(--jm-muted);
+  color: var(--mv-pal-muted);
   font: inherit;
   font-size: 10.5px;
   font-weight: 650;
@@ -419,12 +419,12 @@
   transition: color .2s ease, background .2s ease;
 }
 .cs-unit-btn-{{ cs_id }}.active {
-  background: var(--jm-accent);
+  background: var(--mv-pal-accent);
   color: #FFFFFF;
 }
 .cs-unit-btn-{{ cs_id }}:active { transform: scale(.96); }
 .cs-unit-btn-{{ cs_id }}:focus-visible {
-  outline: 2px solid var(--jm-accent);
+  outline: 2px solid var(--mv-pal-accent);
   outline-offset: 2px;
 }
 .cs-modal-body-{{ cs_id }} { overflow-y: auto; flex: 1; min-height: 0; background: #FFFFFF; }
@@ -469,11 +469,11 @@
 .cs-form-label-{{ cs_id }} {
   font-size: 12px;
   font-weight: 600;
-  color: var(--jm-ink);
+  color: var(--mv-pal-ink);
 }
 .cs-optional-tag-{{ cs_id }} {
   font-size: 9.5px;
-  color: var(--jm-muted);
+  color: var(--mv-pal-muted);
   text-transform: uppercase;
   letter-spacing: .06em;
 }
@@ -482,18 +482,18 @@
   width: 100%;
   padding: 13px 44px 13px 14px;
   border-radius: 12px;
-  border: 1.5px solid var(--jm-border);
-  background: var(--jm-page);
+  border: 1.5px solid var(--mv-pal-border);
+  background: var(--mv-pal-page);
   font: inherit;
   font-size: 14px;
-  color: var(--jm-ink);
+  color: var(--mv-pal-ink);
   outline: none;
   transition: border-color .2s ease, background .2s ease, box-shadow .2s ease;
 }
 .cs-input-wrap-{{ cs_id }} input:focus {
-  border-color: var(--jm-accent);
-  background: var(--jm-surface);
-  box-shadow: 0 0 0 3.5px rgb(var(--jm-accent-rgb) / 10%);
+  border-color: var(--mv-pal-accent);
+  background: var(--mv-pal-surface);
+  box-shadow: 0 0 0 3.5px rgb(var(--mv-pal-accent-rgb) / 10%);
 }
 .cs-input-wrap-{{ cs_id }} input::placeholder { color: #C6BEB6; }
 .cs-input-unit-{{ cs_id }} {
@@ -502,7 +502,7 @@
   top: 50%;
   transform: translateY(-50%);
   font-size: 11px;
-  color: var(--jm-muted);
+  color: var(--mv-pal-muted);
   pointer-events: none;
 }
 .cs-form-footer-{{ cs_id }} {
@@ -521,25 +521,25 @@
   font-weight: 600;
   letter-spacing: .04em;
   color: #FFFFFF;
-  background: linear-gradient(135deg, var(--jm-accent), rgb(var(--jm-accent-rgb) / 82%));
-  box-shadow: 0 12px 26px rgb(var(--jm-accent-rgb) / 26%);
+  background: linear-gradient(135deg, var(--mv-pal-accent), rgb(var(--mv-pal-accent-rgb) / 82%));
+  box-shadow: 0 12px 26px rgb(var(--mv-pal-accent-rgb) / 26%);
   transition: transform .2s ease, box-shadow .2s ease;
 }
-.cs-btn-confirm-{{ cs_id }}:hover { transform: translateY(-1px); box-shadow: 0 16px 32px rgb(var(--jm-accent-rgb) / 32%); }
+.cs-btn-confirm-{{ cs_id }}:hover { transform: translateY(-1px); box-shadow: 0 16px 32px rgb(var(--mv-pal-accent-rgb) / 32%); }
 .cs-btn-ghost-{{ cs_id }} {
   flex: 1;
   padding: 15px;
   border-radius: 999px;
   cursor: pointer;
   background: none;
-  border: 1.5px solid var(--jm-border);
-  color: var(--jm-muted);
+  border: 1.5px solid var(--mv-pal-border);
+  color: var(--mv-pal-muted);
   font: inherit;
   font-size: 13px;
   font-weight: 500;
   transition: all .2s ease;
 }
-.cs-btn-ghost-{{ cs_id }}:hover { border-color: var(--jm-accent); color: var(--jm-accent); }
+.cs-btn-ghost-{{ cs_id }}:hover { border-color: var(--mv-pal-accent); color: var(--mv-pal-accent); }
 
 /* Review step */
 .cs-review-{{ cs_id }} { display: none; }
@@ -549,26 +549,26 @@
   align-items: baseline;
   justify-content: space-between;
   padding: 13px 4px;
-  border-bottom: 1px dashed var(--jm-border);
+  border-bottom: 1px dashed var(--mv-pal-border);
   font-size: 13px;
 }
-.cs-review-tag-{{ cs_id }} .k { color: var(--jm-muted); }
+.cs-review-tag-{{ cs_id }} .k { color: var(--mv-pal-muted); }
 .cs-review-tag-{{ cs_id }} .v { font-weight: 600; }
 .cs-cart-line-{{ cs_id }} {
   margin-top: 20px;
   padding: 14px 18px;
   border-radius: 14px;
-  background: var(--jm-page);
-  border: 1px dashed var(--jm-gold);
+  background: var(--mv-pal-page);
+  border: 1px dashed var(--mv-pal-gold);
   font-size: 12px;
-  color: var(--jm-muted);
+  color: var(--mv-pal-muted);
   line-height: 1.8;
 }
 .cs-cart-line-{{ cs_id }} code {
   font-family: 'SF Mono', Consolas, monospace;
   font-size: 11px;
-  color: var(--jm-accent);
-  background: rgb(var(--jm-accent-rgb) / 7%);
+  color: var(--mv-pal-accent);
+  background: rgb(var(--mv-pal-accent-rgb) / 7%);
   padding: 2px 6px;
   border-radius: 6px;
   word-break: break-all;
@@ -585,8 +585,8 @@
   margin-inline: auto;
   border-radius: 16px;
   overflow: hidden;
-  background: var(--jm-page);
-  border: 1px solid var(--jm-border);
+  background: var(--mv-pal-page);
+  border: 1px solid var(--mv-pal-border);
   flex: 0 0 auto;
 }
 .cs-htm-image-{{ cs_id }} {
@@ -594,32 +594,32 @@
   width: 100%;
   height: auto;
 }
-.cs-htm-image-wrapper-{{ cs_id }} .bq-hotspot {
+.cs-htm-image-wrapper-{{ cs_id }} .mv-hotspot {
   width: {{ block.settings.hotspot_size }}px;
   height: {{ block.settings.hotspot_size }}px;
   transform: none;
-  background: var(--jm-accent);
+  background: var(--mv-pal-accent);
   border-radius: 50%;
-  box-shadow: 0 0 0 4px rgb(var(--jm-accent-rgb) / 22%);
+  box-shadow: 0 0 0 4px rgb(var(--mv-pal-accent-rgb) / 22%);
   cursor: pointer;
 }
-.cs-htm-image-wrapper-{{ cs_id }} .bq-hotspot.on {
-  background: var(--jm-gold);
+.cs-htm-image-wrapper-{{ cs_id }} .mv-hotspot.on {
+  background: var(--mv-pal-gold);
   box-shadow: 0 0 0 4px rgb(201 162 39 / 30%);
 }
-.cs-htm-image-wrapper-{{ cs_id }} .bq-hotspot::after {
+.cs-htm-image-wrapper-{{ cs_id }} .mv-hotspot::after {
   content: '';
   position: absolute;
   inset: -6px;
   border-radius: 50%;
-  border: 1.5px solid rgb(var(--jm-accent-rgb) / 45%);
+  border: 1.5px solid rgb(var(--mv-pal-accent-rgb) / 45%);
   animation: cs-pulse-{{ cs_id }} 2.2s ease infinite;
 }
 @keyframes cs-pulse-{{ cs_id }} {
   0% { transform: scale(.85); opacity: 1; }
   100% { transform: scale(1.4); opacity: 0; }
 }
-.cs-htm-image-wrapper-{{ cs_id }} .bq-hotspot__dot {
+.cs-htm-image-wrapper-{{ cs_id }} .mv-hotspot__dot {
   width: 100%;
   height: 100%;
   font-size: calc({{ block.settings.hotspot_size }}px * .42);
@@ -662,8 +662,8 @@
       </div>
 
       <div class="cs-trigger-right-{{ cs_id }}">
-        <span class="bq-badge-free">Free</span>
-        <svg class="bq-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none"
+        <span class="mv-badge-free">Free</span>
+        <svg class="mv-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none"
           stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <polyline points="4,6 8,10 12,6"/>
         </svg>
@@ -707,7 +707,7 @@
 
 <div id="cs-overlay-{{ cs_id }}"></div>
 <div id="cs-modal-{{ cs_id }}">
-  <div class="bq-modal-header cs-modal-header-{{ cs_id }}">
+  <div class="mv-modal-header cs-modal-header-{{ cs_id }}">
     <div>
       <div class="cs-modal-kicker-{{ cs_id }}">Made to Measure</div>
       <div class="cs-modal-title-{{ cs_id }}">{{ block.settings.modal_title }}</div>
@@ -718,7 +718,7 @@
         <button type="button" class="cs-unit-btn-{{ cs_id }} active" data-cs-unit="cm" aria-pressed="true">CM</button>
         <button type="button" class="cs-unit-btn-{{ cs_id }}" data-cs-unit="inch" aria-pressed="false">IN</button>
       </div>
-      <button type="button" class="bq-modal-close" id="cs-close-{{ cs_id }}">
+      <button type="button" class="mv-modal-close" id="cs-close-{{ cs_id }}">
         <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
           <line x1="1" y1="1" x2="13" y2="13"/>
           <line x1="13" y1="1" x2="1" y2="13"/>
@@ -757,7 +757,7 @@
             </div>
             <div class="cs-input-wrap-{{ cs_id }}">
               <input type="number" step="0.1" min="0"
-                class="bq-input{% unless parts[4] == 'true' %} optional{% endunless %}"
+                class="mv-input{% unless parts[4] == 'true' %} optional{% endunless %}"
                 data-key="{{ parts[0] }}"
                 data-cm="{{ parts[2] }}" data-inch="{{ parts[3] }}"
                 data-required="{{ parts[4] }}"
@@ -833,11 +833,11 @@
               endcase
             -%}
             <div
-              class="bq-hotspot"
+              class="mv-hotspot"
               style="left: calc({{ hp_x }}% - {{ hotspot_half_size }}px); top: calc({{ hp_y }}% - {{ hotspot_half_size }}px);"
               data-htm-hotspot="{{ hotspot_index }}"
             >
-              <div class="bq-hotspot__dot">{{ hotspot_index }}</div>
+              <div class="mv-hotspot__dot">{{ hotspot_index }}</div>
             </div>
           {%- endfor -%}
         </div>
@@ -846,23 +846,23 @@
             {%- assign htm_fields = "1|Bust|Measure around the fullest part of your bust~2|Waist|Measure around the narrowest part of your natural waistline~3|Hips|Measure around the fullest part of your hips, about 8 inches below your waist~4|Hollow to Floor|Measure from the hollow at the base of your throat to the floor~5|Height|Stand straight and measure from the top of your head to the floor" | split: "~" -%}
             {%- for hf in htm_fields -%}
               {%- assign hfparts = hf | split: "|" -%}
-              <div class="bq-accordion-item" data-htm-step="{{ hfparts[0] }}">
-                <div class="bq-accordion-header">
-                  <div class="bq-accordion-number">{{ hfparts[0] }}</div>
-                  <div style="flex:1;font-size:11px;font-weight:600;color:var(--bq-text-main);letter-spacing:0.03em;">{{ hfparts[1] }}</div>
-                  <svg class="bq-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none"
+              <div class="mv-accordion-item" data-htm-step="{{ hfparts[0] }}">
+                <div class="mv-accordion-header">
+                  <div class="mv-accordion-number">{{ hfparts[0] }}</div>
+                  <div style="flex:1;font-size:11px;font-weight:600;color:var(--mv-text-main);letter-spacing:0.03em;">{{ hfparts[1] }}</div>
+                  <svg class="mv-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none"
                     stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <polyline points="4,6 8,10 12,6"/>
                   </svg>
                 </div>
-                <div class="bq-accordion-content">
-                  <div class="bq-accordion-text" style="padding-left:42px;">{{ hfparts[2] }}</div>
+                <div class="mv-accordion-content">
+                  <div class="mv-accordion-text" style="padding-left:42px;">{{ hfparts[2] }}</div>
                 </div>
               </div>
             {%- endfor -%}
           </div>
           {%- if block.settings.htm_note != blank -%}
-            <div class="bq-note cs-htm-note-{{ cs_id }}">{{ block.settings.htm_note }}</div>
+            <div class="mv-note cs-htm-note-{{ cs_id }}">{{ block.settings.htm_note }}</div>
           {%- endif -%}
         </div>
       </div>
@@ -1366,7 +1366,7 @@
     }, true);
 
     htmItems.forEach(item => {
-      item.querySelector('.bq-accordion-header')?.addEventListener('click', () => {
+      item.querySelector('.mv-accordion-header')?.addEventListener('click', () => {
         animateMobileSheetHeight(() => {
           const isActive = item.classList.contains('active');
           htmItems.forEach(i => i.classList.remove('active'));

@@ -62,7 +62,7 @@
 
 <script>
 (function() {
-  var palette = window.JIMISS_CUSTOM_COLOR_PALETTE || {};
+  var palette = window.MV_CUSTOM_COLOR_PALETTE || {};
   var canonical = [
     'Black#000000','Navy Blue#182a55','Dusty Rose#d3b6b6','Sage Green#8a9a5b','Sky Blue#cee7f5','Burgundy#751e15','Emerald#134c36','Champagne#f1e9d2',
     'Mint Green#a1d2b4','Dusty Sage#a3bf9f','Green#05AA3D','Olive Green#556b2f','Peacock#174d4b','Forest Green#12392e',
@@ -92,7 +92,7 @@
     palette[name.toLowerCase()] = { name: name, hex: '#' + line.slice(i + 1).trim() };
   });
   // Respect theme-editor customizations. Legacy default lists are intentionally
-  // ignored because the drawer itself migrates those lists to the canonical JiMiss palette.
+  // ignored because the drawer itself migrates those lists to the canonical Missvella palette.
   var legacy = [
     'Sage Green#A3BF9F\nDusty Rose#DCAE96\nBlush#FFB6C1\nLemon#fff27b',
     'Sage Green#A3BF9F\nMint#98FF98\nEmerald#50C878\nForest#228B22\nOlive#808000\nMoss#8A9A5B',
@@ -120,7 +120,7 @@
       });
     });
   }
-  window.JIMISS_CUSTOM_COLOR_PALETTE = palette;
+  window.MV_CUSTOM_COLOR_PALETTE = palette;
 })();
 </script>
 
@@ -578,7 +578,7 @@
     }).filter(Boolean);
   }
 
-  // Canonical JiMiss 54-color custom palette (Custom Color placeholder is not part of this list).
+  // Canonical Missvella 54-color custom palette (Custom Color placeholder is not part of this list).
   // If an existing block still contains the legacy defaults, migrate it automatically at runtime;
   // manually customized textarea values continue to override the canonical defaults.
   var CANONICAL_PALETTE = {
@@ -645,13 +645,15 @@
     }
   });
 
-  // Expose the same runtime palette used by the Custom Color drawer so native
-  // product swatches can resolve color names even when no Custom Color
-  // placeholder exists on the product.
-  window.JIMISS_CUSTOM_COLOR_PALETTE = window.JIMISS_CUSTOM_COLOR_PALETTE || {};
+  // Publish the runtime palette on `window` so the second script of this block
+  // (native variant swatch rendering) can reuse it. Both scripts render on the
+  // same page but are separate tags, so this global is the bridge.
+  // NOTE: never write a literal script tag inside this block — the LiquidHTML
+  // parser scans raw text and treats it as a nested node, which breaks parsing.
+  window.MV_CUSTOM_COLOR_PALETTE = window.MV_CUSTOM_COLOR_PALETTE || {};
   customPaletteColors.forEach(function(c) {
     if (c && c.name && c.hex) {
-      window.JIMISS_CUSTOM_COLOR_PALETTE[c.name.trim().toLowerCase()] = { name: c.name, hex: c.hex };
+      window.MV_CUSTOM_COLOR_PALETTE[c.name.trim().toLowerCase()] = { name: c.name, hex: c.hex };
     }
   });
 
@@ -967,8 +969,8 @@
 
     // Visual priority for native product variants:
     // 1) variant featured image, 2) Shopify swatch image, 3) Shopify swatch color,
-    // 4) JiMiss palette match. Never fall back to an unexplained gray swatch.
-    var paletteColor = (window.JIMISS_CUSTOM_COLOR_PALETTE || {})[(c.name || '').trim().toLowerCase()];
+    // 4) Missvella palette match. Never fall back to an unexplained gray swatch.
+    var paletteColor = (window.MV_CUSTOM_COLOR_PALETTE || {})[(c.name || '').trim().toLowerCase()];
     if (c.variantImage) {
       sw.style.backgroundColor = '';
       sw.style.backgroundImage = "url('" + c.variantImage + "')";

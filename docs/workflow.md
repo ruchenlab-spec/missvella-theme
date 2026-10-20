@@ -75,6 +75,16 @@ shopify theme push --store ... --theme 167137378374 --allow-live --path theme --
 - [ ] 没有为了改某个设置值而拉取/推送模板
 - [ ] 推送后用 `theme pull --only templates/index.json` 抽查商家文案是否仍在（发现异常立即停止后续推送并告知）
 
+### 4.1 内容类文件（`templates/*.json`、`sections/*.json`）只改本地副本
+
+- 本地副本是**快照**，不是线上真相。改它们只为让仓库保持整洁、避免第三方内容残留。
+- 改完**不要推送**。线上对应内容必须由商家在主题编辑器里改，开发者不代劳。
+- 已知的待商家在编辑器同步的项：
+  - `page.faqs` / `page.about` 的品牌文案与外链（本地已替换为 Missvella 文案 + 站内相对路径）
+  - `page.about` 的旧站 hero 图（本地已清空）
+  - `footer-group` 的旧站 logo 与社交账号（本地已清空，Instagram 改为 `@missvella`）
+- 后续若要推模板，先 `theme pull` 再改，改完用 `--only "templates/xxx.json"` 单独推。
+
 ## 五、开发习惯
 
 ### 5.1 改代码

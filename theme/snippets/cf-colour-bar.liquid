@@ -53,7 +53,8 @@
             {%- endfor -%}
           {%- endfor -%}
           {%- if group_kids > 0 -%}
-            <button type="button" class="cf-pill{% if group_active > 0 %} is-active{% endif %}" data-cf-pill="{{ group_index }}" style="background-color: {{ group_color | default: '#9E9E9E' }};">
+            <button type="button" class="cf-pill{% if group_active > 0 %} is-active{% endif %}" data-cf-pill="{{ group_index }}">
+              <span class="cf-pill__glyph"><i style="background: {{ group_color | default: '#9E9E9E' }};"></i></span>
               <span class="cf-pill__name">{{ group_name }}</span>
               {%- if group_active > 0 -%}<span class="cf-pill__count">{{ group_active }}</span>{%- endif -%}
             </button>
@@ -85,7 +86,8 @@
           {%- endfor -%}
         {%- endfor -%}
         {%- if loose_kids > 0 -%}
-          <button type="button" class="cf-pill{% if loose_active > 0 %} is-active{% endif %}" data-cf-pill="other" style="background-color: #9E9E9E;">
+          <button type="button" class="cf-pill{% if loose_active > 0 %} is-active{% endif %}" data-cf-pill="other">
+            <span class="cf-pill__glyph"><i style="background: #9E9E9E;"></i></span>
             <span class="cf-pill__name">Other</span>
             {%- if loose_active > 0 -%}<span class="cf-pill__count">{{ loose_active }}</span>{%- endif -%}
           </button>
@@ -98,19 +100,26 @@
         {%- if gl == blank -%}{%- continue -%}{%- endif -%}
         {%- assign parts = gl | split: ':' -%}
         {%- assign members = parts[2] | split: ',' -%}
+        {%- assign group_name = parts[0] | strip -%}
         {%- assign group_kids = 0 -%}
+        {%- assign group_active = 0 -%}
         {%- for value in colour_filter.values -%}
           {%- assign value_key = value.label | downcase | strip -%}
           {%- for m in members -%}
             {%- assign m_key = m | downcase | strip -%}
             {%- if m_key contains value_key or value_key contains m_key -%}
               {%- assign group_kids = group_kids | plus: 1 -%}
+              {%- if value.active -%}{%- assign group_active = group_active | plus: 1 -%}{%- endif -%}
               {%- break -%}
             {%- endif -%}
           {%- endfor -%}
         {%- endfor -%}
         {%- if group_kids > 0 -%}
           <div class="cf-bar-panel" data-cf-panel="{{ panel_index }}">
+            <div class="cf-panel-head">
+              <span class="cf-panel-title">{{ group_name }}</span>
+              <span class="cf-panel-meta">{{ group_active }} selected of {{ group_kids }}</span>
+            </div>
             <div class="cf2-swatches cf2-panel-swatches">
               {%- for value in colour_filter.values -%}
                 {%- assign value_key = value.label | downcase | strip -%}
@@ -136,6 +145,10 @@
       {%- endfor -%}
       {%- if loose_kids > 0 -%}
         <div class="cf-bar-panel" data-cf-panel="other">
+          <div class="cf-panel-head">
+            <span class="cf-panel-title">Other</span>
+            <span class="cf-panel-meta">{{ loose_active }} selected of {{ loose_kids }}</span>
+          </div>
           <div class="cf2-swatches cf2-panel-swatches">
             {%- for value in colour_filter.values -%}
               {%- assign value_key = value.label | downcase | strip -%}
