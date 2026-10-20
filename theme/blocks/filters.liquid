@@ -29,15 +29,9 @@
   assign filters = filters | default: results.filters
   assign total_active_values = 0
 -%}
-{%- comment -%} Colour groups: fall back to the built-in colour card standard when the
-merchant has not customized (or has cleared) the setting {%- endcomment -%}
-{%- capture color_group_map_value -%}{%- if block.settings.color_group_map != blank -%}{{ block.settings.color_group_map }}{%- else -%}Blues:#cee7f5:Sky Blue,Mist,Dusty Blue,Steel Blue,Slate Blue,Royal Blue,Stormy,Navy Blue,Deep Sea,Teal,Peacock Blue
-Greens:#174d4b:Peacock,Mint Green,Seafoam,Dusty Sage,Matcha,Sage Green,Agave,Forest Green,Olive Green,Hunter Green,Emerald,Dark Green
-Purples:#FF00FF:Fuchsia,Mulberry,Lilac,Wisteria,Lavender,Dusty Lavender,Mauve,Plum
-Pinks & Reds:#d87f03:Marigold,Blushing Pink,Petal,Coral,Dusty Rose,orange,Sunset,Rose Gold,Canyon Rose,Cinnamon,Terracotta,Burnt Orange,Rust,Cabernet,Burgundy,Paprika,Wine,Rosewood
-Yellow:#fff27b:Lemon,Daffodil,Butter
-Neutrals:#FAFAFA:White,Ivory,Sand,Champagne,Fog,Gold,Silver,grey,Mocha,Toffee
-Darks:#52443b:Espresso,Dark Navy,Black{%- endif -%}{%- endcapture -%}
+{%- comment -%} Colour groups come from the merchant's plain-text setting
+(颜色分组 textarea in the block editor) - no code fallback. {%- endcomment -%}
+{%- assign color_group_map_value = block.settings.color_group_map -%}
 {%- liquid
 
   # Calculate facets margin style
@@ -137,7 +131,7 @@ Darks:#52443b:Espresso,Dark Navy,Black{%- endif -%}{%- endcapture -%}
 
   {%- comment -%} ── ① Colour family bar (top row): pills left, sort/count/density right ── {%- endcomment -%}
   {%- if block_settings.enable_filtering and colour_filter -%}
-    <div class="cf-colour-bar" data-cf-bar>
+    <div class="cf-colour-bar cf-texture--{{ block.settings.swatch_texture | default: 'linen' }}" data-cf-bar>
       <facet-inputs-component
         class="cf-bar-component"
         on:change="/updateFilters"
@@ -1565,6 +1559,20 @@ Darks:#52443b:Espresso,Dark Navy,Black{%- endif -%}{%- endcapture -%}
       "label": "t:settings.enable_filtering",
       "info": "t:info.enable_filtering_info",
       "default": false
+    },
+    {
+      "type": "select",
+      "id": "swatch_texture",
+      "label": "色块质感",
+      "options": [
+        { "value": "none", "label": "无（纯色）" },
+        { "value": "linen", "label": "亚麻" },
+        { "value": "satin", "label": "缎面" },
+        { "value": "mesh", "label": "网纱" },
+        { "value": "velvet", "label": "天鹅绒" }
+      ],
+      "default": "linen",
+      "info": "在色块上叠加一层面料质感，色系胶囊与色板同步生效"
     },
     {
       "type": "textarea",
