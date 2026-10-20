@@ -166,6 +166,10 @@
     align-items: center;
     justify-content: space-between;
     gap: 14px;
+    /* Stacks above the product grid items that follow it in the DOM - without
+       this the sort dropdown panel is painted under the product cards */
+    position: relative;
+    z-index: 11;
   }
 
   .collection-wrapper:has(.cf-colour-bar) .main-collection-grid {
