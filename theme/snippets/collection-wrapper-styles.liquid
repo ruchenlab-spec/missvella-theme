@@ -152,29 +152,42 @@
     display: none;
   }
 
-  /* Colour bar, top bar and product grid all share the RIGHT column (same width) */
+  /* Colour bar row: pills bottom-left, sort/count/density bottom-right,
+     bottom aligned. The expanded panel overlays the products (absolute). */
   .collection-wrapper:has(.cf-colour-bar) .cf-colour-bar {
     grid-column: 2;
     grid-row: 1;
-    padding-block: 4px 10px;
-  }
-
-  .collection-wrapper:has(.cf-colour-bar) .facets-topbar {
-    grid-column: 2;
-    grid-row: 2;
     display: flex;
-    align-items: center;
+    align-items: flex-end;
     justify-content: space-between;
-    gap: 14px;
-    /* Stacks above the product grid items that follow it in the DOM - without
-       this the sort dropdown panel is painted under the product cards */
+    gap: 24px;
+    padding-block: 4px 0;
     position: relative;
     z-index: 11;
   }
 
+  .collection-wrapper:has(.cf-colour-bar) .cf-bar-component {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .cf-bar-right {
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    padding-bottom: 2px;
+  }
+
+  .cf-bar-right .products-count-wrapper {
+    font-size: 13px;
+    color: var(--color-foreground-subdued);
+    white-space: nowrap;
+  }
+
   .collection-wrapper:has(.cf-colour-bar) .main-collection-grid {
     grid-column: 2 !important;
-    grid-row: 3 / span 14;
+    grid-row: 2 / span 14;
   }
 
   @media screen and (max-width: 749px) {
@@ -185,6 +198,7 @@
     .collection-wrapper:has(.cf-colour-bar) .cf-colour-bar {
       grid-column: 1;
       grid-row: 1;
+      display: block;
     }
 
     .cf-colour-bar .cf-bar-pills {
@@ -197,18 +211,17 @@
       display: none;
     }
 
+    .cf-bar-right {
+      display: none;
+    }
+
     .collection-wrapper:has(.cf-colour-bar) .facets-block-wrapper .facets {
       display: none;
     }
 
-    .collection-wrapper:has(.cf-colour-bar) .facets-topbar {
-      grid-column: 1;
-      grid-row: 2;
-    }
-
     .collection-wrapper:has(.cf-colour-bar) .main-collection-grid {
       grid-column: 1 !important;
-      grid-row: 3;
+      grid-row: 2;
     }
   }
 
@@ -273,17 +286,35 @@
    * Expanded panel: light neutral card; the swatch row runs HORIZONTALLY
    * (dots above labels) and scrolls when a family has many colours.
    */
+  /*
+   * Expanded panel: light neutral card that OVERLAYS the products below the
+   * pills row (absolute within the colour bar, full row width). Inline flow
+   * would push the sort controls around and stretch to the pills sub-column.
+   */
   .cf-bar-panel {
     display: none;
-    margin-top: 12px;
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    right: 0;
+    z-index: 12;
     padding: 20px 24px;
     background: #f2efe6;
     border: 1px solid rgb(0 0 0 / 6%);
     border-radius: 12px;
+    box-shadow: 0 16px 38px rgb(0 0 0 / 14%);
   }
 
   .cf-bar-panel.open {
     display: block;
+  }
+
+  @media screen and (max-width: 749px) {
+    .cf-bar-panel {
+      position: static;
+      box-shadow: none;
+      padding: 14px 16px;
+    }
   }
 
   .cf2-panel-swatches {

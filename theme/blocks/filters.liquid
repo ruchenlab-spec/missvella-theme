@@ -135,7 +135,7 @@ Darks:#52443b:Espresso,Dark Navy,Black{%- endif -%}{%- endcapture -%}
     assign builtin_pairs = builtin_pairs | split: ','
   -%}
 
-  {%- comment -%} ── ① Colour family bar (top row, full width) ── {%- endcomment -%}
+  {%- comment -%} ── ① Colour family bar (top row): pills left, sort/count/density right ── {%- endcomment -%}
   {%- if block_settings.enable_filtering and colour_filter -%}
     <div class="cf-colour-bar" data-cf-bar>
       <facet-inputs-component
@@ -287,6 +287,34 @@ Darks:#52443b:Espresso,Dark Navy,Black{%- endif -%}{%- endcapture -%}
           {%- endif -%}
         </form>
       </facet-inputs-component>
+
+      {%- comment -%} Right side of the bar: item count + sort + grid density,
+         bottom-aligned with the colour pills {%- endcomment -%}
+      <div class="cf-bar-right">
+        <div class="products-count-wrapper" data-testid="products-count">
+          <span role="status">
+            {% if products_count > 25000 %}
+              {{- 'content.item_count_cutoff' | t: count: 25000 -}}
+            {% else %}
+              {{- 'content.item_count' | t: count: products_count -}}
+            {% endif %}
+          </span>
+        </div>
+        {% if block_settings.enable_sorting %}
+          {% render 'sorting',
+            results: results,
+            sort_by: sort_by,
+            filter_style: 'vertical',
+            suffix: 'desktop',
+            sort_position: 'desktop',
+            should_use_select_on_mobile: false,
+            section_id: section.id
+          %}
+        {% endif %}
+        {% if block_settings.enable_grid_density %}
+          {% render 'grid-density-controls', viewport: 'desktop' %}
+        {% endif %}
+      </div>
     </div>
     <script>
       document.addEventListener('change', (e) => {
@@ -458,33 +486,6 @@ Darks:#52443b:Espresso,Dark Navy,Black{%- endif -%}{%- endcapture -%}
         </form>
       </facets-form-component>
     </div>
-  </div>
-
-  {%- comment -%} ── Top bar: count + sort (right column, above the grid) ── {%- endcomment -%}
-  <div class="facets-topbar spacing-style">
-    <div class="products-count-wrapper" data-testid="products-count">
-      <span role="status">
-        {% if products_count > 25000 %}
-          {{- 'content.item_count_cutoff' | t: count: 25000 -}}
-        {% else %}
-          {{- 'content.item_count' | t: count: products_count -}}
-        {% endif %}
-      </span>
-    </div>
-    {% if block_settings.enable_sorting %}
-      {% render 'sorting',
-        results: results,
-        sort_by: sort_by,
-        filter_style: 'vertical',
-        suffix: 'desktop',
-        sort_position: 'desktop',
-        should_use_select_on_mobile: false,
-        section_id: section.id
-      %}
-    {% endif %}
-    {% if block_settings.enable_grid_density %}
-      {% render 'grid-density-controls', viewport: 'desktop' %}
-    {% endif %}
   </div>
 
   <div
