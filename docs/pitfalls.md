@@ -84,12 +84,23 @@
 
 ### P11 · `theme check` 报 `Unknown filter 'applicable_disclosures'`
 - **原因**：新版 Horizon 使用的官方新 filter，当前 theme-check 版本尚未收录（误报）。
-- **解决**：忽略。这是本项目 3 个基线错误之一（另外两个见下）。
+- **解决**：忽略。这是本项目 2 个基线错误之一（另一个见下）。
 
-### P12 · `theme check` 的 3 个基线错误（已知，非本次改动引入）
-1. `blocks/disclosures.liquid` / `snippets/cart-disclosure-tooltip.liquid`：`applicable_disclosures` filter 误报（2 个）
-2. `templates/product.json`：`JSONMissingBlock` — 引用 AliReviews app 区块（`shopify://apps/ali-reviews/...`），店铺未安装该 app（1 个）
-- **判定标准**：改动后仍是这 3 个，即未引入新问题。
+### P12 · `theme check` 的基线错误与告警（已知，非本次改动引入）
+**基线错误（2 个，判定标准：改动后仍是这 2 个即未引入新问题）**
+1. `blocks/disclosures.liquid`：`applicable_disclosures` filter 误报
+2. `snippets/cart-disclosure-tooltip.liquid`：`applicable_disclosures` filter 误报
+
+> 曾经还有第 3 个基线错误 `templates/product.json` 的 `JSONMissingBlock`（AliReviews app 区块），已在提交 `651abc0` 随编辑器移除该区块而消失。
+
+**基线告警（19 个，全部来自官方 Horizon 文件，可不处理）**
+- `ValidScopedCSSClass` × 11：官方文件之间互相引用 class
+- `UnusedDocParam` × 5：`snippets/divider.liquid` 官方文档块声明了未使用的参数
+- `ExcessiveSettingsCount` × 1：`sections/header.liquid`
+- `DeprecatedTag` × 1：`sections/header.liquid`
+- `AssetPreload` × 1：`snippets/aboreto-font.liquid`（自研字体，本可预加载但不阻塞）
+
+**自研代码的判定标准**：改动后自研文件（`filters.liquid`、`cf-colour-bar.liquid`、`list-filter.liquid`、`cf2-item.liquid`、`color-facets.liquid`、`circle-collections.liquid`、`custom-sizes.liquid` 等）**不应出现任何 error 或 warning**。
 
 ## 三、CLI 与环境
 
@@ -148,3 +159,22 @@
 ### P25 · 整体覆盖某个 snippet 前先确认依赖
 - 覆盖前检查：调用方（`render 'xxx'`）、它依赖的 snippet、传入参数是否一致。
 - 本项目 `variant-main-picker.liquid` 因定制与官方重构深度耦合，选择整包采用旧版，前提是调用方补回 `block: block` 参数。
+
+### P27 · snippet 里没有 `block` 作用域
+- **症状**：把一段 block 内的代码搬进 snippet 后，`block.settings.xxx` 渲染成空值（着色器类名丢失、开关失效），但 Liquid 不报错，只在页面上"样式莫名其妙没了"。
+- **原因**：`{% render %}` 创建**独立作用域**，snippet 内拿不到外层的 `block`、`block_settings`、`section` 等对象，只能用显式传入的参数。
+- **解决**：把 `block.settings.*`、`section.id` 等在调用方（block 内）取出来，作为 render 参数传进去。例：
+  ```liquid
+  {% render 'cf-colour-bar',
+    swatch_texture: block.settings.swatch_texture,
+    enable_sorting: block_settings.enable_sorting,
+    section_id: section.id
+  %}
+  ```
+- **附带**：`render` 参数名不能和 snippet 内需要保留的全局对象冲突；传对象（如 `results`）是安全的，传值即可。
+
+### P28 · 抽取 HTML 片段时，标签必须整体搬移
+- **症状**：把一段 markup 从 block 搬进 snippet 后，`theme check` 报 `LiquidHTMLSyntaxError: Attempting to end parsing before HtmlElement 'div' was closed` 或 `UnclosedHTMLElement`。
+- **原因**：被搬走的片段的**闭合标签在原处**，只搬了开标签那一半，标签配对被拆散。
+- **解决**：以**最外层元素的完整闭合**为边界切分，不要按"看起来是一个逻辑块"切。搬完用脚本逐行比对原文件与新文件（空白归一化后应完全一致），确认只差缩进。
+- **附带**：`{% stylesheet %}` 里的 CSS 不必跟着搬 —— Shopify 的 stylesheet 是按渲染位置生效的，样式定义留在原处仍然作用得到新位置；但注意 class 作用域告警（`ValidScopedCSSClass`）。

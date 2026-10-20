@@ -8,6 +8,9 @@
   @param {boolean} [should_render_clear] - Whether to render the clear button
   @param {boolean} [show_swatch_label] - Whether to show the swatch label
   @param {boolean} [in_drawer] - Whether the filter is in a drawer
+  @param {string} [color_groups] - Merchant-defined colour group map, one group per
+    line as "Group name:#hex:member, member, member". When blank, the built-in
+    colour standard is used.
 {%- enddoc -%}
 
 {% render 'variant-picker-styles' %}
@@ -262,10 +265,7 @@
                   {%- for value in filter.values -%}
                     {%- assign value_key = value.label | downcase | strip -%}
                     {%- assign in_group = false -%}
-                    {%- if assigned_keys contains value_key -%}
-                      {%- assign already = true -%}
-                    {%- else -%}
-                      {%- assign already = false -%}
+                    {%- unless assigned_keys contains value_key -%}
                       {%- for m in members -%}
                         {%- assign m_key = m | downcase | strip -%}
                         {%- if m_key contains value_key or value_key contains m_key -%}
@@ -273,7 +273,7 @@
                           {%- break -%}
                         {%- endif -%}
                       {%- endfor -%}
-                    {%- endif -%}
+                    {%- endunless -%}
                     {%- if in_group -%}
                       {%- assign assigned_keys = assigned_keys | append: value_key | append: ';' -%}
                       {%- liquid

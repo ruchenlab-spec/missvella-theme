@@ -97,7 +97,7 @@ shopify theme push --store ... --theme 167137378374 --allow-live --path theme --
 - `.gitattributes` 已统一 LF，避免 Windows CRLF 污染 diff。
 
 ### 5.4 验证
-- 结构验证：`shopify theme check --path theme`（已知 3 个基线错误，见 pitfalls）。
+- 结构验证：`shopify theme check --path theme`（已知 2 个基线错误 + 19 个官方文件告警，见 pitfalls）。
 - 渲染验证：`curl http://<预览地址>` 检查关键 class/文案是否出现（无浏览器时）。
 - 视觉验证：开发者在主题编辑器里确认。
 

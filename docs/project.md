@@ -1,6 +1,6 @@
 # 项目概览：现状、进度与决策
 
-> 最后更新：2026-10-18
+> 最后更新：2026-10-20
 
 ## 一、基本信息
 
@@ -28,15 +28,23 @@
 | 7 | 圆形直径可调（0=自动，最大 320px） | ✅ |
 | 8 | 安全推送工作流 + `scripts/push-live.ps1` | ✅ |
 | 9 | 从线上回拉编辑器配置（`templates/index.json`、`config/settings_data.json`） | ✅ |
+| 10 | 集合页筛选重设计：Filters 区块统一布局（顶部色板条 + 左侧边栏） | ✅ |
+| 11 | 颜色快捷筛选行 `color-facets`（flat / family 双模式） | ✅ |
+| 12 | 面包屑全局化 + 主题设置（开关 / 宽度 / 左右留白） | ✅ |
+| 13 | 自定义尺码 Atelier Rose UI + 可配置强调色 | ✅ |
+| 14 | 修复 AliReviews 结构化数据全站污染（仅商品页输出） | ✅ |
+| 15 | `filters.liquid` 拆分 `cf-colour-bar` snippet（复杂度 121 → 达标） | ✅ |
 
 ### 待办 / 待配置
 
 | # | 事项 | 说明 |
 |---|---|---|
 | 1 | 20 处失效资源重新配置 | jimiss 店铺资源在 Missvella 店不存在，清单见 `architecture.md` 第 4 节 |
-| 2 | AliReviews app 集成 | `product.json` 引用 `shopify://apps/ali-reviews/...`，需在 Missvella 店安装 app，或移除该区块 |
+| 2 | AliReviews app 集成 | `product.json` 里的 `shopify://apps/ali-reviews/...` 区块**已在编辑器移除**；若要恢复评价功能需在 Missvella 店安装该 app，或只保留 header 的聚合评分 JSON-LD |
 | 3 | 首页圆形集合上传自定义图 | 编辑器 → 圆形集合轮播 → 每个圆形区块上传图片/选集合 |
 | 4 | 旧主题副本清理（可选） | 主题库里 4 个旧 Horizon / jimiss 副本未动 |
+| 5 | Filters 颜色分组需商家配置 | `color_group_map` 文本域是颜色分组的**唯一来源**，内置色卡仅作兜底；商家需在编辑器粘贴自己的分组 |
+| 6 | 剩余 theme check 告警 | 19 个 warning 全部来自官方 Horizon 文件（`ValidScopedCSSClass` / `UnusedDocParam` 等），未自研代码，可不处理 |
 
 ## 三、决策记录（ADR）
 
@@ -78,6 +86,22 @@
 - **结论**：开发者以主题编辑器实时预览为主，不常驻 `shopify theme dev`（会占用端口并创建临时开发主题）。
 - **影响**：代码改动通过安全推送同步到 live 主题，编辑器刷新即见。
 
+### D9 · 集合页筛选采用「顶部色板条 + 左侧边栏」统一布局
+- **背景**：官方 Filters 区块默认把全部筛选塞进左侧边栏，颜色过多时边栏被拉得很长，与商品网格争夺空间；视觉上也不符合参考店铺的做法。
+- **结论**：颜色类筛选提到网格上方做成一排「色卡胶囊」，点击展开该色系的色板面板；其余筛选（价格、尺码等）留在左侧边栏。排序、结果数量与网格密度控件并入顶部条右侧一行。
+- **落地**：`blocks/filters.liquid` + `snippets/cf-colour-bar.liquid`（顶部条）+ `snippets/collection-wrapper-styles.liquid`（布局与样式）+ `snippets/cf2-item.liquid` / `snippets/list-filter.liquid`（筛选项渲染）。
+- **取舍**：顶部条是集合页专用，不影响搜索页（`search.json`）与其他模板。
+
+### D10 · 颜色分组以商家文本域为唯一来源，内置色卡仅作运行时兜底
+- **背景**：主题编辑器里文本域显示的是**已保存的值**，不是 schema 默认值。若把内置色卡写成 schema 默认值，商家不主动粘贴就永远看不到内置分组。
+- **结论**：`color_group_map` 文本域为空时，运行时回退到内置色卡标准（`filters.liquid` 顶部的 `color_group_map_value` capture）；一旦商家粘贴自定义分组，即完全以文本域为准。
+- **附带**：自定义分组用 `组名:#色值:成员1,成员2` 每行一组的格式。
+
+### D11 · `filters.liquid` 拆分色板条为独立 snippet
+- **背景**：`filters.liquid` 的 Liquid 复杂度达 121，超过 theme check 的 120 上限，再加一个 `if` 就会报错。
+- **结论**：把顶部色板条（含行为脚本）整体搬进 `snippets/cf-colour-bar.liquid`，block 只保留渲染调用。
+- **验证**：抽取前后逐行比对（空白归一化后完全一致），DOM 输出不变。
+
 ## 四、变更时间线
 
 | 日期 | 事件 |
@@ -89,6 +113,12 @@
 | 2026-10-17 | 圆形集合轮播 v2–v6 迭代（per-block → group 标头 → theme blocks → 本地块 + 原生文本样式） |
 | 2026-10-17 | 箭头布局重构（三列 grid、独立列、尺寸可调）；圆形直径可调 |
 | 2026-10-18 | 定位并修复「推送覆盖编辑器配置」问题；回拉线上内容；新增安全推送脚本与项目文档 |
+| 2026-10-18 | 新增颜色快捷筛选行 `color-facets` 区块（flat / family 双模式） |
+| 2026-10-19 | Filters 区块重设计：色板条置顶 + 其余筛选留左侧边栏；商家自定义颜色分组；Soft Minimal 色板 UI |
+| 2026-10-19 | 面包屑全局化，主题设置新增开关 / 宽度 / 左右留白 |
+| 2026-10-19 | 自定义尺码 Atelier Rose UI + 可配置强调色 |
+| 2026-10-20 | 色板条视觉迭代：织物纹理、放大色卡、间距调整；排序 / 密度并入同一行 |
+| 2026-10-20 | 维护：修复 AliReviews JSON-LD 全站污染；补 doc 声明消除 4 个告警；`filters.liquid` 拆分 `cf-colour-bar` snippet |
 
 ## 五、Git 提交约定
 

@@ -22,6 +22,7 @@
 │   └── .shopifyignore         # 上传到店铺时忽略的文件
 ├── scripts/
 │   └── push-live.ps1          # 安全推送脚本（默认只推代码）
+├── demos/                      # UI 设计原型（纯 HTML，不上线）
 ├── docs/                      # 项目文档（不上传店铺）
 ├── .gitignore
 └── .gitattributes             # 统一 LF 换行
@@ -36,7 +37,7 @@
 # 需要改页面结构时：先拉线上最新，再改，再推
 shopify theme pull --store 6icwx6-yv.myshopify.com --theme 167137378374 --only "templates/index.json" --path theme
 
-# 主题静态检查（已知 3 个基线错误，见 docs/pitfalls.md）
+# 主题静态检查（已知 2 个基线错误，见 docs/pitfalls.md）
 shopify theme check --path theme
 ```
 
