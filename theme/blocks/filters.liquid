@@ -171,8 +171,7 @@ Darks:#52443b:Espresso,Dark Navy,Black{%- endif -%}{%- endcapture -%}
                 {%- endfor -%}
               {%- endfor -%}
               {%- if group_kids > 0 -%}
-                <button type="button" class="cf-pill{% if group_active > 0 %} is-active{% endif %}" data-cf-pill="{{ group_index }}">
-                  <span class="cf-pill__dot" style="background: {{ group_color | default: '#D9D9D9' }};"></span>
+                <button type="button" class="cf-pill{% if group_active > 0 %} is-active{% endif %}" data-cf-pill="{{ group_index }}" style="background-color: {{ group_color | default: '#9E9E9E' }};">
                   <span class="cf-pill__name">{{ group_name }}</span>
                   {%- if group_active > 0 -%}<span class="cf-pill__count">{{ group_active }}</span>{%- endif -%}
                 </button>
@@ -204,8 +203,7 @@ Darks:#52443b:Espresso,Dark Navy,Black{%- endif -%}{%- endcapture -%}
               {%- endfor -%}
             {%- endfor -%}
             {%- if loose_kids > 0 -%}
-              <button type="button" class="cf-pill{% if loose_active > 0 %} is-active{% endif %}" data-cf-pill="other">
-                <span class="cf-pill__dot" style="background: #D9D9D9;"></span>
+              <button type="button" class="cf-pill{% if loose_active > 0 %} is-active{% endif %}" data-cf-pill="other" style="background-color: #9E9E9E;">
                 <span class="cf-pill__name">Other</span>
                 {%- if loose_active > 0 -%}<span class="cf-pill__count">{{ loose_active }}</span>{%- endif -%}
               </button>
