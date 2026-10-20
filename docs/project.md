@@ -11,6 +11,7 @@
 | 线上主题（live） | **Missvella Dev** `#167137378374` |
 | 本地代码 | `e:/Missvella_theme_shopify/theme/` |
 | 登录账号 | `ruchenlab@gmail.com`（Shopify CLI 已授权） |
+| Git 仓库 | 本地仓库（`e:/Missvella_theme_shopify`，main 分支，**无远端**） |
 | 工作方式 | 开发者在 **Shopify 主题编辑器**里实时预览；代码改动由 AI 通过安全推送脚本同步 |
 
 ## 二、当前进度
@@ -34,6 +35,7 @@
 | 13 | 自定义尺码 Atelier Rose UI + 可配置强调色 | ✅ |
 | 14 | 移除第三方评价 app 集成（含其结构化数据全站污染） | ✅ |
 | 15 | `filters.liquid` 拆分 `cf-colour-bar` snippet（复杂度 121 → 达标） | ✅ |
+| 16 | 色系行极简线条风格（Demo 1 落地：圆点+大写标签+细线面板+质感纹理） | ✅ |
 
 ### 待办 / 待配置
 

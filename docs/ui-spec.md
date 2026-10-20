@@ -61,6 +61,15 @@
 - 图片比例：商品卡 `portrait_3_4`，圆形集合 `1:1`（`aspect-ratio: 1/1` + `border-radius: 50%` + `object-fit: cover`）。
 - 无图时用 `placeholder_svg_tag`，填充色 `var(--color-foreground)`、透明度 0.35。
 
+### 颜色筛选条（`cf-colour-bar`，极简线条风格）
+- 色系项 = 14px 圆点 glyph + 0.18em 字距大写标签（`Jost`/主题正文体），**无填充无边框**；
+- 选中态：标签细下划线（1px）+ 圆点双环（背景色 3px + 前景色 1px）。
+- 展开面板：**细线风格**——透明背景 + 单条底部 1px 细线（无卡片/阴影/圆角），
+  衬线组名 + `n selected of m` meta 行；色块 34px 圆横排（0.1em 大写名称），
+  双环选中，超宽横向滚动（隐藏滚动条）。
+- 质感：`swatch_texture` 设置（none/linen/satin/mesh/velvet）以 `::after` 叠加层作用于圆点。
+- 面板为覆盖式（absolute，全行宽），z-index 12 高于产品网格。
+
 ### 按钮
 - 优先使用原生 `button` / `link` 区块；自定义按钮复用 `button` 类族（`button-unstyled` 等）。
 

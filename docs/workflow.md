@@ -2,6 +2,8 @@
 
 ## 一、环境
 
+> Git 为**本地仓库**（无远端）；「同步远端」指 Shopify 线上主题（`push-live.ps1`）。
+
 | 组件 | 版本 | 备注 |
 |---|---|---|
 | OS | Windows | PowerShell 5.1 |
