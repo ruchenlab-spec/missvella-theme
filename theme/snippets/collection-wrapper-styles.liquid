@@ -163,8 +163,9 @@
     grid-template-columns: 1fr auto;
     align-items: end;
     gap: 0 24px;
-    padding-block: 0;
-    margin-block-end: 26px;
+    padding-block: 0 16px;
+    margin-block-end: 0;
+    border-bottom: 1px solid rgb(var(--color-foreground-rgb) / 12%);
     position: relative;
     z-index: 11;
   }
@@ -414,9 +415,9 @@
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    padding-block: 0 14px;
-    border-bottom: 1px solid rgb(var(--color-foreground-rgb) / 12%);
-    margin-bottom: 4px;
+    padding-block: 0 18px;
+    border: 0;
+    margin: 0;
   }
   .facets-edit-row { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-top: 4px; }
   .facets-edit-title {
@@ -469,7 +470,8 @@
     display: flex;
     align-items: center;
     gap: 0;
-    padding-block: 14px;
+    padding-block: 0;
+    margin-bottom: 13px;
     border: 0 !important;
     box-shadow: none !important;
     background: none !important;
@@ -492,11 +494,11 @@
     border-top: 1px solid rgb(var(--color-foreground-rgb) / 12%) !important;
     box-shadow: none !important;
     background: none !important;
-    padding-block: 16px;
+    padding-block: 15px;
   }
 
   .facets-block-wrapper .facets__summary .facets__label {
-    font-size: 13px !important;
+    font-size: 12px !important;
     font-weight: 500;
     letter-spacing: 0.02em;
   }
@@ -521,4 +523,8 @@
     }
   }
 
+  /* The demo replaces the shared note with the min/max row under the slider */
+  .facets-block-wrapper .price-facet__highest-price {
+    display: none;
+  }
 {% endstylesheet %}

@@ -87,7 +87,8 @@
   assign pf_max_val = filter.max_value.value | default: filter.range_max | money_without_currency | replace: ',', ''
 -%}
 <style>
-  .pf-range { position: relative; height: 26px; margin: 14px 2px 2px; display: flex; align-items: center; }
+  .pf-range { position: relative; height: 24px; margin: 8px 2px 0; display: flex; align-items: center; }
+  .pf-range-note { display: flex; justify-content: space-between; color: #AAA39A; font-size: 9px; letter-spacing: 0.04em; margin-top: 6px; }
   .pf-range__track { position: absolute; left: 0; right: 0; top: 50%; height: 3px; translate: 0 -50%;
     background: #E8E4DD; border-radius: 5px; }
   .pf-range__fill { position: absolute; top: 50%; height: 3px; translate: 0 -50%;
@@ -105,6 +106,10 @@
   <span class="pf-range__fill" aria-hidden="true"></span>
   <span class="pf-range__thumb" aria-hidden="true"></span>
   <input type="range" class="pf-range__input" min="0" max="{{ pf_max }}" step="1" value="{{ pf_max_val }}" aria-label="{{ 'accessibility.price_filter_high' | t }}">
+</div>
+<div class="pf-range-note">
+  <span>{{ 0 | money_without_currency }}</span>
+  <span class="pf-range-note__max">{{ filter.range_max | money_without_currency }}</span>
 </div>
 <script>
   (function () {
@@ -125,10 +130,12 @@
           if (thumb) thumb.style.left = p + '%';
         }
         function sync() {
-          if (nums && nums.length >= 2) {
+          if (nums; nums.length >= 2) {
             nums[1].value = input.value;
             if (parseFloat(input.value) >= max) nums[1].value = '';
           }
+          var note = comp ? comp.querySelector('.pf-range-note__max') : null;
+          if (note) note.textContent = Number(input.value).toFixed(2);
           paint();
         }
         input.addEventListener('input', sync);
