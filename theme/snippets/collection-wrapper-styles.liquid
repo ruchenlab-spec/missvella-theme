@@ -161,7 +161,7 @@
     align-items: flex-end;
     justify-content: space-between;
     gap: 24px;
-    padding-block: 4px 0;
+    padding-block: 18px 0;
     margin-block-end: 26px;
     position: relative;
     z-index: 11;
@@ -227,7 +227,7 @@
   }
 
   /* ===== Colour family bar components (minimal lines) ===== */
-  .cf-bar-pills { display: flex; flex-wrap: wrap; gap: 0 44px; align-items: flex-end; }
+  .cf-bar-pills { display: flex; flex-wrap: wrap; justify-content: center; gap: 0 44px; align-items: flex-end; }
   .cf-pill {
     position: relative;
     display: flex;
@@ -251,8 +251,9 @@
     transition: color 0.25s ease, border-color 0.25s ease; white-space: nowrap;
   }
   .cf-pill:hover .cf-pill__name { color: var(--color-foreground); }
-  .cf-pill.is-active .cf-pill__name { color: var(--color-foreground); border-bottom-color: var(--color-foreground); }
-  .cf-pill.is-active .cf-pill__glyph i {
+  .cf-pill.is-active .cf-pill__name, .cf-pill.is-open .cf-pill__name { color: var(--color-foreground); border-bottom-color: var(--color-foreground); }
+  .cf-pill.is-active .cf-pill__glyph i, .cf-pill.is-open .cf-pill__glyph i {
+    transform: scale(1.4);
     box-shadow: inset 0 0 0 1px rgb(var(--color-foreground-rgb) / 35%), 0 0 0 3px var(--color-background), 0 0 0 4px var(--color-foreground);
   }
   .cf-pill__count { position: absolute; top: -4px; right: -14px; font-size: 9.5px; color: var(--color-foreground-subdued); }
@@ -260,12 +261,11 @@
     display: none;
     position: absolute;
     top: calc(100% + 1px);
-    left: calc(-1 * var(--page-margin, 40px));
-    right: calc(-1 * var(--page-margin, 40px));
+    left: 0;
+    right: 0;
     z-index: 12;
-    padding: 28px 0 30px;
+    padding: 26px 0 34px;
     background: var(--color-background);
-    border-bottom: 1px solid rgb(var(--color-foreground-rgb) / 10%);
   }
   .cf-bar-panel.open { display: block; animation: cf-panel-fade 0.3s ease; }
   @keyframes cf-panel-fade { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
@@ -278,7 +278,7 @@
   }
   .cf2-panel-swatches::-webkit-scrollbar { display: none; }
   .cf2-panel-swatches .cf2-item__dot {
-    width: 34px; height: 34px;
+    width: 36px; height: 36px;
     box-shadow: inset 0 0 0 1px rgb(var(--color-foreground-rgb) / 10%);
     transition: transform 0.22s ease, box-shadow 0.22s ease;
   }

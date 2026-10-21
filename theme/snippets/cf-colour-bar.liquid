@@ -226,7 +226,8 @@
       const panel = bar.querySelector('[data-cf-panel="' + idx + '"]');
       const isOpen = panel && panel.classList.contains('open');
       bar.querySelectorAll('.cf-bar-panel').forEach((p) => p.classList.remove('open'));
-      if (!isOpen && panel) panel.classList.add('open');
+      bar.querySelectorAll('.cf-pill').forEach((p) => p.classList.remove('is-open'));
+      if (!isOpen && panel) { panel.classList.add('open'); pill.classList.add('is-open'); }
     } else if (!e.target.closest('.cf-bar-panel') && !e.target.closest('.cf-colour-bar')) {
       document.querySelectorAll('.cf-bar-panel.open').forEach((p) => p.classList.remove('open'));
     }
