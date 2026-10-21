@@ -130,13 +130,7 @@
     grid-template-columns: minmax(210px, 250px) minmax(0, 1fr) !important;
   }
 
-  /* Breathing gap between the sidebar and the right column (colour bar, note,
-     product grid) - the sidebar divider sits inside this gutter */
-  @media screen and (min-width: 750px) {
-    .collection-wrapper:has(.facets-block-wrapper) {
-      column-gap: 38px !important;
-    }
-  }
+
 
   /* The filters block holds both the colour bar and the sidebar - let its
      children participate in the collection grid directly */
@@ -458,6 +452,20 @@
   /* Divider between sidebar and content */
   .collection-wrapper:has(.facets-block-wrapper) .facets-block-wrapper .facets {
     border-inline-end: 1px solid rgb(var(--color-foreground-rgb) / 10%);
-    padding-inline-end: 22px;
+    padding-inline-end: 24px;
+  }
+
+  /* The gutter between sidebar and products lives INSIDE the sidebar column:
+     no grid gap, so themes that define extra grid columns cannot eat the
+     right column's width. */
+  @media screen and (min-width: 750px) {
+    .collection-wrapper:has(.facets-block-wrapper) {
+      column-gap: 0 !important;
+      grid-template-columns: minmax(210px, 250px) minmax(0, 1fr) !important;
+    }
+
+    .collection-wrapper:has(.facets-block-wrapper) .facets-block-wrapper .facets {
+      margin-inline-end: 38px;
+    }
   }
 {% endstylesheet %}
