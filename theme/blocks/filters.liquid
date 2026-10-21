@@ -175,7 +175,15 @@ Darks:#52443b:Espresso,Dark Navy,Black{%- endif -%}{%- endcapture -%}
       style="{% render 'spacing-style', settings: block_settings %}{% if block_settings.text_label_case == 'uppercase' %} --facet-label-transform: uppercase;{% endif %}"
       aria-label="{{ 'accessibility.filters' | t }}"
     >
-      <facets-form-component
+              <div class="facets-edit-head">
+          <span class="cf-kicker">Make it yours</span>
+          <div class="facets-edit-row">
+            <h3 class="facets-edit-title">Fine-tune</h3>
+            <a class="facets-edit-reset" href="{{ results_url }}">Reset &#8599;</a>
+          </div>
+          <p class="facets-edit-sub"><em>A few thoughtful filters to find the one.</em></p>
+        </div>
+<facets-form-component
         class="facets__form-wrapper"
         section-id="{{ section.id }}"
         form-style="vertical"
@@ -226,7 +234,7 @@ Darks:#52443b:Espresso,Dark Navy,Black{%- endif -%}{%- endcapture -%}
 
                         assign active_value_count = filter.active_values | size
                         assign total_active_values = total_active_values | plus: active_value_count
-                        render 'list-filter', filter: filter, filter_style: 'vertical', active_value_count: active_value_count, should_render_clear: false, show_swatch_label: block_settings.show_swatch_label, sectionId: section.id, color_groups: color_group_map_value
+                        render 'list-filter', filter: filter, filter_style: 'vertical', active_value_count: active_value_count, should_render_clear: false, show_swatch_label: block_settings.show_swatch_label, sectionId: section.id, color_groups: color_group_map_value, filter_index: forloop.index
                       %}
                   {% endcase %}
                 {%- endfor -%}
@@ -491,7 +499,7 @@ Darks:#52443b:Espresso,Dark Navy,Black{%- endif -%}{%- endcapture -%}
 
                         assign active_value_count = filter.active_values | size
                         assign total_active_values = total_active_values | plus: active_value_count
-                        render 'list-filter', filter: filter, filter_style: 'vertical', active_value_count: active_value_count, should_render_clear: false, in_drawer: true, sectionId: section.id, color_groups: color_group_map_value
+                        render 'list-filter', filter: filter, filter_style: 'vertical', active_value_count: active_value_count, should_render_clear: false, in_drawer: true, sectionId: section.id, color_groups: color_group_map_value, filter_index: forloop.index
                       %}
                   {% endcase %}
                 {%- endfor -%}

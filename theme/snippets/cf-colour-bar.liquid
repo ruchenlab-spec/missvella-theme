@@ -20,6 +20,12 @@
   @param {string} section_id - Section id used by the sort control
 {%- enddoc -%}
 <div class="cf-colour-bar cf-texture--{{ swatch_texture | default: 'linen' }}" data-cf-bar>
+
+  <header class="cf-bar-head">
+    <span class="cf-kicker">Curated by Colour</span>
+    <h3 class="cf-bar-title">Choose your palette <span class="cf-asterisk">&#10035;</span></h3>
+    <span class="cf-bar-tag">A little colour goes a long way</span>
+  </header>
   <facet-inputs-component
     class="cf-bar-component"
     on:change="/updateFilters"
@@ -56,6 +62,7 @@
             <button type="button" class="cf-pill{% if group_active > 0 %} is-active{% endif %}" data-cf-pill="{{ group_index }}">
               <span class="cf-pill__glyph"><i style="background: {{ group_color | default: '#9E9E9E' }};"></i></span>
               <span class="cf-pill__name">{{ group_name }}</span>
+              <span class="cf-pill__num">{% if group_kids < 10 %}0{% endif %}{{ group_kids }}</span>
               {%- if group_active > 0 -%}<span class="cf-pill__count">{{ group_active }}</span>{%- endif -%}
             </button>
           {%- endif -%}
@@ -89,6 +96,7 @@
           <button type="button" class="cf-pill{% if loose_active > 0 %} is-active{% endif %}" data-cf-pill="other">
             <span class="cf-pill__glyph"><i style="background: #9E9E9E;"></i></span>
             <span class="cf-pill__name">Other</span>
+            <span class="cf-pill__num">{% if loose_kids < 10 %}0{% endif %}{{ loose_kids }}</span>
             {%- if loose_active > 0 -%}<span class="cf-pill__count">{{ loose_active }}</span>{%- endif -%}
           </button>
         {%- endif -%}
@@ -209,6 +217,11 @@
     {% if enable_grid_density %}
       {% render 'grid-density-controls', viewport: 'desktop' %}
     {% endif %}
+  <aside class="cf-edit-note">
+    <span class="cf-kicker">The Missvella Edit</span>
+    <p class="cf-edit-title">Made for the entrance. <em>Remembered for the feeling.</em></p>
+    <p class="cf-edit-count"><strong>{{ products_count }}</strong> styles / curated for your occasion</p>
+  </aside>
   </div>
 </div>
 <script>

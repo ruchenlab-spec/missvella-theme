@@ -77,6 +77,7 @@
     {% endif %}
   >
     <summary class="facets__summary">
+      {% if filter_index %}<span class="facet-num">{% if filter_index < 10 %}0{% endif %}{{ filter_index }}</span>{% endif %}
       <span class="facets__label">{{ filter.label }}</span>
 
       <div class="facets__status-wrapper">
