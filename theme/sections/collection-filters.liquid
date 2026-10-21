@@ -16,6 +16,8 @@
 <style>
 .mf-page{padding:26px var(--mf-pad,48px) 70px}
 .mf-shell{display:grid;grid-template-columns:250px minmax(0,1fr);align-items:start}
+.mf-shell--plain{grid-template-columns:minmax(0,1fr)}
+.mf-shell--plain .mf-main{padding-left:0}
 .mf-sidebar{border-right:1px solid #E5E2DC;padding-right:24px}
 .mf-side-title{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding:0 0 18px}
 .mf-side-title h1{margin:0;font-family:var(--font-heading--family,Georgia,serif);font-size:24px;font-weight:400;line-height:1.2;letter-spacing:.04em;text-transform:uppercase}
@@ -102,7 +104,7 @@
   assign mf_ratio = section.settings.image_ratio | default: "3/4"
 -%}
 <div class="mf-page mf-texture--{{ texture }}" style="--mf-cols:{{ mf_cols }};--mf-gap-h:{{ mf_gap_h }}px;--mf-gap-v:{{ mf_gap_v }}px;--mf-pad:{{ mf_pad }}px;--mf-ratio:{{ mf_ratio }};{% if section.settings.background_color != blank %}background:{{ section.settings.background_color }};{% endif %}">
-<div class="mf-shell">
+<div class="mf-shell{% unless section.settings.enable_filters %} mf-shell--plain{% endunless %}">
 {%- assign mf_filters_on = section.settings.enable_filters -%}
   {%- if mf_filters_on -%}
   <aside class="mf-sidebar">
