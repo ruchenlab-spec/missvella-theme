@@ -218,6 +218,19 @@
       window.location.href = inp.checked ? inp.dataset.urlAdd : inp.dataset.urlRemove;
     }
   });
+  function syncPush() {
+    const bar = document.querySelector('.cf-colour-bar');
+    if (!bar) return;
+    const open = bar.querySelector('.cf-bar-panel.open');
+    bar.style.marginBlockEnd = open ? (open.offsetHeight + 8) + 'px' : '';
+    if (window.ResizeObserver) {
+      if (bar._cfRO) bar._cfRO.disconnect();
+      if (open) {
+        bar._cfRO = new ResizeObserver(syncPush);
+        bar._cfRO.observe(open);
+      }
+    }
+  }
   document.addEventListener('click', (e) => {
     const pill = e.target.closest('[data-cf-pill]');
     if (pill) {
@@ -228,8 +241,11 @@
       bar.querySelectorAll('.cf-bar-panel').forEach((p) => p.classList.remove('open'));
       bar.querySelectorAll('.cf-pill').forEach((p) => p.classList.remove('is-open'));
       if (!isOpen && panel) { panel.classList.add('open'); pill.classList.add('is-open'); }
+
+      syncPush();
     } else if (!e.target.closest('.cf-bar-panel') && !e.target.closest('.cf-colour-bar')) {
       document.querySelectorAll('.cf-bar-panel.open').forEach((p) => p.classList.remove('open'));
+      syncPush();
     }
   });
 </script>
