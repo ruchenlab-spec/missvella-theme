@@ -1,0 +1,391 @@
+{%- liquid
+  assign texture = section.settings.swatch_texture | default: "linen"
+  assign groups_raw = section.settings.color_group_map
+  assign group_lines = groups_raw | newline_to_br | split: "<br />"
+  assign builtin_pairs = "pink:#F4B8C8,navy:#1F2A5A,beige:#E8DCC8,rose gold:#DFA79A,rosegold:#DFA79A,blue:#3B5BA5,red:#C0392B,black:#111111,white:#FFFFFF,yellow:#F4D35E,purple:#7D5BA6,green:#3E8E5A,orange:#E4783C,brown:#8B5E3C,grey:#9E9E9E,gray:#9E9E9E,silver:#D9D9D9,gold:#C9A227,champagne:#F0E2C8,ivory:#F7F1E3,burgundy:#7B1E3A,wine:#6B1F35,apricot:#F5C6A5,lavender:#C9B6DB,lilac:#C9B6DB,khaki:#C3B091,dusty rose:#C98E96,teal:#2E8B8B,turquoise:#40C9C9,cobalt:#2242A8,royal blue:#2242A8,sky blue:#8FC1E9,denim:#4F6D8F,aqua:#7FDBDA,emerald:#2E9E6B,sage:#9CAF88,olive:#808000,mint:#B7E4C7,fuchsia:#DE3163,magenta:#D0417E,blush:#F2C6C2,coral:#FF7F50,peach:#F7C59F,rust:#B7410E,tan:#D2B48C,chocolate:#5C3A21,cream:#FFF5E1,multi:#FFFFFF"
+  assign builtin_pairs = builtin_pairs | split: ","
+  assign colour_filter = null
+  for f in collection.filters
+    assign fl = f.label | downcase
+    if fl contains "color" or fl contains "colour" or fl contains "颜色"
+      assign colour_filter = f
+      break
+    endif
+  endfor
+-%}
+<style>
+.mf-page{padding:26px 4.5% 70px}
+.mf-shell{display:grid;grid-template-columns:250px minmax(0,1fr);align-items:start}
+.mf-sidebar{border-right:1px solid #E5E2DC;padding-right:24px}
+.mf-side-title{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding:0 0 18px}
+.mf-side-title h1{margin:0;font-family:var(--font-heading--family,Georgia,serif);font-size:24px;font-weight:400;line-height:1.2;letter-spacing:.04em;text-transform:uppercase}
+.mf-reset{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;color:#8B8884;text-decoration:none;transition:color .2s,background-color .2s,transform .4s}
+.mf-reset svg{width:17px;height:17px}
+.mf-reset:hover{color:#14120F;background:rgb(0 0 0 / 5%);transform:rotate(-40deg)}
+.mf-group{border-top:1px solid #E5E2DC;padding:15px 0}
+.mf-group>summary{display:flex;align-items:center;justify-content:space-between;gap:8px;list-style:none;cursor:pointer;font-size:12px;font-weight:500;margin-bottom:13px}
+.mf-group>summary::-webkit-details-marker{display:none}
+.mf-group>summary .mf-num{font-size:9.5px;letter-spacing:.06em;color:#8B8884;margin-right:10px;font-variant-numeric:tabular-nums}
+.mf-group>summary .mf-label{flex:1 1 auto;min-width:0}
+.mf-group>summary .mf-caret{color:#A29B92;font-size:15px;font-weight:300;transition:transform .2s}
+.mf-group[open]>summary .mf-caret{transform:rotate(180deg)}
+.mf-value{position:relative;display:flex;align-items:center;gap:9px;padding:5px 0;cursor:pointer;font-size:12px;color:#514C47}
+.mf-value input{position:absolute;opacity:0;pointer-events:none}
+.mf-box{width:16px;height:16px;flex:0 0 auto;border:1px solid #D5D0C8;border-radius:2px;display:grid;place-items:center;color:#fff;transition:background-color .16s,border-color .16s}
+.mf-box svg{width:10px;height:10px;display:none}
+.mf-value input:checked+.mf-box{background:#14120F;border-color:#14120F}
+.mf-value input:checked+.mf-box svg{display:block}
+.mf-value input:checked~.mf-value__label{color:#14120F;font-weight:500}
+.mf-value input:disabled+.mf-box{opacity:.35}
+.mf-value:has(input:disabled){opacity:.45;cursor:default}
+.mf-price{padding-top:2px}
+.mf-range{position:relative;height:24px;margin:8px 2px 0;display:flex;align-items:center}
+.mf-range__track{position:absolute;left:0;right:0;top:50%;height:3px;translate:0 -50%;background:#E8E4DD;border-radius:5px}
+.mf-range__fill{position:absolute;top:50%;height:3px;translate:0 -50%;background:#242220;border-radius:5px}
+.mf-range__thumb{position:absolute;top:50%;width:14px;height:14px;translate:-50% -50%;border-radius:50%;background:#242220;border:2px solid #fff;box-shadow:0 0 0 1px #242220;pointer-events:none}
+.mf-range input[type=range]{position:absolute;inset:0;width:100%;height:100%;margin:0;padding:0;opacity:0;background:transparent;border:0;appearance:none;-webkit-appearance:none;z-index:2;cursor:ew-resize}
+.mf-range input[type=range]::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;width:22px;height:22px}
+.mf-range input[type=range]::-moz-range-thumb{width:22px;height:22px;border:0;background:transparent}
+.mf-range-note{display:flex;justify-content:space-between;color:#AAA39A;font-size:9px;margin-top:8px;letter-spacing:.03em}
+.mf-main{padding-left:24px;min-width:0}
+.mf-colourbar{padding:0 0 16px;border-bottom:1px solid #E5E2DC}
+.mf-cb-head{display:flex;align-items:baseline;justify-content:space-between;gap:16px;padding-bottom:14px}
+.mf-cb-title{margin:0;font-family:var(--font-heading--family,Georgia,serif);font-size:24px;font-weight:400;line-height:1.2;letter-spacing:.04em;text-transform:uppercase}
+.mf-cb-tag{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:#8B8884;white-space:nowrap}
+.mf-pills{display:flex;flex-wrap:wrap;gap:8px}
+.mf-pill{position:relative;display:inline-flex;align-items:center;justify-content:space-between;gap:14px;min-width:132px;min-height:42px;padding:10px 14px;border:0;border-radius:3px;color:#fff;font:inherit;font-size:11px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;overflow:hidden;box-shadow:inset 0 0 0 1px rgb(0 0 0 / 10%);transition:box-shadow .2s,transform .2s}
+.mf-pill:hover{transform:translateY(-1px);box-shadow:inset 0 0 0 1px rgb(0 0 0 / 12%),0 8px 18px rgb(0 0 0 / 16%)}
+.mf-pill.is-open{box-shadow:0 0 0 2px #fff,0 0 0 3.5px #14120F}
+.mf-pill__name{position:relative;z-index:2;text-shadow:0 1px 2px rgb(0 0 0 / 25%)}
+.mf-pill__num{position:relative;z-index:2;font-size:10px;opacity:.85;font-variant-numeric:tabular-nums}
+.mf-panel{display:none;margin-top:12px;padding:20px 22px;background:#F2EFE6;border-radius:4px}
+.mf-panel.is-open{display:block}
+.mf-panel-row{display:flex;flex-wrap:nowrap;gap:10px 26px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.mf-panel-row::-webkit-scrollbar{display:none}
+.mf-swatch{position:relative;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;flex:0 0 auto}
+.mf-swatch input{position:absolute;opacity:0;pointer-events:none}
+.mf-swatch__dot{position:relative;width:44px;height:44px;border-radius:50%;box-shadow:inset 0 2px 4px rgb(255 255 255 / 30%),inset 0 -3px 6px rgb(0 0 0 / 18%),inset 0 0 0 1px rgb(0 0 0 / 10%),0 2px 5px rgb(0 0 0 / 14%);overflow:hidden;transition:transform .2s,box-shadow .2s}
+.mf-swatch:hover .mf-swatch__dot{transform:scale(1.08)}
+.mf-swatch input:checked+.mf-swatch__dot{box-shadow:0 0 0 2.5px #fff,0 0 0 4px #14120F,0 4px 10px rgb(0 0 0 / 16%)}
+.mf-swatch__name{font-size:10px;letter-spacing:.04em;color:#514C47;max-width:66px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mf-swatch input:checked~.mf-swatch__name{color:#14120F;font-weight:600}
+.mf-toolbar{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 0 18px}
+.mf-count{font-size:11px;color:#8B8884;letter-spacing:.04em}
+.mf-sort{position:relative;display:inline-flex;align-items:center;gap:8px;font-size:11px;color:#514C47}
+.mf-sort select{appearance:none;-webkit-appearance:none;border:0;background:transparent;font:inherit;font-size:11px;color:#14120F;padding-right:16px;cursor:pointer;outline:none}
+.mf-sort::after{content:"";width:6px;height:6px;border-right:1px solid #514C47;border-bottom:1px solid #514C47;transform:rotate(45deg) translateY(-2px);pointer-events:none}
+.mf-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px 16px}
+.mf-card{display:block;text-decoration:none;color:inherit}
+.mf-card__img{aspect-ratio:3/4;background:#F4F2EE;overflow:hidden}
+.mf-card__img img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s}
+.mf-card:hover .mf-card__img img{transform:scale(1.04)}
+.mf-card__name{margin:10px 0 4px;font-size:11.5px;line-height:1.4;color:#242220}
+.mf-card__price{font-size:11.5px;color:#514C47}
+.mf-empty{padding:60px 0;text-align:center;font-size:12px;color:#8B8884}
+.mf-pagination{display:flex;gap:10px;justify-content:center;padding-top:32px;font-size:12px}
+.mf-pagination a,.mf-pagination span{padding:6px 10px;border:1px solid #E5E2DC;border-radius:3px;text-decoration:none;color:#514C47}
+.mf-pagination .is-current{background:#14120F;border-color:#14120F;color:#fff}
+.mf-pill::after,.mf-swatch__dot::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none}
+.mf-texture--linen .mf-pill::after,.mf-texture--linen .mf-swatch__dot::after{background:repeating-linear-gradient(45deg,rgb(255 255 255 / 14%) 0 1px,transparent 1px 3px),repeating-linear-gradient(-45deg,rgb(0 0 0 / 10%) 0 1px,transparent 1px 3px)}
+.mf-texture--satin .mf-pill::after,.mf-texture--satin .mf-swatch__dot::after{background:linear-gradient(135deg,rgb(255 255 255 / 40%) 0%,rgb(255 255 255 / 8%) 32%,rgb(0 0 0 / 12%) 62%,rgb(255 255 255 / 22%) 100%)}
+.mf-texture--mesh .mf-pill::after,.mf-texture--mesh .mf-swatch__dot::after{background-image:radial-gradient(circle at 25% 25%,rgb(255 255 255 / 30%) 0 1.2px,transparent 2px),radial-gradient(circle at 75% 75%,rgb(0 0 0 / 14%) 0 1.2px,transparent 2px);background-size:6px 6px}
+.mf-texture--velvet .mf-pill::after,.mf-texture--velvet .mf-swatch__dot::after{background:radial-gradient(ellipse at 35% 28%,rgb(255 255 255 / 34%),transparent 58%),radial-gradient(ellipse at 72% 78%,rgb(0 0 0 / 24%),transparent 62%)}
+@media screen and (max-width:989px){.mf-shell{grid-template-columns:1fr}.mf-sidebar{border-right:0;border-bottom:1px solid #E5E2DC;padding:0 0 8px;margin-bottom:18px}.mf-main{padding-left:0}.mf-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.mf-pills{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}.mf-pills::-webkit-scrollbar{display:none}}
+</style>
+
+<div class="mf-page mf-texture--{{ texture }}">
+<div class="mf-shell">
+  <aside class="mf-sidebar">
+    <div class="mf-side-title">
+      <h1>Filters</h1>
+      <a class="mf-reset" href="{{ collection.url }}" aria-label="Reset filters"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><polyline points="3 4 3 9 8 9"/></svg></a>
+    </div>
+    {%- assign mf_idx = 0 -%}
+    {%- for filter in collection.filters -%}
+      {%- liquid
+        assign fl = filter.label | downcase
+        if fl contains "color" or fl contains "colour" or fl contains "颜色"
+          continue
+        endif
+        assign mf_idx = mf_idx | plus: 1
+      -%}
+      <details class="mf-group"{% if mf_idx <= 2 %} open{% endif %}>
+        <summary><span class="mf-num">{{ mf_idx }}</span><span class="mf-label">{{ filter.label }}</span><span class="mf-caret">&#9662;</span></summary>
+        {%- case filter.type -%}
+          {%- when "price_range" -%}
+            {%- liquid
+              assign mf_pmax = filter.range_max | money_without_currency | replace: ",", ""
+              assign mf_pmax_val = filter.max_value.value | default: filter.range_max | money_without_currency | replace: ",", ""
+            -%}
+            <div class="mf-price" data-param="{{ filter.param_name }}" data-max="{{ mf_pmax }}">
+              <div class="mf-range">
+                <span class="mf-range__track"></span>
+                <span class="mf-range__fill"></span>
+                <span class="mf-range__thumb"></span>
+                <input type="range" min="0" max="{{ mf_pmax }}" step="1" value="{{ mf_pmax_val }}" aria-label="{{ "accessibility.price_filter_high" | t }}">
+              </div>
+              <div class="mf-range-note"><span>{{ 0 | money }}</span><span class="mf-range-note__max">{{ filter.range_max | money }}</span></div>
+            </div>
+          {%- else -%}
+            {%- for value in filter.values -%}
+              <label class="mf-value">
+                <input type="checkbox"{% if value.active %} checked{% endif %}{% if value.count == 0 and value.active == false %} disabled{% endif %} data-url-add="{{ value.url_to_add }}" data-url-remove="{{ value.url_to_remove }}">
+                <span class="mf-box"><svg viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="2 6 5 9 10 3"/></svg></span>
+                <span class="mf-value__label">{{ value.label }}</span>
+              </label>
+            {%- endfor -%}
+        {%- endcase -%}
+      </details>
+    {%- endfor -%}
+  </aside>
+  <div class="mf-main">
+    {%- if colour_filter and group_lines.size > 0 -%}
+    <div class="mf-colourbar">
+      <div class="mf-cb-head"><h2 class="mf-cb-title">Filter by color</h2><span class="mf-cb-tag">A little colour goes a long way</span></div>
+      <div class="mf-pills">
+        {%- assign mf_gi = 0 -%}
+        {%- for line in group_lines -%}
+          {%- assign gl = line | strip -%}
+          {%- if gl == blank -%}{%- continue -%}{%- endif -%}
+          {%- assign parts = gl | split: ":" -%}
+          {%- assign gname = parts[0] | strip -%}
+          {%- assign gcolor = parts[1] | strip | default: "#9E9E9E" -%}
+          {%- assign gmembers = parts[2] | split: "," -%}
+          {%- assign gkids = 0 -%}{%- assign gactive = 0 -%}
+          {%- for value in colour_filter.values -%}
+            {%- assign vk = value.label | downcase | strip -%}
+            {%- for m in gmembers -%}
+              {%- assign mk = m | downcase | strip -%}
+              {%- if mk contains vk or vk contains mk -%}
+                {%- assign gkids = gkids | plus: 1 -%}
+                {%- if value.active -%}{%- assign gactive = gactive | plus: 1 -%}{%- endif -%}
+                {%- break -%}
+              {%- endif -%}
+            {%- endfor -%}
+          {%- endfor -%}
+          {%- if gkids > 0 -%}
+            <button type="button" class="mf-pill{% if gactive > 0 %} is-active{% endif %}" data-mf-pill="{{ mf_gi }}" style="background-color:{{ gcolor }}">
+              <span class="mf-pill__name">{{ gname }}</span><span class="mf-pill__num">{{ gkids }}</span>
+            </button>
+          {%- endif -%}
+          {%- assign mf_gi = mf_gi | plus: 1 -%}
+        {%- endfor -%}
+        {%- assign mf_loose = 0 -%}
+        {%- for value in colour_filter.values -%}
+          {%- assign vk = value.label | downcase | strip -%}
+          {%- assign in_any = false -%}
+          {%- for line in group_lines -%}
+            {%- assign gl2 = line | strip -%}
+            {%- if gl2 == blank -%}{%- continue -%}{%- endif -%}
+            {%- assign gm = gl2 | split: ":" -%}
+            {%- assign gm_members = gm[2] | split: "," -%}
+            {%- for m in gm_members -%}
+              {%- assign mk = m | downcase | strip -%}
+              {%- if mk contains vk or vk contains mk -%}{%- assign in_any = true -%}{%- break -%}{%- endif -%}
+            {%- endfor -%}
+          {%- endfor -%}
+          {%- unless in_any -%}{%- assign mf_loose = mf_loose | plus: 1 -%}{%- endunless -%}
+        {%- endfor -%}
+        {%- if mf_loose > 0 -%}
+          <button type="button" class="mf-pill{% if loose_active > 0 %} is-active{% endif %}" data-mf-pill="other" style="background-color:#9E9E9E">
+            <span class="mf-pill__name">Other</span><span class="mf-pill__num">{{ mf_loose }}</span>
+          </button>
+        {%- endif -%}
+      </div>
+      <div class="mf-panels">
+        {%- assign mf_pi = 0 -%}
+        {%- for line in group_lines -%}
+          {%- assign gl = line | strip -%}
+          {%- if gl == blank -%}{%- continue -%}{%- endif -%}
+          {%- assign parts = gl | split: ":" -%}
+          {%- assign gmembers = parts[2] | split: "," -%}
+          {%- assign gkids = 0 -%}
+          {%- for value in colour_filter.values -%}
+            {%- assign vk = value.label | downcase | strip -%}
+            {%- for m in gmembers -%}
+              {%- assign mk = m | downcase | strip -%}
+              {%- if mk contains vk or vk contains mk -%}{%- assign gkids = gkids | plus: 1 -%}{%- break -%}{%- endif -%}
+            {%- endfor -%}
+          {%- endfor -%}
+          {%- if gkids > 0 -%}
+            <div class="mf-panel" data-mf-panel="{{ mf_pi }}">
+              <div class="mf-panel-row">
+                {%- for value in colour_filter.values -%}
+                  {%- assign vk = value.label | downcase | strip -%}
+                  {%- for m in gmembers -%}
+                    {%- assign mk = m | downcase | strip -%}
+                    {%- if mk contains vk or vk contains mk -%}
+                      {%- capture sw_hex -%}{%- render "color-facet-swatch", value: value, builtin_pairs: builtin_pairs -%}{%- endcapture -%}
+                      <label class="mf-swatch">
+                        <input type="checkbox"{% if value.active %} checked{% endif %}{% if value.count == 0 and value.active == false %} disabled{% endif %} data-url-add="{{ value.url_to_add }}" data-url-remove="{{ value.url_to_remove }}">
+                        <span class="mf-swatch__dot" style="background:{{ sw_hex | default: "#D9D9D9" }}"></span>
+                        <span class="mf-swatch__name">{{ value.label }}</span>
+                      </label>
+                      {%- break -%}
+                    {%- endif -%}
+                  {%- endfor -%}
+                {%- endfor -%}
+              </div>
+            </div>
+          {%- endif -%}
+          {%- assign mf_pi = mf_pi | plus: 1 -%}
+        {%- endfor -%}
+        {%- if mf_loose > 0 -%}
+          <div class="mf-panel" data-mf-panel="other"><div class="mf-panel-row">
+            {%- for value in colour_filter.values -%}
+              {%- assign vk = value.label | downcase | strip -%}
+              {%- assign in_any = false -%}
+              {%- for line in group_lines -%}
+                {%- assign gl2 = line | strip -%}
+                {%- if gl2 == blank -%}{%- continue -%}{%- endif -%}
+                {%- assign gm = gl2 | split: ":" -%}
+                {%- assign gm_members = gm[2] | split: "," -%}
+                {%- for m in gm_members -%}
+                  {%- assign mk = m | downcase | strip -%}
+                  {%- if mk contains vk or vk contains mk -%}{%- assign in_any = true -%}{%- break -%}{%- endif -%}
+                {%- endfor -%}
+              {%- endfor -%}
+              {%- unless in_any -%}
+                {%- capture sw_hex -%}{%- render "color-facet-swatch", value: value, builtin_pairs: builtin_pairs -%}{%- endcapture -%}
+                <label class="mf-swatch">
+                  <input type="checkbox"{% if value.active %} checked{% endif %}{% if value.count == 0 and value.active == false %} disabled{% endif %} data-url-add="{{ value.url_to_add }}" data-url-remove="{{ value.url_to_remove }}">
+                  <span class="mf-swatch__dot" style="background:{{ sw_hex | default: "#D9D9D9" }}"></span>
+                  <span class="mf-swatch__name">{{ value.label }}</span>
+                </label>
+              {%- endunless -%}
+            {%- endfor -%}
+          </div></div>
+        {%- endif -%}
+      </div>
+    </div>
+    {%- endif -%}
+    <div class="mf-toolbar">
+      <span class="mf-count">{{ collection.products_count }} items</span>
+      <span class="mf-sort"><select class="mf-sort-select" aria-label="Sort by">
+        {%- for option in collection.sort_options -%}
+          <option value="{{ option.url }}"{% if option.value == collection.sort_by %} selected{% endif %}>{{ option.name }}</option>
+        {%- endfor -%}
+      </select></span>
+    </div>
+    {%- paginate collection.products by 24 -%}
+      {%- if collection.products.size > 0 -%}
+        <div class="mf-grid">
+          {%- for product in collection.products -%}
+            <a class="mf-card" href="{{ product.url }}">
+              <div class="mf-card__img">
+                {%- if product.featured_image -%}
+                  {{ product.featured_image | image_url: width: 640 | image_tag: loading: "lazy", widths: "320,480,640", sizes: "(min-width: 990px) 24vw, 46vw" }}
+                {%- endif -%}
+              </div>
+              <p class="mf-card__name">{{ product.title }}</p>
+              <p class="mf-card__price">{{ product.price | money }}</p>
+            </a>
+          {%- endfor -%}
+        </div>
+        {%- if paginate.pages > 1 -%}
+          <nav class="mf-pagination">
+            {%- if paginate.previous -%}<a href="{{ paginate.previous.url }}">&larr; Prev</a>{%- endif -%}
+            {%- for part in paginate.parts -%}
+              {%- if part.is_link -%}<a href="{{ part.url }}">{{ part.title }}</a>{%- else -%}<span class="is-current">{{ part.title }}</span>{%- endif -%}
+            {%- endfor -%}
+            {%- if paginate.next -%}<a href="{{ paginate.next.url }}">Next &rarr;</a>{%- endif -%}
+          </nav>
+        {%- endif -%}
+      {%- else -%}
+        <p class="mf-empty">No products match these filters.</p>
+      {%- endif -%}
+    {%- endpaginate -%}
+  </div>
+</div>
+</div>
+
+<script>
+  (function () {
+    function nav(input) {
+      var url = input.checked ? input.dataset.urlAdd : input.dataset.urlRemove;
+      if (url) window.location.href = url;
+    }
+    document.addEventListener("change", function (e) {
+      var t = e.target;
+      if (t.matches && t.matches("[data-url-add]")) nav(t);
+      if (t.matches && t.matches(".mf-sort-select")) window.location.href = t.value;
+    });
+    document.addEventListener("click", function (e) {
+      var pill = e.target.closest("[data-mf-pill]");
+      if (pill) {
+        var root = pill.closest(".mf-colourbar");
+        var idx = pill.dataset.mfPill;
+        var panel = root.querySelector('[data-mf-panel="' + idx + '"]');
+        var open = panel && panel.classList.contains("is-open");
+        root.querySelectorAll(".mf-panel").forEach(function (p) { p.classList.remove("is-open"); });
+        root.querySelectorAll(".mf-pill").forEach(function (p) { p.classList.remove("is-open"); });
+        if (!open && panel) { panel.classList.add("is-open"); pill.classList.add("is-open"); }
+      } else if (!e.target.closest(".mf-panel") && !e.target.closest(".mf-pill")) {
+        document.querySelectorAll(".mf-panel.is-open").forEach(function (p) { p.classList.remove("is-open"); });
+        document.querySelectorAll(".mf-pill.is-open").forEach(function (p) { p.classList.remove("is-open"); });
+      }
+    });
+    function initRanges() {
+      document.querySelectorAll(".mf-price").forEach(function (wrap) {
+        if (wrap.dataset.init) return;
+        wrap.dataset.init = "1";
+        var input = wrap.querySelector('input[type="range"]');
+        var fill = wrap.querySelector(".mf-range__fill");
+        var thumb = wrap.querySelector(".mf-range__thumb");
+        var note = wrap.querySelector(".mf-range-note__max");
+        var max = parseFloat(wrap.dataset.max) || 100;
+        var param = wrap.dataset.param;
+        function paint() {
+          var v = parseFloat(input.value);
+          var p = Math.max(0, Math.min(100, v / max * 100));
+          fill.style.width = p + "%";
+          thumb.style.left = p + "%";
+        }
+        input.addEventListener("input", function () {
+          paint();
+          if (note) note.textContent = "$" + Number(input.value).toFixed(2);
+        });
+        input.addEventListener("change", function () {
+          var v = parseFloat(input.value);
+          var url = new URL(window.location.href);
+          url.searchParams.delete(param + ".gte");
+          if (v >= max - 0.01) url.searchParams.delete(param + ".lte");
+          else url.searchParams.set(param + ".lte", v);
+          window.location.href = url.toString();
+        });
+        paint();
+      });
+    }
+    if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", initRanges);
+    else initRanges();
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Collection filters",
+  "enabled_on": { "templates": ["collection"] },
+  "settings": [
+    {
+      "type": "textarea",
+      "id": "color_group_map",
+      "label": "颜色分组",
+      "info": "每行一组：组名:代表色hex:所含色值（逗号分隔）。清空则色系栏不显示。",
+      "default": "Blues:#cee7f5:Sky Blue,Mist,Dusty Blue,Steel Blue,Slate Blue,Royal Blue,Stormy,Navy Blue,Deep Sea,Teal,Peacock Blue\nGreens:#174d4b:Peacock,Mint Green,Seafoam,Dusty Sage,Matcha,Sage Green,Agave,Forest Green,Olive Green,Hunter Green,Emerald,Dark Green\nPurples:#FF00FF:Fuchsia,Mulberry,Lilac,Wisteria,Lavender,Dusty Lavender,Mauve,Plum\nPinks & Reds:#d87f03:Marigold,Blushing Pink,Petal,Coral,Dusty Rose,orange,Sunset,Rose Gold,Canyon Rose,Cinnamon,Terracotta,Burnt Orange,Rust,Cabernet,Burgundy,Paprika,Wine,Rosewood\nYellow:#fff27b:Lemon,Daffodil,Butter\nNeutrals:#FAFAFA:White,Ivory,Sand,Champagne,Fog,Gold,Silver,grey,Mocha,Toffee\nDarks:#52443b:Espresso,Dark Navy,Black"
+    },
+    {
+      "type": "select",
+      "id": "swatch_texture",
+      "label": "色块质感",
+      "options": [
+        { "value": "none", "label": "无" },
+        { "value": "linen", "label": "亚麻" },
+        { "value": "satin", "label": "缎面" },
+        { "value": "mesh", "label": "网纱" },
+        { "value": "velvet", "label": "天鹅绒" }
+      ],
+      "default": "linen"
+    }
+  ]
+}
+{% endschema %}
