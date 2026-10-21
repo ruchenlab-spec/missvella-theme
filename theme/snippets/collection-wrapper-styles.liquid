@@ -159,10 +159,6 @@
     grid-row: 1;
     display: grid;
     grid-template-columns: 1fr auto;
-    grid-template-areas:
-      "head head"
-      "pills right"
-      "note note";
     align-items: end;
     gap: 0 24px;
     padding-block: 18px 0;
@@ -171,10 +167,10 @@
     z-index: 11;
   }
 
-  .collection-wrapper:has(.cf-colour-bar) .cf-bar-head { grid-area: head; }
-  .collection-wrapper:has(.cf-colour-bar) .cf-bar-component { grid-area: pills; align-self: end; }
-  .collection-wrapper:has(.cf-colour-bar) .cf-bar-right { grid-area: right; align-self: end; padding-bottom: 2px; }
-  .collection-wrapper:has(.cf-colour-bar) .cf-edit-note { grid-area: note; }
+  .collection-wrapper:has(.cf-colour-bar) .cf-bar-head { grid-column: 1 / -1; grid-row: 1; }
+  .collection-wrapper:has(.cf-colour-bar) .cf-bar-component { grid-column: 1; grid-row: 2; align-self: end; }
+  .collection-wrapper:has(.cf-colour-bar) .cf-bar-right { grid-column: 2; grid-row: 2; align-self: end; padding-bottom: 2px; }
+  .collection-wrapper:has(.cf-colour-bar) .cf-edit-note { grid-column: 1 / -1; grid-row: 3; }
 
 
 
@@ -384,15 +380,14 @@
   .cf-bar-head {
     display: grid;
     grid-template-columns: 1fr auto;
-    grid-template-areas: "kicker tag" "title tag";
     align-items: end;
     gap: 2px 16px;
     padding-block: 4px 14px;
   }
 
-  .cf-bar-head .cf-kicker { grid-area: kicker; }
+  .cf-bar-head .cf-kicker { grid-column: 1; grid-row: 1; }
   .cf-bar-title {
-    grid-area: title;
+    grid-column: 1; grid-row: 2;
     margin: 0;
     font-family: var(--font-heading--family, Georgia, serif);
     font-size: 24px;
@@ -400,7 +395,7 @@
   }
   .cf-bar-title .cf-asterisk { color: var(--color-foreground-subdued); font-size: 18px; }
   .cf-bar-tag {
-    grid-area: tag;
+    grid-column: 2; grid-row: 1 / span 2;
     font-size: 9.5px;
     letter-spacing: 0.2em;
     text-transform: uppercase;
