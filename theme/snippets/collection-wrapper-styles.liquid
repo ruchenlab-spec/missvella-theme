@@ -517,4 +517,8 @@
       margin-inline-end: 38px;
     }
   }
+  /* Kill the leftover hairline between filter groups (drawn by ::before) */
+  .facets-block-wrapper .facets__item::before {
+    display: none !important;
+  }
 {% endstylesheet %}
