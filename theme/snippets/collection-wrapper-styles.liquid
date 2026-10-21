@@ -163,7 +163,7 @@
     grid-template-columns: 1fr auto;
     align-items: end;
     gap: 0 24px;
-    padding-block: var(--facets-inner-padding-block, 18px 0);
+    padding-block: 0;
     margin-block-end: 26px;
     position: relative;
     z-index: 11;
@@ -386,29 +386,27 @@
   }
 
   .cf-bar-head {
-    display: grid;
-    grid-template-columns: 1fr auto;
-    align-items: end;
-    gap: 2px 16px;
-    padding-block: 4px 14px;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 16px;
+    padding-block: 0 14px;
   }
 
-  .cf-bar-head .cf-kicker { grid-column: 1; grid-row: 1; }
   .cf-bar-title {
-    grid-column: 1; grid-row: 2;
     margin: 0;
     font-family: var(--font-heading--family, Georgia, serif);
     font-size: 24px;
     font-weight: 500;
+    line-height: 1.2;
   }
-  .cf-bar-title .cf-asterisk { color: var(--color-foreground-subdued); font-size: 18px; }
+
   .cf-bar-tag {
-    grid-column: 2; grid-row: 1 / span 2;
     font-size: 9.5px;
     letter-spacing: 0.2em;
     text-transform: uppercase;
     color: var(--color-foreground-subdued);
-    padding-bottom: 6px;
+    white-space: nowrap;
   }
 
   .facets-edit-head {
@@ -416,7 +414,9 @@
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    padding-block: 2px 16px;
+    padding-block: 0 14px;
+    border-bottom: 1px solid rgb(var(--color-foreground-rgb) / 12%);
+    margin-bottom: 4px;
   }
   .facets-edit-row { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-top: 4px; }
   .facets-edit-title {
@@ -424,6 +424,7 @@
     font-family: var(--font-heading--family, Georgia, serif);
     font-size: 24px;
     font-weight: 500;
+    line-height: 1.2;
     letter-spacing: 0.01em;
   }
   .facets-edit-reset {
@@ -488,8 +489,10 @@
   .facets-block-wrapper .facets__panel,
   .facets-block-wrapper .facets__filters-wrapper > details {
     border: 0 !important;
+    border-top: 1px solid rgb(var(--color-foreground-rgb) / 12%) !important;
     box-shadow: none !important;
     background: none !important;
+    padding-block: 16px;
   }
 
   .facets-block-wrapper .facets__summary .facets__label {
@@ -517,8 +520,5 @@
       margin-inline-end: 38px;
     }
   }
-  /* Kill the leftover hairline between filter groups (drawn by ::before) */
-  .facets-block-wrapper .facets__item::before {
-    display: none !important;
-  }
+
 {% endstylesheet %}
