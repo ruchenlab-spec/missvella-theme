@@ -130,6 +130,14 @@
     grid-template-columns: minmax(210px, 250px) minmax(0, 1fr) !important;
   }
 
+  /* Breathing gap between the sidebar and the right column (colour bar, note,
+     product grid) - the sidebar divider sits inside this gutter */
+  @media screen and (min-width: 750px) {
+    .collection-wrapper:has(.cf-colour-bar) {
+      column-gap: 38px !important;
+    }
+  }
+
   /* The filters block holds both the colour bar and the sidebar - let its
      children participate in the collection grid directly */
   .collection-wrapper:has(.cf-colour-bar) .facets-block-wrapper {
