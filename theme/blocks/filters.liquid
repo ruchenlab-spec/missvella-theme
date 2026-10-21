@@ -212,12 +212,14 @@ Darks:#52443b:Espresso,Dark Navy,Black{%- endif -%}{%- endcapture -%}
               {% assign total_active_values = 0 %}
 
               {% capture rendered_filters %}
+                {%- assign sidebar_index = 0 -%}
                 {%- for filter in filters -%}
                   {%- liquid
                     assign fl = filter.label | downcase
                     if fl contains 'color' or fl contains 'colour' or fl contains '颜色'
                       continue
                     endif
+                    assign sidebar_index = sidebar_index | plus: 1
                   -%}
                   {% case filter.type %}
                     {% when 'price_range' %}
@@ -226,7 +228,7 @@ Darks:#52443b:Espresso,Dark Navy,Black{%- endif -%}{%- endcapture -%}
                           assign total_active_values = total_active_values | plus: 1
                           assign is_active = true
                         endif
-                        render 'price-filter', filter: filter, filter_style: 'vertical', should_render_clear: false, id_prefix: 'horizontal', filter_index: forloop.index
+                        render 'price-filter', filter: filter, filter_style: 'vertical', should_render_clear: false, id_prefix: 'horizontal', filter_index: sidebar_index
                       -%}
                     {% else %}
                       {% liquid
@@ -236,7 +238,7 @@ Darks:#52443b:Espresso,Dark Navy,Black{%- endif -%}{%- endcapture -%}
 
                         assign active_value_count = filter.active_values | size
                         assign total_active_values = total_active_values | plus: active_value_count
-                        render 'list-filter', filter: filter, filter_style: 'vertical', active_value_count: active_value_count, should_render_clear: false, show_swatch_label: block_settings.show_swatch_label, sectionId: section.id, color_groups: color_group_map_value, filter_index: forloop.index
+                        render 'list-filter', filter: filter, filter_style: 'vertical', active_value_count: active_value_count, should_render_clear: false, show_swatch_label: block_settings.show_swatch_label, sectionId: section.id, color_groups: color_group_map_value, filter_index: sidebar_index
                       %}
                   {% endcase %}
                 {%- endfor -%}
@@ -491,7 +493,7 @@ Darks:#52443b:Espresso,Dark Navy,Black{%- endif -%}{%- endcapture -%}
                           assign is_active = true
                         endif
 
-                        render 'price-filter', filter: filter, filter_style: 'vertical', should_render_clear: false, id_prefix: 'dialog', filter_index: forloop.index
+                        render 'price-filter', filter: filter, filter_style: 'vertical', should_render_clear: false, id_prefix: 'dialog', filter_index: sidebar_index
                       -%}
                     {% else %}
                       {% liquid
@@ -501,7 +503,7 @@ Darks:#52443b:Espresso,Dark Navy,Black{%- endif -%}{%- endcapture -%}
 
                         assign active_value_count = filter.active_values | size
                         assign total_active_values = total_active_values | plus: active_value_count
-                        render 'list-filter', filter: filter, filter_style: 'vertical', active_value_count: active_value_count, should_render_clear: false, in_drawer: true, sectionId: section.id, color_groups: color_group_map_value, filter_index: forloop.index
+                        render 'list-filter', filter: filter, filter_style: 'vertical', active_value_count: active_value_count, should_render_clear: false, in_drawer: true, sectionId: section.id, color_groups: color_group_map_value, filter_index: sidebar_index
                       %}
                   {% endcase %}
                 {%- endfor -%}

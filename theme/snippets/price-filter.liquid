@@ -301,7 +301,7 @@
     right: 0;
     height: 3px;
     border-radius: 2px;
-    background: rgb(var(--color-foreground-rgb) / 12%);
+    background: #E6E3DD;
     transform: translateY(-50%);
   }
 
@@ -310,7 +310,7 @@
     top: 0;
     bottom: 0;
     border-radius: 2px;
-    background: var(--color-foreground);
+    background: #1A1A1A;
   }
 
   .pf-range__input {
@@ -332,8 +332,8 @@
     width: 16px;
     height: 16px;
     border-radius: 50%;
-    background: var(--color-background);
-    border: 1.5px solid var(--color-foreground);
+    background: #FFFFFF;
+    border: 1.5px solid #1A1A1A;
     box-shadow: 0 1px 4px rgb(0 0 0 / 18%);
     cursor: pointer;
   }
@@ -343,11 +343,18 @@
     width: 16px;
     height: 16px;
     border-radius: 50%;
-    background: var(--color-background);
-    border: 1.5px solid var(--color-foreground);
+    background: #FFFFFF;
+    border: 1.5px solid #1A1A1A;
     box-shadow: 0 1px 4px rgb(0 0 0 / 18%);
     cursor: pointer;
   }
 
-  .pf-range__input::-moz-range-track { background: none; }
+  .pf-range__input::-moz-range-track { background: transparent; border: 0; height: 30px; }
+
+  /* Upper range must not paint over the lower thumb: native tracks transparent */
+  .pf-range__input::-webkit-slider-runnable-track {
+    height: 30px;
+    background: transparent;
+    border: 0;
+  }
 {% endstylesheet %}
