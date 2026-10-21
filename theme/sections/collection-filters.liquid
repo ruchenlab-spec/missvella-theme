@@ -103,6 +103,11 @@
 -%}
 <div class="mf-page mf-texture--{{ texture }}" style="--mf-cols:{{ mf_cols }};--mf-gap-h:{{ mf_gap_h }}px;--mf-gap-v:{{ mf_gap_v }}px;--mf-pad:{{ mf_pad }}px;--mf-ratio:{{ mf_ratio }};{% if section.settings.background_color != blank %}background:{{ section.settings.background_color }};{% endif %}">
 <div class="mf-shell">
+{%- assign mf_filters_on = false -%}
+{%- for block in section.blocks -%}
+  {%- if block.type == "filter-sort" -%}{%- assign mf_filters_on = true -%}{%- break -%}{%- endif -%}
+{%- endfor -%}
+  {%- if mf_filters_on -%}
   <aside class="mf-sidebar">
     <div class="mf-side-title">
       <h1>Filters</h1>
@@ -146,8 +151,9 @@
       </details>
     {%- endfor -%}
   </aside>
+{%- endif -%}
   <div class="mf-main">
-    {%- if colour_filter and group_lines.size > 0 -%}
+    {%- if mf_filters_on and colour_filter and group_lines.size > 0 -%}
     <div class="mf-colourbar">
       <div class="mf-cb-head"><h2 class="mf-cb-title">Filter by color</h2><span class="mf-cb-tag">A little colour goes a long way</span></div>
       <div class="mf-pills">
@@ -267,6 +273,7 @@
       </div>
     </div>
     {%- endif -%}
+    {%- if mf_filters_on -%}
     <div class="mf-toolbar">
       <span class="mf-count">{{ collection.products_count }} items</span>
       <span class="mf-sort"><select class="mf-sort-select" aria-label="Sort by">
@@ -275,17 +282,20 @@
         {%- endfor -%}
       </select></span>
     </div>
+    {%- endif -%}
     {%- assign mf_per_page = section.settings.products_per_page | default: 24 -%}
     {%- paginate collection.products by mf_per_page -%}
       {%- if collection.products.size > 0 -%}
         <div class="mf-grid">
           {%- for product in collection.products -%}
             <a class="mf-card" href="{{ product.url }}">
+              {%- if section.settings.show_image -%}
               <div class="mf-card__img">
                 {%- if product.featured_image -%}
                   {{ product.featured_image | image_url: width: 640 | image_tag: loading: "lazy", widths: "320,480,640", sizes: "(min-width: 990px) 24vw, 46vw" }}
                 {%- endif -%}
               </div>
+              {%- endif -%}
               <p class="mf-card__name">{{ product.title }}</p>
               {%- if section.settings.show_vendor and product.vendor != blank -%}
                 <p class="mf-card__vendor">{{ product.vendor }}</p>
@@ -377,8 +387,15 @@
 
 {% schema %}
 {
-  "name": "Collection filters",
+  "name": "产品系列",
   "enabled_on": { "templates": ["collection"] },
+  "blocks": [
+    {
+      "type": "filter-sort",
+      "name": "筛选和排序",
+      "limit": 1
+    }
+  ],
   "settings": [
     {
       "type": "header",
@@ -447,6 +464,12 @@
         { "value": "1/1", "label": "1:1（方形）" }
       ],
       "default": "3/4"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_image",
+      "label": "显示产品图片",
+      "default": true
     },
     {
       "type": "checkbox",

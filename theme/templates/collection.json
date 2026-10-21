@@ -13,6 +13,12 @@
       "type": "collection-filters",
       "settings": {
         "swatch_texture": "linen"
+      },
+      "blocks": {
+        "filter_sort": {
+          "type": "filter-sort",
+          "settings": {}
+        }
       }
     },
     "section": {
