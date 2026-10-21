@@ -411,24 +411,78 @@
     padding-bottom: 6px;
   }
 
-  .facets-edit-head { padding-block: 2px 18px; border-bottom: 1px solid rgb(var(--color-foreground-rgb) / 10%); margin-bottom: 8px; }
+  .facets-edit-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding-block: 2px 16px;
+  }
   .facets-edit-row { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; margin-top: 4px; }
   .facets-edit-title {
     margin: 0;
     font-family: var(--font-heading--family, Georgia, serif);
-    font-size: 26px;
+    font-size: 24px;
     font-weight: 500;
+    letter-spacing: 0.01em;
   }
   .facets-edit-reset {
-    font-size: 11px;
-    letter-spacing: 0.06em;
+    display: inline-grid;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
     color: var(--color-foreground-subdued);
     text-decoration: none;
-    border-bottom: 1px solid rgb(var(--color-foreground-rgb) / 25%);
+    transition: color 0.2s ease, background-color 0.2s ease, transform 0.4s ease;
   }
-  .facets-edit-reset:hover { color: var(--color-foreground); }
+  .facets-edit-reset svg { width: 17px; height: 17px; }
+  .facets-edit-reset:hover {
+    color: var(--color-foreground);
+    background: rgb(var(--color-foreground-rgb) / 6%);
+    transform: rotate(-40deg);
+  }
   .facets-edit-sub { margin: 6px 0 0; font-size: 12.5px; color: var(--color-foreground-subdued); }
-  .facet-num { font-size: 10px; letter-spacing: 0.1em; color: var(--color-foreground-subdued); margin-right: 6px; }
+  .facet-num {
+    font-size: 9.5px;
+    letter-spacing: 0.12em;
+    color: var(--color-foreground-subdued);
+    margin-inline-end: 10px;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Clear hierarchy: 13px medium group titles, 11px muted footnote */
+  .facets-block-wrapper .facets__summary .facets__label {
+    font-size: 13px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+
+  .facets-block-wrapper .price-facet__highest-price {
+    font-size: 11px;
+    line-height: 1.5;
+    color: var(--color-foreground-subdued);
+  }
+
+  .facets-block-wrapper .facets__summary {
+    padding-block: 14px;
+    border: 0 !important;
+    box-shadow: none !important;
+    background: none !important;
+  }
+
+  .facets-block-wrapper .facets__panel,
+  .facets-block-wrapper .facets__filters-wrapper > details {
+    border: 0 !important;
+    box-shadow: none !important;
+    background: none !important;
+  }
+
+  .facets-block-wrapper .facets__summary .facets__label {
+    font-size: 13px !important;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
 
   /* Divider between sidebar and content */
   .collection-wrapper:has(.facets-block-wrapper) .facets-block-wrapper .facets {

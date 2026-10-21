@@ -33,7 +33,8 @@
       class="facets__summary"
       data-testid="price-filter"
     >
-      <span class="facets__label">{{ filter.label }}</span>
+      {% if filter_index %}<span class="facet-num">{% if filter_index < 10 %}0{% endif %}{{ filter_index }}</span>{% endif %}
+        <span class="facets__label">{{ filter.label }}</span>
       <facet-status-component class="facets__status">
         <template ref="moneyFormat">{{ shop.money_format }}</template>
 
@@ -80,7 +81,51 @@
         data-currency="{{ localization.country.currency.iso_code }}"
         on:change="/updatePriceFilterAndResults"
       >
-        <div class="facets__inputs-wrapper facets__inputs-wrapper--row">
+        {%- liquid
+  assign pf_max = filter.range_max | money_without_currency | replace: ',', ''
+  assign pf_min_val = filter.min_value.value | default: 0 | money_without_currency | replace: ',', ''
+  assign pf_max_val = filter.max_value.value | default: filter.range_max | money_without_currency | replace: ',', ''
+-%}
+<div class="pf-range" data-max="{{ pf_max }}">
+  <div class="pf-range__track" aria-hidden="true"><span class="pf-range__fill"></span></div>
+  <input type="range" class="pf-range__input pf-range__input--min" min="0" max="{{ pf_max }}" step="1" value="{{ pf_min_val }}" aria-label="{{ 'accessibility.price_filter_low' | t }}">
+  <input type="range" class="pf-range__input pf-range__input--max" min="0" max="{{ pf_max }}" step="1" value="{{ pf_max_val }}" aria-label="{{ 'accessibility.price_filter_high' | t }}">
+</div>
+<script>
+  (function () {
+    document.querySelectorAll('.pf-range').forEach(function (wrap) {
+      if (wrap.dataset.init) return;
+      wrap.dataset.init = '1';
+      var rMin = wrap.querySelector('.pf-range__input--min');
+      var rMax = wrap.querySelector('.pf-range__input--max');
+      var fill = wrap.querySelector('.pf-range__fill');
+      var comp = wrap.closest('price-facet-component');
+      var nums = comp ? comp.querySelectorAll('input.price-facet__input') : null;
+      var max = parseFloat(wrap.dataset.max) || 100;
+      function paint() {
+        var lo = parseFloat(rMin.value), hi = parseFloat(rMax.value);
+        fill.style.left = (lo / max * 100) + '%';
+        fill.style.right = (100 - hi / max * 100) + '%';
+      }
+      function sync() {
+        var lo = parseFloat(rMin.value), hi = parseFloat(rMax.value);
+        if (lo > hi - 1) { if (this === rMin) rMin.value = hi - 1; else rMax.value = lo + 1; }
+        if (nums && nums.length >= 2) {
+          nums[0].value = rMin.value;
+          nums[1].value = rMax.value;
+        }
+        paint();
+      }
+      rMin.addEventListener('input', sync);
+      rMax.addEventListener('input', sync);
+      rMin.addEventListener('change', function () { if (nums && nums.length >= 2) nums[0].dispatchEvent(new Event('change', { bubbles: true })); });
+      rMax.addEventListener('change', function () { if (nums && nums.length >= 2) nums[1].dispatchEvent(new Event('change', { bubbles: true })); });
+      paint();
+    });
+  })();
+</script>
+
+<div class="facets__inputs-wrapper facets__inputs-wrapper--row">
           <div
             class="price-facet__inputs-wrapper"
           >
@@ -241,4 +286,68 @@
     padding: var(--input-padding-y) var(--input-padding-x);
     transform: none;
   }
+
+  /* ===== Dual range slider (added) ===== */
+  .pf-range {
+    position: relative;
+    height: 30px;
+    margin: 10px 2px 2px;
+  }
+
+  .pf-range__track {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 3px;
+    border-radius: 2px;
+    background: rgb(var(--color-foreground-rgb) / 12%);
+    transform: translateY(-50%);
+  }
+
+  .pf-range__fill {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    border-radius: 2px;
+    background: var(--color-foreground);
+  }
+
+  .pf-range__input {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    margin: 0;
+    background: none;
+    pointer-events: none;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  .pf-range__input::-webkit-slider-thumb {
+    appearance: none;
+    -webkit-appearance: none;
+    pointer-events: auto;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--color-background);
+    border: 1.5px solid var(--color-foreground);
+    box-shadow: 0 1px 4px rgb(0 0 0 / 18%);
+    cursor: pointer;
+  }
+
+  .pf-range__input::-moz-range-thumb {
+    pointer-events: auto;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: var(--color-background);
+    border: 1.5px solid var(--color-foreground);
+    box-shadow: 0 1px 4px rgb(0 0 0 / 18%);
+    cursor: pointer;
+  }
+
+  .pf-range__input::-moz-range-track { background: none; }
 {% endstylesheet %}
