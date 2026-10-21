@@ -103,10 +103,7 @@
 -%}
 <div class="mf-page mf-texture--{{ texture }}" style="--mf-cols:{{ mf_cols }};--mf-gap-h:{{ mf_gap_h }}px;--mf-gap-v:{{ mf_gap_v }}px;--mf-pad:{{ mf_pad }}px;--mf-ratio:{{ mf_ratio }};{% if section.settings.background_color != blank %}background:{{ section.settings.background_color }};{% endif %}">
 <div class="mf-shell">
-{%- assign mf_filters_on = false -%}
-{%- for block in section.blocks -%}
-  {%- if block.type == "filter-sort" -%}{%- assign mf_filters_on = true -%}{%- break -%}{%- endif -%}
-{%- endfor -%}
+{%- assign mf_filters_on = section.settings.enable_filters -%}
   {%- if mf_filters_on -%}
   <aside class="mf-sidebar">
     <div class="mf-side-title">
@@ -389,14 +386,15 @@
 {
   "name": "产品系列",
   "enabled_on": { "templates": ["collection"] },
-  "blocks": [
-    {
-      "type": "filter-sort",
-      "name": "筛选和排序",
-      "limit": 1
-    }
-  ],
+
   "settings": [
+    {
+      "type": "checkbox",
+      "id": "enable_filters",
+      "label": "启用筛选和排序",
+      "info": "关闭后只显示产品网格（筛选侧栏、色彩栏、排序工具条隐藏）",
+      "default": true
+    },
     {
       "type": "header",
       "content": "颜色筛选"
