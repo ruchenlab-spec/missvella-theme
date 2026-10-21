@@ -19,7 +19,7 @@
   @param {string} sort_by - Currently selected sort option
   @param {string} section_id - Section id used by the sort control
 {%- enddoc -%}
-<div class="cf-colour-bar cf-texture--{{ swatch_texture | default: 'linen' }}" data-cf-bar>
+<div class="cf-colour-bar cf-texture--{{ swatch_texture | default: 'linen' }}" data-cf-bar{% if colour_bar_bg != blank %} style="background-color: {{ colour_bar_bg }};"{% endif %}>
 
   <header class="cf-bar-head">
     <span class="cf-kicker">Curated by Colour</span>
@@ -219,11 +219,7 @@
     {% endif %}
 
   </div>
-  <aside class="cf-edit-note">
-    <span class="cf-kicker">The Missvella Edit</span>
-    <p class="cf-edit-title">Made for the entrance. <em>Remembered for the feeling.</em></p>
-    <p class="cf-edit-count"><strong>{{ products_count }}</strong> styles / curated for your occasion</p>
-  </aside>
+
 </div>
 <script>
   document.addEventListener('change', (e) => {

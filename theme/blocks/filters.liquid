@@ -143,7 +143,8 @@ Darks:#52443b:Espresso,Dark Navy,Black{%- endif -%}{%- endcapture -%}
       colour_filter: colour_filter,
       group_lines: group_lines,
       builtin_pairs: builtin_pairs,
-      swatch_texture: block.settings.swatch_texture,
+      colour_bar_bg: block.settings.colour_bar_bg,
+        swatch_texture: block.settings.swatch_texture,
       results_url: results_url,
       collection_id_attribute: collection_id_attribute,
       collection_handle_attribute: collection_handle_attribute,
@@ -1392,6 +1393,12 @@ Darks:#52443b:Espresso,Dark Navy,Black{%- endif -%}{%- endcapture -%}
       "label": "t:settings.enable_filtering",
       "info": "t:info.enable_filtering_info",
       "default": false
+    },
+    {
+      "type": "color",
+      "id": "colour_bar_bg",
+      "label": "色彩栏背景色",
+      "info": "顶部色系卡片行的背景色，留空为透明"
     },
     {
       "type": "select",
