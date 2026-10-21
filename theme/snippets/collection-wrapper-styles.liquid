@@ -169,7 +169,15 @@
 
   .collection-wrapper:has(.cf-colour-bar) .cf-bar-head { grid-column: 1 / -1; grid-row: 1; }
   .collection-wrapper:has(.cf-colour-bar) .cf-bar-component { grid-column: 1; grid-row: 2; align-self: end; }
-  .collection-wrapper:has(.cf-colour-bar) .cf-bar-right { grid-column: 2; grid-row: 2; align-self: end; padding-bottom: 2px; }
+  .collection-wrapper:has(.cf-colour-bar) .cf-bar-right {
+    grid-column: 2;
+    grid-row: 2;
+    align-self: end;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding-bottom: 2px;
+  }
   .collection-wrapper:has(.cf-colour-bar) .cf-edit-note { grid-column: 1 / -1; grid-row: 3; }
 
 
