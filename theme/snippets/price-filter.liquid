@@ -93,6 +93,7 @@
 </div>
 <script>
   (function () {
+    function initRanges() {
     document.querySelectorAll('.pf-range').forEach(function (wrap) {
       if (wrap.dataset.init) return;
       wrap.dataset.init = '1';
@@ -122,6 +123,12 @@
       rMax.addEventListener('change', function () { if (nums && nums.length >= 2) nums[1].dispatchEvent(new Event('change', { bubbles: true })); });
       paint();
     });
+    }
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initRanges);
+    } else {
+      initRanges();
+    }
   })();
 </script>
 
