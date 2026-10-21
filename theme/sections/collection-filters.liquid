@@ -14,7 +14,7 @@
   endfor
 -%}
 <style>
-.mf-page{padding:26px 4.5% 70px}
+.mf-page{padding:26px var(--mf-pad,48px) 70px}
 .mf-shell{display:grid;grid-template-columns:250px minmax(0,1fr);align-items:start}
 .mf-sidebar{border-right:1px solid #E5E2DC;padding-right:24px}
 .mf-side-title{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;padding:0 0 18px}
@@ -74,12 +74,13 @@
 .mf-sort{position:relative;display:inline-flex;align-items:center;gap:8px;font-size:11px;color:#514C47}
 .mf-sort select{appearance:none;-webkit-appearance:none;border:0;background:transparent;font:inherit;font-size:11px;color:#14120F;padding-right:16px;cursor:pointer;outline:none}
 .mf-sort::after{content:"";width:6px;height:6px;border-right:1px solid #514C47;border-bottom:1px solid #514C47;transform:rotate(45deg) translateY(-2px);pointer-events:none}
-.mf-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px 16px}
+.mf-grid{display:grid;grid-template-columns:repeat(var(--mf-cols,4),minmax(0,1fr));gap:var(--mf-gap-v,18px) var(--mf-gap-h,16px)}
 .mf-card{display:block;text-decoration:none;color:inherit}
-.mf-card__img{aspect-ratio:3/4;background:#F4F2EE;overflow:hidden}
+.mf-card__img{aspect-ratio:var(--mf-ratio,3/4);background:#F4F2EE;overflow:hidden}
 .mf-card__img img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s}
 .mf-card:hover .mf-card__img img{transform:scale(1.04)}
 .mf-card__name{margin:10px 0 4px;font-size:11.5px;line-height:1.4;color:#242220}
+.mf-card__vendor{font-size:10.5px;color:#8B8884;margin:0 0 3px;letter-spacing:.04em;text-transform:uppercase}
 .mf-card__price{font-size:11.5px;color:#514C47}
 .mf-empty{padding:60px 0;text-align:center;font-size:12px;color:#8B8884}
 .mf-pagination{display:flex;gap:10px;justify-content:center;padding-top:32px;font-size:12px}
@@ -93,7 +94,14 @@
 @media screen and (max-width:989px){.mf-shell{grid-template-columns:1fr}.mf-sidebar{border-right:0;border-bottom:1px solid #E5E2DC;padding:0 0 8px;margin-bottom:18px}.mf-main{padding-left:0}.mf-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.mf-pills{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}.mf-pills::-webkit-scrollbar{display:none}}
 </style>
 
-<div class="mf-page mf-texture--{{ texture }}">
+{%- liquid
+  assign mf_cols = section.settings.columns_desktop | default: 4
+  assign mf_gap_h = section.settings.gap_horizontal | default: 16
+  assign mf_gap_v = section.settings.gap_vertical | default: 18
+  assign mf_pad = section.settings.page_padding_inline | default: 48
+  assign mf_ratio = section.settings.image_ratio | default: "3/4"
+-%}
+<div class="mf-page mf-texture--{{ texture }}" style="--mf-cols:{{ mf_cols }};--mf-gap-h:{{ mf_gap_h }}px;--mf-gap-v:{{ mf_gap_v }}px;--mf-pad:{{ mf_pad }}px;--mf-ratio:{{ mf_ratio }};{% if section.settings.background_color != blank %}background:{{ section.settings.background_color }};{% endif %}">
 <div class="mf-shell">
   <aside class="mf-sidebar">
     <div class="mf-side-title">
@@ -267,7 +275,8 @@
         {%- endfor -%}
       </select></span>
     </div>
-    {%- paginate collection.products by 24 -%}
+    {%- assign mf_per_page = section.settings.products_per_page | default: 24 -%}
+    {%- paginate collection.products by mf_per_page -%}
       {%- if collection.products.size > 0 -%}
         <div class="mf-grid">
           {%- for product in collection.products -%}
@@ -278,7 +287,12 @@
                 {%- endif -%}
               </div>
               <p class="mf-card__name">{{ product.title }}</p>
-              <p class="mf-card__price">{{ product.price | money }}</p>
+              {%- if section.settings.show_vendor and product.vendor != blank -%}
+                <p class="mf-card__vendor">{{ product.vendor }}</p>
+              {%- endif -%}
+              {%- if section.settings.show_price -%}
+                <p class="mf-card__price">{{ product.price | money }}</p>
+              {%- endif -%}
             </a>
           {%- endfor -%}
         </div>
@@ -367,6 +381,10 @@
   "enabled_on": { "templates": ["collection"] },
   "settings": [
     {
+      "type": "header",
+      "content": "颜色筛选"
+    },
+    {
       "type": "textarea",
       "id": "color_group_map",
       "label": "颜色分组",
@@ -385,6 +403,77 @@
         { "value": "velvet", "label": "天鹅绒" }
       ],
       "default": "linen"
+    },
+    {
+      "type": "header",
+      "content": "产品网格"
+    },
+    {
+      "type": "range",
+      "id": "products_per_page",
+      "label": "每页产品数",
+      "min": 4, "max": 48, "step": 4, "default": 24
+    },
+    {
+      "type": "select",
+      "id": "columns_desktop",
+      "label": "桌面列数",
+      "options": [
+        { "value": "3", "label": "3 列" },
+        { "value": "4", "label": "4 列" },
+        { "value": "5", "label": "5 列" }
+      ],
+      "default": "4"
+    },
+    {
+      "type": "range",
+      "id": "gap_horizontal",
+      "label": "列间距",
+      "min": 0, "max": 40, "step": 2, "unit": "px", "default": 16
+    },
+    {
+      "type": "range",
+      "id": "gap_vertical",
+      "label": "行间距",
+      "min": 0, "max": 48, "step": 2, "unit": "px", "default": 18
+    },
+    {
+      "type": "select",
+      "id": "image_ratio",
+      "label": "产品图比例",
+      "options": [
+        { "value": "3/4", "label": "3:4（竖版）" },
+        { "value": "4/5", "label": "4:5" },
+        { "value": "1/1", "label": "1:1（方形）" }
+      ],
+      "default": "3/4"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_price",
+      "label": "显示价格",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_vendor",
+      "label": "显示品牌名",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "页面"
+    },
+    {
+      "type": "range",
+      "id": "page_padding_inline",
+      "label": "左右留白",
+      "min": 16, "max": 120, "step": 4, "unit": "px", "default": 48
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "背景色"
     }
   ]
 }
