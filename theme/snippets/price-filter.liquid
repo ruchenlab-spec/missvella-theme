@@ -104,8 +104,8 @@
       var max = parseFloat(wrap.dataset.max) || 100;
       function paint() {
         var lo = parseFloat(rMin.value), hi = parseFloat(rMax.value);
-        fill.style.left = (lo / max * 100) + '%';
-        fill.style.right = (100 - hi / max * 100) + '%';
+        wrap.style.setProperty('--pf-lo', (lo / max * 100) + '%');
+        wrap.style.setProperty('--pf-hi', (100 - hi / max * 100) + '%');
       }
       function sync() {
         var lo = parseFloat(rMin.value), hi = parseFloat(rMax.value);
@@ -293,6 +293,14 @@
     height: 30px;
     margin: 10px 2px 2px;
     isolation: isolate;
+    background:
+      linear-gradient(#1A1A1A, #1A1A1A) no-repeat left 0 top 50% / calc(100% - var(--pf-lo, 0%) - var(--pf-hi, 0%)) 4px,
+      linear-gradient(#E6E3DD, #E6E3DD) center / 100% 4px no-repeat;
+  }
+
+  .pf-range__track,
+  .pf-range__fill {
+    display: none;
   }
 
   .pf-range__track {
