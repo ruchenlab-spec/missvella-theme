@@ -126,26 +126,26 @@
   }
 
   /* ===== Unified filter layout (colour bar on top, sidebar for the rest) ===== */
-  .collection-wrapper:has(.cf-colour-bar) {
+  .collection-wrapper:has(.facets-block-wrapper) {
     grid-template-columns: minmax(210px, 250px) minmax(0, 1fr) !important;
   }
 
   /* Breathing gap between the sidebar and the right column (colour bar, note,
      product grid) - the sidebar divider sits inside this gutter */
   @media screen and (min-width: 750px) {
-    .collection-wrapper:has(.cf-colour-bar) {
+    .collection-wrapper:has(.facets-block-wrapper) {
       column-gap: 38px !important;
     }
   }
 
   /* The filters block holds both the colour bar and the sidebar - let its
      children participate in the collection grid directly */
-  .collection-wrapper:has(.cf-colour-bar) .facets-block-wrapper {
+  .collection-wrapper:has(.facets-block-wrapper) .facets-block-wrapper {
     display: contents;
   }
 
   /* Sidebar starts at the very top, level with the colour bar */
-  .collection-wrapper:has(.cf-colour-bar) .facets-block-wrapper .facets {
+  .collection-wrapper:has(.facets-block-wrapper) .facets-block-wrapper .facets {
     grid-column: 1;
     grid-row: 1 / span 14;
     align-self: start;
@@ -156,13 +156,13 @@
     scrollbar-width: none;
   }
 
-  .collection-wrapper:has(.cf-colour-bar) .facets-block-wrapper .facets::-webkit-scrollbar {
+  .collection-wrapper:has(.facets-block-wrapper) .facets-block-wrapper .facets::-webkit-scrollbar {
     display: none;
   }
 
   /* Colour bar row: pills bottom-left, sort/count/density bottom-right,
      bottom aligned. The expanded panel overlays the products (absolute). */
-  .collection-wrapper:has(.cf-colour-bar) .cf-colour-bar {
+  .collection-wrapper:has(.facets-block-wrapper) .cf-colour-bar {
     grid-column: 2;
     grid-row: 1;
     display: grid;
@@ -175,9 +175,9 @@
     z-index: 11;
   }
 
-  .collection-wrapper:has(.cf-colour-bar) .cf-bar-head { grid-column: 1 / -1; grid-row: 1; }
-  .collection-wrapper:has(.cf-colour-bar) .cf-bar-component { grid-column: 1; grid-row: 2; align-self: end; }
-  .collection-wrapper:has(.cf-colour-bar) .cf-bar-right {
+  .collection-wrapper:has(.facets-block-wrapper) .cf-bar-head { grid-column: 1 / -1; grid-row: 1; }
+  .collection-wrapper:has(.facets-block-wrapper) .cf-bar-component { grid-column: 1; grid-row: 2; align-self: end; }
+  .collection-wrapper:has(.facets-block-wrapper) .cf-bar-right {
     grid-column: 2;
     grid-row: 2;
     align-self: end;
@@ -186,11 +186,11 @@
     gap: 16px;
     padding-bottom: 2px;
   }
-  .collection-wrapper:has(.cf-colour-bar) .cf-edit-note { grid-column: 1 / -1; grid-row: 3; }
+  .collection-wrapper:has(.facets-block-wrapper) .cf-edit-note { grid-column: 1 / -1; grid-row: 3; }
 
 
 
-  .collection-wrapper:has(.cf-colour-bar) .cf-bar-component {
+  .collection-wrapper:has(.facets-block-wrapper) .cf-bar-component {
     flex: 1 1 auto;
     min-width: 0;
   }
@@ -209,17 +209,17 @@
     white-space: nowrap;
   }
 
-  .collection-wrapper:has(.cf-colour-bar) .main-collection-grid {
+  .collection-wrapper:has(.facets-block-wrapper) .main-collection-grid {
     grid-column: 2 !important;
     grid-row: 2 / span 14;
   }
 
   @media screen and (max-width: 749px) {
-    .collection-wrapper:has(.cf-colour-bar) {
+    .collection-wrapper:has(.facets-block-wrapper) {
       grid-template-columns: 1fr !important;
     }
 
-    .collection-wrapper:has(.cf-colour-bar) .cf-colour-bar {
+    .collection-wrapper:has(.facets-block-wrapper) .cf-colour-bar {
       grid-column: 1;
       grid-row: 1;
       display: block;
@@ -243,11 +243,11 @@
       display: none;
     }
 
-    .collection-wrapper:has(.cf-colour-bar) .facets-block-wrapper .facets {
+    .collection-wrapper:has(.facets-block-wrapper) .facets-block-wrapper .facets {
       display: none;
     }
 
-    .collection-wrapper:has(.cf-colour-bar) .main-collection-grid {
+    .collection-wrapper:has(.facets-block-wrapper) .main-collection-grid {
       grid-column: 1 !important;
       grid-row: 2;
     }
@@ -456,7 +456,7 @@
   .facet-num { font-size: 10px; letter-spacing: 0.1em; color: var(--color-foreground-subdued); margin-right: 6px; }
 
   /* Divider between sidebar and content */
-  .collection-wrapper:has(.cf-colour-bar) .facets-block-wrapper .facets {
+  .collection-wrapper:has(.facets-block-wrapper) .facets-block-wrapper .facets {
     border-inline-end: 1px solid rgb(var(--color-foreground-rgb) / 10%);
     padding-inline-end: 22px;
   }
