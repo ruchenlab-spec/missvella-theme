@@ -1,0 +1,61 @@
+{%- doc -%}
+  Renders a visually hidden option fieldset.
+
+  The native radio inputs stay in the DOM so Horizon's variant resolution still
+  knows every option value, while the visible UI is rendered by a dedicated
+  control (Custom Color picker, or the cross-product color group swatches).
+
+  @param {object} product_option - Option object from `options_with_values`.
+  @param {object} product_resource - The product object.
+  @param {object} block - The block object (used for the radio group name).
+  @param {number} fieldset_index - Index of the fieldset.
+  @param {string} [option_kind] - `data-mv-option-kind` value, defaults to `color`.
+{%- enddoc -%}
+
+{%- liquid
+  assign option_kind = option_kind | default: 'color'
+-%}
+
+<div
+  data-mv-hidden-color-picker
+  style="position:absolute;width:0;height:0;overflow:hidden;pointer-events:none;opacity:0;"
+  aria-hidden="true"
+>
+  <fieldset
+    class="variant-option"
+    data-fieldset-index="{{ fieldset_index }}"
+    data-mv-option-kind="{{ option_kind }}"
+    ref="fieldsets[]"
+  >
+    {%- for product_option_value in product_option.values -%}
+      <label>
+        <input
+          type="radio"
+          name="{{ product_option.name | escape }}-{{ block.id }}-{{ product_resource.id }}"
+          value="{{ product_option_value | escape }}"
+          aria-label="{{ product_option_value.name | escape }}"
+          {% if product_option_value.available == false %}
+            aria-disabled="true"
+          {% endif %}
+          data-previous-checked="false"
+          data-fieldset-index="{{ fieldset_index }}"
+          data-input-index="{{ forloop.index0 }}"
+          data-input-id="{{ product_option.position }}-{{ forloop.index0 }}"
+          data-option-name="{{ product_option.name | escape }}"
+          data-option-value-id="{{ product_option_value.id }}"
+          data-option-available="{{ product_option_value.available }}"
+          data-connected-product-url="{{ product_option_value.product_url }}"
+          {% if product_option_value.variant.id %}
+            data-variant-id="{{ product_option_value.variant.id }}"
+          {% endif %}
+          {% if product_option_value.selected %}
+            data-current-checked="true"
+            checked
+          {% else %}
+            data-current-checked="false"
+          {% endif %}
+        >
+      </label>
+    {%- endfor -%}
+  </fieldset>
+</div>

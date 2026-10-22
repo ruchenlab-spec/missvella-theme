@@ -1,0 +1,254 @@
+{%- doc -%}
+  Styles for the cross-product color group swatches.
+
+  The title is rendered inside a native <legend> so it inherits exactly the
+  same typography as the native variant option titles (Size, etc.).
+
+  Appearance is controlled from the variant picker block settings and passed
+  in as CSS custom properties:
+  --color-group-grid, --color-group-min-width, --color-group-card-radius,
+  --color-group-tooltip-shadow.
+  The selected style is applied through `data-selected-style` on the fieldset.
+{%- enddoc -%}
+
+{% stylesheet %}
+  /* The group reuses the native `.variant-option--buttons` class so the
+     title inherits the exact same legend typography as the other variant
+     options.
+
+     The theme also ships a rule that turns `.variant-option--buttons` into a
+     three column grid:
+
+       variant-picker[data-block-id][data-template-product-match]
+         .variant-option--buttons:not(.variant-option--swatches)
+
+     That selector has a weight of 0,4,1, so the override below needs a
+     higher one: three attribute selectors plus two classes give it 0,5,0. */
+  .color-group[data-color-group][data-group-handle][data-mv-option-kind].variant-option--buttons {
+    display: block;
+    grid-template-columns: none;
+    grid-auto-rows: auto;
+    grid-auto-flow: row;
+    gap: 0;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .color-group {
+    --color-group-min-width: var(--color-group-min-width-desktop, 52px);
+    --color-group-card-gap: 8px;
+    --color-group-card-radius: 6px;
+    --color-group-card-ratio: 4 / 5;
+    --color-group-grid: repeat(auto-fill, minmax(var(--color-group-min-width), 1fr));
+    --color-group-tooltip-shadow: none;
+
+    border: none;
+    margin: 0 0 var(--margin-lg);
+    padding: 0;
+    min-width: 0;
+  }
+
+  .color-group__label {
+    display: block;
+    width: 100%;
+    padding: 0;
+    margin-block-end: var(--margin-xs);
+  }
+
+  .color-group__list {
+    display: grid;
+    grid-template-columns: var(--color-group-grid);
+    gap: var(--color-group-card-gap);
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .color-group__item {
+    margin: 0;
+    padding: 0;
+  }
+
+  .color-group__swatch {
+    position: relative;
+    display: block;
+    aspect-ratio: var(--color-group-card-ratio);
+    border-radius: var(--color-group-card-radius);
+    background-color: rgb(var(--color-foreground-rgb) / 0.06);
+    box-shadow: 0 0 0 1px rgb(var(--color-foreground-rgb) / 0.14);
+    cursor: pointer;
+    transition:
+      box-shadow 0.2s ease,
+      transform 0.2s ease;
+  }
+
+  .color-group__image {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: inherit;
+  }
+
+  .color-group__swatch-color {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: inherit;
+  }
+
+  .color-group__swatch:focus-visible {
+    outline: 2px solid rgb(var(--color-foreground-rgb));
+    outline-offset: 2px;
+  }
+
+  /* ------------------------------------------------------------------
+     Selected swatch styles
+
+     Every style sets the same custom property on the group element. The
+     rules are mutually exclusive (one element matches one attribute value),
+     so the result does not depend on the order in which the compiler emits
+     them.
+     ------------------------------------------------------------------ */
+  .color-group[data-selected-style='solid'] {
+    --color-group-selected-shadow:
+      0 0 0 2px rgb(var(--color-foreground-rgb)),
+      0 6px 16px rgb(var(--color-foreground-rgb) / 0.18);
+  }
+
+  .color-group[data-selected-style='outline'] {
+    --color-group-selected-shadow:
+      0 0 0 1px rgb(var(--color-foreground-rgb)),
+      0 0 0 3px rgb(var(--color-background-rgb)),
+      0 0 0 4px rgb(var(--color-foreground-rgb));
+  }
+
+  .color-group[data-selected-style='bar'] {
+    --color-group-selected-shadow: 0 0 0 1px rgb(var(--color-foreground-rgb) / 0.3);
+  }
+
+  .color-group[data-selected-style='dot'] {
+    --color-group-selected-shadow: 0 0 0 1px rgb(var(--color-foreground-rgb));
+  }
+
+  .color-group[data-selected-style='none'] {
+    --color-group-selected-shadow: 0 0 0 1px rgb(var(--color-foreground-rgb) / 0.14);
+  }
+
+  .color-group__swatch--current {
+    box-shadow: var(
+      --color-group-selected-shadow,
+      0 0 0 1px rgb(var(--color-foreground-rgb) / 0.14)
+    );
+    cursor: default;
+  }
+
+  .color-group[data-selected-style='bar'] .color-group__swatch--current::after {
+    content: '';
+    position: absolute;
+    left: 18%;
+    right: 18%;
+    bottom: 4px;
+    height: 3px;
+    border-radius: 2px;
+    background-color: rgb(var(--color-foreground-rgb));
+  }
+
+  .color-group[data-selected-style='dot'] .color-group__swatch--current::after {
+    content: '';
+    position: absolute;
+    right: 4px;
+    bottom: 4px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: rgb(var(--color-foreground-rgb));
+    box-shadow: 0 0 0 2px rgb(var(--color-background-rgb));
+  }
+
+  @media (hover: hover) {
+    .color-group__swatch:not(.color-group__swatch--current):hover {
+      box-shadow:
+        0 0 0 2px rgb(var(--color-foreground-rgb) / 0.5),
+        0 8px 20px rgb(var(--color-foreground-rgb) / 0.2);
+      transform: translateY(-2px);
+    }
+  }
+
+  /* ------------------------------------------------------------------
+     Tooltip
+     ------------------------------------------------------------------ */
+  .color-group__tooltip {
+    position: absolute;
+    bottom: calc(100% + 8px);
+    left: 50%;
+    z-index: 20;
+    padding: 5px 10px;
+    border-radius: 999px;
+    background-color: rgb(var(--color-foreground-rgb) / 0.94);
+    color: rgb(var(--color-background-rgb) / 0.98);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    line-height: 1.35;
+    white-space: nowrap;
+    pointer-events: none;
+    opacity: 0;
+    transform: translate(-50%, 4px);
+    box-shadow: var(--color-group-tooltip-shadow);
+    transition:
+      opacity 0.18s ease,
+      transform 0.18s ease;
+  }
+
+  /* The arrow is a separate element so it is positioned against the swatch
+     itself, which keeps its tip exactly on the centre of the swatch. */
+  .color-group__tooltip-arrow {
+    position: absolute;
+    left: 50%;
+    bottom: calc(100% + 3px);
+    z-index: 21;
+    width: 0;
+    height: 0;
+    border-left: 5px solid transparent;
+    border-right: 5px solid transparent;
+    border-top: 5px solid rgb(var(--color-foreground-rgb) / 0.94);
+    transform: translateX(-50%);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.18s ease;
+  }
+
+  .color-group__swatch:hover .color-group__tooltip,
+  .color-group__swatch:focus-visible .color-group__tooltip {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
+
+  .color-group__swatch:hover .color-group__tooltip-arrow,
+  .color-group__swatch:focus-visible .color-group__tooltip-arrow {
+    opacity: 1;
+  }
+
+  @media (hover: none) {
+    .color-group__tooltip {
+      display: none;
+    }
+  }
+
+  @media (max-width: 749px) {
+    .color-group {
+      --color-group-min-width: var(--color-group-min-width-mobile, 40px);
+      --color-group-card-gap: 6px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .color-group__swatch,
+    .color-group__tooltip,
+    .color-group__tooltip-arrow {
+      transition: none;
+    }
+  }
+{% endstylesheet %}

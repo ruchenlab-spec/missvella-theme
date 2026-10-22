@@ -1,0 +1,94 @@
+{%- doc -%}
+  Resolves the handle of the hidden collection that holds the color group of a
+  product and outputs that handle as a plain string (empty when the product
+  does not belong to a group).
+
+  Shopify Liquid cannot resolve a metaobject's product reference list into
+  product objects (it only exposes GIDs), so the group members always come
+  from a collection. This snippet only finds the group key, the collection
+  itself is resolved by the caller with `collections[handle]`.
+
+  Supported group keys, in order of precedence:
+
+  1. Product tag `group:IVELLA-001` -> collection `group-ivella-001`
+  2. Plain text metafield (`custom.color_group` = `IVELLA-001`) -> the same
+     collection
+  3. Metaobject metafield whose handle is `ivella-001` -> `group-ivella-001`
+
+  @param {object} product_resource - The product object.
+{%- enddoc -%}
+
+{%- liquid
+  assign group_collection_handle = ''
+
+  # ------------------------------------------------------------------
+  # 1) Tag driven group
+  # ------------------------------------------------------------------
+  for group_tag in product_resource.tags
+    assign group_tag_value = group_tag | strip
+    assign group_tag_lower = group_tag_value | downcase
+    if group_tag_lower contains 'group:'
+      assign group_tag_key = group_tag_value | split: ':' | last
+      assign tag_handle = 'group-' | append: group_tag_key | handleize
+      assign tag_collection = collections[tag_handle]
+      if tag_collection != blank
+        assign tag_count = tag_collection.products | size
+        if tag_count > 1
+          assign group_collection_handle = tag_handle
+          break
+        endif
+      endif
+    endif
+  endfor
+
+  # ------------------------------------------------------------------
+  # 2) Plain text metafield holding the group key
+  # ------------------------------------------------------------------
+  if group_collection_handle == blank
+    assign group_key_names = 'custom.color_group,custom.color_group_key,custom.product_group,custom.group_key' | split: ','
+    for group_key_name in group_key_names
+      assign group_key_value = product_resource.metafields[group_key_name].value
+      if group_key_value != blank
+        assign group_key_type = group_key_value.type
+        assign group_key_text = group_key_value | strip
+        if group_key_type == blank and group_key_text != blank
+          assign key_handle = 'group-' | append: group_key_text | handleize
+          assign key_collection = collections[key_handle]
+          if key_collection != blank
+            assign key_count = key_collection.products | size
+            if key_count > 1
+              assign group_collection_handle = key_handle
+              break
+            endif
+          endif
+        endif
+      endif
+    endfor
+  endif
+
+  # ------------------------------------------------------------------
+  # 3) Metaobject metafield -> collection by metaobject handle
+  # ------------------------------------------------------------------
+  if group_collection_handle == blank
+    assign group_keys = 'custom.color_group,custom.product_group,custom.colour_group,color_group' | split: ','
+    for group_key in group_keys
+      assign group_candidate = product_resource.metafields[group_key].value
+      if group_candidate != blank and group_candidate.type != blank
+        assign group_metaobject = group_candidate
+        break
+      endif
+    endfor
+
+    if group_metaobject != blank
+      assign metaobject_handle = 'group-' | append: group_metaobject.handle | handleize
+      assign metaobject_collection = collections[metaobject_handle]
+      if metaobject_collection != blank
+        assign metaobject_count = metaobject_collection.products | size
+        if metaobject_count > 1
+          assign group_collection_handle = metaobject_handle
+        endif
+      endif
+    endif
+  endif
+-%}
+{{- group_collection_handle -}}

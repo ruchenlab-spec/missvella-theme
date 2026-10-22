@@ -184,3 +184,92 @@
 - **原因**：Liquid 的 HTML 解析器对 `script` / `style` 做的是**原始文本扫描**，只认 `</script>` 作为结束标记；注释里的 `<script>` 会被当成一个新的嵌套节点，于是外层节点永远等不到闭合。
 - **解决**：注释里用 "script 标签" / "separate tags" 这类不含尖括号的写法。
 - **附带**：同理，`{% style %}` / `{% stylesheet %}` 内的 CSS 注释里也不要写 `</style>`；JS 里拼接字符串用到标签时也尽量拆开写（`'<' + 'script'`）。
+
+## 六、颜色组（跨产品色卡）功能开发中的坑
+
+> 背景：让"同款不同颜色"各自成为独立产品（独立 URL / 独立首图 / 独立 Pin 落地页），并在产品页用一组色卡互相跳转，替代第三方 LinkOption app。相关文件：`snippets/color-group-collection.liquid`、`color-group-swatches.liquid`、`color-group-styles.liquid`、`variant-hidden-option-fieldset.liquid`、`assets/color-group-swatches.js`。
+
+### P30 · metaobject 的"产品引用列表"在 Liquid 里读不出产品对象
+- **症状**：metaobject 定义里 `Products` 字段选「产品引用 + 列表」，`product.metafields.custom.color_group.value.products.value` 拿到的是一串 GID：`["gid://shopify/Product/10264372019270", ...]`，无法遍历出产品。
+- **原因**：Shopify Liquid **没有 GID → 对象的转换**。metaobject 的引用列表只暴露 GID 字符串数组（单值引用才是对象）。
+- **解决**：成员一律从 **collection** 取（`collections[handle].products` 直接是产品对象）。metaobject / metafield / tag 只用来携带「组键」，由组键拼出 collection handle。
+- **附带**：`all_products` 只能按固定 handle 取、且上限 20 个，无法用 handle 列表动态构造产品数组（Liquid 的 `concat` 也只接受数组，不能拼对象）。
+
+### P31 · Liquid 的 `json` 过滤器只能序列化，不能解析
+- **症状**：`{% capture data %}{% render 'x' %}{% endcapture %}{% assign obj = data | strip | json %}` 之后 `obj.foo` 全是 nil；`obj` 拿到的是被再次序列化的字符串。
+- **原因**：Shopify Liquid 的 `json` 过滤器是**输出方向**（对象 → JSON 文本），没有 `from_json`。
+- **解决**：不要用 capture + JSON 在 snippet 之间传结构化数据。改为：① 传**原始值**（字符串 handle），由接收方自己查；② 或把解析逻辑和渲染逻辑放同一个 snippet；③ 真正需要传对象时用 `render` 的具名参数直接传对象。
+
+### P32 · Liquid 不支持内联数组字面量
+- **症状**：`{% for key in 'a', 'b', 'c' %}` 报 `LiquidHTMLSyntaxError: Arguments must be provided in the format for in <array> ...`。
+- **解决**：先 `assign` 字符串再 split：
+  ```liquid
+  {% assign keys = 'custom.a,custom.b,custom.c' | split: ',' %}
+  {% for key in keys %} ... {% endfor %}
+  ```
+
+### P33 · HTML 注释不能写在 `{% liquid %}` 块内（会静默阻断文件同步）
+- **症状**：调试用的 `<!-- DEBUG ... -->` 放进 `{% liquid %}` 块后：① `theme dev` 日志报 `Liquid syntax error (line 53): Unknown tag '  <!-- DEBUG ...'`；② **该文件不再被同步到预览主题**，页面继续用旧版本，表现为"改了没反应"。
+- **原因**：`{% liquid %}` 内只接受 Liquid 语句，HTML 会被当成未知标签。
+- **解决**：调试输出放在 HTML 上下文（`{% liquid %}` 块外）。
+- **附带**：这类错误**不会**在页面上报错，只在 `theme dev` 日志里；改完文件务必看一眼同步日志（`Synced » update ...`）。
+
+### P34 · CSS 权重：主题自带的规则会压过同权重的自定义规则
+- **症状**：颜色组只排 2 列（预期 9 列）。真实渲染显示 fieldset 的 `display` 是 `grid` 而不是 `block`。
+- **原因**：主题自带规则
+  ```css
+  variant-picker[data-block-id][data-template-product-match]
+    .variant-option--buttons:not(.variant-option--swatches) {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+  ```
+  权重是 **(0,4,1)**（2 属性 + 1 类 + `:not()` 内 1 类 + 1 元素）。自定义的 `.color-group[data-color-group][data-group-handle].variant-option--buttons` 只有 **(0,4,0)**，**少一个元素权重** → 输。
+- **解决**：把自定义规则提到 **(0,5,0)** 以上：多挂属性选择器（`.color-group[data-color-group][data-group-handle][data-mv-option-kind].variant-option--buttons`）。
+- **教训**：用 class 复用主题样式时，必须先算权重再写；`(0,x,0)` 永远小于 `(0,x,1)`。
+
+### P35 · 同权重的 CSS 规则会被编译器重排 → 用互斥变量避免顺序依赖
+- **症状**：五种"选中样式"全部显示成实心描边；其中一条规则还"凭空消失"。
+- **原因**：① 编译产物（Lightning CSS）会重排/合并同权重规则，写在后面的 `solid` 压过了其它样式的 `box-shadow`；② 规则可能被合并优化掉。
+- **解决**：让各样式**互斥地设置同一个 CSS 变量**，基础规则用 `var()` 取值 —— 一个元素只会命中其中一条，天然不冲突：
+  ```css
+  .color-group[data-selected-style='solid'] { --color-group-selected-shadow: 0 0 0 2px ...; }
+  .color-group[data-selected-style='bar']  { --color-group-selected-shadow: 0 0 0 1px ...; }
+  .color-group__swatch--current { box-shadow: var(--color-group-selected-shadow, ...); }
+  ```
+
+### P36 · `::after` 的百分比定位基准不是"卡片"，气泡三角会歪
+- **症状**：tooltip 三角偏左十几像素，看起来没对准色卡中心。
+- **原因**：`::after` 的 `left: 50%` 基准是**其 containing block**（tooltip 自身）的 **content box**（不含 padding），不是色卡宽度。
+- **解决**：把箭头做成**独立元素**（`.color-group__tooltip-arrow`），直接相对 `.color-group__swatch`（`position: relative`）定位 → 永远对准卡片中心。
+
+### P37 · CSS transition 会污染自动化测试读到的 computed style
+- **症状**：脚本里 `setAttribute('data-selected-style', 'bar')` 后立刻读 `getComputedStyle(el).boxShadow`，拿到的仍是旧值（实心描边）。
+- **原因**：`box-shadow` 有 `transition: .2s`，读到的是**过渡中间值/起始值**。
+- **解决**：切换后 `waitForTimeout(300~400)` 再读；或临时关掉 transition。
+- **教训**：改完样式"没生效"时，先怀疑：① CSS 还没编译；② 过渡动画；③ 权重；再怀疑代码。
+
+### P38 · `{% stylesheet %}` 编译成 CDN 产物后不会立刻更新
+- **症状**：改了 CSS 后本地预览仍是旧样式；抓 `compiled_assets/styles.css` 发现内容是新的，但页面表现是旧的。
+- **原因**：`{% stylesheet %}` 会被 Shopify 编译进 `compiled_assets/styles.css`（带 `?v=` 版本号），编译有延迟；同一 URL 还可能被 CDN/浏览器缓存。
+- **解决**：改完 CSS 后等几秒再测；必要时给 URL 加随机 query 绕过缓存；核对**浏览器实际加载的** CSS（`document.styleSheets`）而不是自己 curl 的那份。
+
+### P39 · Windows 上 Edge 无头截图不可用，用 playwright-core 复用系统 Edge
+- **症状**：`msedge --headless=new --screenshot=... ` 报一堆 ERROR 且不产出文件；`--dump-dom` 输出为空。
+- **解决**：装 `playwright-core`（不下载浏览器），用 `executablePath` 指向系统 Edge：
+  ```js
+  const { chromium } = require('playwright-core');
+  const browser = await chromium.launch({ executablePath: 'C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe' });
+  ```
+  可直接读 `getComputedStyle`、用 CDP `CSS.getMatchedStylesForNode` 看命中规则 —— 比截图更适合定位 CSS 问题。
+- **附带**：`page.goto` 用 `waitUntil: 'domcontentloaded'` + 固定等待，别用 `networkidle`（页面有长连接会超时）。
+
+### P40 · 跨产品跳转要带尺码，必须自己算变体映射
+- **症状**：点色块跳到另一颜色的产品页，尺码被重置。
+- **原因**：不同产品的变体 id 不同，`?variant=` 不能跨产品复用。
+- **解决**：渲染时把每个成员产品的「尺码名 → 变体 id」映射以 JSON 放进 `data-sizes`，前端按当前选中的尺码名查表拼 `?variant=`：
+  ```liquid
+  assign size_value_json = variant_size | json
+  assign size_pairs = size_pairs | append: '{"size":' | append: size_value_json | append: ',"variant":' | append: member_variant.id | append: '},'
+  ```
+- **附带**：取尺码值不要用 `variant['option2']` 动态索引（不可靠），按 position 显式取 `option1/option2/option3`。

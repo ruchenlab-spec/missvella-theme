@@ -1,4 +1,4 @@
-{% liquid
+﻿{% liquid
   assign product_resource = closest.product
   if request.visual_preview_mode and product_resource == blank
     assign product_resource = collections.all.products.first
@@ -49,6 +49,127 @@
       "id": "show_size_chart",
       "label": "显示尺码表",
       "default": true
+    },
+    {
+      "type": "header",
+      "content": "颜色组（同款不同色）"
+    },
+    {
+      "type": "checkbox",
+      "id": "color_group_enabled",
+      "label": "启用颜色组选择器",
+      "default": true,
+      "info": "关闭后改为显示商品原生的颜色选项"
+    },
+    {
+      "type": "select",
+      "id": "color_group_columns",
+      "visible_if": "{{ block.settings.color_group_enabled }}",
+      "label": "每行列数",
+      "options": [
+        {
+          "value": "auto",
+          "label": "自适应"
+        },
+        {
+          "value": "4",
+          "label": "4"
+        },
+        {
+          "value": "5",
+          "label": "5"
+        },
+        {
+          "value": "6",
+          "label": "6"
+        },
+        {
+          "value": "7",
+          "label": "7"
+        },
+        {
+          "value": "8",
+          "label": "8"
+        },
+        {
+          "value": "9",
+          "label": "9"
+        },
+        {
+          "value": "10",
+          "label": "10"
+        }
+      ],
+      "default": "auto"
+    },
+    {
+      "type": "range",
+      "id": "color_group_min_width",
+      "visible_if": "{{ block.settings.color_group_enabled }}",
+      "label": "卡片最小宽度（桌面）",
+      "min": 28,
+      "max": 90,
+      "step": 2,
+      "unit": "px",
+      "default": 52
+    },
+    {
+      "type": "range",
+      "id": "color_group_mobile_min_width",
+      "visible_if": "{{ block.settings.color_group_enabled }}",
+      "label": "卡片最小宽度（移动端）",
+      "min": 28,
+      "max": 90,
+      "step": 2,
+      "unit": "px",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "color_group_card_radius",
+      "visible_if": "{{ block.settings.color_group_enabled }}",
+      "label": "卡片圆角",
+      "min": 0,
+      "max": 26,
+      "step": 1,
+      "unit": "px",
+      "default": 6
+    },
+    {
+      "type": "select",
+      "id": "color_group_selected_style",
+      "visible_if": "{{ block.settings.color_group_enabled }}",
+      "label": "选中样式",
+      "options": [
+        {
+          "value": "solid",
+          "label": "实心描边"
+        },
+        {
+          "value": "outline",
+          "label": "外扩描边"
+        },
+        {
+          "value": "bar",
+          "label": "底部指示条"
+        },
+        {
+          "value": "dot",
+          "label": "右下角圆点"
+        },
+        {
+          "value": "none",
+          "label": "无"
+        }
+      ],
+      "default": "solid"
+    },
+    {
+      "type": "checkbox",
+      "id": "color_group_tooltip_shadow",
+      "visible_if": "{{ block.settings.color_group_enabled }}",
+      "label": "颜色名称气泡阴影",
+      "default": false
     },
     {
       "type": "header",

@@ -277,6 +277,11 @@
     type="module"
     fetchpriority="low"
   ></script>
+  <script
+    src="{{ 'color-group-swatches.js' | asset_url }}"
+    type="module"
+    fetchpriority="low"
+  ></script>
   <script type="module">
     import { RecentlyViewed } from '@theme/recently-viewed-products';
     RecentlyViewed.addProduct('{{ product.id }}');
