@@ -264,6 +264,33 @@
   可直接读 `getComputedStyle`、用 CDP `CSS.getMatchedStylesForNode` 看命中规则 —— 比截图更适合定位 CSS 问题。
 - **附带**：`page.goto` 用 `waitUntil: 'domcontentloaded'` + 固定等待，别用 `networkidle`（页面有长连接会超时）。
 
+### P41 · 文件里的 BOM 会在 flex 容器里撑出空白（间距永远调不准）
+- **症状**：某个区块上下多出 30~40px 空白，margin/padding/gap 全部调成 0 也消不掉；隐藏该区块后空白依旧（说明不是它自己的间距），但父容器里多出一个"看不见的节点"。
+- **原因**：文件以 **UTF-8 BOM**（`EF BB BF`）开头时，Liquid 会把 BOM 原样输出为第一个文本节点。**BOM (U+FEFF) 不是 collapsible whitespace**，在 flex 容器里不会被忽略，而是生成一个**匿名 flex item**（行高约 17px）→ 额外空白 = 匿名项高度 + 一次 row-gap。
+- **定位方法**（Playwright）：遍历父容器的 `childNodes`，对文本节点用 `Range.getBoundingClientRect()` 量盒子，能看到那个"看不见的节点"：
+  ```js
+  [...parent.childNodes].forEach((node) => {
+    if (node.nodeType === 3) {
+      const r = document.createRange();
+      r.selectNodeContents(node);
+      console.log(JSON.stringify(node.textContent.slice(0, 20)), r.getBoundingClientRect());
+    }
+  });
+  ```
+- **解决**：去掉文件头 BOM。**本项目的教训**：用 PowerShell `Set-Content -Encoding UTF8` 改 liquid 文件会写入 BOM（PS 5.1 的 UTF8 带 BOM），改文件一律用编辑器工具或 `[System.IO.File]::WriteAllText($p, $text, (New-Object System.Text.UTF8Encoding($false)))`。
+- **排查脚本**（全主题扫 BOM）：
+  ```powershell
+  Get-ChildItem -Recurse -Path theme -Include *.liquid,*.json,*.js,*.css | ForEach-Object {
+    $b=[System.IO.File]::ReadAllBytes($_.FullName)
+    if($b[0] -eq 0xEF -and $b[1] -eq 0xBB -and $b[2] -eq 0xBF){ $_.FullName }
+  }
+  ```
+
+### P42 · 隐藏元素后仍有空白，别急着归因给"主题机制"
+- **症状**：一段空白在隐藏可疑元素后依然存在，容易误判为"主题既有的吸顶预留/间距机制"，从而放弃修复。
+- **教训**：先做**对照实验**（隐藏候选元素 → 重测坐标），把空白归属确定到具体节点再动手；隐藏后仍在 = 不是它的责任，但还要继续用 Range/childNodes 找出真正的占位者（见 P41）。
+- **附带**：本项目最终靠"逐个 childNode 量盒子"才抓到 BOM 节点 —— 常规的 `getComputedStyle` 全部显示 0px/正常，**DOM 层面查不出 flex 匿名项**。
+
 ### P40 · 跨产品跳转要带尺码，必须自己算变体映射
 - **症状**：点色块跳到另一颜色的产品页，尺码被重置。
 - **原因**：不同产品的变体 id 不同，`?variant=` 不能跨产品复用。
