@@ -172,6 +172,28 @@
       "default": false
     },
     {
+      "type": "range",
+      "id": "color_group_gap_start",
+      "visible_if": "{{ block.settings.color_group_enabled }}",
+      "label": "颜色组上方间距",
+      "min": 0,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "color_group_gap_end",
+      "visible_if": "{{ block.settings.color_group_enabled }}",
+      "label": "颜色组下方间距",
+      "min": 0,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "default": 12
+    },
+    {
       "type": "header",
       "content": "t:content.appearance"
     },

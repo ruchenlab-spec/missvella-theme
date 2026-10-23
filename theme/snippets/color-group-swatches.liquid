@@ -14,6 +14,8 @@
   @param {number} [mobile_min_width] - Minimum card width in pixels (mobile).
   @param {number} [card_radius] - Card corner radius in pixels.
   @param {string} [selected_style] - Selected swatch style.
+  @param {number} [gap_start] - Space above the swatch group, in pixels.
+  @param {number} [gap_end] - Space below the swatch group, in pixels.
   @param {boolean} [tooltip_shadow] - Whether the tooltip gets a shadow.
 
   @example
@@ -45,6 +47,8 @@
   assign group_mobile_min_width = mobile_min_width | default: 40
   assign group_card_radius = card_radius | default: 6
   assign group_selected_style = selected_style | default: 'solid'
+  assign group_gap_start = gap_start | default: 0
+  assign group_gap_end = gap_end | default: 12
 
   if group_columns == 'auto'
     assign group_grid = 'repeat(auto-fill, minmax(var(--color-group-min-width), 1fr))'
@@ -67,6 +71,8 @@
       --color-group-min-width-desktop: {{ group_min_width }}px;
       --color-group-min-width-mobile: {{ group_mobile_min_width }}px;
       --color-group-card-radius: {{ group_card_radius }}px;
+      --color-group-gap-start: {{ group_gap_start }}px;
+      --color-group-gap-end: {{ group_gap_end }}px;
       {% if tooltip_shadow %}--color-group-tooltip-shadow: 0 8px 20px rgb(var(--color-foreground-rgb) / 0.24);{% else %}--color-group-tooltip-shadow: none;{% endif %}
     "
   >
