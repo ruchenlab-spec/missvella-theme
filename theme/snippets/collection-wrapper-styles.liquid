@@ -163,9 +163,11 @@
     grid-column: 2;
     grid-row: 1;
     display: block;
-    /* Same inline gutters as the product grid, so the hairline and every row
-       above it share the cards' exact width. */
-    padding-inline: var(--grid-padding-inline-start, 40px) var(--grid-padding-inline-end, 40px);
+    /* Mobile gutter only. On desktop the content column sits flush against
+       the sidebar gap and inherits the page's own outer margin, so the
+       section's left/right padding setting no longer leaks into the
+       sidebar-to-content gap. */
+    padding-inline: var(--page-margin, 20px);
     padding-block: 0 16px;
     margin-block-end: 0;
     position: relative;
@@ -620,7 +622,15 @@
     }
 
     .collection-wrapper:has(.facets-block-wrapper[data-has-filters]) .facets-block-wrapper:not(#filters-drawer) .facets {
-      margin-inline-end: 38px;
+      margin-inline-end: var(--cf-sidebar-gap, 40px);
+    }
+
+    /* Content column (colour bar + grid) sits flush in the filters layout:
+       its only inline inset is the page's own outer margin, so the sidebar
+       gap above is the single source of truth for sidebar-to-content space. */
+    .collection-wrapper:has(.facets-block-wrapper[data-has-filters]) .cf-colour-bar,
+    .collection-wrapper:has(.facets-block-wrapper[data-has-filters]) .main-collection-grid {
+      padding-inline: 0;
     }
   }
 {% endstylesheet %}
