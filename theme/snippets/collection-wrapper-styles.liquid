@@ -154,15 +154,13 @@
     display: none;
   }
 
-  /* Colour bar row: pills bottom-left, sort/count/density bottom-right,
-     bottom aligned. The expanded panel overlays the products (absolute). */
+  /* Colour bar zone: head → pills → results toolbar → active chips, all on
+     the same horizontal alignment lines. The expanded panel overlays the
+     products (absolute). */
   .collection-wrapper:has(.facets-block-wrapper[data-has-filters]) .cf-colour-bar {
     grid-column: 2;
     grid-row: 1;
-    display: grid;
-    grid-template-columns: 1fr auto;
-    align-items: end;
-    gap: 0 24px;
+    display: block;
     padding-block: 0 16px;
     margin-block-end: 0;
     border-bottom: 1px solid rgb(var(--color-foreground-rgb) / 12%);
@@ -170,34 +168,22 @@
     z-index: 11;
   }
 
-  .collection-wrapper:has(.facets-block-wrapper[data-has-filters]) .cf-bar-head { grid-column: 1 / -1; grid-row: 1; }
-  .collection-wrapper:has(.facets-block-wrapper[data-has-filters]) .cf-bar-component { grid-column: 1; grid-row: 2; align-self: end; }
-  .collection-wrapper:has(.facets-block-wrapper[data-has-filters]) .cf-bar-right {
-    grid-column: 2;
-    grid-row: 2;
-    align-self: end;
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding-bottom: 2px;
-  }
-
-
   .collection-wrapper:has(.facets-block-wrapper[data-has-filters]) .cf-bar-component {
-    flex: 1 1 auto;
     min-width: 0;
   }
 
+  /* Results toolbar row: item count left, sort + grid density right. */
   .cf-bar-right {
-    flex: 0 0 auto;
     display: flex;
     align-items: center;
     gap: 18px;
-    padding-bottom: 2px;
+    padding-block: 16px 0;
   }
 
   .cf-bar-right .products-count-wrapper {
-    font-size: 13px;
+    margin-inline-end: auto;
+    font-size: 12px;
+    letter-spacing: 0.04em;
     color: var(--color-foreground-subdued);
     white-space: nowrap;
   }
@@ -205,6 +191,93 @@
   .collection-wrapper:has(.facets-block-wrapper[data-has-filters]) .main-collection-grid {
     grid-column: 2 !important;
     grid-row: 2 / span 14;
+  }
+
+  /* ===== Active filter chips (removable, one per applied value) ===== */
+  .cf-active-bar {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px 10px;
+    padding-block: 14px 0;
+  }
+
+  .cf-active-bar__label {
+    font-size: 9.5px;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--color-foreground-subdued);
+    margin-inline-end: 2px;
+  }
+
+  .cf-active-bar__chips {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .cf-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    min-height: 28px;
+    padding: 4px 11px;
+    border: 1px solid rgb(var(--color-foreground-rgb) / 14%);
+    border-radius: 999px;
+    color: var(--color-foreground);
+    text-decoration: none;
+    font-size: 11px;
+    letter-spacing: 0.04em;
+    transition: border-color 0.18s ease, background-color 0.18s ease;
+  }
+
+  .cf-chip:hover {
+    border-color: rgb(var(--color-foreground-rgb) / 45%);
+    background: rgb(var(--color-foreground-rgb) / 0.03);
+  }
+
+  .cf-chip:focus-visible {
+    outline: 1.5px solid var(--color-foreground);
+    outline-offset: 2px;
+  }
+
+  .cf-chip__x {
+    width: 9px;
+    height: 9px;
+    flex: 0 0 auto;
+    color: var(--color-foreground-subdued);
+    transition: color 0.18s ease;
+  }
+
+  .cf-chip:hover .cf-chip__x { color: var(--color-foreground); }
+
+  .cf-active-bar__clear {
+    appearance: none;
+    background: none;
+    border: 0;
+    padding: 4px 2px;
+    margin-inline-start: auto;
+    font: inherit;
+    font-size: 10.5px;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--color-foreground-subdued);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    text-decoration-color: rgb(var(--color-foreground-rgb) / 35%);
+    cursor: pointer;
+    transition: color 0.18s ease;
+  }
+
+  .cf-active-bar__clear:hover {
+    color: var(--color-foreground);
+    text-decoration-color: currentColor;
+  }
+
+  .cf-active-bar__clear:focus-visible {
+    outline: 1.5px solid var(--color-foreground);
+    outline-offset: 3px;
   }
 
   @media screen and (max-width: 749px) {
@@ -276,8 +349,7 @@
   .cf-pill.is-open,
   .cf-pill.is-active {
     border-color: var(--color-foreground);
-    box-shadow: inset 0 0 0 1px var(--color-foreground);
-    background: rgb(var(--color-foreground-rgb) / 0.05);
+    background: rgb(var(--color-foreground-rgb) / 0.04);
   }
 
   .cf-pill__glyph {
@@ -495,12 +567,6 @@
     box-shadow: none !important;
     background: none !important;
     padding-block: 15px;
-  }
-
-  .facets-block-wrapper .facets__summary .facets__label {
-    font-size: var(--font-size--sm, 13px);
-    font-weight: 500;
-    letter-spacing: 0.02em;
   }
 
   /* Divider between sidebar and content */

@@ -108,8 +108,8 @@
   <input type="range" class="pf-range__input" min="0" max="{{ pf_max }}" step="1" value="{{ pf_max_val }}" aria-label="{{ 'accessibility.price_filter_high' | t }}">
 </div>
 <div class="pf-range-note">
-  <span>{{ 0 | money_without_currency }}</span>
-  <span class="pf-range-note__max">{{ filter.range_max | money_without_currency }}</span>
+  <span>{{ filter.min_value.value | default: 0 | money_without_currency }}</span>
+  <span class="pf-range-note__max">{{ filter.max_value.value | default: filter.range_max | money_without_currency }}</span>
 </div>
 <script>
   (function () {

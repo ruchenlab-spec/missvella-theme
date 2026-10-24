@@ -1,0 +1,73 @@
+{%- comment -%}
+  Active filter chips bar: one removable chip per applied filter value,
+  plus a global "Clear all".
+
+  Rendered inside the colour-bar header zone (cf-colour-bar), above the
+  product grid. Uses the native Shopify filter objects:
+  - list/boolean filters -> value.url_to_remove per active value
+  - price_range filters  -> filter.url_to_remove (min/max applied)
+  Clear all strips every `filter.*` query parameter while keeping `sort_by`
+  and the search term, so the result order survives a clear.
+
+  @param {object} results - The results object (collection or search) with .filters
+{%- endcomment -%}
+
+{%- capture cf_active_chips -%}
+  {%- assign cf_active_total = 0 -%}
+  {%- for f in results.filters -%}
+    {%- if f.type == 'price_range' -%}
+      {%- if f.min_value.value != blank or f.max_value.value != blank -%}
+        {%- assign cf_active_total = cf_active_total | plus: 1 -%}
+        {%- liquid
+          assign cf_price_label = ''
+          if f.min_value.value != blank
+            assign cf_price_label = f.min_value.value | money
+          endif
+          assign cf_price_label = cf_price_label | append: '–'
+          if f.max_value.value != blank
+            assign cf_price_label = cf_price_label | append: f.max_value.value | money
+          endif
+        -%}
+        <a class="cf-chip" href="{{ f.url_to_remove }}" aria-label="{{ f.label }}: {{ cf_price_label }} — remove">
+          <span class="cf-chip__text">{{ cf_price_label }}</span>
+          <svg class="cf-chip__x" viewBox="0 0 10 10" aria-hidden="true" focusable="false"><path d="M1 1l8 8M9 1l-8 8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        </a>
+      {%- endif -%}
+    {%- else -%}
+      {%- for v in f.active_values -%}
+        {%- assign cf_active_total = cf_active_total | plus: 1 -%}
+        <a class="cf-chip" href="{{ v.url_to_remove }}" aria-label="{{ f.label }}: {{ v.label }} — remove">
+          <span class="cf-chip__text">{{ v.label }}</span>
+          <svg class="cf-chip__x" viewBox="0 0 10 10" aria-hidden="true" focusable="false"><path d="M1 1l8 8M9 1l-8 8" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        </a>
+      {%- endfor -%}
+    {%- endif -%}
+  {%- endfor -%}
+{%- endcapture -%}
+
+{%- if cf_active_total > 0 -%}
+  <div class="cf-active-bar" data-cf-active-bar>
+    <span class="cf-active-bar__label">Selected</span>
+    <div class="cf-active-bar__chips">{{ cf_active_chips }}</div>
+    <button type="button" class="cf-active-bar__clear" data-mv-clear-all-facets>Clear all</button>
+  </div>
+  <script>
+    (function () {
+      if (window.__mvClearAllFacetsBound) return;
+      window.__mvClearAllFacetsBound = true;
+      document.addEventListener('click', function (event) {
+        var trigger = event.target.closest('[data-mv-clear-all-facets]');
+        if (!trigger) return;
+        /* Strip every filter.* query parameter; keep sort_by and the search
+           term so the result order survives a clear. */
+        var url = new URL(window.location.href);
+        Array.from(url.searchParams.keys()).forEach(function (key) {
+          if (key.indexOf('filter.') === 0) url.searchParams.delete(key);
+        });
+        url.searchParams.delete('page');
+        event.preventDefault();
+        window.location.assign(url.toString());
+      });
+    })();
+  </script>
+{%- endif -%}

@@ -1,12 +1,14 @@
 {%- doc -%}
-  Colour family bar: family pills + expandable swatch panels, with the
-  item count, sort and grid-density controls on the right.
+  Colour family bar: family pills + expandable swatch panels, followed by
+  the results toolbar (item count, sort, grid density) and the removable
+  active-filter chips bar.
 
   @param {object} colour_filter - The colour filter object
   @param {object} group_lines - Colour group map split into lines, one group per
     line as "Group name:#hex:member, member, member"
   @param {object} builtin_pairs - Built-in colour-name fallback pairs
   @param {string} swatch_texture - Texture class modifier (linen/satin/mesh/velvet)
+  @param {string} [colour_bar_bg] - Optional background colour for the bar
   @param {string} results_url - URL the facet form submits to
   @param {string} collection_id_attribute
   @param {string} collection_handle_attribute
@@ -179,8 +181,7 @@
     </form>
   </facet-inputs-component>
 
-  {%- comment -%} Right side of the bar: item count + sort + grid density,
-     bottom-aligned with the colour pills {%- endcomment -%}
+  {%- comment -%} Results toolbar: item count left, sort + grid density right {%- endcomment -%}
   <div class="cf-bar-right">
     <div class="products-count-wrapper" data-testid="products-count">
       <span role="status">
@@ -205,8 +206,10 @@
     {% if enable_grid_density %}
       {% render 'grid-density-controls', viewport: 'desktop' %}
     {% endif %}
-
   </div>
+
+  {%- comment -%} Removable chips for every applied filter value {%- endcomment -%}
+  {% render 'cf-active-bar', results: results %}
 
 </div>
 <script>
