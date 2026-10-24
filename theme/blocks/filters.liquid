@@ -146,7 +146,6 @@ Darks:#52443b:Espresso,Dark Navy,Black{%- endif -%}{%- endcapture -%}
       group_lines: group_lines,
       builtin_pairs: builtin_pairs,
       colour_bar_bg: block.settings.colour_bar_bg,
-        swatch_texture: block.settings.swatch_texture,
       results_url: results_url,
       collection_id_attribute: collection_id_attribute,
       collection_handle_attribute: collection_handle_attribute,
@@ -1397,20 +1396,6 @@ Darks:#52443b:Espresso,Dark Navy,Black{%- endif -%}{%- endcapture -%}
       "id": "colour_bar_bg",
       "label": "色彩栏背景色",
       "info": "顶部色系卡片行的背景色，留空为透明"
-    },
-    {
-      "type": "select",
-      "id": "swatch_texture",
-      "label": "色块质感",
-      "options": [
-        { "value": "none", "label": "无（纯色）" },
-        { "value": "linen", "label": "亚麻" },
-        { "value": "satin", "label": "缎面" },
-        { "value": "mesh", "label": "网纱" },
-        { "value": "velvet", "label": "天鹅绒" }
-      ],
-      "default": "linen",
-      "info": "在色块上叠加一层面料质感，色系胶囊与色板同步生效"
     },
     {
       "type": "number",

@@ -7,7 +7,6 @@
   @param {object} group_lines - Colour group map split into lines, one group per
     line as "Group name:#hex:member, member, member"
   @param {object} builtin_pairs - Built-in colour-name fallback pairs
-  @param {string} swatch_texture - Texture class modifier (linen/satin/mesh/velvet)
   @param {string} [colour_bar_bg] - Optional background colour for the bar
   @param {string} results_url - URL the facet form submits to
   @param {string} collection_id_attribute
@@ -21,7 +20,7 @@
   @param {string} sort_by - Currently selected sort option
   @param {string} section_id - Section id used by the sort control
 {%- enddoc -%}
-<div class="cf-colour-bar cf-texture--{{ swatch_texture | default: 'linen' }}" data-cf-bar{% if colour_bar_bg != blank %} style="background-color: {{ colour_bar_bg }};"{% endif %}>
+<div class="cf-colour-bar" data-cf-bar{% if colour_bar_bg != blank %} style="background-color: {{ colour_bar_bg }};"{% endif %}>
 
   <header class="cf-bar-head">
     <h3 class="cf-bar-title">Filter by color</h3>
@@ -100,7 +99,7 @@
         {%- assign colour_active_total = colour_filter.active_values | size -%}
         <button
           type="button"
-          class="cf-pill cf-pill--all{% if colour_active_total == 0 %} is-active{% endif %}"
+          class="cf-pill cf-pill--all"
           data-cf-clear-color
           aria-pressed="{% if colour_active_total == 0 %}true{% else %}false{% endif %}"
         >
@@ -261,18 +260,16 @@
       window.location.href = inp.checked ? inp.dataset.urlAdd : inp.dataset.urlRemove;
     }
   });
-  function syncPush(bar) {
-    if (!bar) return;
-    const open = bar.querySelector('.cf-bar-panel.open');
-    bar.style.marginBlockEnd = open ? (open.offsetHeight + 8) + 'px' : '';
-    if (window.ResizeObserver) {
-      if (bar._cfRO) bar._cfRO.disconnect();
-      bar._cfRO = null;
-      if (open) {
-        bar._cfRO = new ResizeObserver(() => syncPush(bar));
-        bar._cfRO.observe(open);
-      }
-    }
+  /* The "All color" pill carries the underline only while no family is open
+     and no family holds real selections; it moves to the opened/selected
+     family otherwise. */
+  function syncAllState() {
+    document.querySelectorAll('.cf-colour-bar').forEach(function (bar) {
+      var all = bar.querySelector('.cf-pill--all');
+      if (!all) return;
+      var anyEngaged = bar.querySelector('.cf-pill.is-active:not(.cf-pill--all), .cf-pill.is-open:not(.cf-pill--all)');
+      all.classList.toggle('is-active', !anyEngaged);
+    });
   }
   document.addEventListener('click', (e) => {
     const pill = e.target.closest('[data-cf-pill]');
@@ -291,10 +288,12 @@
         p.setAttribute('aria-expanded', p.classList.contains('is-open') ? 'true' : 'false');
       });
 
-      syncPush(bar);
+      syncAllState();
     } else if (!e.target.closest('.cf-bar-panel') && !e.target.closest('.cf-colour-bar')) {
       document.querySelectorAll('.cf-bar-panel.open').forEach((p) => p.classList.remove('open'));
-      document.querySelectorAll('.cf-colour-bar').forEach(syncPush);
+      document.querySelectorAll('.cf-colour-bar .cf-pill').forEach((p) => p.classList.remove('is-open'));
+      syncAllState();
     }
   });
+  syncAllState();
 </script>
