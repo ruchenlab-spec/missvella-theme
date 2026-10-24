@@ -37,6 +37,24 @@
   %}
 </div>
 
+{%- comment -%}
+  Price emphasis for the product page only.
+
+  The price that sits under the product title is rendered with the `price`
+  block, which is also used by every product card (collection grids, best
+  sellers, related products, ...). Applying the style globally would make
+  all card prices bold and larger, so the rule is scoped to the product
+  details column of a product page.
+{%- endcomment -%}
+{%- if request.page_type == 'product' -%}
+  {% style %}
+    .product-details product-price .price {
+      font-weight: var(--font-weight-semibold, 600);
+      font-size: 1.125rem;
+    }
+  {% endstyle %}
+{%- endif -%}
+
 {% stylesheet %}
   /* Clear padding on mobile, if not full-width */
   @media screen and (max-width: 749px) {
@@ -48,6 +66,36 @@
   .view-product-title {
     display: none;
   }
+
+  /* ------------------------------------------------------------------
+     Tighten the vertical rhythm of the title cluster on the product page:
+     series/SKU line → product title → price.
+
+     The spacing comes from the merchant's group gap (12px) plus the series
+     bottom margin, so it is trimmed here instead of touching the saved
+     block settings. Only the group that actually holds the price is
+     affected; the accordion and the other groups keep their spacing.
+     ------------------------------------------------------------------ */
+  .product-details .product-series {
+    margin-block-end: 0;
+  }
+
+  .product-details .group-block:has(> .group-block-content > product-price) {
+    margin-block-start: -4px;
+  }
+
+  .product-details
+    .group-block:has(> .group-block-content > product-price)
+    > .group-block-content {
+    row-gap: 8px;
+  }
+
+  /* ------------------------------------------------------------------
+     Fit preference tabs: only one panel is visible at a time. The variant
+     picker owns the tabs and toggles `mv-fit-standard` / `mv-fit-custom`
+     on `.product-details`; the Custom Size block hides itself in standard
+     mode (see blocks/custom-sizes.liquid).
+     ------------------------------------------------------------------ */
 
   /* Container styles */
   .product-details {

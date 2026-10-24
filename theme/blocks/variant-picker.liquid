@@ -52,6 +52,33 @@
     },
     {
       "type": "header",
+      "content": "尺码展示方式"
+    },
+    {
+      "type": "select",
+      "id": "size_layout",
+      "label": "尺码展示方式",
+      "options": [
+        {
+          "value": "matrix",
+          "label": "尺码矩阵（一次展示全部尺码）"
+        },
+        {
+          "value": "dropdowns",
+          "label": "下拉框"
+        }
+      ],
+      "default": "matrix"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_fit_tabs",
+      "label": "显示 Standard Size / Custom Fit 切换 Tab",
+      "default": true,
+      "info": "开启后，标准尺码矩阵与 Custom Size（定制测量）区块通过 Tab 切换展示，两者不会同时出现"
+    },
+    {
+      "type": "header",
       "content": "颜色组（同款不同色）"
     },
     {
@@ -60,6 +87,24 @@
       "label": "启用颜色组选择器",
       "default": true,
       "info": "关闭后改为显示商品原生的颜色选项"
+    },
+    {
+      "type": "select",
+      "id": "color_group_display_style",
+      "visible_if": "{{ block.settings.color_group_enabled }}",
+      "label": "展示样式",
+      "options": [
+        {
+          "value": "cards",
+          "label": "图片卡片"
+        },
+        {
+          "value": "swatches",
+          "label": "小色块"
+        }
+      ],
+      "default": "cards",
+      "info": "图片卡片：显示每个颜色的商品图，占空间较大；小色块：只显示颜色（色号），更紧凑。每行排列数量按下方「卡片/色块大小」与「间距」自动计算"
     },
     {
       "type": "select",
@@ -100,7 +145,8 @@
           "label": "10"
         }
       ],
-      "default": "auto"
+      "default": "auto",
+      "info": "自适应：按卡片大小与间距自动填满整行；固定列数：强制每行显示指定数量"
     },
     {
       "type": "range",
@@ -111,7 +157,8 @@
       "max": 90,
       "step": 2,
       "unit": "px",
-      "default": 52
+      "default": 52,
+      "info": "小色块模式下即色块大小。自适应行数按此宽度与间距自动计算"
     },
     {
       "type": "range",
@@ -122,7 +169,20 @@
       "max": 90,
       "step": 2,
       "unit": "px",
-      "default": 40
+      "default": 40,
+      "info": "小色块模式下即色块大小"
+    },
+    {
+      "type": "range",
+      "id": "color_group_gap",
+      "visible_if": "{{ block.settings.color_group_enabled }}",
+      "label": "卡片/色块间距",
+      "min": 2,
+      "max": 24,
+      "step": 2,
+      "unit": "px",
+      "default": 8,
+      "info": "每行能排列多少张卡片/色块，由「卡片大小」与此间距根据可用宽度自动计算"
     },
     {
       "type": "range",

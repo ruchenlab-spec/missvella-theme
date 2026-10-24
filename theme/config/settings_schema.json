@@ -116,6 +116,23 @@
         "label": "t:options.accent"
       },
       {
+        "type": "select",
+        "id": "type_display_font",
+        "label": "展示字体",
+        "info": "开启后，标题与副标题统一使用 Aboreto 展示字体。注意：Aboreto 没有小写字形，所有字母都会显示为大写；关闭后完全使用上面选择的标题/副标题字体。",
+        "options": [
+          {
+            "value": "none",
+            "label": "不使用"
+          },
+          {
+            "value": "aboreto",
+            "label": "Aboreto"
+          }
+        ],
+        "default": "aboreto"
+      },
+      {
         "type": "header",
         "content": "t:content.text_presets"
       },

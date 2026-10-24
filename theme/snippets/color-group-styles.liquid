@@ -9,6 +9,8 @@
   --color-group-grid, --color-group-min-width, --color-group-card-radius,
   --color-group-tooltip-shadow.
   The selected style is applied through `data-selected-style` on the fieldset.
+  The display style (image cards vs. small colour blocks) is applied through
+  `data-display-style`.
 {%- enddoc -%}
 
 {% stylesheet %}
@@ -20,11 +22,16 @@
      three column grid:
 
        variant-picker[data-block-id][data-template-product-match]
-         .variant-option--buttons:not(.variant-option--swatches)
+         .variant-option--buttons:not(.variant-option--swatches):not(.variant-option--matrix)
 
-     That selector has a weight of 0,4,1, so the override below needs a
-     higher one: three attribute selectors plus two classes give it 0,5,0. */
-  .color-group[data-color-group][data-group-handle][data-mv-option-kind].variant-option--buttons {
+     That selector has a weight of 0,5,1 (two attribute selectors, three
+     classes — two of them inside :not() — plus the element name). The
+     override below must outrank it, otherwise the fieldset itself becomes a
+     three column grid and the swatch list gets squeezed into its middle
+     column (~2 cards per row with dead space on both sides). Adding the
+     fourth attribute selector lifts the override to 0,6,0. Do NOT drop
+     `[data-selected-style]` — the layout depends on it winning. */
+  .color-group[data-color-group][data-group-handle][data-mv-option-kind][data-selected-style].variant-option--buttons {
     display: block;
     grid-template-columns: none;
     grid-auto-rows: auto;
@@ -45,6 +52,10 @@
     --color-group-tooltip-shadow: none;
     --color-group-gap-start: 0px;
     --color-group-gap-end: 12px;
+    /* Selection ring geometry. `swatches` tightens the offsets so the ring
+       never eats a 28px colour block. */
+    --color-group-ring-width: 1px;
+    --color-group-ring-offset: 3px;
 
     border: none;
     padding: 0;
@@ -52,10 +63,23 @@
   }
 
   .color-group__label {
-    display: block;
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 12px;
     width: 100%;
     padding: 0;
     margin-block-end: var(--margin-xs);
+  }
+
+  /* Current colour name — never rely on the swatch image alone. */
+  .color-group__current {
+    font-family: var(--font-body--family);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--color-foreground-subdued, #77736d);
   }
 
   .color-group__list {
@@ -114,17 +138,21 @@
      so the result does not depend on the order in which the compiler emits
      them.
      ------------------------------------------------------------------ */
+
+  /* Refined double ring: outer hairline, breathing room, inner hairline. */
   .color-group[data-selected-style='solid'] {
     --color-group-selected-shadow:
-      0 0 0 2px rgb(var(--color-foreground-rgb)),
-      0 6px 16px rgb(var(--color-foreground-rgb) / 0.18);
+      0 0 0 var(--color-group-ring-width) rgb(var(--color-foreground-rgb)),
+      0 0 0 var(--color-group-ring-offset) var(--color-background),
+      0 0 0 calc(var(--color-group-ring-offset) + var(--color-group-ring-width)) rgb(var(--color-foreground-rgb)),
+      0 6px 16px rgb(var(--color-foreground-rgb) / 0.12);
   }
 
   .color-group[data-selected-style='outline'] {
     --color-group-selected-shadow:
-      0 0 0 1px rgb(var(--color-foreground-rgb)),
-      0 0 0 3px rgb(var(--color-background-rgb)),
-      0 0 0 4px rgb(var(--color-foreground-rgb));
+      0 0 0 var(--color-group-ring-width) rgb(var(--color-foreground-rgb)),
+      0 0 0 var(--color-group-ring-offset) rgb(var(--color-background-rgb)),
+      0 0 0 calc(var(--color-group-ring-offset) + var(--color-group-ring-width)) rgb(var(--color-foreground-rgb));
   }
 
   .color-group[data-selected-style='bar'] {
@@ -173,10 +201,36 @@
   @media (hover: hover) {
     .color-group__swatch:not(.color-group__swatch--current):hover {
       box-shadow:
-        0 0 0 2px rgb(var(--color-foreground-rgb) / 0.5),
-        0 8px 20px rgb(var(--color-foreground-rgb) / 0.2);
-      transform: translateY(-2px);
+        0 0 0 1px rgb(var(--color-foreground-rgb) / 0.45),
+        0 0 0 var(--color-group-ring-offset) var(--color-background),
+        0 0 0 calc(var(--color-group-ring-offset) + 1px) rgb(var(--color-foreground-rgb) / 0.25),
+        0 6px 16px rgb(var(--color-foreground-rgb) / 0.12);
     }
+  }
+
+  /* ------------------------------------------------------------------
+     Display style: small colour blocks (小色块)
+
+     Same markup as the card mode — the grid track is the swatch size, the
+     swatch is square (1/1) instead of a 4/5 card, and the selection ring
+     tightens so it never overwhelms a small colour block. The number of
+     swatches per row still follows the configured size + gap.
+     ------------------------------------------------------------------ */
+  .color-group[data-display-style='swatches'] {
+    --color-group-card-ratio: 1 / 1;
+    --color-group-ring-offset: 2px;
+  }
+
+  .color-group[data-display-style='swatches'] .color-group__list {
+    /* Fixed-size tracks: keep the swatches at their configured size instead
+       of stretching them across the whole row. */
+    justify-content: flex-start;
+  }
+
+  /* A colour block that carries an uploaded swatch image (fabric texture)
+     keeps the image; a pure colour shows the colour itself. */
+  .color-group[data-display-style='swatches'] .color-group__image {
+    border-radius: inherit;
   }
 
   /* ------------------------------------------------------------------
@@ -242,8 +296,10 @@
 
   @media (max-width: 749px) {
     .color-group {
+      /* Mobile only swaps the card/swatch size. The gap comes from the block
+         setting (inline custom property) and stays identical on every
+         viewport so the merchant's spacing is predictable. */
       --color-group-min-width: var(--color-group-min-width-mobile, 40px);
-      --color-group-card-gap: 6px;
     }
   }
 

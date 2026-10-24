@@ -35,7 +35,7 @@
 
 {% if show_series or show_sku %}
   <div
-    class="product-series"
+    class="product-series{% unless show_series %} product-series--sku-only{% endunless %}"
     style="
       --series-size: {{ settings.series_font_size | default: 12 }}px;
       --series-case: {{ settings.series_case | default: 'none' }};
@@ -91,5 +91,14 @@
     opacity: 0.7;
     white-space: nowrap;
     margin-inline-start: auto;
+  }
+
+  /* Without the series label the SKU takes its place on the left. */
+  .product-series--sku-only {
+    justify-content: flex-start;
+  }
+
+  .product-series--sku-only .product-series__sku {
+    margin-inline-start: 0;
   }
 {% endstylesheet %}

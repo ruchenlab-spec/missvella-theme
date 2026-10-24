@@ -1,12 +1,12 @@
 {%- comment -%}
-  Aboreto — 自托管显示字体，用于主题的「标题(heading)」与「副标题(subheading)」字体预设。
+  Aboreto — 自托管展示字体。
 
   字体文件放在 theme/assets/aboreto-regular.ttf，用 asset_url 取 CDN 地址。
 
-  这段必须渲染在 `theme-styles-variables` 之后（见 layout/theme.liquid）：
-  两边都写 `:root`，后出现的声明才生效，所以顺序不能换。
-
-  商家在主题编辑器里选的标题/副标题字体仍然保留，作为加载失败时的回退字体。
+  这里只负责「注册字体 + 预加载」，**不覆盖**主题的字体变量：
+  是否把 Aboreto 用作标题 / 副标题字体，由主题设置里的「展示字体」开关决定，
+  变量统一在 `theme-styles-variables.liquid`（主题自身的字体代码）里输出。
+  这样编辑器里的字体选择恢复可控，关闭开关即可完全回到主题默认字体。
 {%- endcomment -%}
 
 {%- assign aboreto_url = 'aboreto-regular.ttf' | asset_url -%}
@@ -20,10 +20,5 @@
     font-weight: 400;
     font-style: normal;
     font-display: swap;
-  }
-
-  :root {
-    --font-heading--family: 'Aboreto', {{ settings.type_heading_font.family }}, {{ settings.type_heading_font.fallback_families }};
-    --font-subheading--family: 'Aboreto', {{ settings.type_subheading_font.family }}, {{ settings.type_subheading_font.fallback_families }};
   }
 </style>

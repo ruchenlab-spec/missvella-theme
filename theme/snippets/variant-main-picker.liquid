@@ -23,6 +23,14 @@
   endif
   assign fieldset_index = 0
 
+  # Size layout: the merchant can show every size at once (matrix) instead of a
+  # dropdown. Missing settings fall back to the matrix, which is the default.
+  assign size_layout = block_settings.size_layout | default: 'matrix'
+  assign show_fit_tabs = true
+  if block_settings.show_fit_tabs == false
+    assign show_fit_tabs = false
+  endif
+
   assign product_has_size_option = false
   for option_scan in product_resource.options_with_values
     assign option_scan_key = option_scan.name | strip | downcase
@@ -126,15 +134,47 @@
           product_resource: product_resource,
           group_handle: color_group_handle,
           current_product: product,
+          display_style: block_settings.color_group_display_style,
           columns: block_settings.color_group_columns,
           min_width: block_settings.color_group_min_width,
           mobile_min_width: block_settings.color_group_mobile_min_width,
           card_radius: block_settings.color_group_card_radius,
           selected_style: block_settings.color_group_selected_style,
           tooltip_shadow: block_settings.color_group_tooltip_shadow,
+          gap: block_settings.color_group_gap,
           gap_start: block_settings.color_group_gap_start,
           gap_end: block_settings.color_group_gap_end
         -%}
+      {%- endif -%}
+      {%- if show_fit_tabs and product_has_size_option -%}
+        {%- comment -%}
+          Fit preference tabs. The tabs only switch what is shown: Standard Size
+          reveals the size matrix rendered by this picker, Custom Fit reveals the
+          Custom Size block that lives next to this picker.
+        {%- endcomment -%}
+        <div class="mv-fit-tabs" role="tablist" aria-label="Fit preference">
+          <button
+            type="button"
+            class="mv-fit-tab is-active"
+            role="tab"
+            aria-selected="true"
+            aria-controls="mv-fit-panel-standard"
+            data-mv-fit-tab="standard"
+          >
+            <span class="mv-fit-tab__text">Standard Size</span>
+          </button>
+          <button
+            type="button"
+            class="mv-fit-tab"
+            role="tab"
+            aria-selected="false"
+            aria-controls="mv-fit-panel-custom"
+            data-mv-fit-tab="custom"
+          >
+            <span class="mv-fit-tab__text">Custom Fit</span>
+          </button>
+        </div>
+        <p class="mv-fit-error" data-mv-fit-error hidden></p>
       {%- endif -%}
       {%- for product_option in product_resource.options_with_values -%}
         {%- liquid
@@ -216,6 +256,13 @@
           assign longest_value = 0
           assign is_plus_size_collapsible = false
           assign plus_size_selected = false
+          assign is_size_matrix = false
+
+          # PDP size matrix: every size is shown at once, no extra click needed.
+          if is_size_option and size_layout == 'matrix'
+            assign is_size_matrix = true
+            assign variant_style = 'buttons'
+          endif
 
           if variant_style == 'buttons' and settings.variant_button_width == 'equal-width-buttons'
             assign fieldset_id = section.id | append: '-' | append: product_resource.id | append: '-' | append: product_option.name | handleize
@@ -224,7 +271,8 @@
 
           # PDP Size option: collapse everything from US18+ onward behind a compact toggle.
           # Custom Sizes is a technical placeholder and must not affect Plus Size expansion.
-          if variant_style != 'swatch'
+          # The size matrix shows every size, so it never collapses.
+          if variant_style != 'swatch' and is_size_matrix == false
             if is_size_option
               assign plus_size_scan_started = false
               for option_scan_value in product_option.values
@@ -254,9 +302,9 @@
               {{- product_option.selected_value -}}
             </span>
           </div>
-        {%- elsif variant_style == 'swatch' or block_settings.variant_style == 'buttons' -%}
+        {%- elsif variant_style == 'swatch' or variant_style == 'buttons' -%}
           <fieldset
-            class="variant-option variant-option--buttons{% if variant_style == 'swatch' %} variant-option--swatches{% else %} variant-option--{{ settings.variant_button_width }}{% endif %}{% if is_plus_size_collapsible %} variant-option--plus-size-collapsible{% endif %}"
+            class="variant-option variant-option--buttons{% if variant_style == 'swatch' %} variant-option--swatches{% elsif is_size_matrix %}{% else %} variant-option--{{ settings.variant_button_width }}{% endif %}{% if is_size_matrix %} variant-option--matrix{% endif %}{% if is_plus_size_collapsible %} variant-option--plus-size-collapsible{% endif %}"
             data-fieldset-index="{{ fieldset_index }}"
             {% if is_color_option %}
               data-mv-option-kind="color"
@@ -405,6 +453,12 @@
               {% endstyle %}
             {% endif %}
           </fieldset>
+          {%- if is_size_matrix -%}
+            <p class="mv-size-summary" data-mv-size-summary>
+              <span class="mv-size-summary__label">Selected size</span>
+              <span class="mv-size-summary__value" data-mv-size-value>{{ product_option.selected_value }}</span>
+            </p>
+          {%- endif -%}
           {%- assign fieldset_index = fieldset_index | plus: 1 -%}
         {%- elsif block_settings.variant_style == 'dropdowns' -%}
           {%
@@ -490,10 +544,17 @@
               <svg
                 aria-hidden="true"
                 focusable="false"
-                class="icon icon-caret"
-                viewBox="0 0 10 6"
+                class="icon icon-caret icon-caret--line"
+                viewBox="0 0 12 12"
+                fill="none"
               >
-                {%- render 'icon', icon: 'caret' -%}
+                <path
+                  d="M2.75 4.75 6 8l3.25-3.25"
+                  stroke="currentColor"
+                  stroke-width="1.5"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
               </svg>
             </div>
           </div>
@@ -503,6 +564,106 @@
       <script type="application/json">
         {{ product_resource.selected_or_first_available_variant | json }}
       </script>
+      {%- if show_fit_tabs and product_has_size_option -%}
+        {%- comment -%}
+          Fit preference tabs + selected size summary.
+
+          The tabs toggle a mode class on the product details wrapper, which is the
+          closest common ancestor of this picker and the Custom Size block. CSS then
+          decides what is visible, so no markup is moved around.
+        {%- endcomment -%}
+        <script>
+          (function () {
+            var picker = document.currentScript && document.currentScript.closest('variant-picker');
+            if (!picker || picker.dataset.mvFitInit) return;
+            picker.dataset.mvFitInit = '1';
+
+            var scope = picker.closest('.product-details') || document;
+            var errorLine = picker.querySelector('[data-mv-fit-error]');
+            var summary = picker.querySelector('[data-mv-size-summary]');
+            var currentMode = 'standard';
+
+            function tabButtons() {
+              return picker.querySelectorAll('[data-mv-fit-tab]');
+            }
+
+            function customBlock() {
+              return scope.querySelector('.custom-sizes-block');
+            }
+
+            function showError(message) {
+              if (!errorLine) return;
+              errorLine.textContent = message;
+              errorLine.hidden = false;
+            }
+
+            function hideError() {
+              if (errorLine) errorLine.hidden = true;
+            }
+
+            function applyMode(mode, notify) {
+              currentMode = mode;
+              scope.classList.toggle('mv-fit-standard', mode === 'standard');
+              scope.classList.toggle('mv-fit-custom', mode === 'custom');
+              Array.prototype.forEach.call(tabButtons(), function (tab) {
+                var active = tab.dataset.mvFitTab === mode;
+                tab.classList.toggle('is-active', active);
+                tab.setAttribute('aria-selected', active ? 'true' : 'false');
+              });
+              if (tabButtons().length) {
+                var customTab = picker.querySelector('[data-mv-fit-tab="custom"]');
+                if (customTab && !customBlock()) customTab.hidden = true;
+              }
+              hideError();
+              if (notify !== false) {
+                document.dispatchEvent(new CustomEvent('mv:fit-mode', { detail: { mode: mode } }));
+              }
+            }
+
+            // Delegated listener: the theme re-renders the picker markup on
+            // variant changes, which would drop listeners bound to the buttons.
+            picker.addEventListener('click', function (event) {
+              var tab = event.target && event.target.closest ? event.target.closest('[data-mv-fit-tab]') : null;
+              if (!tab || !picker.contains(tab)) return;
+              if (tab.dataset.mvFitTab === 'custom' && !customBlock()) return;
+              applyMode(tab.dataset.mvFitTab, true);
+            });
+
+            // Keep the "Selected size" line in sync with the current selection.
+            function syncSummary() {
+              if (!summary) return;
+              var value = picker.querySelector('[data-mv-size-value]');
+              var checked = picker.querySelector('.variant-option--matrix input[type="radio"]:checked');
+              if (value && checked && checked.value) value.textContent = checked.value;
+            }
+
+            picker.addEventListener('change', syncSummary);
+            document.addEventListener('shopify:product:select', function (event) {
+              if (event.target !== picker) return;
+              if (event.promise && typeof event.promise.then === 'function') {
+                event.promise.then(syncSummary).catch(function () {});
+              } else {
+                syncSummary();
+              }
+            });
+
+            // Re-apply the mode after the theme re-renders the picker markup.
+            if (typeof MutationObserver === 'function') {
+              var queued = false;
+              new MutationObserver(function () {
+                if (queued) return;
+                queued = true;
+                requestAnimationFrame(function () {
+                  queued = false;
+                  applyMode(currentMode, false);
+                });
+              }).observe(picker, { childList: true, subtree: true });
+            }
+
+            applyMode('standard', true);
+          })();
+        </script>
+      {%- endif -%}
     </form>
   </variant-picker>
 {% endunless %}
@@ -636,17 +797,279 @@
     /* Keep Color typography consistent even when the product has only one color. */
     variant-picker[data-block-id='{{ block.id }}'][data-template-product-match='true']
       .variant-option[data-mv-option-kind='color'] > legend {
-      margin-block-end: 8px;
-      line-height: 1.25;
-      font-size: 13px;
+    margin-block-end: 8px;
+    line-height: 1.25;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.035em;
+    text-transform: uppercase;
+    color: #000000;
+    }
+
+    /* ------------------------------------------------------------------
+       Fit preference tabs (Standard Size / Custom Fit)
+       ------------------------------------------------------------------ */
+    .mv-fit-tabs {
+      display: flex;
+      align-items: stretch;
+      gap: 28px;
+      width: 100%;
+      margin-block: 20px 4px;
+      border-block-end: 1px solid #E5E1DB;
+    }
+
+    .mv-fit-tab {
+      appearance: none;
+      border: 0;
+      background: transparent;
+      padding: 0 0 12px;
+      margin: 0;
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      font-family: var(--font-body--family);
+      font-size: 11px;
       font-weight: 600;
-      letter-spacing: 0.035em;
+      letter-spacing: 0.14em;
       text-transform: uppercase;
-      color: #000000;
+      color: #8A8580;
+      cursor: pointer;
+      transition: color 0.18s ease;
+    }
+
+    .mv-fit-tab::after {
+      content: '';
+      position: absolute;
+      inset-inline: 0;
+      inset-block-end: -1px;
+      height: 1px;
+      background: #191918;
+      transform: scaleX(0);
+      transform-origin: center;
+      transition: transform 0.22s cubic-bezier(0.22, 0.72, 0.24, 1);
+    }
+
+    .mv-fit-tab:hover {
+      color: #191918;
+    }
+
+    .mv-fit-tab.is-active {
+      color: #191918;
+    }
+
+    .mv-fit-tab.is-active::after {
+      transform: scaleX(1);
+    }
+
+    .mv-fit-tab:focus-visible {
+      outline: 2px solid #191918;
+      outline-offset: 3px;
+      border-radius: 2px;
+    }
+
+    .mv-fit-error {
+      display: block;
+      margin: 10px 0 0;
+      font-family: var(--font-body--family);
+      font-size: 12px;
+      line-height: 1.4;
+      color: #B4465E;
+    }
+
+    /* ------------------------------------------------------------------
+       Size matrix — every size visible at once
+       ------------------------------------------------------------------ */
+    variant-picker[data-block-id='{{ block.id }}'][data-template-product-match='true']
+      .variant-option--matrix {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 8px;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      border: none;
     }
 
     variant-picker[data-block-id='{{ block.id }}'][data-template-product-match='true']
-      .variant-option--buttons:not(.variant-option--swatches) {
+      .variant-option--matrix > legend {
+      grid-column: 1 / -1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      width: 100%;
+      margin-block-end: 10px;
+      padding: 0;
+    }
+
+    @media screen and (max-width: 989px) {
+      variant-picker[data-block-id='{{ block.id }}'][data-template-product-match='true']
+        .variant-option--matrix.variant-option--matrix {
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+      }
+    }
+
+    @media screen and (max-width: 749px) {
+      variant-picker[data-block-id='{{ block.id }}'][data-template-product-match='true']
+        .variant-option--matrix.variant-option--matrix {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 7px;
+      }
+    }
+
+    variant-picker[data-block-id='{{ block.id }}'][data-template-product-match='true']
+      .variant-option--matrix
+      .variant-option__button-label {
+      /* Reset the theme defaults so the size digits always stay visible.
+         `overflow: clip` is kept on purpose: the theme hides its selection
+         pill by translating it out of the label. */
+      flex: 0 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+      min-width: 0;
+      min-height: 44px;
+      margin: 0;
+      padding: 0 6px;
+      border: 1px solid #E5E1DB;
+      border-radius: 2px;
+      background: #FFFFFF;
+      color: #222222;
+      font-family: var(--font-body--family);
+      font-size: 13.5px;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      line-height: 1.2;
+      white-space: nowrap;
+      cursor: pointer;
+      box-sizing: border-box;
+      transition:
+        border-color 0.16s ease,
+        background-color 0.16s ease,
+        color 0.16s ease;
+    }
+
+    variant-picker[data-block-id='{{ block.id }}'][data-template-product-match='true']
+      .variant-option--matrix
+      .variant-option__button-label:hover {
+      border-color: #A9A7A2;
+      background: #FAF9F7;
+      color: #191918;
+    }
+
+    variant-picker[data-block-id='{{ block.id }}'][data-template-product-match='true']
+      .variant-option--matrix
+      .variant-option__button-label:has(:checked) {
+      border-color: #191918;
+      background: #191918;
+      color: #FFFFFF;
+    }
+
+    variant-picker[data-block-id='{{ block.id }}'][data-template-product-match='true']
+      .variant-option--matrix
+      .variant-option__button-label:has(:checked):hover {
+      border-color: #191918;
+      background: #191918;
+      color: #FFFFFF;
+    }
+
+    variant-picker[data-block-id='{{ block.id }}'][data-template-product-match='true']
+      .variant-option--matrix
+      .variant-option__button-label:has([data-option-available='false']) {
+      border-style: dashed;
+      color: #A9A7A2;
+    }
+
+    variant-picker[data-block-id='{{ block.id }}'][data-template-product-match='true']
+      .variant-option--matrix
+      .variant-option__button-label:has(:focus-visible) {
+      outline: 2px solid #191918;
+      outline-offset: 2px;
+    }
+
+    /* The native radio stays in the DOM (variant resolution depends on it). */
+    variant-picker[data-block-id='{{ block.id }}'][data-template-product-match='true']
+      .variant-option--matrix
+      .variant-option__button-label
+      input {
+      position: absolute;
+      width: 1px;
+      height: 1px;
+      margin: -1px;
+      padding: 0;
+      border: 0;
+      opacity: 0;
+      pointer-events: none;
+      clip-path: inset(50%);
+    }
+
+    variant-picker[data-block-id='{{ block.id }}'][data-template-product-match='true']
+      .variant-option--matrix
+      .variant-option__button-label__text {
+      position: static;
+      inset: auto;
+      width: auto;
+      height: auto;
+      max-width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      pointer-events: none;
+    }
+
+    /* Selected size summary */
+    .mv-size-summary {
+      display: flex;
+      align-items: baseline;
+      gap: 6px;
+      margin: 10px 0 0;
+      font-family: var(--font-body--family);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: #8A8580;
+    }
+
+    .mv-size-summary__value {
+      font-weight: 600;
+      color: #191918;
+    }
+
+    /* ------------------------------------------------------------------
+       Custom Fit mode: the size matrix and its summary step aside so the
+       custom measurement panel is the only content under the tabs.
+       ------------------------------------------------------------------ */
+    .mv-fit-custom
+      variant-picker[data-template-product-match='true']
+      .variant-option--matrix.variant-option--matrix {
+      display: none;
+    }
+
+    .mv-fit-custom .mv-size-summary.mv-size-summary {
+      display: none;
+    }
+
+    /* Dropdown option labels (e.g. Size) share the same typography as the
+       Color legend so both option titles look identical. */
+    variant-picker[data-block-id='{{ block.id }}'][data-template-product-match='true']
+      .variant-option--dropdowns
+      > label,
+    variant-picker[data-block-id='{{ block.id }}'][data-template-product-match='true']
+      .variant-option--dropdowns
+      .mv-size-dropdown-label-row
+      > label {
+    margin-block-end: 8px;
+    line-height: 1.25;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.035em;
+    text-transform: uppercase;
+    color: #000000;
+    }
+
+    variant-picker[data-block-id='{{ block.id }}'][data-template-product-match='true']
+      .variant-option--buttons:not(.variant-option--swatches):not(.variant-option--matrix) {
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
       column-gap: 8px;
@@ -654,14 +1077,89 @@
       width: 100%;
     }
 
+    /* ------------------------------------------------------------------
+       Refined size dropdown: quieter border, generous hit area, a stroked
+       chevron that flips while the control has focus.
+       ------------------------------------------------------------------ */
     variant-picker[data-block-id='{{ block.id }}'][data-template-product-match='true']
-      .variant-option--buttons:not(.variant-option--swatches) > legend {
+      .variant-option__select-wrapper {
+      border-color: #D9D7D2;
+      border-radius: 10px;
+      background: #FFFFFF;
+      box-shadow:
+        0 1px 2px rgb(26 26 24 / 0.04),
+        inset 0 1px 0 rgb(255 255 255 / 0.7);
+      transition:
+        border-color .18s ease,
+        background-color .18s ease,
+        box-shadow .18s ease;
+    }
+
+    variant-picker[data-block-id='{{ block.id }}'][data-template-product-match='true']
+      .variant-option__select-wrapper:hover {
+      border-color: #A9A7A2;
+      background: #FCFBF9;
+    }
+
+    variant-picker[data-block-id='{{ block.id }}'][data-template-product-match='true']
+      .variant-option__select-wrapper:has(.variant-option__select:focus) {
+      border-color: #000000;
+      background: #FFFFFF;
+      box-shadow: 0 0 0 3px rgb(0 0 0 / 0.06);
+    }
+
+    variant-picker[data-block-id='{{ block.id }}'][data-template-product-match='true']
+      .variant-option__select {
+      font-family: var(--font-body--family);
+      font-size: 14px;
+      font-weight: 500;
+      letter-spacing: 0.02em;
+      line-height: 1.2;
+      color: #000000;
+      padding-block: 15px;
+      padding-inline: 16px 46px;
+      background: transparent;
+    }
+
+    variant-picker[data-block-id='{{ block.id }}'][data-template-product-match='true']
+      .variant-option__select option {
+      font-family: var(--font-body--family);
+      font-size: 14px;
+      color: #000000;
+      padding: 10px 12px;
+    }
+
+    variant-picker[data-block-id='{{ block.id }}'][data-template-product-match='true']
+      .variant-option__select-wrapper .icon-caret {
+      width: 12px;
+      height: 12px;
+      inset-inline-end: 16px;
+      color: #000000;
+      opacity: 0.72;
+      transition:
+        transform .22s cubic-bezier(.22, .72, .24, 1),
+        opacity .18s ease;
+    }
+
+    variant-picker[data-block-id='{{ block.id }}'][data-template-product-match='true']
+      .variant-option__select-wrapper:hover .icon-caret {
+      opacity: 1;
+    }
+
+    variant-picker[data-block-id='{{ block.id }}'][data-template-product-match='true']
+      .variant-option__select-wrapper:has(.variant-option__select:focus) .icon-caret {
+      opacity: 1;
+      transform: translateY(-50%) rotate(180deg);
+    }
+
+    variant-picker[data-block-id='{{ block.id }}'][data-template-product-match='true']
+      .variant-option--buttons:not(.variant-option--swatches):not(.variant-option--matrix) > legend {
       grid-column: 1 / -1;
       width: 100%;
     }
 
     variant-picker[data-block-id='{{ block.id }}'][data-template-product-match='true']
-      .variant-option--buttons:not(.variant-option--swatches)
+      .variant-option--buttons:not(.variant-option--swatches):not(.variant-option--matrix)
       legend {
       margin-block-end: 8px;
       line-height: 1.25;
@@ -678,7 +1176,7 @@
     }
 
     variant-picker[data-block-id='{{ block.id }}'][data-template-product-match='true']
-      .variant-option--buttons:not(.variant-option--swatches)
+      .variant-option--buttons:not(.variant-option--swatches):not(.variant-option--matrix)
       .variant-option__button-label {
       width: 100%;
       min-width: 0;
@@ -695,14 +1193,14 @@
 
     @media (hover: hover) {
       variant-picker[data-block-id='{{ block.id }}'][data-template-product-match='true']
-        .variant-option--buttons:not(.variant-option--swatches)
+        .variant-option--buttons:not(.variant-option--swatches):not(.variant-option--matrix)
         .variant-option__button-label:hover {
         transform: translateY(-1px);
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.055);
       }
 
       variant-picker[data-block-id='{{ block.id }}'][data-template-product-match='true']
-        .variant-option--buttons:not(.variant-option--swatches)
+        .variant-option--buttons:not(.variant-option--swatches):not(.variant-option--matrix)
         .variant-option__button-label:has(:checked):hover {
         box-shadow: 0 5px 14px rgba(0, 0, 0, 0.12);
       }
@@ -718,7 +1216,7 @@
 
     @media screen and (max-width: 749px) {
       variant-picker[data-block-id='{{ block.id }}'][data-template-product-match='true']
-        .variant-option--buttons:not(.variant-option--swatches)
+        .variant-option--buttons:not(.variant-option--swatches):not(.variant-option--matrix)
         .variant-option__button-label {
         min-height: 42px;
         padding-block: 6px;

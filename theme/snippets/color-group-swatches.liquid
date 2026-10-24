@@ -9,11 +9,13 @@
   @param {object} product_resource - The product object.
   @param {string} [group_handle] - Handle of the group collection.
   @param {object} [current_product] - Product to treat as the active one.
+  @param {string} [display_style] - `cards` (image cards) or `swatches` (small colour blocks).
   @param {string} [columns] - Number of columns per row, or `auto`.
   @param {number} [min_width] - Minimum card width in pixels (desktop).
   @param {number} [mobile_min_width] - Minimum card width in pixels (mobile).
   @param {number} [card_radius] - Card corner radius in pixels.
   @param {string} [selected_style] - Selected swatch style.
+  @param {number} [gap] - Space between cards/swatches in pixels.
   @param {number} [gap_start] - Space above the swatch group, in pixels.
   @param {number} [gap_end] - Space below the swatch group, in pixels.
   @param {boolean} [tooltip_shadow] - Whether the tooltip gets a shadow.
@@ -41,17 +43,67 @@
 
   assign group_member_count = group_members | size
 
+  # ------------------------------------------------ current colour name
+  # Shown next to the "COLOR" legend so the selection never depends on the
+  # swatch image alone.
+  assign current_color_label = blank
+  for member in group_members
+    if member.id == current_product.id
+      assign current_color_label = member.metafields['custom.color_name'].value
+      if current_color_label == blank
+        assign current_color_label = member.metafields['custom.color'].value
+      endif
+      if current_color_label == blank
+        assign current_color_label = member.metafields['custom.colour'].value
+      endif
+      if current_color_label == blank
+        assign current_color_label = member.metafields['custom.color_label'].value
+      endif
+      if current_color_label == blank
+        assign current_color_label = member.metafields['color_name'].value
+      endif
+      if current_color_label == blank
+        for member_option in member.options_with_values
+          assign option_key = member_option.name | strip | downcase
+          if option_key == 'color' or option_key == 'colour' or option_key == '颜色'
+            assign current_color_label = member_option.values.first.name
+            break
+          endif
+        endfor
+      endif
+      if current_color_label == blank
+        assign current_color_label = member.title
+      endif
+      break
+    endif
+  endfor
+
   # ------------------------------------------------ appearance settings
+  # `display_style` switches the whole group between image cards (`cards`,
+  # the default) and compact colour blocks (`swatches`). Everything else
+  # (columns, sizes, radius, gaps) is shared by both modes.
+  assign group_display_style = display_style | default: 'cards'
   assign group_columns = columns | default: 'auto'
   assign group_min_width = min_width | default: 52
   assign group_mobile_min_width = mobile_min_width | default: 40
   assign group_card_radius = card_radius | default: 6
   assign group_selected_style = selected_style | default: 'solid'
+  assign group_gap = gap | default: 8
   assign group_gap_start = gap_start | default: 0
   assign group_gap_end = gap_end | default: 12
 
+  # Cards stretch to fill the row (`minmax(min, 1fr)`); swatches keep the
+  # configured size so a row never blows up when only a few colours exist.
+  # In both modes the number of tracks is derived from the available width,
+  # the configured card/swatch size and the gap — never a fixed 2-per-row.
   if group_columns == 'auto'
-    assign group_grid = 'repeat(auto-fill, minmax(var(--color-group-min-width), 1fr))'
+    if group_display_style == 'swatches'
+      assign group_grid = 'repeat(auto-fill, var(--color-group-min-width))'
+    else
+      assign group_grid = 'repeat(auto-fill, minmax(var(--color-group-min-width), 1fr))'
+    endif
+  elsif group_display_style == 'swatches'
+    assign group_grid = 'repeat(' | append: group_columns | append: ', var(--color-group-min-width))'
   else
     assign group_grid = 'repeat(' | append: group_columns | append: ', minmax(0, 1fr))'
   endif
@@ -65,18 +117,25 @@
     data-mv-option-kind="color"
     data-color-group
     data-group-handle="{{ group_handle }}"
+    data-display-style="{{ group_display_style }}"
     data-selected-style="{{ group_selected_style }}"
     style="
       --color-group-grid: {{ group_grid }};
       --color-group-min-width-desktop: {{ group_min_width }}px;
       --color-group-min-width-mobile: {{ group_mobile_min_width }}px;
       --color-group-card-radius: {{ group_card_radius }}px;
+      --color-group-card-gap: {{ group_gap }}px;
       --color-group-gap-start: {{ group_gap_start }}px;
       --color-group-gap-end: {{ group_gap_end }}px;
       {% if tooltip_shadow %}--color-group-tooltip-shadow: 0 8px 20px rgb(var(--color-foreground-rgb) / 0.24);{% else %}--color-group-tooltip-shadow: none;{% endif %}
     "
   >
-    <legend class="color-group__label">{{ group_title }}</legend>
+    <legend class="color-group__label">
+      <span class="color-group__label-text">{{ group_title }}</span>
+      {%- if current_color_label != blank -%}
+        <span class="color-group__current">{{ current_color_label }}</span>
+      {%- endif -%}
+    </legend>
 
     <ul class="color-group__list" role="list">
       {%- for member in group_members -%}
@@ -120,7 +179,16 @@
             assign color_label = member.title
           endif
 
-          # ------------------------------------------------ swatch image
+          # ------------------------------------------------ swatch visual
+          # `visual_url` / `visual_color` are resolved once per member and
+          # drive both the card and the swatch markup.
+          #
+          # Card mode:  uploaded swatch image > product photo > colour (色号)
+          # Swatch mode: uploaded swatch image > colour (色号) > product photo
+          #
+          # The compact swatch mode prefers the colour itself so the merchant's
+          # 色号 is what shoppers see; the photo is only a last resort when no
+          # colour was configured for that member.
           assign thumb = blank
           assign swatch_keys = 'custom.color_swatch,custom.color_image,custom.swatch' | split: ','
           for image_key in swatch_keys
@@ -134,14 +202,27 @@
             assign thumb = swatch_image
           endif
 
-          assign thumb_url = blank
-          assign preview_url = blank
-          if thumb != blank
-            assign thumb_url = thumb | image_url: width: 160
-          elsif member.featured_media != blank
-            assign thumb_url = member.featured_media.preview_image | image_url: width: 160
+          assign featured_url = blank
+          if member.featured_media != blank
+            assign featured_url = member.featured_media.preview_image | image_url: width: 160
           endif
 
+          assign visual_url = blank
+          assign visual_color = swatch_color
+          if thumb != blank
+            assign visual_url = thumb | image_url: width: 160
+            assign visual_color = blank
+          elsif group_display_style == 'swatches'
+            if swatch_color == blank and featured_url != blank
+              assign visual_url = featured_url
+              assign visual_color = blank
+            endif
+          elsif featured_url != blank
+            assign visual_url = featured_url
+            assign visual_color = blank
+          endif
+
+          assign preview_url = blank
           if member.featured_media != blank
             assign preview_url = member.featured_media.preview_image | image_url: width: 900
           endif
@@ -186,10 +267,10 @@
               class="color-group__swatch color-group__swatch--current"
               aria-current="true"
             >
-              {%- if thumb_url != blank -%}
+              {%- if visual_url != blank -%}
                 <img
                   class="color-group__image"
-                  src="{{ thumb_url }}"
+                  src="{{ visual_url }}"
                   alt=""
                   width="80"
                   height="100"
@@ -198,7 +279,7 @@
               {%- else -%}
                 <span
                   class="color-group__swatch-color"
-                  style="background-color: {% if swatch_color %}{{ swatch_color.rgb }}{% else %}rgb(var(--color-foreground-rgb) / 0.25){% endif %};"
+                  style="background-color: {% if visual_color %}rgb({{ visual_color.rgb }}){% else %}rgb(var(--color-foreground-rgb) / 0.25){% endif %};"
                 ></span>
               {%- endif -%}
               <span class="color-group__tooltip" aria-hidden="true">{{ color_label }}</span>
@@ -214,10 +295,10 @@
               {% if preview_url != blank %}data-preview-src="{{ preview_url }}"{% endif %}
               aria-label="{{ color_label | escape }}"
             >
-              {%- if thumb_url != blank -%}
+              {%- if visual_url != blank -%}
                 <img
                   class="color-group__image"
-                  src="{{ thumb_url }}"
+                  src="{{ visual_url }}"
                   alt=""
                   width="80"
                   height="100"
@@ -226,7 +307,7 @@
               {%- else -%}
                 <span
                   class="color-group__swatch-color"
-                  style="background-color: {% if swatch_color %}{{ swatch_color.rgb }}{% else %}rgb(var(--color-foreground-rgb) / 0.25){% endif %};"
+                  style="background-color: {% if visual_color %}rgb({{ visual_color.rgb }}){% else %}rgb(var(--color-foreground-rgb) / 0.25){% endif %};"
                 ></span>
               {%- endif -%}
               <span class="color-group__tooltip" aria-hidden="true">{{ color_label }}</span>
