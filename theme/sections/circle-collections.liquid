@@ -45,6 +45,16 @@
     assign arrow_icon = 'caret'
   endif
 
+  # "large" icon styles get a visibly bigger arrow than the base setting.
+  if section.settings.icons_style contains 'large'
+    assign arrow_size = arrow_size | plus: 16
+  endif
+
+  # Without arrows the carousel is a single centered column (no reserved gutters).
+  if section.settings.icons_style == 'none'
+    assign arrow_size = 0
+  endif
+
   if section.settings.background_color != blank
     render 'contrast-override', background_color: section.settings.background_color, section_id: section.id
   endif
@@ -67,6 +77,7 @@
     --circle-gap: {{ circle_gap }}px;
     --circle-size: {{ circle_size_css }};
     --circle-arrow-size: {{ arrow_size }}px;
+    --circle-carousel-gap: {% if arrow_size == 0 %}0px{% else %}8px{% endif %};
     --circle-title-size: {{ section.settings.title_font_size | default: 12 }}px;
     --circle-title-spacing: {{ section.settings.title_letter_spacing | default: 1 }}px;
     --circle-title-transform: {{ section.settings.title_case | default: 'uppercase' }};
@@ -88,7 +99,7 @@
       {%- if block.type == 'circle_collection' -%}
         {%- liquid
           assign col = block.settings.collection
-          assign item_link = '#'
+          assign item_link = blank
           if col != blank
             assign item_link = col.url
           endif
@@ -97,8 +108,7 @@
             assign item_title = col.title
           endif
         -%}
-        {%- capture circle_content -%}
-          <a class="circle-collections__item" href="{{ item_link }}">
+        {%- capture circle_inner -%}
             <div class="circle-collections__media">
               {%- if block.settings.custom_video != blank -%}
                 {{
@@ -138,7 +148,14 @@
             {%- if item_title != blank -%}
               <span class="circle-collections__title">{{ item_title }}</span>
             {%- endif -%}
-          </a>
+        {%- endcapture -%}
+        {%- capture circle_content -%}
+          {%- if item_link != blank -%}
+            <a class="circle-collections__item" href="{{ item_link }}">{{ circle_inner }}</a>
+          {%- else -%}
+            {%- comment -%} No collection picked: render a static circle instead of a dead "#" link. {%- endcomment -%}
+            <div class="circle-collections__item">{{ circle_inner }}</div>
+          {%- endif -%}
         {%- endcapture -%}
         {%- render 'slideshow-slide',
           index: circle_index,
@@ -244,7 +261,7 @@
     display: grid;
     grid-template-columns: var(--circle-arrow-size) minmax(0, 1fr) var(--circle-arrow-size);
     align-items: center;
-    column-gap: 8px;
+    column-gap: var(--circle-carousel-gap, 8px);
     width: 100%;
   }
 

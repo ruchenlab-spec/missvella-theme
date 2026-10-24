@@ -43,7 +43,10 @@
 
   # Built-in colour-name map: "name:#hex" pairs. Matched against the option value
   # lowercased, so "Rose gold", "rose-gold" and "ROSE GOLD" all match.
-  assign builtin_map = 'pink:#F4B8C8,navy:#1F2A5A,beige:#E8DCC8,rose gold:#DFA79A,rosegold:#DFA79A,blue:#3B5BA5,red:#C0392B,black:#111111,white:#FFFFFF,yellow:#F4D35E,purple:#7D5BA6,green:#3E8E5A,orange:#E4783C,brown:#8B5E3C,grey:#9E9E9E,gray:#9E9E9E,silver:#D9D9D9,gold:#C9A227,champagne:#F0E2C8,ivory:#F7F1E3,burgundy:#7B1E3A,wine:#6B1F35,apricot:#F5C6A5,lavender:#C9B6DB,lilac:#C9B6DB,khaki:#C3B091,dusty rose:#C98E96,teal:#2E8B8B,turquoise:#40C9C9,cobalt:#2242A8,royal blue:#2242A8,sky blue:#8FC1E9,denim:#4F6D8F,aqua:#7FDBDA,emerald:#2E9E6B,sage:#9CAF88,olive:#808000,mint:#B7E4C7,fuchsia:#DE3163,magenta:#D0417E,blush:#F2C6C2,coral:#FF7F50,peach:#F7C59F,rust:#B7410E,tan:#D2B48C,chocolate:#5C3A21,cream:#FFF5E1,multi:#FFFFFF'
+  capture builtin_map_raw
+    render 'color-facet-pairs'
+  endcapture
+  assign builtin_map = builtin_map_raw | strip
 
   assign builtin_pairs = builtin_map | split: ','
 
@@ -108,6 +111,7 @@
         <a
           class="color-facets__item{% if active_color_count == 0 %} is-active{% endif %}"
           href="{{ closest.collection.url | default: routes.root_url }}"
+          data-mv-clear-color-facets
           aria-label="{{ block.settings.all_label | default: 'All' }}"
         >
           <span class="color-facets__dot color-facets__dot--all" aria-hidden="true">
@@ -253,6 +257,7 @@
           <a
             class="color-facets__item{% if active_color_count == 0 %} is-active{% endif %}"
             href="{{ closest.collection.url | default: routes.root_url }}"
+            data-mv-clear-color-facets
             aria-label="{{ block.settings.all_label | default: 'All' }}"
           >
             <span class="color-facets__dot color-facets__dot--all" aria-hidden="true">
@@ -302,6 +307,29 @@
       </div>
     {% endif %}
   </div>
+  <script>
+    /* "All" only clears the colour facets: size, price, sort and the rest of
+       the active filters survive (the old link went to the bare collection URL
+       and wiped everything). */
+    (function () {
+      function isColorParam(key) {
+        if (!/^filter\.v\./.test(key)) return false;
+        if (/^filter\.v\.price/.test(key)) return false;
+        return /color|colour|颜色|color-pattern/i.test(key);
+      }
+      document.addEventListener('click', function (event) {
+        var link = event.target.closest('[data-mv-clear-color-facets]');
+        if (!link) return;
+        var url = new URL(window.location.href);
+        Array.from(url.searchParams.keys()).forEach(function (key) {
+          if (isColorParam(key)) url.searchParams.delete(key);
+        });
+        url.searchParams.delete('page');
+        event.preventDefault();
+        window.location.assign(url.toString());
+      });
+    })();
+  </script>
 {% endif %}
 
 {% stylesheet %}
@@ -469,17 +497,19 @@
 
   /* ===== Vertical (left sidebar) layout ===== */
   @media screen and (min-width: 750px) {
-    .collection-wrapper:has(.color-facets--vertical) {
+    /* Yield to the Filters block's sidebar when both are present — otherwise
+       both grids fight over column 1. */
+    .collection-wrapper:has(.color-facets--vertical):not(:has(.facets-block-wrapper[data-has-filters])) {
       /* Two columns: swatch sidebar + everything else (filters bar, product grid) */
       grid-template-columns: minmax(200px, 260px) minmax(0, 1fr) !important;
     }
 
-    .collection-wrapper:has(.color-facets--vertical) > div:has(> .color-facets) {
+    .collection-wrapper:has(.color-facets--vertical):not(:has(.facets-block-wrapper[data-has-filters])) > div:has(> .color-facets) {
       grid-column: 1;
       grid-row: 1 / span 12;
     }
 
-    .collection-wrapper:has(.color-facets--vertical) > *:not(:has(> .color-facets)) {
+    .collection-wrapper:has(.color-facets--vertical):not(:has(.facets-block-wrapper[data-has-filters])) > *:not(:has(> .color-facets)) {
       grid-column: 2;
     }
   }
@@ -783,10 +813,10 @@
       "default": "All"
     },
     {
-      "type": "text",
-      "id": "back_label",
-      "label": "返回按钮文字",
-      "default": "Back",
+      "type": "color",
+      "id": "flyout_bg_color",
+      "label": "展开面板背景",
+      "default": "#FFFFFF",
       "visible_if": "{{ block.settings.grouping == 'family' }}"
     },
     {

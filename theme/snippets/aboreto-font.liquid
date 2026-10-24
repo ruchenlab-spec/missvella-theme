@@ -11,7 +11,14 @@
 
 {%- assign aboreto_url = 'aboreto-regular.ttf' | asset_url -%}
 
+{%- comment -%}
+  Only preload when the theme's global display font is Aboreto. The @font-face
+  below stays so individual text blocks can still select it on demand — a
+  font-face costs nothing until it is actually used, a preload always does.
+{%- endcomment -%}
+{%- if settings.type_display_font == 'aboreto' -%}
 <link rel="preload" href="{{ aboreto_url }}" as="font" type="font/ttf" crossorigin>
+{%- endif -%}
 
 <style>
   @font-face {

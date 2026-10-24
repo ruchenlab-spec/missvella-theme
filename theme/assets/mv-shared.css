@@ -1,28 +1,31 @@
 /* ============================================================
-   Missvella product UI — shared styles
-   Palette: #EBE8E2 / #FAFAF8 / #000000
+   Missvella product UI — shared primitives
+   All neutral colors, fonts and radii come from the theme's
+   global tokens (color-palette.liquid / theme-styles-variables.liquid),
+   so "Theme settings" keeps controlling the whole storefront.
+   Only the missing --mv-pal-* aliases are defined here.
    ============================================================ */
 
 :root {
-  --mv-pal-page: #FAFAF8;
-  --mv-pal-surface: #FFFFFF;
-  --mv-pal-ink: #000000;
-  --mv-pal-muted: #6C6A67;
-  --mv-pal-border: #D9D7D2;
+  --mv-pal-page: rgb(var(--color-foreground-rgb) / 0.03);
+  --mv-pal-surface: var(--color-background);
+  --mv-pal-ink: var(--color-foreground);
+  --mv-pal-muted: var(--color-foreground-muted, rgb(var(--color-foreground-rgb) / 0.55));
+  --mv-pal-border: var(--color-border, rgb(var(--color-foreground-rgb) / 0.14));
   --mv-text-main: var(--mv-pal-ink);
 }
 
-/* Product CTA: keep black as the strongest commercial action. */
+/* Product CTA: geometry follows the theme's primary button radius setting. */
 product-form-component .add-to-cart-button,
 product-form-component button[type='submit'].button {
-  border-radius: 10px !important;
+  border-radius: var(--style-border-radius-buttons-primary, 10px);
   transition: transform 0.16s ease, box-shadow 0.16s ease, opacity 0.16s ease;
 }
 @media (hover: hover) {
   product-form-component .add-to-cart-button:hover,
   product-form-component button[type='submit'].button:hover {
     transform: translateY(-1px);
-    box-shadow: 0 7px 20px rgba(0, 0, 0, 0.12);
+    box-shadow: 0 7px 20px rgb(var(--color-foreground-rgb) / 0.12);
   }
 }
 product-form-component .add-to-cart-button:active,
@@ -36,7 +39,7 @@ product-form-component button[type='submit'].button:active {
   letter-spacing: .055em;
   text-transform: uppercase;
   color: var(--mv-pal-ink);
-  background: #FFFFFF;
+  background: var(--color-background);
   border: 1px solid var(--mv-pal-border);
   padding: 5px 7px;
   border-radius: 7px;
@@ -53,7 +56,7 @@ product-form-component button[type='submit'].button:active {
   color: var(--mv-pal-muted);
   line-height: 1.55;
   padding: 9px 11px;
-  background: #F5F4F1;
+  background: rgb(var(--color-foreground-rgb) / 0.04);
   border-radius: 8px;
   border-left: 3px solid var(--mv-pal-ink);
 }
@@ -64,23 +67,30 @@ product-form-component button[type='submit'].button:active {
   overflow: hidden;
   transition: border-color .18s ease, box-shadow .18s ease;
 }
-.mv-accordion-item.active { border-color: rgba(0,0,0,.24); box-shadow: 0 0 0 2px rgba(0,0,0,.04); }
+.mv-accordion-item.active {
+  border-color: rgb(var(--color-foreground-rgb) / 0.24);
+  box-shadow: 0 0 0 2px rgb(var(--color-foreground-rgb) / 0.04);
+}
 .mv-accordion-header {
   display: flex;
   align-items: center;
   gap: 8px;
   padding: 9px 11px;
   cursor: pointer;
-  background: #fff;
+  background: var(--color-background);
   transition: background .16s ease;
 }
-@media (hover:hover) { .mv-accordion-header:hover { background: #F6F5F2; } }
-.mv-accordion-item.active .mv-accordion-header { background: #F6F5F2; }
+@media (hover:hover) {
+  .mv-accordion-header:hover,
+  .mv-accordion-item.active .mv-accordion-header {
+    background: rgb(var(--color-foreground-rgb) / 0.04);
+  }
+}
 .mv-accordion-number {
   width: 23px;
   height: 23px;
   border-radius: 7px;
-  background: #FFFFFF;
+  background: var(--color-background);
   color: var(--mv-pal-muted);
   display: grid;
   place-items: center;
@@ -88,7 +98,7 @@ product-form-component button[type='submit'].button:active {
   font-size: 10px;
   flex-shrink: 0;
 }
-.mv-accordion-item.active .mv-accordion-number { background: var(--mv-pal-ink); color: #fff; }
+.mv-accordion-item.active .mv-accordion-number { background: var(--mv-pal-ink); color: var(--color-background); }
 .mv-accordion-content { max-height: 0; overflow: hidden; transition: max-height .28s ease; }
 .mv-accordion-item.active .mv-accordion-content { max-height: 320px; }
 .mv-accordion-text { padding: 8px 12px 11px; color: var(--mv-pal-muted); font-size: 11px; line-height: 1.6; }
@@ -98,7 +108,7 @@ product-form-component button[type='submit'].button:active {
   width: 26px;
   height: 26px;
   border-radius: 8px;
-  background: #fff;
+  background: var(--color-background);
   border: 1.5px solid var(--mv-pal-ink);
   display: grid;
   place-items: center;
@@ -106,37 +116,37 @@ product-form-component button[type='submit'].button:active {
   font-size: 10px;
   color: var(--mv-pal-ink);
   transition: transform .16s ease, background .16s ease, color .16s ease;
-  box-shadow: 0 3px 10px rgba(0,0,0,.10);
+  box-shadow: 0 3px 10px rgb(var(--color-foreground-rgb) / .10);
 }
 .mv-hotspot.active .mv-hotspot__dot,
-.mv-hotspot:hover .mv-hotspot__dot { background: var(--mv-pal-ink); color: #fff; transform: scale(1.06); }
+.mv-hotspot:hover .mv-hotspot__dot { background: var(--mv-pal-ink); color: var(--color-background); transform: scale(1.06); }
 
 .mv-input {
   min-height: 46px;
   padding: 10px 38px 10px 12px;
   border: 1px solid var(--mv-pal-border);
-  border-radius: 8px;
+  border-radius: var(--style-border-radius-inputs, 8px);
   font-size: 12px;
   color: var(--mv-pal-ink);
   font-family: inherit;
   width: 100%;
-  background: #fff;
+  background: var(--color-background);
   transition: border-color .16s ease, box-shadow .16s ease, background .16s ease;
 }
-.mv-input::placeholder { color: #AAA7A2; }
+.mv-input::placeholder { color: rgb(var(--color-foreground-rgb) / 0.4); }
 .mv-input:focus {
   outline: none;
   border-color: var(--mv-pal-ink);
-  box-shadow: 0 0 0 3px rgba(0,0,0,.08);
+  box-shadow: 0 0 0 3px rgb(var(--color-foreground-rgb) / .08);
 }
-.mv-input.optional { border-style: solid; background: #FCFCFB; }
+.mv-input.optional { border-style: solid; background: rgb(var(--color-foreground-rgb) / 0.02); }
 
 .mv-modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 15px 18px;
-  background: #fff;
+  background: var(--color-background);
   color: var(--mv-pal-ink);
   flex-shrink: 0;
 }
@@ -144,7 +154,7 @@ product-form-component button[type='submit'].button:active {
   width: 34px;
   height: 34px;
   border: 0;
-  background: #FFFFFF;
+  background: var(--color-background);
   border-radius: 9px;
   cursor: pointer;
   display: grid;
@@ -152,5 +162,5 @@ product-form-component button[type='submit'].button:active {
   transition: background .16s ease;
   padding: 0;
 }
-@media (hover:hover) { .mv-modal-close:hover { background: #F6F5F2; } }
+@media (hover:hover) { .mv-modal-close:hover { background: rgb(var(--color-foreground-rgb) / 0.04); } }
 .mv-modal-close svg { width: 12px; height: 12px; color: var(--mv-pal-ink); display: block; }

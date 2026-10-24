@@ -130,7 +130,7 @@
           if (thumb) thumb.style.left = p + '%';
         }
         function sync() {
-          if (nums; nums.length >= 2) {
+          if (nums && nums.length >= 2) {
             nums[1].value = input.value;
             if (parseFloat(input.value) >= max) nums[1].value = '';
           }

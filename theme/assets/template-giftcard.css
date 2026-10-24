@@ -82,7 +82,7 @@
 
 .gift-card__badge {
   border: 1px solid var(--color-border);
-  border-radius: var(--style-border-radius-buttons);
+  border-radius: var(--style-border-radius-buttons-secondary);
   display: inline-block;
   line-height: 0.25;
   padding: var(--padding-md);

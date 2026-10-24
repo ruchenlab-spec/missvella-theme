@@ -47,8 +47,10 @@
   endif
 
   # Built-in colour-name fallback map (same as the colour facets block)
-  assign builtin_pairs = 'pink:#F4B8C8,navy:#1F2A5A,beige:#E8DCC8,rose gold:#DFA79A,rosegold:#DFA79A,blue:#3B5BA5,red:#C0392B,black:#111111,white:#FFFFFF,yellow:#F4D35E,purple:#7D5BA6,green:#3E8E5A,orange:#E4783C,brown:#8B5E3C,grey:#9E9E9E,gray:#9E9E9E,silver:#D9D9D9,gold:#C9A227,champagne:#F0E2C8,ivory:#F7F1E3,burgundy:#7B1E3A,wine:#6B1F35,apricot:#F5C6A5,lavender:#C9B6DB,lilac:#C9B6DB,khaki:#C3B091,dusty rose:#C98E96,teal:#2E8B8B,turquoise:#40C9C9,cobalt:#2242A8,royal blue:#2242A8,sky blue:#8FC1E9,denim:#4F6D8F,aqua:#7FDBDA,emerald:#2E9E6B,sage:#9CAF88,olive:#808000,mint:#B7E4C7,fuchsia:#DE3163,magenta:#D0417E,blush:#F2C6C2,coral:#FF7F50,peach:#F7C59F,rust:#B7410E,tan:#D2B48C,chocolate:#5C3A21,cream:#FFF5E1,multi:#FFFFFF'
-  assign builtin_pairs = builtin_pairs | split: ','
+  capture builtin_pairs_raw
+    render 'color-facet-pairs'
+  endcapture
+  assign builtin_pairs = builtin_pairs_raw | strip | split: ','
 
   # Grouped rendering (merchant-defined colour groups): group name:swatch:members
   assign has_groups = false
@@ -598,7 +600,7 @@
 
   .show-more__label {
     text-align: start;
-    font-size: var(--font-size--body-md);
+    font-size: var(--font-size--md);
     font-family: var(--font-paragraph--family);
   }
 
@@ -1190,7 +1192,7 @@
   }
 
   .cf2-group__name {
-    font-size: 11px;
+    font-size: var(--font-size--2xs, 11px);
     letter-spacing: 0.1em;
     text-transform: uppercase;
     font-weight: 600;
@@ -1198,7 +1200,7 @@
   }
 
   .cf2-group__count {
-    font-size: 10px;
+    font-size: var(--font-size--3xs, 10px);
     color: var(--color-foreground-subdued);
   }
 

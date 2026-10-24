@@ -14,26 +14,39 @@
  */
 
 const SIZE_OPTION_NAME_PATTERN = /^(size|尺寸)[\s\-_–—]/i;
-const SELECTOR_CHECKED_RADIO =
-  'variant-picker input[type="radio"]:checked, [data-mv-option-kind="size"] input[type="radio"]:checked';
+const SELECT_SIZE_DROPDOWN_PATTERN = /^options\[(size|尺寸)\]/i;
 
 /**
  * Returns the size label the shopper currently selected, if any.
+ * The search stays inside the given picker (or the whole document when no
+ * picker is provided) so multi-product pages never carry a foreign size.
+ * @param {Element|null} [picker] - The variant-picker element to scope to.
  * @returns {string|null}
  */
-function getSelectedSize() {
-  for (const radio of document.querySelectorAll(SELECTOR_CHECKED_RADIO)) {
-    const name = radio.getAttribute('name') || '';
-    if (!SIZE_OPTION_NAME_PATTERN.test(name)) continue;
-    const value = (radio.value || '').trim();
-    if (value) return value;
+function getSelectedSize(picker) {
+  const scope = picker || document;
+  const checkedSelector = picker
+    ? 'input[type="radio"]:checked'
+    : 'variant-picker input[type="radio"]:checked, [data-mv-option-kind="size"] input[type="radio"]:checked';
+
+  for (const control of scope.querySelectorAll(`${checkedSelector}, select`)) {
+    const name = control.getAttribute('name') || '';
+    const isSize =
+      control instanceof HTMLSelectElement
+        ? SELECT_SIZE_DROPDOWN_PATTERN.test(name)
+        : SIZE_OPTION_NAME_PATTERN.test(name);
+    if (!isSize) continue;
+
+    const value = (control.value || '').trim();
+    // "Custom Sizes" placeholders are not real sizes.
+    if (value && !/^custom sizes?$/i.test(value)) return value;
   }
 
   // Fallback: resolve the size from the `?variant=` parameter.
   const variantId = new URLSearchParams(window.location.search).get('variant');
   if (!variantId) return null;
 
-  for (const radio of document.querySelectorAll('variant-picker input[type="radio"][data-variant-id]')) {
+  for (const radio of scope.querySelectorAll('input[type="radio"][data-variant-id]')) {
     if (radio.getAttribute('data-variant-id') !== variantId) continue;
     const name = radio.getAttribute('name') || '';
     if (!SIZE_OPTION_NAME_PATTERN.test(name)) continue;
@@ -89,6 +102,7 @@ function getMainMediaImage() {
 
 let previewedImage = null;
 let previewRestoreState = null;
+let activePreviewLink = null;
 
 /**
  * Temporarily shows the first image of another colour.
@@ -99,17 +113,24 @@ function previewColorImage(link) {
   if (!previewSrc) return;
 
   const image = getMainMediaImage();
-  if (!image || image.src === previewSrc) return;
+  if (!image) return;
+  if (activePreviewLink === link) return;
 
-  previewRestoreState = {
-    image,
-    src: image.getAttribute('src'),
-    srcset: image.getAttribute('srcset'),
-  };
+  // Only the first hover saves the ORIGINAL image. Consecutive hovers over
+  // different swatches must not overwrite the restore state with another
+  // colour's preview URL.
+  if (!previewRestoreState) {
+    previewRestoreState = {
+      image,
+      src: image.getAttribute('src'),
+      srcset: image.getAttribute('srcset'),
+    };
+  }
 
   image.removeAttribute('srcset');
   image.setAttribute('src', previewSrc);
   previewedImage = image;
+  activePreviewLink = link;
 }
 
 /**
@@ -125,13 +146,14 @@ function restoreColorImage() {
 
   previewRestoreState = null;
   previewedImage = null;
+  activePreviewLink = null;
 }
 
 document.addEventListener('click', (event) => {
   const link = event.target.closest('a[data-color-group-link]');
   if (!link) return;
 
-  const targetUrl = buildTargetUrl(link, getSelectedSize());
+  const targetUrl = buildTargetUrl(link, getSelectedSize(link.closest('variant-picker')));
   if (!targetUrl) return;
 
   event.preventDefault();
@@ -146,8 +168,10 @@ document.addEventListener('pointerover', (event) => {
 
 document.addEventListener('pointerout', (event) => {
   const link = event.target.closest('a[data-color-group-link]');
-  if (!link) return;
-  if (previewedImage && event.relatedTarget && previewedImage.contains(event.relatedTarget)) return;
+  if (!link || link !== activePreviewLink) return;
+  // Stay in preview while the pointer is still inside the same swatch link
+  // (e.g. moving between the image and the tooltip inside it).
+  if (event.relatedTarget && link.contains(event.relatedTarget)) return;
   restoreColorImage();
 });
 

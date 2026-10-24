@@ -126,7 +126,7 @@
   }
 
   /* ===== Unified filter layout (colour bar on top, sidebar for the rest) ===== */
-  .collection-wrapper:has(.facets-block-wrapper) {
+  .collection-wrapper:has(.facets-block-wrapper[data-has-filters]) {
     grid-template-columns: minmax(210px, 250px) minmax(0, 1fr) !important;
   }
 
@@ -134,12 +134,12 @@
 
   /* The filters block holds both the colour bar and the sidebar - let its
      children participate in the collection grid directly */
-  .collection-wrapper:has(.facets-block-wrapper) .facets-block-wrapper {
+  .collection-wrapper:has(.facets-block-wrapper[data-has-filters]) .facets-block-wrapper {
     display: contents;
   }
 
   /* Sidebar starts at the very top, level with the colour bar */
-  .collection-wrapper:has(.facets-block-wrapper) .facets-block-wrapper .facets {
+  .collection-wrapper:has(.facets-block-wrapper[data-has-filters]) .facets-block-wrapper .facets {
     grid-column: 1;
     grid-row: 1 / span 14;
     align-self: start;
@@ -150,13 +150,13 @@
     margin: var(--facets-margin, 0);
   }
 
-  .collection-wrapper:has(.facets-block-wrapper) .facets-block-wrapper .facets::-webkit-scrollbar {
+  .collection-wrapper:has(.facets-block-wrapper[data-has-filters]) .facets-block-wrapper .facets::-webkit-scrollbar {
     display: none;
   }
 
   /* Colour bar row: pills bottom-left, sort/count/density bottom-right,
      bottom aligned. The expanded panel overlays the products (absolute). */
-  .collection-wrapper:has(.facets-block-wrapper) .cf-colour-bar {
+  .collection-wrapper:has(.facets-block-wrapper[data-has-filters]) .cf-colour-bar {
     grid-column: 2;
     grid-row: 1;
     display: grid;
@@ -170,9 +170,9 @@
     z-index: 11;
   }
 
-  .collection-wrapper:has(.facets-block-wrapper) .cf-bar-head { grid-column: 1 / -1; grid-row: 1; }
-  .collection-wrapper:has(.facets-block-wrapper) .cf-bar-component { grid-column: 1; grid-row: 2; align-self: end; }
-  .collection-wrapper:has(.facets-block-wrapper) .cf-bar-right {
+  .collection-wrapper:has(.facets-block-wrapper[data-has-filters]) .cf-bar-head { grid-column: 1 / -1; grid-row: 1; }
+  .collection-wrapper:has(.facets-block-wrapper[data-has-filters]) .cf-bar-component { grid-column: 1; grid-row: 2; align-self: end; }
+  .collection-wrapper:has(.facets-block-wrapper[data-has-filters]) .cf-bar-right {
     grid-column: 2;
     grid-row: 2;
     align-self: end;
@@ -183,7 +183,7 @@
   }
 
 
-  .collection-wrapper:has(.facets-block-wrapper) .cf-bar-component {
+  .collection-wrapper:has(.facets-block-wrapper[data-has-filters]) .cf-bar-component {
     flex: 1 1 auto;
     min-width: 0;
   }
@@ -202,17 +202,17 @@
     white-space: nowrap;
   }
 
-  .collection-wrapper:has(.facets-block-wrapper) .main-collection-grid {
+  .collection-wrapper:has(.facets-block-wrapper[data-has-filters]) .main-collection-grid {
     grid-column: 2 !important;
     grid-row: 2 / span 14;
   }
 
   @media screen and (max-width: 749px) {
-    .collection-wrapper:has(.facets-block-wrapper) {
+    .collection-wrapper:has(.facets-block-wrapper[data-has-filters]) {
       grid-template-columns: 1fr !important;
     }
 
-    .collection-wrapper:has(.facets-block-wrapper) .cf-colour-bar {
+    .collection-wrapper:has(.facets-block-wrapper[data-has-filters]) .cf-colour-bar {
       grid-column: 1;
       grid-row: 1;
       display: block;
@@ -236,11 +236,11 @@
       display: none;
     }
 
-    .collection-wrapper:has(.facets-block-wrapper) .facets-block-wrapper .facets {
+    .collection-wrapper:has(.facets-block-wrapper[data-has-filters]) .facets-block-wrapper .facets {
       display: none;
     }
 
-    .collection-wrapper:has(.facets-block-wrapper) .main-collection-grid {
+    .collection-wrapper:has(.facets-block-wrapper[data-has-filters]) .main-collection-grid {
       grid-column: 1 !important;
       grid-row: 2;
     }
@@ -277,7 +277,7 @@
   .cf-pill.is-active {
     border-color: var(--color-foreground);
     box-shadow: inset 0 0 0 1px var(--color-foreground);
-    background: #F4F1EA;
+    background: rgb(var(--color-foreground-rgb) / 0.05);
   }
 
   .cf-pill__glyph {
@@ -453,9 +453,9 @@
     font-variant-numeric: tabular-nums;
   }
 
-  /* Clear hierarchy: 13px medium group titles, 11px muted footnote */
+  /* Clear hierarchy: medium group titles, muted footnote */
   .facets-block-wrapper .facets__summary .facets__label {
-    font-size: 13px;
+    font-size: var(--font-size--sm, 13px);
     font-weight: 500;
     letter-spacing: 0.02em;
   }
@@ -498,13 +498,13 @@
   }
 
   .facets-block-wrapper .facets__summary .facets__label {
-    font-size: 12px !important;
+    font-size: var(--font-size--sm, 13px);
     font-weight: 500;
     letter-spacing: 0.02em;
   }
 
   /* Divider between sidebar and content */
-  .collection-wrapper:has(.facets-block-wrapper) .facets-block-wrapper .facets {
+  .collection-wrapper:has(.facets-block-wrapper[data-has-filters]) .facets-block-wrapper .facets {
     border-inline-end: 1px solid rgb(var(--color-foreground-rgb) / 10%);
     padding-inline-end: 24px;
   }
@@ -513,12 +513,12 @@
      no grid gap, so themes that define extra grid columns cannot eat the
      right column's width. */
   @media screen and (min-width: 750px) {
-    .collection-wrapper:has(.facets-block-wrapper) {
+    .collection-wrapper:has(.facets-block-wrapper[data-has-filters]) {
       column-gap: 0 !important;
       grid-template-columns: minmax(210px, 250px) minmax(0, 1fr) !important;
     }
 
-    .collection-wrapper:has(.facets-block-wrapper) .facets-block-wrapper .facets {
+    .collection-wrapper:has(.facets-block-wrapper[data-has-filters]) .facets-block-wrapper .facets {
       margin-inline-end: 38px;
     }
   }

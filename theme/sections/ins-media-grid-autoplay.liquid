@@ -14,10 +14,11 @@
   assign media_position = section.settings.media_position
 
   assign video_muted = section.settings.video_muted
+  # Keep preload at "metadata" even with autoplay: the IntersectionObserver
+  # gates playback, and play() triggers the real download for visible videos.
   assign video_preload = 'metadata'
   if section.settings.video_autoplay
     assign video_muted = true
-    assign video_preload = 'auto'
   endif
 -%}
 
@@ -177,11 +178,6 @@
     #ins-{{ section.id }} .ins-item:hover .ins-overlay-content { opacity: 1; transform: translateY(0); }
   {%- endif -%}
 
-  #ins-{{ section.id }} .ins-overlay-icon svg {
-    width: 24px; height: 24px;
-    margin: 0 auto 6px;
-    display: block;
-  }
   #ins-{{ section.id }} .ins-overlay-caption {
     font-family: var(--font-body--family);
     font-size: 12px;
@@ -302,7 +298,7 @@
   }
   #ins-{{ section.id }} .ins-cta a {
     display: inline-block;
-    font-family: var(--font-body--family);
+    font-family: var(--button-font-family-primary, var(--font-body--family));
     font-size: {{ section.settings.cta_size }}px;
     letter-spacing: 0.1em;
     text-transform: uppercase;
@@ -312,7 +308,7 @@
     color: {{ section.settings.cta_text_color }};
     background: {{ section.settings.cta_bg_color }};
     transition: opacity 0.2s;
-    border-radius: 10px;
+    border-radius: var(--style-border-radius-buttons-primary, 10px);
   }
   #ins-{{ section.id }} .ins-cta a:hover { opacity: 0.7; }
 </style>
@@ -450,9 +446,9 @@
 
   <div class="ins-dots" id="ins-dots-{{ section.id }}" hidden></div>
 
-  {%- if section.settings.cta_label != blank -%}
+  {%- if section.settings.cta_label != blank and section.settings.cta_link != blank -%}
     <div class="ins-cta">
-      <a href="{{ section.settings.cta_link | default: '#' }}">
+      <a href="{{ section.settings.cta_link }}">
         {{ section.settings.cta_label }}
       </a>
     </div>
@@ -506,9 +502,9 @@
     return video.dataset.insManualPaused === 'true';
   }
 
-  function safePlay(video) {
-    /* 用户手动暂停优先级高于自动播放 */
-    if (!videoAutoplay || document.visibilityState === 'hidden' || isVideoManuallyPaused(video)) return;
+  function safePlay(video, force) {
+    /* 用户手动暂停优先级高于自动播放；手动点击(force=true)绕过自动播放开关 */
+    if (!force && (!videoAutoplay || document.visibilityState === 'hidden' || isVideoManuallyPaused(video))) return;
 
     video.muted = true;
     video.defaultMuted = true;
@@ -559,7 +555,7 @@
       if (video.paused) {
         /* 用户主动恢复播放，解除手动暂停锁 */
         delete video.dataset.insManualPaused;
-        safePlay(video);
+        safePlay(video, true);
       } else {
         /* 用户主动暂停：锁定状态，禁止 IntersectionObserver / hover / 翻页同步自动恢复 */
         video.dataset.insManualPaused = 'true';
@@ -631,7 +627,6 @@
         video.autoplay = true;
         video.setAttribute('muted', '');
         video.setAttribute('autoplay', '');
-        video.preload = 'auto';
       } else {
         video.removeAttribute('autoplay');
         pauseVideo(video);
@@ -897,7 +892,6 @@
       "settings": [
         { "type": "image_picker", "id": "image", "label": "图片", "info": "未选择视频时显示此图片。" },
         { "type": "video", "id": "video", "label": "视频（支持 Shopify 托管视频 / MOV 上传）", "info": "选择视频后优先显示视频；Shopify 会处理上传的视频并输出适合网页播放的格式。" },
-        { "type": "select", "id": "media_type", "label": "徽章类型（兼容旧数据）", "options": [{ "value": "image", "label": "图片" }, { "value": "video", "label": "视频徽章" }, { "value": "reel", "label": "Reel 徽章" }], "default": "image" },
         { "type": "url", "id": "link", "label": "跳转链接" },
         { "type": "text", "id": "caption", "label": "说明文字（覆盖在图片上）" }
       ]

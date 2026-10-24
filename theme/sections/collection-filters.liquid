@@ -2,8 +2,10 @@
   assign texture = section.settings.swatch_texture | default: "linen"
   assign groups_raw = section.settings.color_group_map
   assign group_lines = groups_raw | newline_to_br | split: "<br />"
-  assign builtin_pairs = "pink:#F4B8C8,navy:#1F2A5A,beige:#E8DCC8,rose gold:#DFA79A,rosegold:#DFA79A,blue:#3B5BA5,red:#C0392B,black:#111111,white:#FFFFFF,yellow:#F4D35E,purple:#7D5BA6,green:#3E8E5A,orange:#E4783C,brown:#8B5E3C,grey:#9E9E9E,gray:#9E9E9E,silver:#D9D9D9,gold:#C9A227,champagne:#F0E2C8,ivory:#F7F1E3,burgundy:#7B1E3A,wine:#6B1F35,apricot:#F5C6A5,lavender:#C9B6DB,lilac:#C9B6DB,khaki:#C3B091,dusty rose:#C98E96,teal:#2E8B8B,turquoise:#40C9C9,cobalt:#2242A8,royal blue:#2242A8,sky blue:#8FC1E9,denim:#4F6D8F,aqua:#7FDBDA,emerald:#2E9E6B,sage:#9CAF88,olive:#808000,mint:#B7E4C7,fuchsia:#DE3163,magenta:#D0417E,blush:#F2C6C2,coral:#FF7F50,peach:#F7C59F,rust:#B7410E,tan:#D2B48C,chocolate:#5C3A21,cream:#FFF5E1,multi:#FFFFFF"
-  assign builtin_pairs = builtin_pairs | split: ","
+  capture builtin_pairs_raw
+    render "color-facet-pairs"
+  endcapture
+  assign builtin_pairs = builtin_pairs_raw | strip | split: ","
   assign colour_filter = null
   for f in collection.filters
     assign fl = f.label | downcase
@@ -56,10 +58,10 @@
 .mf-cb-title{margin:0;font-family:var(--font-heading--family,Georgia,serif);font-size:24px;font-weight:400;line-height:1.2;letter-spacing:.04em;text-transform:uppercase}
 .mf-cb-tag{font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:#8B8884;white-space:nowrap}
 .mf-pills{display:flex;flex-wrap:wrap;gap:8px}
-.mf-pill{position:relative;display:inline-flex;align-items:center;justify-content:space-between;gap:14px;min-width:132px;min-height:42px;padding:10px 14px;border:0;border-radius:3px;color:#fff;font:inherit;font-size:11px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;overflow:hidden;box-shadow:inset 0 0 0 1px rgb(0 0 0 / 10%);transition:box-shadow .2s,transform .2s}
+.mf-pill{position:relative;display:inline-flex;align-items:center;justify-content:space-between;gap:14px;min-width:132px;min-height:42px;padding:10px 14px;border:0;border-radius:3px;color:inherit;font:inherit;font-size:11px;letter-spacing:.08em;text-transform:uppercase;cursor:pointer;overflow:hidden;box-shadow:inset 0 0 0 1px rgb(0 0 0 / 10%);transition:box-shadow .2s,transform .2s}
 .mf-pill:hover{transform:translateY(-1px);box-shadow:inset 0 0 0 1px rgb(0 0 0 / 12%),0 8px 18px rgb(0 0 0 / 16%)}
 .mf-pill.is-open{box-shadow:0 0 0 2px #fff,0 0 0 3.5px #14120F}
-.mf-pill__name{position:relative;z-index:2;text-shadow:0 1px 2px rgb(0 0 0 / 25%)}
+.mf-pill__name{position:relative;z-index:2}
 .mf-pill__num{position:relative;z-index:2;font-size:10px;opacity:.85;font-variant-numeric:tabular-nums}
 .mf-panel{display:none;margin-top:12px;padding:20px 22px;background:#F2EFE6;border-radius:4px}
 .mf-panel.is-open{display:block}
@@ -178,7 +180,11 @@
             {%- endfor -%}
           {%- endfor -%}
           {%- if gkids > 0 -%}
-            <button type="button" class="mf-pill{% if gactive > 0 %} is-active{% endif %}" data-mf-pill="{{ mf_gi }}" style="background-color:{{ gcolor }}">
+            {%- comment -%} Pick readable text per pill background (light groups get dark text). {%- endcomment -%}
+            {%- assign g_bd_white = gcolor | brightness_difference: '#FFFFFF' -%}
+            {%- assign g_text = '#FFFFFF' -%}
+            {%- if g_bd_white < 100 -%}{%- assign g_text = '#1A1A1A' -%}{%- endif -%}
+            <button type="button" class="mf-pill{% if gactive > 0 %} is-active{% endif %}" data-mf-pill="{{ mf_gi }}" style="background-color:{{ gcolor }};color:{{ g_text }}">
               <span class="mf-pill__name">{{ gname }}</span><span class="mf-pill__num">{{ gkids }}</span>
             </button>
           {%- endif -%}
@@ -278,7 +284,7 @@
       <span class="mf-count">{{ collection.products_count }} items</span>
       <span class="mf-sort"><select class="mf-sort-select" aria-label="Sort by">
         {%- for option in collection.sort_options -%}
-          <option value="{{ option.url }}"{% if option.value == collection.sort_by %} selected{% endif %}>{{ option.name }}</option>
+          <option value="{{ option.value }}"{% if option.value == collection.sort_by %} selected{% endif %}>{{ option.name }}</option>
         {%- endfor -%}
       </select></span>
     </div>
@@ -332,7 +338,14 @@
     document.addEventListener("change", function (e) {
       var t = e.target;
       if (t.matches && t.matches("[data-url-add]")) nav(t);
-      if (t.matches && t.matches(".mf-sort-select")) window.location.href = t.value;
+      if (t.matches && t.matches(".mf-sort-select")) {
+        // Keep every active filter; only swap the sort_by parameter.
+        var url = new URL(window.location.href);
+        if (t.value) url.searchParams.set("sort_by", t.value);
+        else url.searchParams.delete("sort_by");
+        url.searchParams.delete("page");
+        window.location.href = url.toString();
+      }
     });
     document.addEventListener("click", function (e) {
       var pill = e.target.closest("[data-mf-pill]");

@@ -35,6 +35,48 @@
     {{ results_count_attribute }}
   >
     <form action="{{ results_url }}" class="cf-bar-form">
+      {%- comment -%}
+        Assign every filter value to exactly ONE group (first match wins).
+        The previous fuzzy matching could put "Peacock Blue" into both Blues
+        and Greens, which rendered the same value twice, duplicated input IDs
+        and inflated the "Other" count once per non-matching group.
+      {%- endcomment -%}
+      {%- assign cf_assigned = '|' -%}
+      {%- assign cf_map = '|' -%}
+      {%- assign cf_group_scan = 0 -%}
+      {%- for line in group_lines -%}
+        {%- assign gl = line | strip -%}
+        {%- if gl == blank -%}{%- continue -%}{%- endif -%}
+        {%- assign parts = gl | split: ':' -%}
+        {%- assign members = parts[2] | split: ',' -%}
+        {%- for value in colour_filter.values -%}
+          {%- assign value_key = value.label | downcase | strip -%}
+          {%- assign value_needle = '|' | append: value_key | append: '|' -%}
+          {%- if cf_assigned contains value_needle -%}{%- continue -%}{%- endif -%}
+          {%- for m in members -%}
+            {%- assign m_key = m | downcase | strip -%}
+            {%- if m_key contains value_key or value_key contains m_key -%}
+              {%- assign cf_assigned = cf_assigned | append: value_key | append: '|' -%}
+              {%- assign cf_entry = '|' | append: cf_group_scan | append: ':' | append: value_key | append: '|' -%}
+              {%- assign cf_map = cf_map | append: cf_entry -%}
+              {%- break -%}
+            {%- endif -%}
+          {%- endfor -%}
+        {%- endfor -%}
+        {%- assign cf_group_scan = cf_group_scan | plus: 1 -%}
+      {%- endfor -%}
+      {%- comment -%} Other: values that no group claimed {%- endcomment -%}
+      {%- assign loose_kids = 0 -%}
+      {%- assign loose_active = 0 -%}
+      {%- for value in colour_filter.values -%}
+        {%- assign value_key = value.label | downcase | strip -%}
+        {%- assign value_needle = '|' | append: value_key | append: '|' -%}
+        {%- unless cf_assigned contains value_needle -%}
+          {%- assign loose_kids = loose_kids | plus: 1 -%}
+          {%- if value.active -%}{%- assign loose_active = loose_active | plus: 1 -%}{%- endif -%}
+        {%- endunless -%}
+      {%- endfor -%}
+
       <div class="cf-bar-pills">
         {%- assign group_index = 0 -%}
         {%- for line in group_lines -%}
@@ -43,19 +85,15 @@
           {%- assign parts = gl | split: ':' -%}
           {%- assign group_name = parts[0] | strip -%}
           {%- assign group_color = parts[1] | strip -%}
-          {%- assign members = parts[2] | split: ',' -%}
           {%- assign group_kids = 0 -%}
           {%- assign group_active = 0 -%}
           {%- for value in colour_filter.values -%}
             {%- assign value_key = value.label | downcase | strip -%}
-            {%- for m in members -%}
-              {%- assign m_key = m | downcase | strip -%}
-              {%- if m_key contains value_key or value_key contains m_key -%}
-                {%- assign group_kids = group_kids | plus: 1 -%}
-                {%- if value.active -%}{%- assign group_active = group_active | plus: 1 -%}{%- endif -%}
-                {%- break -%}
-              {%- endif -%}
-            {%- endfor -%}
+            {%- assign cf_needle = '|' | append: group_index | append: ':' | append: value_key | append: '|' -%}
+            {%- if cf_map contains cf_needle -%}
+              {%- assign group_kids = group_kids | plus: 1 -%}
+              {%- if value.active -%}{%- assign group_active = group_active | plus: 1 -%}{%- endif -%}
+            {%- endif -%}
           {%- endfor -%}
           {%- if group_kids > 0 -%}
             <button type="button" class="cf-pill{% if group_active > 0 %} is-active{% endif %}" data-cf-pill="{{ group_index }}">
@@ -66,30 +104,6 @@
             </button>
           {%- endif -%}
           {%- assign group_index = group_index | plus: 1 -%}
-        {%- endfor -%}
-        {%- comment -%} Other: values not in any group {%- endcomment -%}
-        {%- assign loose_kids = 0 -%}
-        {%- assign loose_active = 0 -%}
-        {%- for value in colour_filter.values -%}
-          {%- assign value_key = value.label | downcase | strip -%}
-          {%- assign matched = false -%}
-          {%- for line in group_lines -%}
-            {%- assign gl2 = line | strip -%}
-            {%- if gl2 == blank -%}{%- continue -%}{%- endif -%}
-            {%- assign gm = gl2 | split: ':' -%}
-            {%- assign gm_members = gm[2] | split: ',' -%}
-            {%- for m in gm_members -%}
-              {%- assign m_key = m | downcase | strip -%}
-              {%- if m_key contains value_key or value_key contains m_key -%}
-                {%- assign matched = true -%}
-                {%- break -%}
-              {%- endif -%}
-            {%- endfor -%}
-            {%- unless matched -%}
-              {%- assign loose_kids = loose_kids | plus: 1 -%}
-              {%- if value.active -%}{%- assign loose_active = loose_active | plus: 1 -%}{%- endif -%}
-            {%- endunless -%}
-          {%- endfor -%}
         {%- endfor -%}
         {%- if loose_kids > 0 -%}
           <button type="button" class="cf-pill{% if loose_active > 0 %} is-active{% endif %}" data-cf-pill="other">
@@ -106,46 +120,34 @@
         {%- assign gl = line | strip -%}
         {%- if gl == blank -%}{%- continue -%}{%- endif -%}
         {%- assign parts = gl | split: ':' -%}
-        {%- assign members = parts[2] | split: ',' -%}
         {%- assign group_name = parts[0] | strip -%}
         {%- assign group_kids = 0 -%}
         {%- assign group_active = 0 -%}
-        {%- for value in colour_filter.values -%}
-          {%- assign value_key = value.label | downcase | strip -%}
-          {%- for m in members -%}
-            {%- assign m_key = m | downcase | strip -%}
-            {%- if m_key contains value_key or value_key contains m_key -%}
+        {%- capture panel_swatches -%}
+          {%- for value in colour_filter.values -%}
+            {%- assign value_key = value.label | downcase | strip -%}
+            {%- assign cf_needle = '|' | append: panel_index | append: ':' | append: value_key | append: '|' -%}
+            {%- if cf_map contains cf_needle -%}
               {%- assign group_kids = group_kids | plus: 1 -%}
               {%- if value.active -%}{%- assign group_active = group_active | plus: 1 -%}{%- endif -%}
-              {%- break -%}
+              {%- liquid
+                assign input_id = 'Filter-cf-bar-' | append: value.label | handleize
+                assign is_disabled = false
+                if value.count == 0 and value.active == false
+                  assign is_disabled = true
+                endif
+              -%}
+              {% render 'cf2-item', value: value, input_id: input_id, facet_target: 'facet-inputs-component-colour-bar', is_disabled: is_disabled, builtin_pairs: builtin_pairs, navigate: true %}
             {%- endif -%}
           {%- endfor -%}
-        {%- endfor -%}
+        {%- endcapture -%}
         {%- if group_kids > 0 -%}
           <div class="cf-bar-panel" data-cf-panel="{{ panel_index }}">
             <div class="cf-panel-head">
               <span class="cf-panel-title">{{ group_name }}</span>
               <span class="cf-panel-meta">{{ group_active }} selected of {{ group_kids }}</span>
             </div>
-            <div class="cf2-swatches cf2-panel-swatches">
-              {%- for value in colour_filter.values -%}
-                {%- assign value_key = value.label | downcase | strip -%}
-                {%- for m in members -%}
-                  {%- assign m_key = m | downcase | strip -%}
-                  {%- if m_key contains value_key or value_key contains m_key -%}
-                    {%- liquid
-                      assign input_id = 'Filter-cf-bar-' | append: value.label | handleize
-                      assign is_disabled = false
-                      if value.count == 0 and value.active == false
-                        assign is_disabled = true
-                      endif
-                    -%}
-                    {% render 'cf2-item', value: value, input_id: input_id, facet_target: 'facet-inputs-component-colour-bar', is_disabled: is_disabled, builtin_pairs: builtin_pairs, navigate: true %}
-                    {%- break -%}
-                  {%- endif -%}
-                {%- endfor -%}
-              {%- endfor -%}
-            </div>
+            <div class="cf2-swatches cf2-panel-swatches">{{ panel_swatches }}</div>
           </div>
         {%- endif -%}
         {%- assign panel_index = panel_index | plus: 1 -%}
@@ -159,21 +161,8 @@
           <div class="cf2-swatches cf2-panel-swatches">
             {%- for value in colour_filter.values -%}
               {%- assign value_key = value.label | downcase | strip -%}
-              {%- assign matched = false -%}
-              {%- for line in group_lines -%}
-                {%- assign gl2 = line | strip -%}
-                {%- if gl2 == blank -%}{%- continue -%}{%- endif -%}
-                {%- assign gm = gl2 | split: ':' -%}
-                {%- assign gm_members = gm[2] | split: ',' -%}
-                {%- for m in gm_members -%}
-                  {%- assign m_key = m | downcase | strip -%}
-                  {%- if m_key contains value_key or value_key contains m_key -%}
-                    {%- assign matched = true -%}
-                    {%- break -%}
-                  {%- endif -%}
-                {%- endfor -%}
-              {%- endfor -%}
-              {%- unless matched -%}
+              {%- assign value_needle = '|' | append: value_key | append: '|' -%}
+              {%- unless cf_assigned contains value_needle -%}
                 {%- liquid
                   assign input_id = 'Filter-cf-bar-' | append: value.label | handleize
                   assign is_disabled = false
@@ -227,15 +216,15 @@
       window.location.href = inp.checked ? inp.dataset.urlAdd : inp.dataset.urlRemove;
     }
   });
-  function syncPush() {
-    const bar = document.querySelector('.cf-colour-bar');
+  function syncPush(bar) {
     if (!bar) return;
     const open = bar.querySelector('.cf-bar-panel.open');
     bar.style.marginBlockEnd = open ? (open.offsetHeight + 8) + 'px' : '';
     if (window.ResizeObserver) {
       if (bar._cfRO) bar._cfRO.disconnect();
+      bar._cfRO = null;
       if (open) {
-        bar._cfRO = new ResizeObserver(syncPush);
+        bar._cfRO = new ResizeObserver(() => syncPush(bar));
         bar._cfRO.observe(open);
       }
     }
@@ -251,10 +240,10 @@
       bar.querySelectorAll('.cf-pill').forEach((p) => p.classList.remove('is-open'));
       if (!isOpen && panel) { panel.classList.add('open'); pill.classList.add('is-open'); }
 
-      syncPush();
+      syncPush(bar);
     } else if (!e.target.closest('.cf-bar-panel') && !e.target.closest('.cf-colour-bar')) {
       document.querySelectorAll('.cf-bar-panel.open').forEach((p) => p.classList.remove('open'));
-      syncPush();
+      document.querySelectorAll('.cf-colour-bar').forEach(syncPush);
     }
   });
 </script>

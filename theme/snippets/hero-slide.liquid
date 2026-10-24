@@ -14,6 +14,15 @@
     else
       assign inner_align = 'center'
   endcase
+
+  # Only the first visible slide may delay LCP: load it eagerly with a high
+  # fetch priority; every other slide stays lazy.
+  assign hero_loading = 'lazy'
+  assign hero_preload = false
+  if is_first
+    assign hero_loading = 'eager'
+    assign hero_preload = true
+  endif
 -%}
 
 <div
@@ -26,7 +35,8 @@
       | image_url: width: 3840
       | image_tag:
         class: 'slide-img slide-img-desktop',
-        loading: 'lazy',
+        loading: hero_loading,
+        preload: hero_preload,
         widths: '750, 1100, 1500, 1780, 2000, 3000, 3840',
         sizes: '100vw',
         alt: block.settings.title
@@ -43,7 +53,8 @@
       | image_url: width: 1200
       | image_tag:
         class: 'slide-img slide-img-mobile',
-        loading: 'lazy',
+        loading: hero_loading,
+        preload: hero_preload,
         widths: '375, 550, 750, 1000, 1200',
         sizes: '100vw',
         alt: block.settings.title
@@ -54,7 +65,8 @@
       | image_url: width: 1200
       | image_tag:
         class: 'slide-img slide-img-mobile',
-        loading: 'lazy',
+        loading: hero_loading,
+        preload: hero_preload,
         widths: '375, 550, 750, 1000, 1200',
         sizes: '100vw',
         alt: block.settings.title

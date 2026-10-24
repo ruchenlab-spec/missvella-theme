@@ -199,12 +199,6 @@
     max-width: 720px;
   }
 
-@media screen and (max-width: 749px) {
-  #slideshow-{{ section.id }} .slide-title {
-    font-size: 20px !important;
-  }
-}
-
   /* ── Body text ── */
   #slideshow-{{ section.id }} .slide-text {
     font-family: var(--font-body--family);
@@ -220,8 +214,8 @@
     letter-spacing: 0.08em;
     text-transform: uppercase;
     text-decoration: none;
-    font-family: var(--font-body--family);
-    border-radius: 10px;
+    font-family: var(--button-font-family-primary, var(--font-body--family));
+    border-radius: var(--style-border-radius-buttons-primary, 10px);
     transition: background-color 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease, transform 0.22s ease;
     cursor: pointer;
     background: var(--hero-btn-bg);

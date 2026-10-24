@@ -23,6 +23,9 @@ export default class VariantPicker extends Component {
   /** @type {AbortController | undefined} */
   #abortController;
 
+  /** Aborts the change listener when the element disconnects. */
+  #eventsAbortController;
+
   /** @type {number[][]} */
   #checkedIndices = [];
 
@@ -33,6 +36,10 @@ export default class VariantPicker extends Component {
 
   connectedCallback() {
     super.connectedCallback();
+    // A reconnected element must not accumulate radios/listeners from its
+    // previous connection (Theme Editor reorders, section re-renders).
+    this.#radios = [];
+    this.#checkedIndices = [];
     const fieldsets = /** @type {HTMLFieldSetElement[]} */ (this.refs.fieldsets || []);
 
     fieldsets.forEach((fieldset) => {
@@ -45,13 +52,17 @@ export default class VariantPicker extends Component {
       }
     });
 
-    this.addEventListener('change', this.variantChanged.bind(this));
+    this.#eventsAbortController = new AbortController();
+    this.addEventListener('change', this.variantChanged.bind(this), { signal: this.#eventsAbortController.signal });
     this.#resizeObserver.observe(this);
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
     this.#resizeObserver.disconnect();
+    this.#eventsAbortController?.abort();
+    this.#radios = [];
+    this.#checkedIndices = [];
   }
 
   /**

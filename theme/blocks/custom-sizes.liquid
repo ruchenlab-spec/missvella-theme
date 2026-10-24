@@ -50,11 +50,13 @@
   --mv-pal-accent: {{ accent_color }};
   --mv-pal-accent-rgb: {{ accent_r }}, {{ accent_g }}, {{ accent_b }};
   --mv-pal-gold: #C9A227;
-  --mv-pal-ink: #1A1A1A;
-  --mv-pal-surface: #FFFFFF;
-  --mv-pal-page: #FAF9F7;
-  --mv-pal-border: #E8E2DC;
-  --mv-pal-muted: #8A8580;
+  /* Neutral surfaces follow the theme palette; only the accent is a
+     merchant-controlled local setting. */
+  --mv-pal-ink: var(--color-foreground);
+  --mv-pal-surface: var(--color-background);
+  --mv-pal-page: rgb(var(--color-foreground-rgb) / 0.03);
+  --mv-pal-border: var(--color-border, rgb(var(--color-foreground-rgb) / 0.12));
+  --mv-pal-muted: var(--color-foreground-muted, rgb(var(--color-foreground-rgb) / 0.55));
   font-family: var(--font-body--family, 'Helvetica Neue', sans-serif);
   color: var(--mv-pal-ink);
 }
@@ -111,7 +113,7 @@
 }
 .cs-trigger-body-{{ cs_id }} { flex: 1; min-width: 0; }
 .cs-trigger-title-{{ cs_id }} {
-  font-family: Georgia, 'Times New Roman', serif;
+  font-family: var(--font-heading--family, Georgia, 'Times New Roman', serif);
   font-size: 15px;
   font-weight: 600;
   color: var(--mv-pal-ink);
@@ -163,7 +165,7 @@
   display: inline-flex;
   align-items: center;
   gap: 7px;
-  font-family: Georgia, 'Times New Roman', serif;
+  font-family: var(--font-heading--family, Georgia, 'Times New Roman', serif);
   font-size: 13.5px;
   font-weight: 600;
   color: var(--mv-pal-ink);
@@ -235,8 +237,8 @@
   transition: background .16s ease, box-shadow .16s ease;
 }
 .cs-checkbox-box-{{ cs_id }}.unchecked {
-  background: #fff;
-  box-shadow: inset 0 0 0 1px #BEBBB5;
+  background: var(--mv-pal-surface);
+  box-shadow: inset 0 0 0 1px rgb(var(--color-foreground-rgb) / 0.3);
 }
 .cs-checkbox-box-{{ cs_id }} svg { width: 12px; height: 12px; }
 .cs-checkbox-box-{{ cs_id }}.unchecked svg { display: none; }
@@ -270,13 +272,19 @@
 }
 #cs-overlay-{{ cs_id }}.active { display: block; }
 #cs-modal-{{ cs_id }} {
-  --mv-pal-ink: #1A1A1A;
-  --mv-pal-surface: #FFFFFF;
-  --mv-pal-border: #E8E2DC;
-  --mv-pal-muted: #8A8580;
+  /* The modal is portaled to <body>, so it must carry the full palette
+     itself — nothing can be inherited from .cs-block-{{ cs_id }}. */
+  --mv-pal-accent: {{ accent_color }};
+  --mv-pal-accent-rgb: {{ accent_r }}, {{ accent_g }}, {{ accent_b }};
+  --mv-pal-gold: #C9A227;
+  --mv-pal-ink: var(--color-foreground);
+  --mv-pal-surface: var(--color-background);
+  --mv-pal-page: rgb(var(--color-foreground-rgb) / 0.03);
+  --mv-pal-border: var(--color-border, rgb(var(--color-foreground-rgb) / 0.12));
+  --mv-pal-muted: var(--color-foreground-muted, rgb(var(--color-foreground-rgb) / 0.55));
   position: fixed;
-  background: #FFFFFF;
-  color: #1A1A1A;
+  background: var(--mv-pal-surface);
+  color: var(--mv-pal-ink);
   z-index: 2147483647;
   flex-direction: column;
   overflow: hidden;
@@ -325,7 +333,7 @@
     width: 38px;
     height: 4px;
     border-radius: 4px;
-    background: #D5CFC9;
+    background: rgb(var(--color-foreground-rgb) / 0.22);
     margin: 8px auto -2px;
     flex-shrink: 0;
   }
@@ -334,7 +342,7 @@
   border-radius: 0;
   border-bottom: 1px solid var(--mv-pal-border);
   padding: 20px 28px 0;
-  background: #FFFFFF;
+  background: var(--mv-pal-surface);
 }
 .cs-modal-kicker-{{ cs_id }} {
   font-size: 10px;
@@ -344,7 +352,7 @@
   text-transform: uppercase;
 }
 .cs-modal-title-{{ cs_id }} {
-  font-family: Georgia, 'Times New Roman', serif;
+  font-family: var(--font-heading--family, Georgia, 'Times New Roman', serif);
   font-size: 20px;
   color: var(--mv-pal-ink);
   font-weight: 600;
@@ -420,14 +428,14 @@
 }
 .cs-unit-btn-{{ cs_id }}.active {
   background: var(--mv-pal-accent);
-  color: #FFFFFF;
+  color: var(--color-background, #FFFFFF);
 }
 .cs-unit-btn-{{ cs_id }}:active { transform: scale(.96); }
 .cs-unit-btn-{{ cs_id }}:focus-visible {
   outline: 2px solid var(--mv-pal-accent);
   outline-offset: 2px;
 }
-.cs-modal-body-{{ cs_id }} { overflow-y: auto; flex: 1; min-height: 0; background: #FFFFFF; }
+.cs-modal-body-{{ cs_id }} { overflow-y: auto; flex: 1; min-height: 0; background: var(--mv-pal-surface); }
 .cs-tab-panel-{{ cs_id }} { display: none; }
 .cs-tab-panel-{{ cs_id }}.active { display: block; }
 /* The real form panel has no .cs-form-wrap element; apply the gutter to the actual panel. */
@@ -495,7 +503,7 @@
   background: var(--mv-pal-surface);
   box-shadow: 0 0 0 3.5px rgb(var(--mv-pal-accent-rgb) / 10%);
 }
-.cs-input-wrap-{{ cs_id }} input::placeholder { color: #C6BEB6; }
+.cs-input-wrap-{{ cs_id }} input::placeholder { color: rgb(var(--color-foreground-rgb) / 0.35); }
 .cs-input-unit-{{ cs_id }} {
   position: absolute;
   right: 13px;
@@ -603,10 +611,6 @@
   box-shadow: 0 0 0 4px rgb(var(--mv-pal-accent-rgb) / 22%);
   cursor: pointer;
 }
-.cs-htm-image-wrapper-{{ cs_id }} .mv-hotspot.on {
-  background: var(--mv-pal-gold);
-  box-shadow: 0 0 0 4px rgb(201 162 39 / 30%);
-}
 .cs-htm-image-wrapper-{{ cs_id }} .mv-hotspot::after {
   content: '';
   position: absolute;
@@ -690,7 +694,7 @@
 
 .cs-guide-title-{{ cs_id }} {
   margin: 6px 0 0;
-  font-family: Georgia, 'Times New Roman', serif;
+  font-family: var(--font-heading--family, Georgia, 'Times New Roman', serif);
   font-size: 16px;
   font-weight: 600;
   line-height: 1.25;
@@ -705,29 +709,28 @@
   color: var(--mv-pal-muted);
 }
 
-/* The guide action doubles as the trigger that opens the measurement form. */
+/* The guide action doubles as the trigger that opens the measurement form.
+   Styled as a primary action: it follows the theme's global button colors. */
 .cs-block-{{ cs_id }} .cs-trigger-{{ cs_id }} {
   display: inline-flex;
   align-items: center;
   gap: 10px;
   min-height: 44px;
   padding: 0 12px 0 6px;
-  border: 1px solid #191918;
+  border: 1px solid var(--color-primary-button-background, var(--mv-pal-accent));
   border-radius: 999px;
-  background: #191918;
-  color: #FFFFFF;
+  background: var(--color-primary-button-background, var(--mv-pal-accent));
+  color: var(--color-primary-button-text, #FFFFFF);
   cursor: pointer;
   transition:
     transform 0.16s ease,
-    background-color 0.16s ease;
+    box-shadow 0.16s ease;
 }
 
 @media (hover: hover) {
   .cs-block-{{ cs_id }} .cs-trigger-{{ cs_id }}:hover {
-    background: #2A2A28;
-    border-color: #2A2A28;
     transform: translateY(-1px);
-    box-shadow: 0 8px 20px rgb(26 26 24 / 18%);
+    box-shadow: 0 8px 20px rgb(var(--color-foreground-rgb) / .18);
   }
 }
 
@@ -737,7 +740,7 @@
   border: 0;
   border-radius: 999px;
   background: rgb(255 255 255 / 0.14);
-  color: #FFFFFF;
+  color: var(--color-primary-button-text, #FFFFFF);
   flex-shrink: 0;
 }
 
@@ -759,7 +762,7 @@
   letter-spacing: 0.1em;
   text-transform: uppercase;
   line-height: 1.2;
-  color: #FFFFFF;
+  color: var(--color-primary-button-text, #FFFFFF);
   white-space: nowrap;
 }
 
@@ -768,13 +771,13 @@
 }
 
 .cs-block-{{ cs_id }} .cs-trigger-right-{{ cs_id }} {
-  color: #FFFFFF;
+  color: var(--color-primary-button-text, #FFFFFF);
 }
 
 .cs-block-{{ cs_id }} .cs-trigger-right-{{ cs_id }} .mv-badge-free {
   background: rgb(255 255 255 / 0.14);
   border-color: rgb(255 255 255 / 0.28);
-  color: #FFFFFF;
+  color: var(--color-primary-button-text, #FFFFFF);
 }
 
 /* ------------------------------------------------------------------
@@ -1054,9 +1057,6 @@
     if (!block || block._csInit) return;
     block._csInit = true;
 
-    // The root custom element is the layout hook for the fit preference tabs.
-    const root = block.parentElement;
-
     // Fit scope: the closest product details wrapper carries the mode class
     // (`mv-fit-standard` / `mv-fit-custom`) added by the variant picker tabs.
     function fitScope() {
@@ -1098,7 +1098,6 @@
     const trigger   = document.getElementById('cs-trigger-' + id);
     const closeBtn  = document.getElementById('cs-close-' + id);
     const unit      = document.getElementById('cs-unit-' + id);
-    const submitBtn = document.getElementById('cs-submit-' + id);
     const clearBtn  = document.getElementById('cs-clear-' + id);
     const nextBtn    = document.getElementById('cs-next-' + id);
     const backBtn    = document.getElementById('cs-back-' + id);
@@ -1626,7 +1625,10 @@
     if (REGISTRY.keydown) document.removeEventListener('keydown', REGISTRY.keydown);
 
     REGISTRY.fitMode = (event) => {
-      const mode = event.detail && event.detail.mode;
+      const detail = event.detail || {};
+      // Events from a different product's variant picker must not switch this block.
+      if (detail.productId && String(detail.productId) !== String(PRODUCT_ID)) return;
+      const mode = detail.mode;
       if (mode === 'custom') {
         if (savedData && isChecked) syncProperty();
         syncNativeSizeVariant(true);
@@ -1647,11 +1649,22 @@
       const mode = currentFitMode();
 
       if (mode === 'standard') {
-        const picker = getVariantPicker();
-        const checked = picker
-          ? picker.querySelector('.variant-option--matrix input[type="radio"]:checked')
-          : null;
-        if (!checked) {
+        // Accept whatever control the Size option currently renders as:
+        // matrix/button radios, a dropdown select, or a single fixed value.
+        const control = getCurrentSizeControl();
+        const controlOk = control && valueOf(control) && valueOf(control) !== PLACEHOLDER_SIZE;
+
+        let singleOk = false;
+        if (!controlOk) {
+          const picker = getVariantPicker();
+          const single = picker
+            ? picker.querySelector('[data-mv-standard-size-panel] [data-testid="variant-option-single-value"]')
+            : null;
+          const singleValue = single ? (single.textContent || '').trim() : '';
+          singleOk = !!singleValue && singleValue !== PLACEHOLDER_SIZE;
+        }
+
+        if (!controlOk && !singleOk) {
           event.preventDefault();
           event.stopPropagation();
           showFitError('Please select a size before adding to bag.');
@@ -1728,7 +1741,6 @@
   "name": "Custom Sizes",
   "tag": null,
   "settings": [
-    { "type": "text", "id": "button_text", "label": "Button Text", "default": "Custom Size" },
     { "type": "text", "id": "modal_title", "label": "Modal Title", "default": "Custom Size" },
     { "type": "color", "id": "accent_color", "label": "主色调（Accent）", "default": "#1A1A1A",
       "info": "按钮、选中环、输入框聚焦等强调元素的颜色。适合奢华极简：炭黑、深棕、酒红均可。" },

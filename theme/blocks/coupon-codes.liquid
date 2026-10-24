@@ -516,13 +516,15 @@
       textarea.focus();
       textarea.select();
 
+      let ok = false;
       try {
-        document.execCommand('copy');
+        ok = document.execCommand('copy');
       } catch (error) {
         console.warn('Coupon copy failed', error);
       }
 
       textarea.remove();
+      return ok;
     };
 
     root.querySelectorAll('[data-coupon-copy]').forEach((button) => {
@@ -530,15 +532,19 @@
         const code = button.dataset.code;
         if (!code) return;
 
+        let copied = false;
         try {
           if (navigator.clipboard && window.isSecureContext) {
             await navigator.clipboard.writeText(code);
+            copied = true;
           } else {
-            fallbackCopy(code);
+            copied = fallbackCopy(code);
           }
         } catch (error) {
-          fallbackCopy(code);
+          copied = fallbackCopy(code);
         }
+
+        if (!copied) return; /* Don't show "COPIED" when the copy actually failed. */
 
         const label = button.querySelector('[data-copy-label]');
         const original = button.dataset.defaultLabel || 'COPY';
