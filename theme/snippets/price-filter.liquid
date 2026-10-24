@@ -5,6 +5,7 @@
   @param {string} filter_style - The filter style, can be 'horizontal' or 'vertical'.
   @param {boolean} [should_render_clear] - Whether to render the clear button.
   @param {string} [id_prefix] - Unique prefix to avoid duplicate IDs when rendered multiple times.
+  @param {number} [filter_index] - Index of the filter in the sidebar, rendered as the group number.
   @param {number} [price_max_override] - Stable slider ceiling. Shopify's
     filter.range_max shrinks with the filtered results (apply 0–50 and prices
     above 50 become unreachable); a fixed override keeps the full range.
@@ -93,77 +94,15 @@
   if pf_max == blank or pf_max == '0.0' or pf_max == '0'
     assign pf_max = pf_range_max
   endif
-  assign pf_min_val = filter.min_value.value | default: 0 | money_without_currency | replace: ',', ''
-  assign pf_max_val = filter.max_value.value | money_without_currency | replace: ',', ''
-  if pf_max_val == blank or pf_max_val == '0.0' or pf_max_val == '0'
-    assign pf_max_val = pf_max
-  endif
 -%}
-<style>
-  .pf-range { position: relative; height: 24px; margin: 8px 2px 0; display: flex; align-items: center; }
-  .pf-range-note { display: flex; justify-content: space-between; color: #AAA39A; font-size: 9px; letter-spacing: 0.04em; margin-top: 6px; }
-  .pf-range__track { position: absolute; left: 0; right: 0; top: 50%; height: 3px; translate: 0 -50%;
-    background: #E8E4DD; border-radius: 5px; }
-  .pf-range__fill { position: absolute; top: 50%; height: 3px; translate: 0 -50%;
-    background: #1A1A1A; border-radius: 5px; }
-  .pf-range__thumb { position: absolute; top: 50%; width: 14px; height: 14px; translate: -50% -50%;
-    border-radius: 50%; background: #1A1A1A; border: 2px solid #FFFFFF;
-    box-shadow: 0 0 0 1px #1A1A1A; pointer-events: none; }
-  .pf-range__input { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; padding: 0;
-    opacity: 0; background: transparent; border: 0; appearance: none; -webkit-appearance: none; z-index: 2; }
-  .pf-range__input::-webkit-slider-thumb { appearance: none; -webkit-appearance: none; width: 22px; height: 22px; cursor: ew-resize; }
-  .pf-range__input::-moz-range-thumb { width: 22px; height: 22px; border: 0; background: transparent; cursor: ew-resize; }
-</style>
-<div class="pf-range" data-max="{{ pf_max }}">
-  <span class="pf-range__track" aria-hidden="true"></span>
-  <span class="pf-range__fill" aria-hidden="true"></span>
-  <span class="pf-range__thumb" aria-hidden="true"></span>
-  <input type="range" class="pf-range__input" min="0" max="{{ pf_max }}" step="1" value="{{ pf_max_val }}" aria-label="{{ 'accessibility.price_filter_high' | t }}">
-</div>
-<div class="pf-range-note">
-  <span>{{ filter.min_value.value | default: 0 | money_without_currency }}</span>
-  <span class="pf-range-note__max">{{ filter.max_value.value | default: filter.range_max | money_without_currency }}</span>
-</div>
-<script>
-  (function () {
-    function initRanges() {
-      document.querySelectorAll('.pf-range').forEach(function (wrap) {
-        if (wrap.dataset.init) return;
-        wrap.dataset.init = '1';
-        var input = wrap.querySelector('.pf-range__input');
-        var fill = wrap.querySelector('.pf-range__fill');
-        var thumb = wrap.querySelector('.pf-range__thumb');
-        var comp = wrap.closest('price-facet-component');
-        var nums = comp ? comp.querySelectorAll('input.price-facet__input') : null;
-        var max = parseFloat(wrap.dataset.max) || 100;
-        function paint() {
-          var v = parseFloat(input.value);
-          var p = Math.max(0, Math.min(100, v / max * 100));
-          if (fill) { fill.style.left = '0%'; fill.style.width = p + '%'; }
-          if (thumb) thumb.style.left = p + '%';
-        }
-        function sync() {
-          if (nums && nums.length >= 2) {
-            nums[1].value = input.value;
-            if (parseFloat(input.value) >= max) nums[1].value = '';
-          }
-          var note = comp ? comp.querySelector('.pf-range-note__max') : null;
-          if (note) note.textContent = Number(input.value).toFixed(2);
-          paint();
-        }
-        input.addEventListener('input', sync);
-        input.addEventListener('change', function () {
-          if (nums && nums.length >= 2) nums[1].dispatchEvent(new Event('change', { bubbles: true }));
-        });
-        paint();
-      });
-    }
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initRanges);
-    } else {
-      initRanges();
-    }
-  })();</script>
+{%- comment -%}
+  Native min/max inputs only. The custom range slider was removed: Shopify's
+  filter.range_max follows the filtered results, which trapped the slider and
+  re-pinned its thumb after every section re-render. Typing exact values is
+  deterministic and the applied range still shows in the chips bar above the
+  grid. pf_max (from the block's price_filter_max setting) keeps the native
+  input's data-max stable so typed values are never clamped to a shrunken range.
+{%- endcomment -%}
 
 <div class="facets__inputs-wrapper facets__inputs-wrapper--row">
           <div
@@ -207,9 +146,9 @@
                 {%- endif -%}
                 type="text"
                 inputmode="decimal"
-                placeholder="{{ filter.range_max | money_without_currency }}"
+                placeholder="{{ pf_max }}"
                 data-min="{{ max_input_min_value | money_without_currency }}"
-                data-max="{{ filter.range_max | money_without_currency }}"
+                data-max="{{ pf_max }}"
                 ref="maxInput"
                 autocomplete="off"
                 aria-label="{{ 'accessibility.price_filter_high' | t }}"
