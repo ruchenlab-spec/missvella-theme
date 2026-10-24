@@ -3,6 +3,7 @@ node_modules/
 .shopify/
 *.log
 *.tmp
+.tmp-*
 
 # 系统垃圾
 .DS_Store
