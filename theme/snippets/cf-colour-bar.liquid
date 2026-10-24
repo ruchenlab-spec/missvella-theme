@@ -25,7 +25,22 @@
 
   <header class="cf-bar-head">
     <h3 class="cf-bar-title">Filter by color</h3>
-    <span class="cf-bar-tag">A little colour goes a long way</span>
+    <div class="cf-head-controls">
+      {% if enable_sorting %}
+        {% render 'sorting',
+          results: results,
+          sort_by: sort_by,
+          filter_style: 'vertical',
+          suffix: 'desktop',
+          sort_position: 'desktop',
+          should_use_select_on_mobile: false,
+          section_id: section_id
+        %}
+      {% endif %}
+      {% if enable_grid_density %}
+        {% render 'grid-density-controls', viewport: 'desktop' %}
+      {% endif %}
+    </div>
   </header>
   <facet-inputs-component
     class="cf-bar-component"
@@ -181,7 +196,7 @@
     </form>
   </facet-inputs-component>
 
-  {%- comment -%} Results toolbar: item count left, sort + grid density right {%- endcomment -%}
+  {%- comment -%} Results toolbar: item count (sort + density live in the header row) {%- endcomment -%}
   <div class="cf-bar-right">
     <div class="products-count-wrapper" data-testid="products-count">
       <span role="status">
@@ -192,20 +207,6 @@
         {% endif %}
       </span>
     </div>
-    {% if enable_sorting %}
-      {% render 'sorting',
-        results: results,
-        sort_by: sort_by,
-        filter_style: 'vertical',
-        suffix: 'desktop',
-        sort_position: 'desktop',
-        should_use_select_on_mobile: false,
-        section_id: section_id
-      %}
-    {% endif %}
-    {% if enable_grid_density %}
-      {% render 'grid-density-controls', viewport: 'desktop' %}
-    {% endif %}
   </div>
 
   {%- comment -%} Removable chips for every applied filter value {%- endcomment -%}
