@@ -168,7 +168,7 @@
        section's left/right padding setting no longer leaks into the
        sidebar-to-content gap. */
     padding-inline: var(--page-margin, 20px);
-    padding-block: 0 16px;
+    padding-block: 0;
     margin-block-end: 0;
     position: relative;
     z-index: 11;
@@ -181,7 +181,7 @@
     content: '';
     display: block;
     height: 1px;
-    margin-block-start: 16px;
+    margin-block-start: 10px;
     background: rgb(var(--color-foreground-rgb) / 12%);
   }
 
@@ -209,7 +209,7 @@
     grid-column: 2 !important;
     grid-row: 2 / span 14;
     /* Breathing room between the header hairline and the first card row. */
-    padding-block-start: 24px;
+    padding-block-start: 16px;
   }
 
   /* ===== Active filter chips (removable, one per applied value) ===== */
