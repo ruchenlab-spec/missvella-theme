@@ -129,6 +129,8 @@
               type="button"
               class="cf-pill{% if group_active > 0 %} is-active{% endif %}"
               data-cf-pill="{{ group_index }}"
+              aria-expanded="false"
+              aria-controls="cf-panel-{{ group_index }}"
               aria-pressed="{% if group_active > 0 %}true{% else %}false{% endif %}"
             >
               <span class="cf-pill__glyph" style="background: {{ group_color | default: '#9E9E9E' }};" aria-hidden="true"></span>
@@ -181,7 +183,7 @@
           {%- endfor -%}
         {%- endcapture -%}
         {%- if group_kids > 0 -%}
-          <div class="cf-bar-panel" data-cf-panel="{{ panel_index }}">
+          <div class="cf-bar-panel" id="cf-panel-{{ panel_index }}" data-cf-panel="{{ panel_index }}">
             <div class="cf-panel-head">
               <span class="cf-panel-title">{{ group_name }}</span>
               <span class="cf-panel-meta">{{ group_active }} selected of {{ group_kids }}</span>
@@ -282,6 +284,12 @@
       bar.querySelectorAll('.cf-bar-panel').forEach((p) => p.classList.remove('open'));
       bar.querySelectorAll('.cf-pill').forEach((p) => p.classList.remove('is-open'));
       if (!isOpen && panel) { panel.classList.add('open'); pill.classList.add('is-open'); }
+
+      // The opened family presents the "selected" treatment (like the demo)
+      // while aria-pressed keeps reporting the real filter state.
+      bar.querySelectorAll('.cf-pill').forEach(function (p) {
+        p.setAttribute('aria-expanded', p.classList.contains('is-open') ? 'true' : 'false');
+      });
 
       syncPush(bar);
     } else if (!e.target.closest('.cf-bar-panel') && !e.target.closest('.cf-colour-bar')) {

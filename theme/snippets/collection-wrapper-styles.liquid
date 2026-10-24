@@ -383,8 +383,10 @@
 
   .cf-pill.is-active { background: rgb(var(--color-foreground-rgb) / 0.04); }
 
-  /* 2px ink underline overlapping the bar's bottom hairline */
-  .cf-pill.is-active::after {
+  /* 2px ink underline overlapping the bar's bottom hairline — shown for the
+     opened family (demo behaviour) and for a family with real selections. */
+  .cf-pill.is-active::after,
+  .cf-pill.is-open::after {
     content: '';
     position: absolute;
     left: 14px;
@@ -408,7 +410,8 @@
     background: linear-gradient(105deg, #d94747 0%, #e98a39 17%, #e5d75d 33%, #5c9b69 50%, #5599c7 67%, #6559a9 83%, #b36b9c 100%);
   }
 
-  .cf-pill.is-active .cf-pill__glyph {
+  .cf-pill.is-active .cf-pill__glyph,
+  .cf-pill.is-open .cf-pill__glyph {
     outline: 1px solid var(--color-foreground);
     outline-offset: 2px;
   }
