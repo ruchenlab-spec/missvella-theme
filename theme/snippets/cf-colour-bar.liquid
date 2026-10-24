@@ -95,6 +95,18 @@
       {%- endfor -%}
 
       <div class="cf-bar-pills">
+        {%- comment -%} All color: no colour constraint, clears colour params via the
+           theme's existing filter mechanism (sort/q/other facets survive). {%- endcomment -%}
+        {%- assign colour_active_total = colour_filter.active_values | size -%}
+        <button
+          type="button"
+          class="cf-pill cf-pill--all{% if colour_active_total == 0 %} is-active{% endif %}"
+          data-cf-clear-color
+          aria-pressed="{% if colour_active_total == 0 %}true{% else %}false{% endif %}"
+        >
+          <span class="cf-pill__glyph cf-pill__glyph--rainbow" aria-hidden="true"></span>
+          <span class="cf-pill__name">All color</span>
+        </button>
         {%- assign group_index = 0 -%}
         {%- for line in group_lines -%}
           {%- assign gl = line | strip -%}
@@ -113,8 +125,13 @@
             {%- endif -%}
           {%- endfor -%}
           {%- if group_kids > 0 -%}
-            <button type="button" class="cf-pill{% if group_active > 0 %} is-active{% endif %}" data-cf-pill="{{ group_index }}">
-              <span class="cf-pill__glyph"><i style="background: {{ group_color | default: '#9E9E9E' }};"></i></span>
+            <button
+              type="button"
+              class="cf-pill{% if group_active > 0 %} is-active{% endif %}"
+              data-cf-pill="{{ group_index }}"
+              aria-pressed="{% if group_active > 0 %}true{% else %}false{% endif %}"
+            >
+              <span class="cf-pill__glyph" style="background: {{ group_color | default: '#9E9E9E' }};" aria-hidden="true"></span>
               <span class="cf-pill__name">{{ group_name }}</span>
               <span class="cf-pill__num">{% if group_kids < 10 %}0{% endif %}{{ group_kids }}</span>
               {%- if group_active > 0 -%}<span class="cf-pill__count">{{ group_active }}</span>{%- endif -%}
@@ -123,8 +140,13 @@
           {%- assign group_index = group_index | plus: 1 -%}
         {%- endfor -%}
         {%- if loose_kids > 0 -%}
-          <button type="button" class="cf-pill{% if loose_active > 0 %} is-active{% endif %}" data-cf-pill="other">
-            <span class="cf-pill__glyph"><i style="background: #9E9E9E;"></i></span>
+          <button
+            type="button"
+            class="cf-pill{% if loose_active > 0 %} is-active{% endif %}"
+            data-cf-pill="other"
+            aria-pressed="{% if loose_active > 0 %}true{% else %}false{% endif %}"
+          >
+            <span class="cf-pill__glyph" style="background: #9E9E9E;" aria-hidden="true"></span>
             <span class="cf-pill__name">Other</span>
             <span class="cf-pill__num">{% if loose_kids < 10 %}0{% endif %}{{ loose_kids }}</span>
             {%- if loose_active > 0 -%}<span class="cf-pill__count">{{ loose_active }}</span>{%- endif -%}
@@ -214,6 +236,23 @@
 
 </div>
 <script>
+  {%- comment -%} All color: strip colour query params, keep sort / search / other facets. {%- endcomment -%}
+  if (!window.__mvCfClearColorBound) {
+    window.__mvCfClearColorBound = true;
+    document.addEventListener('click', function (event) {
+      var trigger = event.target.closest('[data-cf-clear-color]');
+      if (!trigger) return;
+      var url = new URL(window.location.href);
+      Array.from(url.searchParams.keys()).forEach(function (key) {
+        if (/^filter\.v\./.test(key) && !/^filter\.v\.price/.test(key) && /color|colour|颜色|color-pattern/i.test(key)) {
+          url.searchParams.delete(key);
+        }
+      });
+      url.searchParams.delete('page');
+      event.preventDefault();
+      window.location.assign(url.toString());
+    });
+  }
   document.addEventListener('change', (e) => {
     const inp = e.target;
     if (inp.matches && inp.matches('[data-url-add]')) {
