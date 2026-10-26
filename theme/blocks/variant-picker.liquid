@@ -104,85 +104,29 @@
         }
       ],
       "default": "cards",
-      "info": "图片卡片：显示每个颜色的商品图，占空间较大；小色块：只显示颜色（色号），更紧凑。每行排列数量按下方「卡片/色块大小」与「间距」自动计算"
-    },
-    {
-      "type": "select",
-      "id": "color_group_columns",
-      "visible_if": "{{ block.settings.color_group_enabled }}",
-      "label": "每行列数",
-      "options": [
-        {
-          "value": "auto",
-          "label": "自适应"
-        },
-        {
-          "value": "4",
-          "label": "4"
-        },
-        {
-          "value": "5",
-          "label": "5"
-        },
-        {
-          "value": "6",
-          "label": "6"
-        },
-        {
-          "value": "7",
-          "label": "7"
-        },
-        {
-          "value": "8",
-          "label": "8"
-        },
-        {
-          "value": "9",
-          "label": "9"
-        },
-        {
-          "value": "10",
-          "label": "10"
-        }
-      ],
-      "default": "auto",
-      "info": "自适应：按卡片大小与间距自动填满整行；固定列数：强制每行显示指定数量"
+      "info": "图片卡片：显示每个颜色的商品图，占空间较大；小色块：只显示颜色（色号），更紧凑。每行排列数量由下方「每行列数」决定，宽度和间距按数量自动计算"
     },
     {
       "type": "range",
-      "id": "color_group_min_width",
+      "id": "color_group_columns_desktop",
       "visible_if": "{{ block.settings.color_group_enabled }}",
-      "label": "卡片最小宽度（桌面）",
-      "min": 28,
-      "max": 90,
-      "step": 2,
-      "unit": "px",
-      "default": 52,
-      "info": "小色块模式下即色块大小。自适应行数按此宽度与间距自动计算"
-    },
-    {
-      "type": "range",
-      "id": "color_group_mobile_min_width",
-      "visible_if": "{{ block.settings.color_group_enabled }}",
-      "label": "卡片最小宽度（移动端）",
-      "min": 28,
-      "max": 90,
-      "step": 2,
-      "unit": "px",
-      "default": 40,
-      "info": "小色块模式下即色块大小"
-    },
-    {
-      "type": "range",
-      "id": "color_group_gap",
-      "visible_if": "{{ block.settings.color_group_enabled }}",
-      "label": "卡片/色块间距",
+      "label": "每行列数（桌面）",
       "min": 2,
-      "max": 24,
-      "step": 2,
-      "unit": "px",
-      "default": 8,
-      "info": "每行能排列多少张卡片/色块，由「卡片大小」与此间距根据可用宽度自动计算"
+      "max": 12,
+      "step": 1,
+      "default": 6,
+      "info": "每行排列的数量。卡片/色块宽度与间距按此数量自动均分计算，始终填满整行"
+    },
+    {
+      "type": "range",
+      "id": "color_group_columns_mobile",
+      "visible_if": "{{ block.settings.color_group_enabled }}",
+      "label": "每行列数（移动端）",
+      "min": 1,
+      "max": 8,
+      "step": 1,
+      "default": 4,
+      "info": "移动端每行排列的数量"
     },
     {
       "type": "range",
@@ -193,7 +137,8 @@
       "max": 26,
       "step": 1,
       "unit": "px",
-      "default": 6
+      "default": 0,
+      "info": "极简奢侈风默认直角（0）；如需圆角可手动调大"
     },
     {
       "type": "select",
@@ -230,28 +175,6 @@
       "visible_if": "{{ block.settings.color_group_enabled }}",
       "label": "颜色名称气泡阴影",
       "default": false
-    },
-    {
-      "type": "range",
-      "id": "color_group_gap_start",
-      "visible_if": "{{ block.settings.color_group_enabled }}",
-      "label": "颜色组上方间距",
-      "min": 0,
-      "max": 48,
-      "step": 2,
-      "unit": "px",
-      "default": 0
-    },
-    {
-      "type": "range",
-      "id": "color_group_gap_end",
-      "visible_if": "{{ block.settings.color_group_enabled }}",
-      "label": "颜色组下方间距",
-      "min": 0,
-      "max": 48,
-      "step": 2,
-      "unit": "px",
-      "default": 12
     },
     {
       "type": "header",

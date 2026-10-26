@@ -10,14 +10,10 @@
   @param {string} [group_handle] - Handle of the group collection.
   @param {object} [current_product] - Product to treat as the active one.
   @param {string} [display_style] - `cards` (image cards) or `swatches` (small colour blocks).
-  @param {string} [columns] - Number of columns per row, or `auto`.
-  @param {number} [min_width] - Minimum card width in pixels (desktop).
-  @param {number} [mobile_min_width] - Minimum card width in pixels (mobile).
+  @param {number} [columns_desktop] - Cards/swatches per row on desktop. Width and gap are derived from this count.
+  @param {number} [columns_mobile] - Cards/swatches per row on mobile.
   @param {number} [card_radius] - Card corner radius in pixels.
   @param {string} [selected_style] - Selected swatch style.
-  @param {number} [gap] - Space between cards/swatches in pixels.
-  @param {number} [gap_start] - Space above the swatch group, in pixels.
-  @param {number} [gap_end] - Space below the swatch group, in pixels.
   @param {boolean} [tooltip_shadow] - Whether the tooltip gets a shadow.
 
   @example
@@ -81,31 +77,38 @@
   # ------------------------------------------------ appearance settings
   # `display_style` switches the whole group between image cards (`cards`,
   # the default) and compact colour blocks (`swatches`). Everything else
-  # (columns, sizes, radius, gaps) is shared by both modes.
+  # (columns, radius, outer gaps) is shared by both modes.
   assign group_display_style = display_style | default: 'cards'
-  assign group_columns = columns | default: 'auto'
-  assign group_min_width = min_width | default: 52
-  assign group_mobile_min_width = mobile_min_width | default: 40
+  assign group_columns_desktop = columns_desktop | default: 6
+  assign group_columns_mobile = columns_mobile | default: 4
   assign group_card_radius = card_radius | default: 6
   assign group_selected_style = selected_style | default: 'solid'
-  assign group_gap = gap | default: 8
-  assign group_gap_start = gap_start | default: 0
-  assign group_gap_end = gap_end | default: 12
 
-  # Cards stretch to fill the row (`minmax(min, 1fr)`); swatches keep the
-  # configured size so a row never blows up when only a few colours exist.
-  # In both modes the number of tracks is derived from the available width,
-  # the configured card/swatch size and the gap — never a fixed 2-per-row.
-  if group_columns == 'auto'
-    if group_display_style == 'swatches'
-      assign group_grid = 'repeat(auto-fill, var(--color-group-min-width))'
-    else
-      assign group_grid = 'repeat(auto-fill, minmax(var(--color-group-min-width), 1fr))'
-    endif
-  elsif group_display_style == 'swatches'
-    assign group_grid = 'repeat(' | append: group_columns | append: ', var(--color-group-min-width))'
+  # The merchant only picks the number of items per row; width and gap are
+  # derived from it. Width: every track is an equal `1fr` share of the row,
+  # so it always fills the container exactly — no dead space on the right.
+  # Gap: fewer columns → larger cards → proportionally larger gap, so the
+  # spacing keeps pace with the card size on any container width.
+  if group_columns_desktop <= 3
+    assign group_gap_desktop = 12
+  elsif group_columns_desktop <= 5
+    assign group_gap_desktop = 10
+  elsif group_columns_desktop <= 7
+    assign group_gap_desktop = 8
+  elsif group_columns_desktop <= 9
+    assign group_gap_desktop = 6
   else
-    assign group_grid = 'repeat(' | append: group_columns | append: ', minmax(0, 1fr))'
+    assign group_gap_desktop = 4
+  endif
+
+  if group_columns_mobile <= 2
+    assign group_gap_mobile = 8
+  elsif group_columns_mobile <= 4
+    assign group_gap_mobile = 6
+  elsif group_columns_mobile <= 6
+    assign group_gap_mobile = 5
+  else
+    assign group_gap_mobile = 4
   endif
 -%}
 
@@ -120,13 +123,11 @@
     data-display-style="{{ group_display_style }}"
     data-selected-style="{{ group_selected_style }}"
     style="
-      --color-group-grid: {{ group_grid }};
-      --color-group-min-width-desktop: {{ group_min_width }}px;
-      --color-group-min-width-mobile: {{ group_mobile_min_width }}px;
+      --color-group-columns-desktop: {{ group_columns_desktop }};
+      --color-group-columns-mobile: {{ group_columns_mobile }};
       --color-group-card-radius: {{ group_card_radius }}px;
-      --color-group-card-gap: {{ group_gap }}px;
-      --color-group-gap-start: {{ group_gap_start }}px;
-      --color-group-gap-end: {{ group_gap_end }}px;
+      --color-group-card-gap-desktop: {{ group_gap_desktop }}px;
+      --color-group-card-gap-mobile: {{ group_gap_mobile }}px;
       {% if tooltip_shadow %}--color-group-tooltip-shadow: 0 8px 20px rgb(var(--color-foreground-rgb) / 0.24);{% else %}--color-group-tooltip-shadow: none;{% endif %}
     "
   >

@@ -6,8 +6,8 @@
 
   Appearance is controlled from the variant picker block settings and passed
   in as CSS custom properties:
-  --color-group-grid, --color-group-min-width, --color-group-card-radius,
-  --color-group-tooltip-shadow.
+  --color-group-columns-desktop/-mobile, --color-group-card-gap-desktop/-mobile,
+  --color-group-card-radius, --color-group-tooltip-shadow.
   The selected style is applied through `data-selected-style` on the fieldset.
   The display style (image cards vs. small colour blocks) is applied through
   `data-display-style`.
@@ -39,19 +39,22 @@
     gap: 0;
     min-width: 0;
     width: 100%;
-    margin-block-start: var(--color-group-gap-start, 0px);
-    margin-block-end: var(--color-group-gap-end, 12px);
+    /* Internal vertical rhythm is 8px across the whole picker. */
+    margin-block-start: 0;
+    margin-block-end: 8px;
   }
 
   .color-group {
-    --color-group-min-width: var(--color-group-min-width-desktop, 52px);
-    --color-group-card-gap: 8px;
-    --color-group-card-radius: 6px;
+    /* The merchant picks the item count per row; the card width and the gap
+       are derived from it. Inline style sets only the raw -desktop / -mobile
+       values so the media query below can swap them (inline rules would
+       otherwise outrank this stylesheet). */
+    --color-group-columns: var(--color-group-columns-desktop, 6);
+    --color-group-card-gap: var(--color-group-card-gap-desktop, 8px);
+    --color-group-card-radius: 0px;
     --color-group-card-ratio: 4 / 5;
-    --color-group-grid: repeat(auto-fill, minmax(var(--color-group-min-width), 1fr));
+    --color-group-grid: repeat(var(--color-group-columns), minmax(0, 1fr));
     --color-group-tooltip-shadow: none;
-    --color-group-gap-start: 0px;
-    --color-group-gap-end: 12px;
     /* Selection ring geometry. `swatches` tightens the offsets so the ring
        never eats a 28px colour block. */
     --color-group-ring-width: 1px;
@@ -69,16 +72,18 @@
     gap: 12px;
     width: 100%;
     padding: 0;
-    margin-block-end: var(--margin-xs);
+    margin-block-end: 8px;
   }
 
-  /* Current colour name — never rely on the swatch image alone. */
+  /* Current colour name — never rely on the swatch image alone.
+     Toolbar-label standard: body font / 10px / 500 / 0.12em / uppercase. */
   .color-group__current {
     font-family: var(--font-body--family);
-    font-size: var(--font-size--2xs, 11px);
+    font-size: 10px;
     font-weight: 500;
-    letter-spacing: 0.06em;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
+    line-height: 1;
     color: var(--color-foreground-subdued, #77736d);
   }
 
@@ -102,8 +107,8 @@
     display: block;
     aspect-ratio: var(--color-group-card-ratio);
     border-radius: var(--color-group-card-radius);
-    background-color: rgb(var(--color-foreground-rgb) / 0.06);
-    box-shadow: 0 0 0 1px rgb(var(--color-foreground-rgb) / 0.14);
+    background-color: rgb(var(--color-foreground-rgb) / 4%);
+    box-shadow: 0 0 0 1px rgb(var(--color-foreground-rgb) / 15%);
     cursor: pointer;
     transition:
       box-shadow 0.2s ease,
@@ -126,8 +131,8 @@
   }
 
   .color-group__swatch:focus-visible {
-    outline: 2px solid rgb(var(--color-foreground-rgb));
-    outline-offset: 2px;
+    outline: 1.5px solid var(--color-foreground);
+    outline-offset: 3px;
   }
 
   /* ------------------------------------------------------------------
@@ -139,38 +144,38 @@
      them.
      ------------------------------------------------------------------ */
 
-  /* Refined double ring: outer hairline, breathing room, inner hairline. */
+  /* Selection follows the design-language recipe: a single 1px ink ring set
+     off by a background gap (outline 1px + offset). `solid` = full ink,
+     `outline` = 15% hairline. `bar`/`dot` keep only the base 15% edge plus
+     their own ink marker — no extra ring, no drop shadows (no shadow jumps). */
   .color-group[data-selected-style='solid'] {
     --color-group-selected-shadow:
-      0 0 0 var(--color-group-ring-width) rgb(var(--color-foreground-rgb)),
       0 0 0 var(--color-group-ring-offset) var(--color-background),
-      0 0 0 calc(var(--color-group-ring-offset) + var(--color-group-ring-width)) rgb(var(--color-foreground-rgb)),
-      0 6px 16px rgb(var(--color-foreground-rgb) / 0.12);
+      0 0 0 calc(var(--color-group-ring-offset) + var(--color-group-ring-width)) var(--color-foreground);
   }
 
   .color-group[data-selected-style='outline'] {
     --color-group-selected-shadow:
-      0 0 0 var(--color-group-ring-width) rgb(var(--color-foreground-rgb)),
-      0 0 0 var(--color-group-ring-offset) rgb(var(--color-background-rgb)),
-      0 0 0 calc(var(--color-group-ring-offset) + var(--color-group-ring-width)) rgb(var(--color-foreground-rgb));
+      0 0 0 var(--color-group-ring-offset) var(--color-background),
+      0 0 0 calc(var(--color-group-ring-offset) + var(--color-group-ring-width)) rgb(var(--color-foreground-rgb) / 15%);
   }
 
   .color-group[data-selected-style='bar'] {
-    --color-group-selected-shadow: 0 0 0 1px rgb(var(--color-foreground-rgb) / 0.3);
+    --color-group-selected-shadow: none;
   }
 
   .color-group[data-selected-style='dot'] {
-    --color-group-selected-shadow: 0 0 0 1px rgb(var(--color-foreground-rgb));
+    --color-group-selected-shadow: none;
   }
 
   .color-group[data-selected-style='none'] {
-    --color-group-selected-shadow: 0 0 0 1px rgb(var(--color-foreground-rgb) / 0.14);
+    --color-group-selected-shadow: none;
   }
 
   .color-group__swatch--current {
     box-shadow: var(
       --color-group-selected-shadow,
-      0 0 0 1px rgb(var(--color-foreground-rgb) / 0.14)
+      0 0 0 1px rgb(var(--color-foreground-rgb) / 15%)
     );
     cursor: default;
   }
@@ -181,8 +186,7 @@
     left: 18%;
     right: 18%;
     bottom: 4px;
-    height: 3px;
-    border-radius: 2px;
+    height: 2px;
     background-color: rgb(var(--color-foreground-rgb));
   }
 
@@ -199,32 +203,23 @@
   }
 
   @media (hover: hover) {
+    /* Hover language: quiet edge deepen 15% → 70%, no offset ring, no drop
+       shadow (shadow/opacity jumps are banned). */
     .color-group__swatch:not(.color-group__swatch--current):hover {
-      box-shadow:
-        0 0 0 1px rgb(var(--color-foreground-rgb) / 0.45),
-        0 0 0 var(--color-group-ring-offset) var(--color-background),
-        0 0 0 calc(var(--color-group-ring-offset) + 1px) rgb(var(--color-foreground-rgb) / 0.25),
-        0 6px 16px rgb(var(--color-foreground-rgb) / 0.12);
+      box-shadow: 0 0 0 1px rgb(var(--color-foreground-rgb) / 70%);
     }
   }
 
   /* ------------------------------------------------------------------
      Display style: small colour blocks (小色块)
 
-     Same markup as the card mode — the grid track is the swatch size, the
-     swatch is square (1/1) instead of a 4/5 card, and the selection ring
-     tightens so it never overwhelms a small colour block. The number of
-     swatches per row still follows the configured size + gap.
+     Same markup as the card mode — the swatch is square (1/1) instead of a
+     4/5 card, and the selection ring tightens so it never overwhelms a small
+     colour block. Per-row count comes from the block setting.
      ------------------------------------------------------------------ */
   .color-group[data-display-style='swatches'] {
     --color-group-card-ratio: 1 / 1;
     --color-group-ring-offset: 2px;
-  }
-
-  .color-group[data-display-style='swatches'] .color-group__list {
-    /* Fixed-size tracks: keep the swatches at their configured size instead
-       of stretching them across the whole row. */
-    justify-content: flex-start;
   }
 
   /* A colour block that carries an uploaded swatch image (fabric texture)
@@ -296,10 +291,9 @@
 
   @media (max-width: 749px) {
     .color-group {
-      /* Mobile only swaps the card/swatch size. The gap comes from the block
-         setting (inline custom property) and stays identical on every
-         viewport so the merchant's spacing is predictable. */
-      --color-group-min-width: var(--color-group-min-width-mobile, 40px);
+      /* Mobile swaps the per-row count (and the gap derived from it). */
+      --color-group-columns: var(--color-group-columns-mobile, 4);
+      --color-group-card-gap: var(--color-group-card-gap-mobile, 6px);
     }
   }
 
