@@ -81,11 +81,6 @@ Darks:#52443b:Espresso,Dark Navy,Black{%- endif -%}{%- endcapture -%}
   # for the rest) - the old horizontal/vertical mode switch is retired.
   assign should_show_pane = block_settings.enable_filtering
 
-  assign should_use_select_on_mobile = true
-  if block_settings.enable_filtering == false and block_settings.enable_sorting
-    assign should_use_select_on_mobile = false
-  endif
-
   # Use collection.id if available (normal collection). Don't fall back to handle — non-numeric IDs fail GID validation.
   assign collection_id = results.id | default: collection.id
 -%}
@@ -337,7 +332,7 @@ Darks:#52443b:Espresso,Dark Navy,Black{%- endif -%}{%- endcapture -%}
           aria-haspopup="dialog"
         >
           <span class="svg-wrapper">
-            {{ 'icon-filter.svg' | inline_asset_content }}
+            {{ 'icon-filter-sliders.svg' | inline_asset_content }}
           </span>
 
           {{ 'actions.show_filters' | t }}
@@ -365,7 +360,7 @@ Darks:#52443b:Espresso,Dark Navy,Black{%- endif -%}{%- endcapture -%}
 
     {% liquid
       assign child_count = 0
-      if block_settings.enable_filtering == false and block_settings.enable_sorting
+      if block_settings.enable_sorting
         assign child_count = child_count | plus: 1
       endif
       if block_settings.enable_grid_density
@@ -374,7 +369,7 @@ Darks:#52443b:Espresso,Dark Navy,Black{%- endif -%}{%- endcapture -%}
     %}
 
     <div class="facets-mobile-wrapper facets-controls-wrapper{% if child_count > 1 %} facets-mobile-wrapper--multiple-controls{% endif %}">
-      {% if block_settings.enable_filtering == false and block_settings.enable_sorting %}
+      {% if block_settings.enable_sorting %}
         <facets-form-component
           section-id="{{ section.id }}"
           id="FacetFiltersForm--{{ section.id }}-mobile-sorting-only"
@@ -394,7 +389,7 @@ Darks:#52443b:Espresso,Dark Navy,Black{%- endif -%}{%- endcapture -%}
               filter_style: 'vertical',
               suffix: 'mobile',
               sort_position: 'mobile',
-              should_use_select_on_mobile: should_use_select_on_mobile,
+              should_use_select_on_mobile: false,
               section_id: section.id
             %}
           </form>
@@ -471,6 +466,7 @@ Darks:#52443b:Espresso,Dark Navy,Black{%- endif -%}{%- endcapture -%}
               <div class="facets__filters-wrapper">
                 {% assign total_active_values = 0 %}
                 {% assign is_active = false %}
+                {% assign drawer_index = 0 %}
 
                 {%- for filter in filters -%}
                   {%- liquid
@@ -478,6 +474,7 @@ Darks:#52443b:Espresso,Dark Navy,Black{%- endif -%}{%- endcapture -%}
                     if fl contains 'color' or fl contains 'colour' or fl contains '颜色'
                       continue
                     endif
+                    assign drawer_index = drawer_index | plus: 1
                   -%}
                   {% case filter.type %}
                     {% when 'price_range' %}
@@ -487,7 +484,7 @@ Darks:#52443b:Espresso,Dark Navy,Black{%- endif -%}{%- endcapture -%}
                           assign is_active = true
                         endif
 
-                        render 'price-filter', filter: filter, filter_style: 'vertical', should_render_clear: false, id_prefix: 'dialog', filter_index: sidebar_index, price_max_override: block_settings.price_filter_max
+                        render 'price-filter', filter: filter, filter_style: 'vertical', should_render_clear: false, id_prefix: 'dialog', filter_index: drawer_index, price_max_override: block_settings.price_filter_max
                       -%}
                     {% else %}
                       {% liquid
@@ -497,22 +494,11 @@ Darks:#52443b:Espresso,Dark Navy,Black{%- endif -%}{%- endcapture -%}
 
                         assign active_value_count = filter.active_values | size
                         assign total_active_values = total_active_values | plus: active_value_count
-                        render 'list-filter', filter: filter, filter_style: 'vertical', active_value_count: active_value_count, should_render_clear: false, in_drawer: true, sectionId: section.id, color_groups: color_group_map_value, filter_index: sidebar_index
+                        render 'list-filter', filter: filter, filter_style: 'vertical', active_value_count: active_value_count, should_render_clear: false, in_drawer: true, sectionId: section.id, color_groups: color_group_map_value, filter_index: drawer_index
                       %}
                   {% endcase %}
                 {%- endfor -%}
               </div>
-            {% endif %}
-
-            {% if block_settings.enable_sorting %}
-              {% render 'sorting',
-                results: results,
-                sort_by: sort_by,
-                filter_style: 'vertical',
-                suffix: 'overflow',
-                should_use_select_on_mobile: should_use_select_on_mobile,
-                section_id: section.id
-              %}
             {% endif %}
           </scroll-hint>
         </form>
@@ -549,6 +535,72 @@ Darks:#52443b:Espresso,Dark Navy,Black{%- endif -%}{%- endcapture -%}
     </dialog>
   </theme-drawer>
 {% endif %}
+
+<script>
+  (function () {
+    var STORAGE_KEY = 'mv-filters-sidebar-collapsed';
+
+    function setCollapsed(wrapper, collapsed) {
+      wrapper.classList.toggle('is-filters-collapsed', collapsed);
+      var toggle = wrapper.querySelector('[data-cf-sidebar-toggle]');
+      if (toggle) toggle.setAttribute('aria-expanded', collapsed ? 'false' : 'true');
+    }
+
+    document.addEventListener('click', function (event) {
+      var toggle = event.target.closest('[data-cf-sidebar-toggle]');
+      if (toggle) {
+        var wrapper = toggle.closest('.collection-wrapper');
+        if (wrapper) {
+          var collapsed = !wrapper.classList.contains('is-filters-collapsed');
+          setCollapsed(wrapper, collapsed);
+          try { localStorage.setItem(STORAGE_KEY, collapsed ? '1' : '0'); } catch (error) {}
+        }
+        return;
+      }
+
+      /* Refresh icon: spin one full turn on click, never on hover */
+      var reset = event.target.closest('.facets-edit-reset');
+      if (reset && !reset.classList.contains('is-spinning')) {
+        reset.classList.add('is-spinning');
+      }
+    });
+
+    document.addEventListener('animationend', function (event) {
+      if (event.animationName !== 'facets-reset-spin') return;
+      var reset = event.target.closest('.facets-edit-reset');
+      if (reset) reset.classList.remove('is-spinning');
+    });
+
+    /* Restore collapsed state before first paint of the sidebar */
+    try {
+      if (localStorage.getItem(STORAGE_KEY) === '1') {
+        document.querySelectorAll('.facets-block-wrapper:not(#filters-drawer) .facets').forEach(function (facets) {
+          var wrapper = facets.closest('.collection-wrapper');
+          if (wrapper) setCollapsed(wrapper, true);
+        });
+      }
+    } catch (error) {}
+
+    /* Crossing back to desktop closes the bottom-sheet filter drawer, so no
+       right-side drawer is left open after a mobile-to-desktop switch. */
+    var mobileQuery = window.matchMedia('(max-width: 749px)');
+    var wasMobile = mobileQuery.matches;
+    var onBreakpointChange = function (event) {
+      if (wasMobile && !event.matches) {
+        var drawer = document.getElementById('filters-drawer');
+        if (drawer && drawer.hasAttribute('open') && typeof drawer.close === 'function') {
+          drawer.close();
+        }
+      }
+      wasMobile = event.matches;
+    };
+    if (typeof mobileQuery.addEventListener === 'function') {
+      mobileQuery.addEventListener('change', onBreakpointChange);
+    } else if (typeof mobileQuery.addListener === 'function') {
+      mobileQuery.addListener(onBreakpointChange);
+    }
+  })();
+</script>
 
 {% stylesheet %}
   .facets-block-wrapper {
@@ -1035,30 +1087,15 @@ Darks:#52443b:Espresso,Dark Navy,Black{%- endif -%}{%- endcapture -%}
     }
   }
 
-  :is(.facets--drawer, .facets--vertical) :is(.facets__item, .sorting-filter)::before {
-    content: '';
-    display: block;
-    height: 0;
-    width: calc(100% - var(--theme-drawer-padding) * 2);
-    border-top: var(--style-border-width) solid rgb(var(--color-foreground-rgb) / var(--opacity-10-25));
-    margin: 0 auto;
-  }
+  /* Group hairlines: the details element itself carries class facets__panel
+     and gets a single 10% border-top (collection-wrapper-styles). The old
+     ::before line is retired — it stacked on the same position and rendered
+     as a doubled, darker divider in the drawer and sidebar. */
 
   @media screen and (min-width: 750px) {
-    .facets:not(.facets--drawer) :is(.facets__item, .sorting-filter)::before {
-      width: 100%;
-    }
-
     .facets--horizontal .facets__item:not(:first-of-type)::before,
     .facets--horizontal .sorting-filter::before {
       content: none;
-    }
-  }
-
-  @media screen and (min-width: 750px) {
-    .facets--vertical .facets__item:not(:first-of-type)::before,
-    .facets--vertical .sorting-filter::before {
-      content: '';
     }
   }
 
@@ -1324,16 +1361,16 @@ Darks:#52443b:Espresso,Dark Navy,Black{%- endif -%}{%- endcapture -%}
     letter-spacing: 0.02em;
   }
 
-  /* Checkbox: rounded square that fills on check */
+  /* Checkbox: square that fills on check */
   .facets .checkbox .icon-checkmark {
-    border-radius: 5px;
+    border-radius: 0;
     transition:
       background-color 0.2s ease,
       border-color 0.2s ease;
   }
 
   .facets .checkbox__input:checked + .checkbox__label .icon-checkmark {
-    border-radius: 5px;
+    border-radius: 0;
   }
 
   .facets .checkbox__input:checked + .checkbox__label .icon-checkmark svg :is(path, polyline, line) {
@@ -1367,15 +1404,45 @@ Darks:#52443b:Espresso,Dark Navy,Black{%- endif -%}{%- endcapture -%}
     pointer-events: none;
   }
 
-  /* Price inputs: refined fields */
+  /* Price inputs: square fields with a hairline ink border, matching the
+     minimal-luxury toolbar style. Compact paddings: the $ label sits flush
+     left, the value starts right after it (no dead space), vertical padding
+     tightened to keep the field low. */
   .facets .price-facet__input {
-    border-radius: 10px;
-    border: 1px solid rgb(var(--color-foreground-rgb) / 18%);
+    border-radius: 0;
+    border: 1px solid rgb(var(--color-foreground-rgb) / 16%);
     transition: border-color 0.2s ease;
+    padding-block: 7px;
+    padding-inline-start: 24px;
+    padding-inline-end: 9px;
+    text-align: start;
+    font-size: 13px;
+  }
+
+  .facets .price-facet__label {
+    padding: 7px;
+    font-size: 13px;
   }
 
   .facets .price-facet__input:focus {
     border-color: rgb(var(--color-foreground-rgb) / 70%);
+  }
+
+  /* Keep both price inputs on one row in the narrow DESKTOP sidebar: the
+     fields shrink instead of wrapping. The mobile drawer is excluded — its
+     container is narrower and forcing nowrap made the row overflow. */
+  .facets-block-wrapper:not(#filters-drawer) .price-facet__inputs-wrapper {
+    flex-wrap: nowrap;
+  }
+
+  .facets-block-wrapper .price-facet__field {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .facets-block-wrapper .price-facet__separator {
+    flex: 0 0 auto;
+    padding-inline: 2px;
   }
 {% endstylesheet %}
 

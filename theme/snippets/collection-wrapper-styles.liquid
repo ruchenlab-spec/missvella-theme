@@ -176,13 +176,18 @@
 
   /* Hairline drawn INSIDE the content box, so it spans exactly the pills'
      and the cards' width in every width mode (border-bottom would span the
-     padded element box and run wider than the grid). */
+     padded element box and run wider than the grid). Shown only while a
+     colour panel is expanded — collapsed stays a single clean bar. */
   .cf-colour-bar::after {
     content: '';
-    display: block;
+    display: none;
     height: 1px;
     margin-block-start: 10px;
     background: rgb(var(--color-foreground-rgb) / 12%);
+  }
+
+  .cf-colour-bar:has(.cf-bar-panel.open)::after {
+    display: block;
   }
 
   .collection-wrapper:has(.facets-block-wrapper[data-has-filters]) .cf-bar-component {
@@ -194,7 +199,7 @@
     display: flex;
     align-items: center;
     gap: 18px;
-    padding-block: 16px 0;
+    padding-block: 10px 0;
   }
 
   .cf-bar-right .products-count-wrapper {
@@ -209,7 +214,7 @@
     grid-column: 2 !important;
     grid-row: 2 / span 14;
     /* Breathing room between the header hairline and the first card row. */
-    padding-block-start: 16px;
+    padding-block-start: 10px;
   }
 
   /* ===== Active filter chips (removable, one per applied value) ===== */
@@ -218,7 +223,9 @@
     align-items: center;
     flex-wrap: wrap;
     gap: 8px 10px;
-    padding-block: 14px 0;
+    /* Symmetric with the grid's own padding-block-start below, so the row
+       sits with equal, compact space above and below. */
+    padding-block: 10px;
   }
 
   .cf-active-bar__label {
@@ -310,31 +317,58 @@
       display: block;
     }
 
-    .cf-bar-row {
-      display: block;
+    /* Mobile: the colour pills are a single swipeable line. Higher-specificity
+       selectors here because the base merged-row rules appear later in the
+       file with equal weight. align-items MUST be stretch: the base rule's
+       center would shrink the row to its content width, the overflow scroll
+       container would never establish, and swiping would move the page. */
+    .cf-colour-bar .cf-bar-head {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0;
+      border-block: 0;
     }
 
-    .cf-colour-bar .cf-bar-pills {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
+    .cf-colour-bar .cf-bar-head .cf-bar-pills {
+      display: flex;
+      overflow-x: auto;
+      overflow-y: hidden;
+      scrollbar-width: none;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior-x: contain;
+      touch-action: pan-x;
+      border-inline: 0;
+      border-top: 1px solid rgb(var(--color-foreground-rgb) / 10%);
+      border-bottom: 1px solid rgb(var(--color-foreground-rgb) / 10%);
+    }
+
+    .cf-colour-bar .cf-bar-head .cf-bar-pills::-webkit-scrollbar {
+      display: none;
+    }
+
+    .cf-colour-bar .cf-pill {
+      flex: 0 0 auto;
+      min-height: 48px;
+      padding: 0 12px;
+      border-right: 1px solid rgb(var(--color-foreground-rgb) / 10%);
       border-bottom: 0;
     }
 
-    .cf-pill {
-      min-height: 48px;
-      padding: 0 10px;
+    .cf-colour-bar .cf-pill:last-child {
       border-right: 0;
-      border-bottom: 1px solid rgb(var(--color-foreground-rgb) / 7%);
+    }
+
+    /* SORT + density are integrated into the "Filter" row on mobile — the
+       header's own controls row is removed to avoid duplicates. */
+    .cf-colour-bar .cf-bar-head .cf-head-controls {
+      display: none;
     }
 
     .cf-pill.is-active::after { left: 10px; right: 10px; }
     .cf-pill__name { font-size: 9px; letter-spacing: 0.09em; }
 
     .cf-bar-right {
-      display: none;
-    }
-
-    .cf-bar-head .cf-head-controls {
       display: none;
     }
 
@@ -346,6 +380,43 @@
       grid-column: 1 !important;
       grid-row: 2;
     }
+
+    /* Mobile filters open as a BOTTOM SHEET instead of a right-side drawer:
+       full width, anchored to the bottom edge, slides up/down, capped at 85%
+       of the viewport so the page stays visible behind it. The padding
+       variable is normalized so header, content and action bar share the
+       same left/right inset. */
+    #filters-drawer .theme-drawer__dialog {
+      --theme-drawer-padding: var(--padding-lg);
+      inset-inline: 0;
+      inset-inline-end: 0;
+      top: auto;
+      bottom: 0;
+      width: 100%;
+      max-width: 100%;
+      height: auto;
+      max-height: 85dvh;
+      padding-block: 0 var(--safe-area-inset-bottom);
+      padding-inline: 0;
+      border-inline-start: none;
+      border-top: 1px solid rgb(var(--color-foreground-rgb) / 10%);
+    }
+
+    #filters-drawer .theme-drawer__dialog--opening {
+      animation: mv-drawer-slide-up var(--animation-speed) var(--animation-timing-fade-in);
+    }
+
+    #filters-drawer .theme-drawer__dialog--closing {
+      animation: mv-drawer-slide-down var(--animation-speed) var(--animation-timing-fade-out) forwards;
+    }
+  }
+
+  @keyframes mv-drawer-slide-up {
+    from { transform: translateY(100%); }
+  }
+
+  @keyframes mv-drawer-slide-down {
+    to { transform: translateY(100%); }
   }
 
   /* ===== Colour family bar — square-corner editorial bar (demo port) ===== */
@@ -353,10 +424,7 @@
     display: flex;
     width: 100%;
     position: relative;
-    /* 16px above and below, synced with the grid's hairline spacing */
-    padding-block: 16px;
-    border-top: 1px solid rgb(var(--color-foreground-rgb) / 10%);
-    border-bottom: 1px solid rgb(var(--color-foreground-rgb) / 10%);
+    padding-block: 0;
   }
 
   .cf-pill {
@@ -366,10 +434,10 @@
     align-items: center;
     gap: 11px;
     min-width: 0;
-    min-height: 56px;
+    min-height: 44px;
     padding: 0 14px;
     border: 0;
-    border-right: 1px solid rgb(var(--color-foreground-rgb) / 7%);
+    border-right: 1px solid rgb(var(--color-foreground-rgb) / 10%);
     border-radius: 0;
     background: transparent;
     color: inherit;
@@ -389,14 +457,14 @@
   /* 2px ink underline overlapping the bar's bottom hairline — shown for the
      opened family (demo behaviour) and for a family with real selections.
      Spans the full option width and lands on the container's bottom border
-     (16px container padding + 1px overlap). */
+     (1px overlap). */
   .cf-pill.is-active::after,
   .cf-pill.is-open::after {
     content: '';
     position: absolute;
     left: 0;
     right: 0;
-    bottom: -17px;
+    bottom: -1px;
     height: 2px;
     background: var(--color-foreground);
   }
@@ -413,9 +481,9 @@
 
   /* Rectangular family swatch — light colours stay visible on white */
   .cf-pill__glyph {
-    width: 27px;
-    height: 21px;
-    flex: 0 0 27px;
+    width: 32px;
+    height: 24px;
+    flex: 0 0 32px;
     border-radius: 0;
     border: 1px solid rgb(0 0 0 / 12%);
     position: relative;
@@ -453,23 +521,27 @@
   .cf-pill__count { display: none; }
   /* Panel renders IN FLOW when open (no overlay): it grows between the pills
      and the grid, so the hairline above the grid always separates the swatches
-     from the cards. */
+     from the cards. Spacing is symmetric when expanded: 10px above (here) and
+     10px below (cf-bar-right's padding-block-start). */
   .cf-bar-panel {
     display: none;
-    padding: 4px 0 8px;
+    padding: 10px 0 0;
   }
   .cf-bar-panel.open { display: block; animation: cf-panel-fade 0.3s ease; }
   @keyframes cf-panel-fade { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
-  .cf-panel-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 12px; }
+  .cf-panel-head { display: flex; align-items: baseline; justify-content: space-between; margin-bottom: 8px; }
   .cf-panel-title { font-family: var(--font-heading--family, inherit); font-size: 17px; }
   .cf-panel-meta { font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--color-foreground-subdued); }
   .cf2-panel-swatches {
     display: flex; flex-wrap: nowrap; overflow-x: auto; justify-content: flex-start;
-    gap: 12px 28px; scrollbar-width: none; padding-bottom: 2px;
+    gap: 10px 20px; scrollbar-width: none;
+    /* Inner padding gives the selected outline (1px + 3px offset) room, so it
+       is not clipped by the scroll container on the left/top edges. */
+    padding: 4px 4px 6px;
   }
   .cf2-panel-swatches::-webkit-scrollbar { display: none; }
   .cf2-panel-swatches .cf2-item__dot {
-    width: 28px; height: 28px; border-radius: 0;
+    width: 34px; height: 34px; border-radius: 0;
     box-shadow: inset 0 0 0 1px rgb(0 0 0 / 14%);
     transition: transform 0.18s ease, box-shadow 0.18s ease;
   }
@@ -493,12 +565,23 @@
     color: var(--color-foreground-subdued);
   }
 
+  /* Merged toolbar row: toggle + colour pills + sort/density on one line.
+     The top/bottom hairlines belong to the whole row, so the filter toggle
+     and the sort/density controls are enclosed in the same bar; vertical
+     hairlines separate the three groups (same tone as the pill dividers). */
   .cf-bar-head {
     display: flex;
     align-items: center;
-    justify-content: space-between;
     gap: 16px;
-    padding-block: 0 12px;
+    padding-block: 0;
+    border-block: 1px solid rgb(var(--color-foreground-rgb) / 10%);
+  }
+
+  .cf-bar-head .cf-bar-pills {
+    flex: 1 1 auto;
+    width: auto;
+    min-width: 0;
+    border-inline: 1px solid rgb(var(--color-foreground-rgb) / 10%);
   }
 
   /* Sort + density cluster in the header row (hidden on mobile: the native
@@ -530,7 +613,10 @@
     align-items: center;
     justify-content: space-between;
     gap: 12px;
-    padding-block: 0 18px;
+    /* Same height as the colour bar row so the sidebar title, its reset icon
+       and the bar contents share one horizontal centre line. */
+    height: 44px;
+    padding-block: 0;
     border: 0;
     margin: 0;
   }
@@ -557,7 +643,140 @@
   .facets-edit-reset:hover {
     color: var(--color-foreground);
     background: rgb(var(--color-foreground-rgb) / 6%);
-    transform: rotate(-40deg);
+  }
+  /* Spin one full turn on click only (class added by script) — never on hover */
+  .facets-edit-reset.is-spinning svg { animation: facets-reset-spin 0.6s ease; }
+  @keyframes facets-reset-spin { to { transform: rotate(360deg); } }
+
+  /* Collapsible sidebar (demo port): the toggle lives in the colour-bar
+     header. Expanded = plain serif "Hide filters" text; collapsed = bordered
+     pill "Filters". */
+  .cf-filter-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    height: 32px;
+    padding: 0 11px;
+    border: 1px solid transparent;
+    border-radius: 0;
+    background: transparent;
+    color: var(--color-foreground);
+    font: inherit;
+    cursor: pointer;
+    white-space: nowrap;
+    flex: 0 0 auto;
+    transition: border-color 0.2s ease, background-color 0.2s ease, box-shadow 0.2s ease, padding 0.2s ease;
+  }
+  .cf-filter-toggle:hover {
+    border-color: rgb(var(--color-foreground-rgb) / 15%);
+    background: rgb(var(--color-foreground-rgb) / 3%);
+  }
+  .cf-filter-toggle:focus-visible {
+    outline: 1.5px solid var(--color-foreground);
+    outline-offset: 3px;
+  }
+  .cf-filter-toggle__icon {
+    display: inline-flex;
+    align-items: center;
+    line-height: 0;
+    color: var(--color-foreground-subdued);
+  }
+  .cf-filter-toggle__icon svg,
+  .cf-filter-toggle__icon .svg-wrapper {
+    display: block;
+    width: 15px;
+    height: 15px;
+  }
+  /* Unified toolbar typography: every text control in the merged row uses
+     the same treatment as the ALL COLOR pill name (body family, 10px, wide
+     tracking, uppercase) for one minimal-luxury voice. */
+  .cf-filter-toggle__label {
+    font-family: var(--font-body--family);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    line-height: 1;
+  }
+  .cf-filter-toggle__label-closed { display: none; }
+  .cf-filter-toggle__arrow {
+    display: inline-flex;
+    align-items: center;
+    line-height: 0;
+    color: var(--color-foreground-subdued);
+    transition: transform 0.25s ease;
+  }
+  .cf-filter-toggle__arrow svg {
+    display: block;
+    width: 10px;
+    height: 10px;
+  }
+
+  /* Collapsed: pill treatment, swapped label, flipped arrow. The label keeps
+     the expanded typography (serif, same size) in both states. */
+  .collection-wrapper.is-filters-collapsed .cf-filter-toggle {
+    border-color: rgb(var(--color-foreground-rgb) / 15%);
+    background: var(--color-background);
+    padding: 0 13px;
+    box-shadow: 0 2px 8px rgb(0 0 0 / 3%);
+  }
+  .collection-wrapper.is-filters-collapsed .cf-filter-toggle .cf-filter-toggle__label-open { display: none; }
+  .collection-wrapper.is-filters-collapsed .cf-filter-toggle .cf-filter-toggle__label-closed { display: inline; }
+  .collection-wrapper.is-filters-collapsed .cf-filter-toggle .cf-filter-toggle__arrow { transform: rotate(180deg); }
+
+  @media screen and (max-width: 749px) {
+    /* Mobile has its own drawer toggle button */
+    .cf-filter-toggle { display: none; }
+
+    /* Shared sliders icon: same 15px size as the desktop toggle. */
+    .facets-toggle__button .svg-wrapper svg {
+      width: 15px;
+      height: 15px;
+    }
+  }
+
+  /* Sort control: same quiet treatment as the toggle — 32px hit area, pill
+     typography, muted caret, soft hover. */
+  .cf-bar-head .sorting-filter .facets__summary {
+    height: 32px;
+    min-height: 0;
+    align-items: center;
+    gap: 7px;
+    padding: 0 11px;
+    border-radius: 0;
+    transition: background-color 0.2s ease;
+  }
+  .cf-bar-head .sorting-filter .facets__summary:hover {
+    background: rgb(var(--color-foreground-rgb) / 3%);
+  }
+  .cf-bar-head .sorting-filter .facets__summary .facets__label {
+    font-family: var(--font-body--family);
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-foreground);
+  }
+  .cf-bar-head .sorting-filter .facets__summary .icon-caret {
+    width: 8px;
+    height: 8px;
+    margin-block: 0;
+    color: var(--color-foreground-subdued);
+  }
+
+  /* Grid density icons: muted by default, ink on hover/active, sized to sit
+     quietly next to the 10px uppercase labels. */
+  .cf-bar-head .column-picker {
+    color: var(--color-foreground-subdued);
+    padding: 6px;
+  }
+  .cf-bar-head .column-picker svg {
+    width: 15px;
+    height: 15px;
+  }
+  .cf-bar-head .column-options__option:hover .column-picker,
+  .cf-bar-head .column-options__option-input:checked ~ .column-picker {
+    color: var(--color-foreground);
   }
   .facets-edit-sub { margin: 6px 0 0; font-size: 12.5px; color: var(--color-foreground-subdued); }
   .facet-num {
@@ -570,11 +789,12 @@
     font-variant-numeric: tabular-nums;
   }
 
-  /* Clear hierarchy: medium group titles, muted footnote */
+  /* Clear hierarchy: smaller, bold, uppercase group titles, muted footnote */
   .facets-block-wrapper .facets__summary .facets__label {
-    font-size: var(--font-size--sm, 13px);
-    font-weight: 500;
-    letter-spacing: 0.02em;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
   }
 
   .facets-block-wrapper .price-facet__highest-price {
@@ -589,15 +809,18 @@
     gap: 0;
     /* Symmetric padding keeps the collapsed row vertically centred between
        the top and bottom hairlines. */
-    padding-block: 16px;
+    padding-block: 11px;
     margin-bottom: 0;
     border: 0 !important;
     box-shadow: none !important;
     background: none !important;
   }
 
+  /* Open group: the space between the title row and the options (summary
+     bottom padding) matches the space below the options (details bottom
+     padding, 10px) — symmetric above and below. */
   .facets-block-wrapper details[open] > .facets__summary {
-    padding-block-end: 8px;
+    padding-block-end: 10px;
   }
 
   .facets-block-wrapper .facets__summary .facet-num { flex: 0 0 30px; margin: 0; }
@@ -606,16 +829,38 @@
   .facets-block-wrapper .facets__summary .facets__status { margin-inline-start: auto; }
   .facets-block-wrapper .facets__summary .icon-caret { flex: 0 0 auto; }
 
+  /* Count bubble: a perfect 20px circle (the base rule's swatch-height
+       division made it an ellipse). Swatch strips keep the base sizing. */
+  .facets-block-wrapper .facets__bubble:not(.facets__swatch-wrapper) {
+    width: 20px;
+    height: 20px;
+    min-width: 20px;
+    flex: 0 0 auto;
+    padding: 0;
+    border-radius: 50%;
+  }
+
   /* Price: native min/max inputs; the applied range shows in the chips bar */
   .facets-block-wrapper .facets__summary[data-testid='price-filter'] .facets__status { display: none; }
 
+  /* Group hairlines: the details element itself carries class facets__panel,
+     so this single rule draws ONE uniform 10% line above every group — in the
+     desktop sidebar and in the mobile bottom-sheet drawer alike. The bottom
+     padding applies ONLY when the group is open: on closed rows (mobile
+     drawer) it would add dead space below the summary and break the
+     vertical rhythm. */
   .facets-block-wrapper .facets__panel,
   .facets-block-wrapper .facets__filters-wrapper > details {
     border: 0 !important;
-    border-top: 1px solid var(--color-foreground) !important;
+    border-top: 1px solid rgb(var(--color-foreground-rgb) / 10%) !important;
     box-shadow: none !important;
     background: none !important;
-    padding-block: 0 15px;
+    padding-block: 0;
+  }
+
+  .facets-block-wrapper details[open].facets__panel,
+  .facets-block-wrapper .facets__filters-wrapper > details[open] {
+    padding-block: 0 10px;
   }
 
   /* Divider between sidebar and content */
@@ -631,11 +876,32 @@
     .collection-wrapper:has(.facets-block-wrapper[data-has-filters]) {
       column-gap: 0 !important;
       grid-template-columns: minmax(210px, 250px) minmax(0, 1fr) !important;
+      transition: grid-template-columns 0.28s ease;
     }
 
     .collection-wrapper:has(.facets-block-wrapper[data-has-filters]) .facets-block-wrapper:not(#filters-drawer) .facets {
       margin-inline-end: var(--cf-sidebar-gap, 40px);
+      transition: opacity 0.18s ease;
     }
+
+    /* Collapsed sidebar (demo behaviour): the sidebar column collapses to zero
+       width with an animated grid transition, the sidebar itself fades out and
+       the products expand into the full row. minmax() on both ends keeps the
+       grid-template-columns transition interpolable. */
+    .collection-wrapper.is-filters-collapsed:has(.facets-block-wrapper[data-has-filters]) {
+      grid-template-columns: minmax(0px, 0px) minmax(0, 1fr) !important;
+      transition: grid-template-columns 0.28s ease;
+    }
+
+    .collection-wrapper.is-filters-collapsed .facets-block-wrapper:not(#filters-drawer) .facets {
+      opacity: 0;
+      pointer-events: none;
+      overflow: hidden !important;
+      margin-inline-end: 0 !important;
+      padding-inline-end: 0 !important;
+      border-inline-end-color: transparent;
+    }
+  }
 
     /* Content column (colour bar + grid) sits flush in the filters layout:
        its only inline inset is the page's own outer margin, so the sidebar
