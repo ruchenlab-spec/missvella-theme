@@ -5,6 +5,7 @@
   @param {object} [variant_image] - an alternate image when there is no swatch value
   @param {string} [mode] - one of 'unscaled', 'filter', 'pill'
   @param {string} [label] - visually-hidden accessible label for the swatch (e.g. the color name)
+  @param {string} [swatch_style] - extra inline CSS appended to the swatch span (highest cascade priority)
 
   @example
   {% render 'swatch', swatch: swatch, variant_image: variant_image, mode: 'unscaled', label: option_value.name %}
@@ -44,6 +45,7 @@
   style="
     --swatch-background: {{ swatch_value }};
     {% if swatch.image and settings.show_variant_image == false %} --swatch-focal-point: {{ swatch.image.presentation.focal_point }};{% endif %}
+    {{ swatch_style }}
   "
 >
 </span>

@@ -48,9 +48,70 @@
 {%- endcomment -%}
 {%- if request.page_type == 'product' -%}
   {% style %}
+    /* ------------------------------------------------------------------
+       Editorial typography system for the details column (Missvella UI
+       spec): serif display title, quiet functional labels, light price.
+       Layout, spacing and block order stay in the merchant's hands — only
+       type hierarchy, color and weight are set here.
+       ------------------------------------------------------------------ */
+
+    /* Product title — the serif voice of the brand. Size / weight / family /
+       colour are merchant settings on this block (the "产品标题" section in the
+       block settings panel); the defaults reproduce the editorial scale. The
+       second selector outranks the text block's custom-font-size/custom-color
+       variants without resorting to !important. */
+    .product-details {
+      --mv-title-size: {{ block_settings.title_font_size | default: 32 }}px;
+      --mv-title-weight: {{ block_settings.title_font_weight | default: 400 }};
+      --mv-title-family: {% if block_settings.title_font_family == 'body' %}var(--font-body--family){% else %}var(--font-heading--family){% endif %};
+      {% if block_settings.title_color != blank %}--mv-title-color: {{ block_settings.title_color }};{% endif %}
+    }
+
+    .product-details .text-block h1,
+    .product-details .text-block.custom-font-size.custom-color h1 {
+      font-family: var(--mv-title-family);
+      font-weight: var(--mv-title-weight);
+      font-size: clamp(calc(var(--mv-title-size) * 0.8), 2.5vw, var(--mv-title-size));
+      line-height: 1.18;
+      letter-spacing: 0.01em;
+      text-transform: none;
+      text-wrap: balance;
+      color: var(--mv-title-color, var(--color-foreground));
+      margin-block: 0;
+    }
+
+    .product-details .text-block h1 a {
+      color: inherit;
+      text-decoration: none;
+    }
+
+    /* Series / SKU line — quiet functional label above the title. Only the
+       letter spacing / case are set here; family, size and colour come from
+       the block's 系列标题与 SKU settings (via product-series.liquid) so the
+       merchant's controls keep working. */
+    .product-details .product-series__sku {
+      font-size: {{ block_settings.sku_font_size | default: 10 }}px;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      line-height: 1;
+    }
+
+    /* Price — functional sans text, medium weight (never bold display). */
     .product-details product-price .price {
-      font-weight: var(--font-weight-semibold, 600);
-      font-size: 1.125rem;
+      font-weight: 500;
+      font-size: 15px;
+      letter-spacing: 0.02em;
+    }
+
+    /* Accordion headers — the same functional-label standard as the option
+       legends; the theme's 14px body voice is too heavy for this list. */
+    .product-details accordion-custom summary.details__header {
+      font-family: var(--font-body--family);
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--color-foreground);
     }
   {% endstyle %}
 {%- endif -%}
@@ -190,6 +251,63 @@
   "settings": [
     {
       "type": "header",
+      "content": "产品标题"
+    },
+    {
+      "type": "range",
+      "id": "title_font_size",
+      "label": "字号（桌面）",
+      "min": 20,
+      "max": 48,
+      "step": 1,
+      "unit": "px",
+      "default": 32,
+      "info": "小屏自动缩放到 80%"
+    },
+    {
+      "type": "select",
+      "id": "title_font_weight",
+      "label": "字重",
+      "options": [
+        {
+          "value": "400",
+          "label": "常规"
+        },
+        {
+          "value": "500",
+          "label": "中等"
+        },
+        {
+          "value": "600",
+          "label": "半粗"
+        }
+      ],
+      "default": "400"
+    },
+    {
+      "type": "select",
+      "id": "title_font_family",
+      "label": "字体",
+      "options": [
+        {
+          "value": "heading",
+          "label": "衬线（标题字体）"
+        },
+        {
+          "value": "body",
+          "label": "无衬线（正文字体）"
+        }
+      ],
+      "default": "heading"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "颜色",
+      "placeholder": "默认"
+    },
+    {
+      "type": "header",
       "content": "系列标题与 SKU"
     },
     {
@@ -260,6 +378,17 @@
       "id": "sku_prefix",
       "label": "SKU 前缀",
       "default": "SKU:",
+      "visible_if": "{{ block.settings.show_sku }}"
+    },
+    {
+      "type": "range",
+      "id": "sku_font_size",
+      "label": "SKU 字号",
+      "min": 8,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "default": 10,
       "visible_if": "{{ block.settings.show_sku }}"
     },
     {

@@ -1,0 +1,135 @@
+{%- doc -%}
+  Missvella swatch button spec — the single source of truth for every colour
+  sample button on the storefront. Do not fork these rules per surface; add
+  consumers to the selector lists below instead.
+
+  Consumers:
+  - default variant picker colour labels
+    (`variant-picker .variant-option__button-label--has-swatch`)
+  - cross-product colour group blocks
+    (`variant-picker .color-group__swatch`)
+
+  Spec (brand demo):
+  - square face, 1px hairline edge at 25% ink
+  - selected = 1px ink ring with a 3px gap (the demo's double frame)
+
+  One mechanism for both surfaces — the container box NEVER changes size, and
+  the selected state only shrinks the FACE by the ring's footprint (4px per
+  side), painting the ring as a box-shadow. Face + ring therefore equals the
+  normal face size exactly, and no layout ever moves (flex rows and grid rows
+  alike). A margin/outline shrink is forbidden here: inside a grid cell it
+  resizes rows and eats the cell gaps.
+
+  Sizing:
+  - Variant picker: fixed 34px face; the label box is the face box (34px), so
+    face + ring equals the other swatches' size exactly.
+  - Colour group: the grid cell is the reserved box, so the face size follows
+    the merchant's per-row column count (fixed 8px gap, dynamic face size).
+
+  @example
+  {% render 'mv-swatch-button-styles' %}
+{%- enddoc -%}
+
+{% stylesheet %}
+  /* ---------- shared spec values ---------- */
+  variant-picker .variant-option--buttons .variant-option__button-label--has-swatch,
+  variant-picker .color-group {
+    --mv-swatch-size: 34px;
+    --mv-swatch-ring-width: 1px;
+    --mv-swatch-ring-offset: 3px;
+    /* space the ring needs outside the face: gap + ring */
+    --mv-swatch-ring-total: calc(var(--mv-swatch-ring-offset) + var(--mv-swatch-ring-width));
+    /* the box a swatch always occupies: face + ring on every side */
+    --mv-swatch-outer: calc(var(--mv-swatch-size) + 2 * var(--mv-swatch-ring-total));
+  }
+
+  /* ---------- default variant picker ---------- */
+  /* The label is exactly the face box and never changes size. The theme keeps
+     these labels `display: block` (see variant-picker-styles' "maintain block
+     display" override), so the shrunken selected face is centred with margins
+     instead of flex. */
+  variant-picker .variant-option--buttons .variant-option__button-label--has-swatch {
+    position: relative;
+    box-sizing: border-box;
+    width: var(--mv-swatch-size);
+    height: var(--mv-swatch-size);
+    min-width: 0;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    border: none;
+    background: transparent;
+    border-radius: 0;
+    flex: 0 0 auto;
+  }
+
+  /* the face fills the label */
+  variant-picker .variant-option--buttons .variant-option__button-label--has-swatch > .swatch {
+    display: block;
+    width: var(--mv-swatch-size);
+    height: var(--mv-swatch-size);
+    box-sizing: border-box;
+    border-radius: 0;
+    border-color: rgb(var(--color-foreground-rgb) / 25%);
+  }
+
+  /* selected: shrink the FACE (margins keep it centred inside the unchanged
+     label) so face + ring equals the other swatches' size exactly; the ring is
+     a box-shadow, so nothing in the row moves and the ring's outer edge lands
+     flush with the row's left-aligned boundary. */
+  variant-picker .variant-option--buttons .variant-option__button-label--has-swatch:has(:checked) > .swatch {
+    width: calc(var(--mv-swatch-size) - 2 * var(--mv-swatch-ring-total));
+    height: calc(var(--mv-swatch-size) - 2 * var(--mv-swatch-ring-total));
+    margin: var(--mv-swatch-ring-total);
+    box-shadow:
+      0 0 0 var(--mv-swatch-ring-offset) var(--color-background),
+      0 0 0 calc(var(--mv-swatch-ring-offset) + var(--mv-swatch-ring-width)) var(--color-foreground);
+  }
+
+  /* The theme draws its own selected-state outline on the checked label (and a
+     ::after ring in old Safari). With the single box-shadow ring above that
+     stacks into multiple frames — suppress the theme's layers here. Focus
+     rings (:focus-visible) are left untouched for keyboard users. */
+  variant-picker .variant-option--buttons .variant-option__button-label--has-swatch:has(:checked) {
+    outline: none;
+  }
+
+  variant-picker .variant-option--buttons .variant-option__button-label--has-swatch:has(:checked)::after {
+    content: none;
+  }
+
+  /* ---------- colour group ---------- */
+  /* The face (colour block or image) carries the hairline edge; the outer
+     box is layout only. */
+  variant-picker .color-group__swatch > .color-group__swatch-color,
+  variant-picker .color-group__swatch > .color-group__image {
+    box-sizing: border-box;
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 1px solid rgb(var(--color-foreground-rgb) / 25%);
+    border-radius: 0;
+  }
+
+  /* selected: the face shrinks by the ring footprint inside its (unchanged)
+     grid cell, and the ring is a box-shadow — face + ring equals the other
+     swatches' size exactly, and the grid never reflows. */
+  variant-picker .color-group__swatch--current > .color-group__swatch-color,
+  variant-picker .color-group__swatch--current > .color-group__image {
+    position: absolute;
+    inset: var(--mv-swatch-ring-total);
+    width: auto;
+    height: auto;
+    box-shadow:
+      0 0 0 var(--mv-swatch-ring-offset) var(--color-background),
+      0 0 0 calc(var(--mv-swatch-ring-offset) + var(--mv-swatch-ring-width)) var(--color-foreground);
+  }
+
+  /* hover: quiet edge deepen on the face */
+  @media (hover: hover) {
+    variant-picker .color-group__swatch:not(.color-group__swatch--current):hover > .color-group__swatch-color,
+    variant-picker .color-group__swatch:not(.color-group__swatch--current):hover > .color-group__image {
+      border-color: rgb(var(--color-foreground-rgb) / 70%);
+    }
+  }
+{% endstylesheet %}

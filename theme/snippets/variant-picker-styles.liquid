@@ -23,70 +23,6 @@
     padding-inline-start: max(4px, var(--padding-inline-start));
   }
 
-  /* Dropdown variant option styles */
-  .variant-option__select-wrapper {
-    display: flex;
-    position: relative;
-    border: var(--style-border-width-inputs) solid var(--color-variant-border);
-    border-radius: var(--style-border-radius-inputs);
-    align-items: center;
-    margin-top: var(--margin-2xs);
-    overflow: clip;
-    color: var(--color-variant-text);
-  }
-
-  .variant-option__select-wrapper:has(.swatch) {
-    --variant-picker-swatch-width: 20px;
-    --variant-picker-swatch-height: 20px;
-  }
-
-  .variant-option__select-wrapper:hover {
-    border-color: var(--color-variant-hover-border);
-    color: var(--color-variant-hover-text);
-  }
-
-  .variant-option__select-wrapper:hover .variant-option__select {
-    background-color: var(--color-variant-hover-background);
-  }
-
-  .variant-option__select:focus-visible {
-    outline: var(--focus-outline-width) solid currentcolor;
-    outline-offset: var(--focus-outline-offset);
-  }
-
-  .variant-option__select {
-    padding-block: var(--padding-md);
-    padding-inline: var(--padding-lg) calc(var(--padding-lg) + var(--icon-size-2xs));
-    appearance: none;
-    background-color: var(--color-variant-background);
-    color: inherit;
-    border: 0;
-    width: 100%;
-    margin: 0;
-    cursor: pointer;
-  }
-
-  .variant-option__select-wrapper .icon {
-    position: absolute;
-    inset-inline-end: var(--padding-md);
-    top: 50%;
-    transform: translateY(-50%);
-    width: var(--icon-size-2xs);
-    height: var(--icon-size-2xs);
-    pointer-events: none;
-  }
-
-  .variant-option__select--has-swatch {
-    padding-inline-start: calc((2 * var(--padding-sm)) + var(--variant-picker-swatch-width));
-  }
-
-  .variant-option__select-wrapper .swatch {
-    position: absolute;
-    top: 50%;
-    inset-inline-start: var(--padding-md);
-    transform: translateY(-50%);
-  }
-
   /* Variant picker alignment modifiers */
   .variant-picker--center,
   .variant-picker--center .variant-option {
@@ -151,7 +87,6 @@
   }
 
   .variant-option--buttons legend,
-  .variant-option--dropdowns > label,
   .variant-option[data-testid='variant-option-single'] {
     color: var(--variant-option-label-color, var(--color-foreground));
   }
@@ -163,7 +98,6 @@
 
   @media (prefers-reduced-motion: no-preference) {
     .variant-option__button-label,
-    .variant-option__select-wrapper,
     .variant-option__button-label::before,
     .variant-option__button-label::after,
     .variant-option__button-label:has([data-previous-checked='true'], [data-current-checked='true'])
@@ -189,7 +123,6 @@
       transition-property: border-color;
     }
 
-    .variant-option__select-wrapper,
     .variant-option__button-label {
       transition-property: background-color, border-color, color;
     }

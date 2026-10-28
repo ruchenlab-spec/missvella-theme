@@ -72,8 +72,7 @@ export default class VariantPicker extends Component {
   variantChanged(event) {
     if (!(event.target instanceof HTMLElement)) return;
 
-    const selectedOption =
-      event.target instanceof HTMLSelectElement ? event.target.options[event.target.selectedIndex] : event.target;
+    const selectedOption = event.target;
 
     if (!selectedOption) return;
 
@@ -245,19 +244,6 @@ export default class VariantPicker extends Component {
         }
       }
       target.checked = true;
-    }
-
-    if (target instanceof HTMLSelectElement) {
-      const newValue = target.value;
-      const newSelectedOption = Array.from(target.options).find((option) => option.value === newValue);
-
-      if (!newSelectedOption) throw new Error('Option not found');
-
-      for (const option of target.options) {
-        option.removeAttribute('selected');
-      }
-
-      newSelectedOption.setAttribute('selected', 'selected');
     }
   }
 

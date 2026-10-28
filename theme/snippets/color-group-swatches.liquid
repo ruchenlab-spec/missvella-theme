@@ -84,32 +84,13 @@
   assign group_card_radius = card_radius | default: 6
   assign group_selected_style = selected_style | default: 'solid'
 
-  # The merchant only picks the number of items per row; width and gap are
-  # derived from it. Width: every track is an equal `1fr` share of the row,
-  # so it always fills the container exactly — no dead space on the right.
-  # Gap: fewer columns → larger cards → proportionally larger gap, so the
-  # spacing keeps pace with the card size on any container width.
-  if group_columns_desktop <= 3
-    assign group_gap_desktop = 12
-  elsif group_columns_desktop <= 5
-    assign group_gap_desktop = 10
-  elsif group_columns_desktop <= 7
-    assign group_gap_desktop = 8
-  elsif group_columns_desktop <= 9
-    assign group_gap_desktop = 6
-  else
-    assign group_gap_desktop = 4
-  endif
-
-  if group_columns_mobile <= 2
-    assign group_gap_mobile = 8
-  elsif group_columns_mobile <= 4
-    assign group_gap_mobile = 6
-  elsif group_columns_mobile <= 6
-    assign group_gap_mobile = 5
-  else
-    assign group_gap_mobile = 4
-  endif
+  # The merchant only picks the number of items per row. The gap is FIXED
+  # (the theme's 8px rhythm); the swatch size then follows the column count —
+  # more columns → smaller swatches, fewer → larger. Width: every track is an
+  # equal `1fr` share of the row, so the row always fills the container
+  # exactly — no dead space on the right.
+  assign group_gap_desktop = 8
+  assign group_gap_mobile = 8
 -%}
 
 {% render 'color-group-styles' %}

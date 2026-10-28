@@ -1214,8 +1214,7 @@
 
     function optionNameOf(control) {
       if (!control) return '';
-      const source = control instanceof HTMLSelectElement ? control.selectedOptions[0] : control;
-      return (source?.dataset?.optionName || '').trim().toLowerCase();
+      return (control?.dataset?.optionName || '').trim().toLowerCase();
     }
 
     function isSizeControl(control) {
@@ -1224,7 +1223,6 @@
     }
 
     function valueOf(control) {
-      if (control instanceof HTMLSelectElement) return control.value;
       return control?.value || '';
     }
 
@@ -1232,10 +1230,7 @@
       const picker = getVariantPicker();
       if (!picker) return null;
 
-      const checked = Array.from(picker.querySelectorAll('input[type="radio"]:checked')).find(isSizeControl);
-      if (checked) return checked;
-
-      return Array.from(picker.querySelectorAll('select')).find(isSizeControl) || null;
+      return Array.from(picker.querySelectorAll('input[type="radio"]:checked')).find(isSizeControl) || null;
     }
 
     function getSizeRadio(value) {
@@ -1244,12 +1239,6 @@
       return Array.from(picker.querySelectorAll('input[type="radio"]')).find(input => {
         return isSizeControl(input) && input.value === value;
       }) || null;
-    }
-
-    function getSizeSelect() {
-      const picker = getVariantPicker();
-      if (!picker) return null;
-      return Array.from(picker.querySelectorAll('select')).find(isSizeControl) || null;
     }
 
     function captureStandardSize() {
@@ -1346,18 +1335,6 @@
       if (radio) {
         if (!radio.checked) withProgrammaticSizeChange(radio, () => radio.click());
         return true;
-      }
-
-      const select = getSizeSelect();
-      if (select) {
-        const option = Array.from(select.options).find(opt => opt.value === value);
-        if (option) {
-          withProgrammaticSizeChange(select, () => {
-            select.value = value;
-            select.dispatchEvent(new Event('change', { bubbles: true }));
-          });
-          return true;
-        }
       }
 
       return false;
@@ -1650,7 +1627,7 @@
 
       if (mode === 'standard') {
         // Accept whatever control the Size option currently renders as:
-        // matrix/button radios, a dropdown select, or a single fixed value.
+        // matrix/button radios or a single fixed value.
         const control = getCurrentSizeControl();
         const controlOk = control && valueOf(control) && valueOf(control) !== PLACEHOLDER_SIZE;
 
@@ -1689,7 +1666,7 @@
 
     REGISTRY.change = (event) => {
       const control = event.target;
-      if (!(control instanceof HTMLInputElement || control instanceof HTMLSelectElement)) return;
+      if (!(control instanceof HTMLInputElement)) return;
       // Ignore size switches performed by the fit preference tabs.
       if (control.dataset && control.dataset.mvProgrammaticSize) return;
 

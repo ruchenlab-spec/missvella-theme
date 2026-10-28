@@ -76,9 +76,6 @@
       --color-variant-hover-background: {{ u_effective_hover_bg }};
       --color-variant-hover-text: {{ u_effective_hover_text }};
       --color-variant-hover-border: {{ u_effective_hover_border }};
-      {% if block_settings.variant_style == 'dropdowns' %}
-        --color-selected-variant-border: rgb({{ effective_border_color.rgba }});
-      {% endif %}
     }
   {% endif %}
   {% if selected_custom %}

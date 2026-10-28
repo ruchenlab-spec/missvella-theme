@@ -24,10 +24,6 @@
       "label": "t:settings.style",
       "options": [
         {
-          "value": "dropdowns",
-          "label": "t:options.dropdowns"
-        },
-        {
           "value": "buttons",
           "label": "t:options.buttons"
         }
@@ -52,23 +48,35 @@
     },
     {
       "type": "header",
-      "content": "尺码展示方式"
+      "content": "尺寸组"
     },
     {
-      "type": "select",
-      "id": "size_layout",
-      "label": "尺码展示方式",
-      "options": [
-        {
-          "value": "matrix",
-          "label": "尺码矩阵（一次展示全部尺码）"
-        },
-        {
-          "value": "dropdowns",
-          "label": "下拉框"
-        }
-      ],
-      "default": "matrix"
+      "type": "range",
+      "id": "size_columns_desktop",
+      "label": "每行列数（桌面）",
+      "min": 2,
+      "max": 12,
+      "step": 1,
+      "default": 6
+    },
+    {
+      "type": "range",
+      "id": "size_columns_mobile",
+      "label": "每行列数（移动端）",
+      "min": 1,
+      "max": 8,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "range",
+      "id": "size_card_radius",
+      "label": "卡片圆角",
+      "min": 0,
+      "max": 26,
+      "step": 1,
+      "unit": "px",
+      "default": 0
     },
     {
       "type": "checkbox",
@@ -103,8 +111,7 @@
           "label": "小色块"
         }
       ],
-      "default": "cards",
-      "info": "图片卡片：显示每个颜色的商品图，占空间较大；小色块：只显示颜色（色号），更紧凑。每行排列数量由下方「每行列数」决定，宽度和间距按数量自动计算"
+      "default": "cards"
     },
     {
       "type": "range",
@@ -114,8 +121,7 @@
       "min": 2,
       "max": 12,
       "step": 1,
-      "default": 6,
-      "info": "每行排列的数量。卡片/色块宽度与间距按此数量自动均分计算，始终填满整行"
+      "default": 6
     },
     {
       "type": "range",
@@ -125,8 +131,7 @@
       "min": 1,
       "max": 8,
       "step": 1,
-      "default": 4,
-      "info": "移动端每行排列的数量"
+      "default": 4
     },
     {
       "type": "range",
@@ -137,8 +142,7 @@
       "max": 26,
       "step": 1,
       "unit": "px",
-      "default": 0,
-      "info": "极简奢侈风默认直角（0）；如需圆角可手动调大"
+      "default": 0
     },
     {
       "type": "select",
