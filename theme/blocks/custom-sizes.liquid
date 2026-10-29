@@ -609,19 +609,10 @@
   background: var(--mv-pal-accent);
   border-radius: 50%;
   box-shadow: 0 0 0 4px rgb(var(--mv-pal-accent-rgb) / 22%);
-  cursor: pointer;
+  cursor: default;
 }
 .cs-htm-image-wrapper-{{ cs_id }} .mv-hotspot::after {
-  content: '';
-  position: absolute;
-  inset: -6px;
-  border-radius: 50%;
-  border: 1.5px solid rgb(var(--mv-pal-accent-rgb) / 45%);
-  animation: cs-pulse-{{ cs_id }} 2.2s ease infinite;
-}
-@keyframes cs-pulse-{{ cs_id }} {
-  0% { transform: scale(.85); opacity: 1; }
-  100% { transform: scale(1.4); opacity: 0; }
+  display: none;
 }
 .cs-htm-image-wrapper-{{ cs_id }} .mv-hotspot__dot {
   width: 100%;
@@ -629,13 +620,49 @@
   font-size: calc({{ block.settings.hotspot_size }}px * .42);
   box-sizing: border-box;
 }
-.cs-htm-accordion-wrapper-{{ cs_id }} {
+.cs-measurement-list-{{ cs_id }} {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 0;
   width: 100%;
 }
-.cs-htm-note-{{ cs_id }} { margin-top: 12px; }
+.cs-measurement-step-{{ cs_id }} {
+  padding-block: 12px;
+  border-block-end: 1px solid var(--mv-pal-border);
+}
+.cs-measurement-step-{{ cs_id }}:first-child { padding-block-start: 0; }
+.cs-measurement-step-{{ cs_id }}:last-child { border-block-end: 0; }
+.cs-measurement-title-{{ cs_id }} {
+  margin: 0;
+  font-family: var(--font-body--family);
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mv-pal-ink);
+}
+.cs-measurement-title-{{ cs_id }} span {
+  margin-inline-end: 8px;
+  color: var(--mv-pal-muted);
+}
+.cs-measurement-description-{{ cs_id }},
+.cs-htm-note-{{ cs_id }} {
+  margin: 5px 0 0;
+  font-family: var(--font-body--family);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.65;
+  letter-spacing: 0;
+  color: var(--mv-pal-muted);
+}
+.cs-htm-note-{{ cs_id }} {
+  margin-block-start: 12px;
+  padding-block-start: 12px;
+  border-block-start: 1px solid var(--mv-pal-border);
+  font-size: 11px;
+}
+.cs-htm-note-{{ cs_id }} p { margin: 0; }
 @media screen and (max-width: 749px) {
   .cs-modal-body-{{ cs_id }} > .cs-tab-panel-{{ cs_id }}[data-panel='form'] {
     padding: 16px 18px 20px;
@@ -840,7 +867,7 @@
   height: auto;
   max-height: none;
   margin-block-start: 0;
-  border: 1px solid var(--mv-pal-border);
+  border: 1px solid #d8d3ca;
   border-block-start: 0;
   border-radius: 0;
   box-shadow: none;
@@ -991,6 +1018,7 @@
 .cs-block-{{ cs_id }}.has-inline-form .cs-summary-{{ cs_id }} {
   margin: 0;
   padding: 16px;
+  border-color: #d8d3ca;
   border-block-start: 0;
   border-radius: 0;
 }
@@ -1211,27 +1239,18 @@
           {%- endfor -%}
         </div>
         <div>
-          <div class="cs-htm-accordion-wrapper-{{ cs_id }}">
+          <div class="cs-measurement-list-{{ cs_id }}">
             {%- assign htm_fields = "1|Bust|Measure around the fullest part of your bust~2|Waist|Measure around the narrowest part of your natural waistline~3|Hips|Measure around the fullest part of your hips, about 8 inches below your waist~4|Hollow to Floor|Measure from the hollow at the base of your throat to the floor~5|Height|Stand straight and measure from the top of your head to the floor" | split: "~" -%}
             {%- for hf in htm_fields -%}
               {%- assign hfparts = hf | split: "|" -%}
-              <div class="mv-accordion-item" data-htm-step="{{ hfparts[0] }}">
-                <div class="mv-accordion-header">
-                  <div class="mv-accordion-number">{{ hfparts[0] }}</div>
-                  <div style="flex:1;font-size:11px;font-weight:600;color:var(--mv-text-main);letter-spacing:0.03em;">{{ hfparts[1] }}</div>
-                  <svg class="mv-chevron" width="16" height="16" viewBox="0 0 16 16" fill="none"
-                    stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <polyline points="4,6 8,10 12,6"/>
-                  </svg>
-                </div>
-                <div class="mv-accordion-content">
-                  <div class="mv-accordion-text" style="padding-left:42px;">{{ hfparts[2] }}</div>
-                </div>
-              </div>
+              <section class="cs-measurement-step-{{ cs_id }}">
+                <h3 class="cs-measurement-title-{{ cs_id }}"><span>{{ hfparts[0] }}</span>{{ hfparts[1] }}</h3>
+                <p class="cs-measurement-description-{{ cs_id }}">{{ hfparts[2] }}</p>
+              </section>
             {%- endfor -%}
           </div>
           {%- if block.settings.htm_note != blank -%}
-            <div class="mv-note cs-htm-note-{{ cs_id }}">{{ block.settings.htm_note }}</div>
+            <div class="cs-htm-note-{{ cs_id }}">{{ block.settings.htm_note }}</div>
           {%- endif -%}
         </div>
       </div>
@@ -1327,8 +1346,6 @@
     const inputs    = modal.querySelectorAll('[data-key]');
     const tabBtns   = modal.querySelectorAll('[data-tab]');
     const tabPanels = modal.querySelectorAll('[data-panel]');
-    const htmItems  = modal.querySelectorAll('[data-htm-step]');
-    const hotspots  = modal.querySelectorAll('[data-htm-hotspot]');
     const unitBtns  = modal.querySelectorAll('[data-cs-unit]');
     const tabsNav   = modal.querySelector('.cs-tabs-nav-' + id);
     if (usesInlineForm && tabsNav) {
@@ -1769,34 +1786,6 @@
     // Same clear rule as the example: once the customer chooses a normal Shopify
     // Size again, Custom Size is no longer part of the line item. Registered
     // through the document handler registry below (single live instance).
-
-    htmItems.forEach(item => {
-      item.querySelector('.mv-accordion-header')?.addEventListener('click', () => {
-        animateMobileSheetHeight(() => {
-          const isActive = item.classList.contains('active');
-          htmItems.forEach(i => i.classList.remove('active'));
-          hotspots.forEach(h => h.classList.remove('active'));
-          if (!isActive) {
-            item.classList.add('active');
-            const hs = modal.querySelector('[data-htm-hotspot="' + item.dataset.htmStep + '"]');
-            if (hs) hs.classList.add('active');
-          }
-        });
-      });
-    });
-
-    hotspots.forEach(hs => {
-      hs.addEventListener('click', () => {
-        animateMobileSheetHeight(() => {
-          const step = hs.dataset.htmHotspot;
-          htmItems.forEach(i => i.classList.remove('active'));
-          hotspots.forEach(h => h.classList.remove('active'));
-          const item = modal.querySelector('[data-htm-step="' + step + '"]');
-          if (item) item.classList.add('active');
-          hs.classList.add('active');
-        });
-      });
-    });
 
     captureStandardSize();
 
