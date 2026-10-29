@@ -1148,6 +1148,13 @@
   }
   #cs-measure-dialog-{{ cs_id }} .cs-htm-image-wrapper-{{ cs_id }} { max-width: 250px; }
 }
+@media screen and (max-width: 374px) {
+  #cs-modal-{{ cs_id }}.cs-inline .cs-tabs-nav-{{ cs_id }} {
+    gap: 8px;
+    margin-inline: 12px;
+  }
+  #cs-modal-{{ cs_id }}.cs-inline .cs-unit-btn-{{ cs_id }} { padding-inline: 6px; }
+}
 {% endstyle %}
 
 <custom-sizes-{{ cs_id }} class="custom-sizes-block" {{ block.shopify_attributes }}>
