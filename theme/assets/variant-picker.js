@@ -464,6 +464,19 @@ export default class VariantPicker extends Component {
       this.dataset.productUrl = newProductUrl;
     }
 
+    // Server markup starts on Standard Size. Keep the shopper's current fit
+    // mode before morphing so attribute-only updates cannot reset the tabs
+    // while the neighbouring custom measurement editor stays visible.
+    const fitScope = this.closest('.product-details');
+    const fitMode = fitScope?.dataset.mvFitMode;
+    if (!newProduct && (fitMode === 'custom' || fitMode === 'standard')) {
+      newVariantPickerSource.querySelectorAll('[data-mv-fit-tab]').forEach((tab) => {
+        const active = tab.getAttribute('data-mv-fit-tab') === fitMode;
+        tab.classList.toggle('is-active', active);
+        tab.setAttribute('aria-selected', String(active));
+      });
+    }
+
     morph(this, newVariantPickerSource, {
       ...MORPH_OPTIONS,
       getNodeKey: (node) => {

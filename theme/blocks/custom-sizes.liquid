@@ -131,27 +131,27 @@
 
 .cs-summary-{{ cs_id }} {
   display: none;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 4px 12px;
+  flex-direction: column;
+  gap: 10px;
   margin-block-start: 10px;
-  padding: 8px 12px;
+  padding: 10px 12px;
   border: 1px solid var(--mv-pal-border);
   border-radius: 0;
   background: var(--mv-pal-surface);
   box-sizing: border-box;
 }
 .cs-block-{{ cs_id }}.has-data .cs-summary-{{ cs_id }} { display: flex; }
+.cs-summary-footer-{{ cs_id }} { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
 .cs-summary-status-{{ cs_id }} {
   display: inline-flex;
   align-items: center;
   gap: 7px;
   min-width: 0;
   font-family: var(--font-body--family);
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 400;
   line-height: 1.4;
+  letter-spacing: .1em;
   color: var(--mv-pal-ink);
   white-space: nowrap;
 }
@@ -162,26 +162,25 @@
   border-radius: 50%;
   background: #3d7c54;
 }
-.cs-summary-actions-{{ cs_id }} { display: inline-flex; align-items: center; gap: 12px; flex-shrink: 0; }
+.cs-summary-actions-{{ cs_id }} { display: inline-flex; align-items: center; gap: 8px; flex-shrink: 0; }
 .cs-summary-values-{{ cs_id }} {
-  display: flex;
-  flex: 0 0 100%;
-  flex-wrap: wrap;
-  gap: 4px 14px;
-  margin: 2px 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px 20px;
+  margin: 0;
   font-family: var(--font-body--family);
   font-size: 11px;
   font-weight: 400;
   line-height: 1.5;
 }
-.cs-summary-values-{{ cs_id }} > div { display: inline-flex; gap: 4px; white-space: nowrap; }
-.cs-summary-values-{{ cs_id }} dt { color: var(--mv-pal-muted); font-weight: 400; }
-.cs-summary-values-{{ cs_id }} dd { margin: 0; color: var(--mv-pal-ink); font-variant-numeric: tabular-nums; }
+.cs-summary-values-{{ cs_id }} > div { display: flex; align-items: baseline; justify-content: space-between; gap: 6px; min-width: 0; }
+.cs-summary-values-{{ cs_id }} dt { color: var(--mv-pal-muted); font-size: 10px; font-weight: 400; }
+.cs-summary-values-{{ cs_id }} dd { margin: 0; flex-shrink: 0; color: var(--mv-pal-ink); font-variant-numeric: tabular-nums; }
 .cs-btn-edit-{{ cs_id }},
 .cs-btn-cancel-{{ cs_id }} {
-  min-height: 28px;
-  padding: 4px 0;
-  border: 0;
+  min-height: 30px;
+  padding: 4px 12px;
+  border: 1px solid var(--mv-pal-border);
   border-radius: 0;
   background: transparent;
   box-shadow: none;
@@ -189,13 +188,13 @@
   font-size: 11px;
   font-weight: 400;
   line-height: 1.4;
-  color: var(--mv-pal-muted);
+  color: var(--mv-pal-ink);
   cursor: pointer;
-  transition: color .16s ease;
+  transition: color .16s ease, background-color .16s ease;
 }
 @media (hover: hover) {
   .cs-btn-edit-{{ cs_id }}:hover,
-  .cs-btn-cancel-{{ cs_id }}:hover { color: var(--mv-pal-accent); }
+  .cs-btn-cancel-{{ cs_id }}:hover { color: var(--mv-pal-accent); background: var(--pi-soft, var(--mv-pal-page)); }
 }
 
 #cs-overlay-{{ cs_id }} {
@@ -921,15 +920,17 @@
     </div>
 
     <div class="cs-summary-{{ cs_id }}" id="cs-summary-{{ cs_id }}">
-      <div class="cs-summary-status-{{ cs_id }}" role="status">
-        <span class="cs-status-dot-{{ cs_id }}" aria-hidden="true"></span>
-        Measurements saved
-      </div>
-      <div class="cs-summary-actions-{{ cs_id }}">
-        <button type="button" class="cs-btn-edit-{{ cs_id }}" id="cs-edit-{{ cs_id }}">Edit</button>
-        <button type="button" class="cs-btn-cancel-{{ cs_id }}" id="cs-cancel-{{ cs_id }}">Cancel</button>
-      </div>
       <dl class="cs-summary-values-{{ cs_id }}" id="cs-summary-values-{{ cs_id }}" aria-label="Saved measurements"></dl>
+      <div class="cs-summary-footer-{{ cs_id }}">
+        <div class="cs-summary-status-{{ cs_id }}" role="status">
+          <span class="cs-status-dot-{{ cs_id }}" aria-hidden="true"></span>
+          SAVED
+        </div>
+        <div class="cs-summary-actions-{{ cs_id }}">
+          <button type="button" class="cs-btn-edit-{{ cs_id }}" id="cs-edit-{{ cs_id }}">Edit</button>
+          <button type="button" class="cs-btn-cancel-{{ cs_id }}" id="cs-cancel-{{ cs_id }}">Cancel</button>
+        </div>
+      </div>
     </div>
 
   </div>

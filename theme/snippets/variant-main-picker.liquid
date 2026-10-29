@@ -584,10 +584,10 @@
             if (!picker || picker.dataset.mvFitInit) return;
             picker.dataset.mvFitInit = '1';
 
-            var scope = picker.closest('.product-details') || document;
+            var scope = picker.closest('.product-details') || picker.closest('.shopify-section') || picker;
             var errorLine = picker.querySelector('[data-mv-fit-error]');
             var productId = picker.dataset.productId || '';
-            var currentMode = 'standard';
+            var currentMode = scope.dataset.mvFitMode || (scope.classList.contains('mv-fit-custom') ? 'custom' : 'standard');
 
             function tabButtons() {
               return picker.querySelectorAll('[data-mv-fit-tab]');
@@ -603,6 +603,7 @@
 
             function applyMode(mode, notify) {
               currentMode = mode;
+              scope.dataset.mvFitMode = mode;
               scope.classList.toggle('mv-fit-standard', mode === 'standard');
               scope.classList.toggle('mv-fit-custom', mode === 'custom');
               Array.prototype.forEach.call(tabButtons(), function (tab) {
@@ -631,18 +632,8 @@
               applyMode(tab.dataset.mvFitTab, true);
             });
 
-            // Re-apply the mode after the theme re-renders the picker markup.
-            if (typeof MutationObserver === 'function') {
-              var queued = false;
-              new MutationObserver(function () {
-                if (queued) return;
-                queued = true;
-                requestAnimationFrame(function () {
-                  queued = false;
-                  applyMode(currentMode, false);
-                });
-              }).observe(picker, { childList: true, subtree: true });
-            }
+            // variant-picker.js carries this mode into server markup before
+            // morphing it, keeping tab attributes and panel state in sync.
 
             // The Custom Sizes block is parsed after this picker, so the first
             // applyMode runs before it exists. Re-apply once the DOM is ready
@@ -655,7 +646,7 @@
             } else {
               start();
             }
-            applyMode('standard', false);
+            applyMode(currentMode, false);
           })();
         </script>
       {%- endif -%}
