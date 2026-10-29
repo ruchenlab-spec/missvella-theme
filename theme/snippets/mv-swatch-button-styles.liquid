@@ -11,7 +11,7 @@
 
   Spec (brand demo):
   - square face, 1px hairline edge at 25% ink
-  - selected = 1px ink ring with a 3px gap (the demo's double frame)
+  - selected = 1px shared border-colour ring with a 3px gap
 
   One mechanism for both surfaces — the container box NEVER changes size, and
   the selected state only shrinks the FACE by the ring's footprint (4px per
@@ -37,6 +37,7 @@
     --mv-swatch-size: 34px;
     --mv-swatch-ring-width: 1px;
     --mv-swatch-ring-offset: 3px;
+    --mv-swatch-ring-color: var(--pi-border, var(--color-border, rgb(var(--color-foreground-rgb) / 15%)));
     /* space the ring needs outside the face: gap + ring */
     --mv-swatch-ring-total: calc(var(--mv-swatch-ring-offset) + var(--mv-swatch-ring-width));
     /* the box a swatch always occupies: face + ring on every side */
@@ -83,7 +84,7 @@
     margin: var(--mv-swatch-ring-total);
     box-shadow:
       0 0 0 var(--mv-swatch-ring-offset) var(--color-background),
-      0 0 0 calc(var(--mv-swatch-ring-offset) + var(--mv-swatch-ring-width)) var(--pi-accent, var(--color-foreground));
+      0 0 0 calc(var(--mv-swatch-ring-offset) + var(--mv-swatch-ring-width)) var(--mv-swatch-ring-color);
   }
 
   /* The theme draws its own selected-state outline on the checked label (and a
@@ -122,7 +123,7 @@
     height: auto;
     box-shadow:
       0 0 0 var(--mv-swatch-ring-offset) var(--color-background),
-      0 0 0 calc(var(--mv-swatch-ring-offset) + var(--mv-swatch-ring-width)) var(--pi-accent, var(--color-foreground));
+      0 0 0 calc(var(--mv-swatch-ring-offset) + var(--mv-swatch-ring-width)) var(--mv-swatch-ring-color);
   }
 
   /* hover: quiet edge deepen on the face */
