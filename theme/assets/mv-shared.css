@@ -103,24 +103,6 @@ product-form-component button[type='submit'].button:active {
 .mv-accordion-item.active .mv-accordion-content { max-height: 320px; }
 .mv-accordion-text { padding: 8px 12px 11px; color: var(--mv-pal-muted); font-size: 11px; line-height: 1.6; }
 
-.mv-hotspot { position: absolute; transform: translate(-50%, -50%); cursor: pointer; z-index: 2; }
-.mv-hotspot__dot {
-  width: 26px;
-  height: 26px;
-  border-radius: 8px;
-  background: var(--color-background);
-  border: 1.5px solid var(--mv-pal-ink);
-  display: grid;
-  place-items: center;
-  font-weight: 650;
-  font-size: 10px;
-  color: var(--mv-pal-ink);
-  transition: transform .16s ease, background .16s ease, color .16s ease;
-  box-shadow: 0 3px 10px rgb(var(--color-foreground-rgb) / .10);
-}
-.mv-hotspot.active .mv-hotspot__dot,
-.mv-hotspot:hover .mv-hotspot__dot { background: var(--mv-pal-ink); color: var(--color-background); transform: scale(1.06); }
-
 .mv-input {
   min-height: 46px;
   padding: 10px 38px 10px 12px;

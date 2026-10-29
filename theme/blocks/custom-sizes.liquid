@@ -603,24 +603,6 @@
   width: 100%;
   height: auto;
 }
-.cs-htm-image-wrapper-{{ cs_id }} .mv-hotspot {
-  width: {{ block.settings.hotspot_size }}px;
-  height: {{ block.settings.hotspot_size }}px;
-  transform: none;
-  background: var(--mv-pal-accent);
-  border-radius: 50%;
-  box-shadow: 0 0 0 4px rgb(var(--mv-pal-accent-rgb) / 22%);
-  cursor: default;
-}
-.cs-htm-image-wrapper-{{ cs_id }} .mv-hotspot::after {
-  display: none;
-}
-.cs-htm-image-wrapper-{{ cs_id }} .mv-hotspot__dot {
-  width: 100%;
-  height: 100%;
-  font-size: calc({{ block.settings.hotspot_size }}px * .42);
-  box-sizing: border-box;
-}
 .cs-measurement-list-{{ cs_id }} {
   display: flex;
   flex-direction: column;
@@ -1002,8 +984,7 @@
   text-underline-offset: 3px;
 }
 #cs-modal-{{ cs_id }}.cs-inline button:hover { transform: none; }
-#cs-modal-{{ cs_id }}.cs-inline .cs-review-{{ cs_id }},
-#cs-modal-{{ cs_id }}.cs-inline .cs-htm-content-{{ cs_id }} { padding: 16px; }
+#cs-modal-{{ cs_id }}.cs-inline .cs-review-{{ cs_id }} { padding: 16px; }
 #cs-modal-{{ cs_id }}.cs-inline .cs-review-tag-{{ cs_id }} {
   padding: 10px 0;
   font-size: 12px;
@@ -1036,41 +1017,46 @@
 .cs-block-{{ cs_id }}.has-inline-form .cs-summary-tags-{{ cs_id }} span,
 .cs-block-{{ cs_id }}.has-inline-form .cs-summary-status-{{ cs_id }},
 .cs-block-{{ cs_id }}.has-inline-form .cs-summary-actions-{{ cs_id }} button,
-.cs-block-{{ cs_id }}.has-inline-form .cs-checkbox-box-{{ cs_id }},
-#cs-modal-{{ cs_id }}.cs-inline .cs-htm-image-wrapper-{{ cs_id }} {
+.cs-block-{{ cs_id }}.has-inline-form .cs-checkbox-box-{{ cs_id }} {
   border-radius: 0;
   box-shadow: none;
 }
 #cs-measure-dialog-{{ cs_id }} {
-  width: min(640px, calc(100vw - 32px));
+  --cs-guide-secondary: {{ block.settings.secondary_color | default: '#9c876d' }};
+  --cs-guide-line: color-mix(in srgb, var(--cs-guide-secondary) 24%, var(--mv-pal-surface));
+  --cs-guide-wash: color-mix(in srgb, var(--cs-guide-secondary) 7%, var(--mv-pal-surface));
+  --mv-pal-border: var(--cs-guide-line);
+  --mv-pal-muted: rgb(var(--color-foreground-rgb) / 0.68);
+  width: min(760px, calc(100vw - 32px));
   max-width: none;
   max-height: min(88dvh, 860px);
   padding: 0;
-  border: 1px solid #d8d3ca;
+  border: 1px solid var(--cs-guide-line);
   border-radius: 0;
   background: var(--mv-pal-surface);
   color: var(--mv-pal-ink);
   box-shadow: none;
 }
 #cs-measure-dialog-{{ cs_id }}[open] { display: flex; flex-direction: column; }
-#cs-measure-dialog-{{ cs_id }}::backdrop { background: rgb(0 0 0 / 40%); }
+#cs-measure-dialog-{{ cs_id }}::backdrop { background: rgb(26 22 20 / 42%); }
 .cs-measure-dialog-header-{{ cs_id }} {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 16px;
   flex: 0 0 auto;
-  padding: 14px 20px;
+  padding: 20px 28px;
   border-block-end: 1px solid var(--mv-pal-border);
 }
 .cs-measure-dialog-header-{{ cs_id }} h2 {
   margin: 0;
-  font-family: var(--font-body--family);
-  font-size: 11px;
-  font-weight: 500;
-  line-height: 1.5;
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
+  font-family: var(--font-heading--family);
+  font-size: 26px;
+  font-weight: 400;
+  line-height: 1.25;
+  letter-spacing: 0.01em;
+  text-transform: none;
+  color: var(--mv-pal-accent);
 }
 .cs-measure-dialog-close-{{ cs_id }} {
   display: grid;
@@ -1081,7 +1067,7 @@
   border: 0;
   border-radius: 0;
   background: transparent;
-  color: inherit;
+  color: var(--mv-pal-accent);
   cursor: pointer;
 }
 .cs-measure-dialog-close-{{ cs_id }}:focus-visible {
@@ -1097,19 +1083,72 @@
   display: grid;
   grid-template-columns: minmax(0, 0.9fr) minmax(0, 1fr);
   align-items: start;
-  gap: 24px;
-  padding: 20px;
+  gap: 28px;
+  padding: 28px;
 }
 #cs-measure-dialog-{{ cs_id }} .cs-htm-image-wrapper-{{ cs_id }} {
   width: 100%;
+  border: 0;
   border-radius: 0;
+  background: var(--cs-guide-wash);
   box-shadow: none;
 }
+#cs-measure-dialog-{{ cs_id }} .cs-htm-image-{{ cs_id }} { mix-blend-mode: multiply; }
+#cs-measure-dialog-{{ cs_id }} .cs-measurement-markers {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+#cs-measure-dialog-{{ cs_id }} .cs-measurement-markers rect { fill: var(--mv-pal-accent); }
+#cs-measure-dialog-{{ cs_id }} .cs-measurement-markers text {
+  fill: var(--mv-pal-surface);
+  font-family: var(--font-body--family);
+  font-size: 32px;
+  font-weight: 500;
+}
+#cs-measure-dialog-{{ cs_id }} .cs-measurement-step-{{ cs_id }} { padding-block: 14px; }
+#cs-measure-dialog-{{ cs_id }} .cs-measurement-step-{{ cs_id }}:first-child { padding-block-start: 0; }
+#cs-measure-dialog-{{ cs_id }} .cs-measurement-title-{{ cs_id }} {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--mv-pal-accent);
+  letter-spacing: 0.1em;
+}
+#cs-measure-dialog-{{ cs_id }} .cs-measurement-title-{{ cs_id }} span {
+  display: inline-grid;
+  place-items: center;
+  width: 22px;
+  height: 22px;
+  margin: 0;
+  flex: 0 0 22px;
+  background: var(--mv-pal-accent);
+  color: var(--mv-pal-surface);
+  font-size: 10px;
+  letter-spacing: 0;
+}
+#cs-measure-dialog-{{ cs_id }} .cs-measurement-description-{{ cs_id }} {
+  margin: 7px 0 0 32px;
+  font-size: 12px;
+  line-height: 1.75;
+}
+#cs-measure-dialog-{{ cs_id }} .cs-htm-note-{{ cs_id }} {
+  padding: 14px 16px;
+  margin-block-start: 10px;
+  border: 0;
+  border-inline-start: 1px solid var(--cs-guide-secondary);
+  background: var(--cs-guide-wash);
+  line-height: 1.7;
+}
 @media screen and (max-width: 549px) {
+  .cs-measure-dialog-header-{{ cs_id }} { padding: 16px 20px; }
+  .cs-measure-dialog-header-{{ cs_id }} h2 { font-size: 23px; }
   #cs-measure-dialog-{{ cs_id }} .cs-htm-content-{{ cs_id }} {
     grid-template-columns: minmax(0, 1fr);
     gap: 20px;
-    padding: 16px;
+    padding: 20px;
   }
   #cs-measure-dialog-{{ cs_id }} .cs-htm-image-wrapper-{{ cs_id }} { max-width: 260px; }
 }
@@ -1278,38 +1317,8 @@
               height="1394"
               loading="lazy"
             >
+            {% render 'measurement-guide-markers' %}
           {%- endif -%}
-          {%- assign hotspot_half_size = block.settings.hotspot_size | divided_by: 2.0 -%}
-          {%- for hotspot_index in (1..5) -%}
-            {%- liquid
-              assign hp_x = 50
-              assign hp_y = 50
-              case hotspot_index
-                when 1
-                  assign hp_x = block.settings.hp1_x
-                  assign hp_y = block.settings.hp1_y
-                when 2
-                  assign hp_x = block.settings.hp2_x
-                  assign hp_y = block.settings.hp2_y
-                when 3
-                  assign hp_x = block.settings.hp3_x
-                  assign hp_y = block.settings.hp3_y
-                when 4
-                  assign hp_x = block.settings.hp4_x
-                  assign hp_y = block.settings.hp4_y
-                when 5
-                  assign hp_x = block.settings.hp5_x
-                  assign hp_y = block.settings.hp5_y
-              endcase
-            -%}
-            <div
-              class="mv-hotspot"
-              style="left: calc({{ hp_x }}% - {{ hotspot_half_size }}px); top: calc({{ hp_y }}% - {{ hotspot_half_size }}px);"
-              data-htm-hotspot="{{ hotspot_index }}"
-            >
-              <div class="mv-hotspot__dot">{{ hotspot_index }}</div>
-            </div>
-          {%- endfor -%}
         </div>
         <div>
           <div class="cs-measurement-list-{{ cs_id }}">
@@ -2044,30 +2053,42 @@
   "name": "Custom Sizes",
   "tag": null,
   "settings": [
-    { "type": "text", "id": "modal_title", "label": "Modal Title", "default": "Custom Size" },
-    { "type": "color", "id": "accent_color", "label": "主色调（Accent）", "default": "#1A1A1A",
-      "info": "按钮、选中环、输入框聚焦等强调元素的颜色。适合奢华极简：炭黑、深棕、酒红均可。" },
-    { "type": "image_picker", "id": "htm_image", "label": "How to Measure Image" },
-    { "type": "richtext", "id": "htm_note", "label": "Measurement Note",
-      "default": "<p>All measurements should be taken over underwear. For best results, have someone help you measure.</p>" },
-    { "type": "header", "content": "Hotspot Positions" },
-    { "type": "range", "id": "hotspot_size", "label": "Hotspot Size", "min": 20, "max": 40, "step": 2, "unit": "px", "default": 22 },
-    { "type": "header", "content": "Hotspot 1 — Bust" },
-    { "type": "range", "id": "hp1_x", "label": "X %", "min": 0, "max": 100, "step": 1, "unit": "%", "default": 23 },
-    { "type": "range", "id": "hp1_y", "label": "Y %", "min": 0, "max": 100, "step": 1, "unit": "%", "default": 25 },
-    { "type": "header", "content": "Hotspot 2 — Waist" },
-    { "type": "range", "id": "hp2_x", "label": "X %", "min": 0, "max": 100, "step": 1, "unit": "%", "default": 23 },
-    { "type": "range", "id": "hp2_y", "label": "Y %", "min": 0, "max": 100, "step": 1, "unit": "%", "default": 33 },
-    { "type": "header", "content": "Hotspot 3 — Hips" },
-    { "type": "range", "id": "hp3_x", "label": "X %", "min": 0, "max": 100, "step": 1, "unit": "%", "default": 23 },
-    { "type": "range", "id": "hp3_y", "label": "Y %", "min": 0, "max": 100, "step": 1, "unit": "%", "default": 44 },
-    { "type": "header", "content": "Hotspot 4 — Hollow to Floor" },
-    { "type": "range", "id": "hp4_x", "label": "X %", "min": 0, "max": 100, "step": 1, "unit": "%", "default": 13 },
-    { "type": "range", "id": "hp4_y", "label": "Y %", "min": 0, "max": 100, "step": 1, "unit": "%", "default": 57 },
-    { "type": "header", "content": "Hotspot 5 — Height" },
-    { "type": "range", "id": "hp5_x", "label": "X %", "min": 0, "max": 100, "step": 1, "unit": "%", "default": 84 },
-    { "type": "range", "id": "hp5_y", "label": "Y %", "min": 0, "max": 100, "step": 1, "unit": "%", "default": 50 }
+    {
+      "type": "text",
+      "id": "modal_title",
+      "label": "Modal Title",
+      "default": "Custom Size"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "主色调（Accent）",
+      "default": "#1A1A1A",
+      "info": "按钮、选中环、输入框聚焦等强调元素的颜色。适合奢华极简：炭黑、深棕、酒红均可。"
+    },
+    {
+      "type": "color",
+      "id": "secondary_color",
+      "label": "辅助色（Secondary）",
+      "default": "#9C876D",
+      "info": "测量说明弹窗的细线、背景与提示色。"
+    },
+    {
+      "type": "image_picker",
+      "id": "htm_image",
+      "label": "How to Measure Image"
+    },
+    {
+      "type": "richtext",
+      "id": "htm_note",
+      "label": "Measurement Note",
+      "default": "<p>All measurements should be taken over underwear. For best results, have someone help you measure.</p>"
+    }
   ],
-  "presets": [{ "name": "Custom Sizes" }]
+  "presets": [
+    {
+      "name": "Custom Sizes"
+    }
+  ]
 }
 {% endschema %}
