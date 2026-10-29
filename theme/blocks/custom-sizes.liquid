@@ -47,12 +47,12 @@
 -%}
 {% style %}
 .cs-block-{{ cs_id }},
+#cs-modal-{{ cs_id }},
 #cs-measure-dialog-{{ cs_id }} {
-  --mv-pal-accent: {{ accent_color }};
-  --mv-pal-accent-rgb: {{ accent_r }}, {{ accent_g }}, {{ accent_b }};
-  --mv-pal-gold: #C9A227;
-  /* Neutral surfaces follow the theme palette; only the accent is a
-     merchant-controlled local setting. */
+  --mv-pal-accent: var(--pi-accent, {{ accent_color }});
+  --mv-pal-accent-rgb: var(--pi-accent-rgb, {{ accent_r }} {{ accent_g }} {{ accent_b }});
+  --mv-pal-gold: var(--pi-secondary, #C9A227);
+  /* Unified section colors take precedence; standalone blocks keep their palette. */
   --mv-pal-ink: var(--color-foreground);
   --mv-pal-surface: var(--color-background);
   --mv-pal-page: rgb(var(--color-foreground-rgb) / 0.03);
@@ -121,15 +121,6 @@
   letter-spacing: .01em;
   line-height: 1.25;
 }
-.cs-trigger-sub-{{ cs_id }} {
-  font-size: 9.5px;
-  color: var(--mv-pal-gold);
-  margin-top: 3px;
-  line-height: 1.3;
-  letter-spacing: .14em;
-  text-transform: uppercase;
-  font-weight: 600;
-}
 .cs-trigger-right-{{ cs_id }} {
   display: flex;
   align-items: center;
@@ -137,7 +128,6 @@
   flex-shrink: 0;
   color: var(--mv-pal-accent);
 }
-.cs-block-{{ cs_id }}.has-data.expanded .cs-trigger-right-{{ cs_id }} .mv-chevron { transform: rotate(180deg); }
 
 .cs-summary-{{ cs_id }} {
   display: none;
@@ -275,14 +265,6 @@
 #cs-modal-{{ cs_id }} {
   /* The modal is portaled to <body>, so it must carry the full palette
      itself — nothing can be inherited from .cs-block-{{ cs_id }}. */
-  --mv-pal-accent: {{ accent_color }};
-  --mv-pal-accent-rgb: {{ accent_r }}, {{ accent_g }}, {{ accent_b }};
-  --mv-pal-gold: #C9A227;
-  --mv-pal-ink: var(--color-foreground);
-  --mv-pal-surface: var(--color-background);
-  --mv-pal-page: rgb(var(--color-foreground-rgb) / 0.03);
-  --mv-pal-border: var(--color-border, rgb(var(--color-foreground-rgb) / 0.12));
-  --mv-pal-muted: var(--color-foreground-muted, rgb(var(--color-foreground-rgb) / 0.55));
   position: fixed;
   background: var(--mv-pal-surface);
   color: var(--mv-pal-ink);
@@ -439,7 +421,7 @@
 .cs-modal-body-{{ cs_id }} { overflow-y: auto; flex: 1; min-height: 0; background: var(--mv-pal-surface); }
 .cs-tab-panel-{{ cs_id }} { display: none; }
 .cs-tab-panel-{{ cs_id }}.active { display: block; }
-/* The real form panel has no .cs-form-wrap element; apply the gutter to the actual panel. */
+/* Form panel gutters. */
 .cs-modal-body-{{ cs_id }} > .cs-tab-panel-{{ cs_id }}[data-panel='form'] {
   padding: 22px 28px 28px;
   box-sizing: border-box;
@@ -467,13 +449,6 @@
   .cs-modal-header-{{ cs_id }} { padding: 16px 20px 0; }
   .cs-tabs-nav-{{ cs_id }} { margin-inline: 20px; }
   .cs-modal-body-{{ cs_id }} > .cs-tab-panel-{{ cs_id }}[data-panel='form'] { padding: 18px 20px 22px; }
-}
-.cs-field-{{ cs_id }} { display: flex; flex-direction: column; gap: 6px; }
-.cs-field-head-{{ cs_id }} {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
 }
 .cs-form-label-{{ cs_id }} {
   font-size: 12px;
@@ -529,7 +504,7 @@
   font-size: 13px;
   font-weight: 600;
   letter-spacing: .04em;
-  color: #FFFFFF;
+  color: var(--pi-on-accent, #FFFFFF);
   background: linear-gradient(135deg, var(--mv-pal-accent), rgb(var(--mv-pal-accent-rgb) / 82%));
   box-shadow: 0 12px 26px rgb(var(--mv-pal-accent-rgb) / 26%);
   transition: transform .2s ease, box-shadow .2s ease;
@@ -776,10 +751,6 @@
   white-space: nowrap;
 }
 
-.cs-block-{{ cs_id }} .cs-trigger-sub-{{ cs_id }} {
-  display: none;
-}
-
 .cs-block-{{ cs_id }} .cs-trigger-right-{{ cs_id }} {
   color: var(--color-primary-button-text, #FFFFFF);
 }
@@ -850,7 +821,7 @@
   height: auto;
   max-height: none;
   margin-block-start: 0;
-  border: 1px solid #d8d3ca;
+  border: 1px solid var(--pi-border, #d8d3ca);
   border-block-start: 0;
   border-radius: 0;
   box-shadow: none;
@@ -981,8 +952,8 @@
 }
 #cs-modal-{{ cs_id }}.cs-inline .cs-btn-confirm-{{ cs_id }} {
   padding: 10px 12px;
-  background: var(--mv-pal-ink);
-  color: var(--mv-pal-surface);
+  background: var(--mv-pal-accent);
+  color: var(--pi-on-accent, var(--mv-pal-surface));
 }
 #cs-modal-{{ cs_id }}.cs-inline .cs-btn-ghost-{{ cs_id }} {
   flex: 0 0 auto;
@@ -1008,7 +979,7 @@
 .cs-block-{{ cs_id }}.has-inline-form .cs-summary-{{ cs_id }} {
   margin: 0;
   padding: 16px;
-  border-color: #d8d3ca;
+  border-color: var(--pi-border, #d8d3ca);
   border-block-start: 0;
   border-radius: 0;
 }
@@ -1030,11 +1001,11 @@
   box-shadow: none;
 }
 #cs-measure-dialog-{{ cs_id }} {
-  --cs-guide-secondary: {{ block.settings.secondary_color | default: '#9c876d' }};
-  --cs-guide-line: color-mix(in srgb, var(--cs-guide-secondary) 24%, var(--mv-pal-surface));
+  --cs-guide-secondary: var(--pi-secondary, {{ block.settings.secondary_color | default: '#9c876d' }});
+  --cs-guide-line: var(--pi-border, color-mix(in srgb, var(--cs-guide-secondary) 24%, var(--mv-pal-surface)));
   --cs-guide-wash: color-mix(in srgb, var(--cs-guide-secondary) 7%, var(--mv-pal-surface));
   --mv-pal-border: var(--cs-guide-line);
-  --mv-pal-muted: rgb(var(--color-foreground-rgb) / 0.68);
+  --mv-pal-muted: var(--pi-muted, rgb(var(--color-foreground-rgb) / 0.68));
   width: min(760px, calc(100vw - 32px));
   max-width: none;
   max-height: min(88dvh, 860px);
@@ -1121,7 +1092,7 @@
   margin: 0;
   flex: 0 0 18px;
   background: var(--mv-pal-accent);
-  color: var(--mv-pal-surface);
+  color: var(--pi-on-accent, var(--mv-pal-surface));
   font-size: 10px;
   letter-spacing: 0;
 }
@@ -1218,7 +1189,10 @@
 </custom-sizes-{{ cs_id }}>
 
 <div id="cs-overlay-{{ cs_id }}"></div>
-<div id="cs-modal-{{ cs_id }}">
+<div id="cs-modal-{{ cs_id }}"
+  style="{% render 'product-information-palette', settings: section.settings %}"
+  {% if section.settings.info_palette_enabled != false %}data-product-palette{% endif %}
+>
   <div class="mv-modal-header cs-modal-header-{{ cs_id }}">
     <div>
       <div class="cs-modal-kicker-{{ cs_id }}">Made to Measure</div>
@@ -1332,7 +1306,10 @@
   </div>
 </div>
 
-<dialog id="cs-measure-dialog-{{ cs_id }}" aria-labelledby="cs-measure-dialog-title-{{ cs_id }}">
+<dialog id="cs-measure-dialog-{{ cs_id }}" aria-labelledby="cs-measure-dialog-title-{{ cs_id }}"
+  style="{% render 'product-information-palette', settings: section.settings %}"
+  {% if section.settings.info_palette_enabled != false %}data-product-palette{% endif %}
+>
   <header class="cs-measure-dialog-header-{{ cs_id }}">
     <h2 id="cs-measure-dialog-title-{{ cs_id }}">How to Measure</h2>
     <button type="button" class="cs-measure-dialog-close-{{ cs_id }}" aria-label="Close measurement guide" autofocus>

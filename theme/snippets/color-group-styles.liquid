@@ -195,7 +195,7 @@
     left: 50%;
     z-index: 20;
     padding: 5px 10px;
-    border-radius: 999px;
+    border-radius: 0;
     background-color: rgb(var(--color-foreground-rgb) / 0.94);
     color: rgb(var(--color-background-rgb) / 0.98);
     font-size: 11px;
@@ -248,6 +248,11 @@
   }
 
   @media (max-width: 749px) {
+    /* The current color is already named above the grid; avoid sticky
+       hover bubbles extending the page on narrow/touch layouts. */
+    .color-group__tooltip,
+    .color-group__tooltip-arrow { display: none; }
+
     .color-group {
       /* Mobile swaps the per-row count (and the gap derived from it). */
       --color-group-columns: var(--color-group-columns-mobile, 4);

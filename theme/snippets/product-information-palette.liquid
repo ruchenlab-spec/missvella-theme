@@ -1,0 +1,20 @@
+{%- doc -%}
+  Shared CSS color tokens for product details and their portaled dialogs.
+  @param {object} settings - Product information section settings.
+{%- enddoc -%}
+{%- if settings.info_palette_enabled != false -%}
+  {%- assign info_text = settings.info_text_color | default: '#1A1A1A' -%}
+  {%- assign info_surface = settings.info_surface_color | default: '#FFFFFF' -%}
+  {%- assign info_accent = settings.info_accent_color | default: '#1A1A1A' -%}
+  --pi-text: {{ info_text }};
+  --pi-text-rgb: {{ info_text | color_extract: 'red' }} {{ info_text | color_extract: 'green' }} {{ info_text | color_extract: 'blue' }};
+  --pi-surface: {{ info_surface }};
+  --pi-surface-rgb: {{ info_surface | color_extract: 'red' }} {{ info_surface | color_extract: 'green' }} {{ info_surface | color_extract: 'blue' }};
+  --pi-muted: {{ settings.info_muted_color | default: '#77736D' }};
+  --pi-border: {{ settings.info_border_color | default: '#D8D3CA' }};
+  --pi-accent: {{ info_accent }};
+  --pi-accent-rgb: {{ info_accent | color_extract: 'red' }} {{ info_accent | color_extract: 'green' }} {{ info_accent | color_extract: 'blue' }};
+  --pi-on-accent: {{ settings.info_accent_text_color | default: '#FFFFFF' }};
+  --pi-secondary: {{ settings.info_secondary_color | default: '#9C876D' }};
+  --pi-soft: {{ settings.info_soft_color | default: '#EFEDE7' }};
+{%- endif -%}

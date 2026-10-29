@@ -385,6 +385,16 @@
     "groups": ["header", "footer"]
   },
   "settings": [
+    {"type":"header","content":"产品信息统一色系"},
+    {"type":"checkbox","id":"info_palette_enabled","label":"统一控制信息区配色","default":true,"info":"标题、价格、SKU、选项、按钮和弹窗使用以下配色；关闭后恢复各区块原有配色。"},
+    {"type":"color","id":"info_text_color","label":"主要文字","default":"#1A1A1A","visible_if":"{{ section.settings.info_palette_enabled }}"},
+    {"type":"color","id":"info_muted_color","label":"辅助文字","default":"#77736D","visible_if":"{{ section.settings.info_palette_enabled }}"},
+    {"type":"color","id":"info_surface_color","label":"信息区与弹窗背景","default":"#FFFFFF","visible_if":"{{ section.settings.info_palette_enabled }}"},
+    {"type":"color","id":"info_border_color","label":"细线与描边","default":"#D8D3CA","visible_if":"{{ section.settings.info_palette_enabled }}"},
+    {"type":"color","id":"info_accent_color","label":"强调色 / 主按钮 / 已选尺码","default":"#1A1A1A","visible_if":"{{ section.settings.info_palette_enabled }}"},
+    {"type":"color","id":"info_accent_text_color","label":"强调色上的文字","default":"#FFFFFF","visible_if":"{{ section.settings.info_palette_enabled }}"},
+    {"type":"color","id":"info_secondary_color","label":"辅助强调色","default":"#9C876D","visible_if":"{{ section.settings.info_palette_enabled }}"},
+    {"type":"color","id":"info_soft_color","label":"TAB 选中与悬停底色","default":"#EFEDE7","visible_if":"{{ section.settings.info_palette_enabled }}"},
     {
       "type": "header",
       "content": "t:content.layout"

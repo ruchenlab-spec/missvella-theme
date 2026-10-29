@@ -15,24 +15,6 @@
   --mv-text-main: var(--mv-pal-ink);
 }
 
-/* Product CTA: geometry follows the theme's primary button radius setting. */
-product-form-component .add-to-cart-button,
-product-form-component button[type='submit'].button {
-  border-radius: var(--style-border-radius-buttons-primary, 10px);
-  transition: transform 0.16s ease, box-shadow 0.16s ease, opacity 0.16s ease;
-}
-@media (hover: hover) {
-  product-form-component .add-to-cart-button:hover,
-  product-form-component button[type='submit'].button:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 7px 20px rgb(var(--color-foreground-rgb) / 0.12);
-  }
-}
-product-form-component .add-to-cart-button:active,
-product-form-component button[type='submit'].button:active {
-  transform: translateY(0);
-}
-
 .mv-badge-free {
   font-size: 9px;
   line-height: 1;

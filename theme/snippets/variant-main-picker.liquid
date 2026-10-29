@@ -152,7 +152,7 @@
     style="
       {% render 'spacing-style', settings: block_settings %}
        {% if block_settings.option_label_text_color != blank %}
-        --variant-option-label-color: rgba({{ block_settings.option_label_text_color.rgba }});
+        --variant-option-label-color: var(--pi-muted, rgba({{ block_settings.option_label_text_color.rgba }}));
         --variant-option-label-color-subdued: rgba({{ block_settings.option_label_text_color.rgb }} / var(--opacity-subdued-text));
       {% endif %}
     "
@@ -397,7 +397,7 @@
             {%- if is_size_option -%}
               <span class="mv-size-summary" data-mv-size-summary>
                 <span class="mv-size-summary__label">Selected size</span>
-                <span class="mv-size-summary__value" data-mv-size-value>{{ product_option.selected_value | escape }}</span>
+                <span class="mv-size-summary__value" data-testid="variant-option-single-value" data-mv-size-value>{{ product_option.selected_value | escape }}</span>
               </span>
             {%- else -%}
             {{- product_option.name | escape -}}
@@ -447,7 +447,6 @@
                     aria-controls="mv-size-chart-drawer-{{ size_chart_uid }}"
                   >
                     <span>SIZE GUIDE</span>
-                    <span class="mv-size-chart-trigger-arrow" aria-hidden="true">↗</span>
                   </button>
                   {%- endif -%}
                 </span>
@@ -575,7 +574,7 @@
       </script>
       {%- if show_fit_tabs and product_has_size_option -%}
         {%- comment -%}
-          Fit preference tabs + selected size summary.
+          Fit preference tabs. Selected size is managed by variant-picker.js.
 
           The tabs toggle a mode class on the product details wrapper, which is the
           closest common ancestor of this picker and the Custom Size block. CSS then
@@ -589,7 +588,6 @@
 
             var scope = picker.closest('.product-details') || document;
             var errorLine = picker.querySelector('[data-mv-fit-error]');
-            var summary = picker.querySelector('[data-mv-size-summary]');
             var productId = picker.dataset.productId || '';
             var currentMode = 'standard';
 
@@ -635,29 +633,6 @@
               applyMode(tab.dataset.mvFitTab, true);
             });
 
-            // Keep the "Selected size" line in sync with the current selection,
-            // regardless of whether Size renders as a matrix, buttons or a select.
-            function syncSummary() {
-              if (!summary) return;
-              var value = picker.querySelector('[data-mv-size-value]');
-              var panel = picker.querySelector('[data-mv-standard-size-panel]');
-              if (!value || !panel) return;
-              var checked = panel.querySelector('input[type="radio"]:checked');
-              var select = panel.querySelector('select');
-              var next = checked ? checked.value : (select ? select.value : '');
-              if (next) value.textContent = next;
-            }
-
-            picker.addEventListener('change', syncSummary);
-            document.addEventListener('shopify:product:select', function (event) {
-              if (event.target !== picker) return;
-              if (event.promise && typeof event.promise.then === 'function') {
-                event.promise.then(syncSummary).catch(function () {});
-              } else {
-                syncSummary();
-              }
-            });
-
             // Re-apply the mode after the theme re-renders the picker markup.
             if (typeof MutationObserver === 'function') {
               var queued = false;
@@ -676,7 +651,6 @@
             // so the Custom Fit tab visibility reflects the final markup.
             function start() {
               applyMode(currentMode, false);
-              syncSummary();
             }
             if (document.readyState === 'loading') {
               document.addEventListener('DOMContentLoaded', start, { once: true });
@@ -696,6 +670,8 @@
   <aside
     class="mv-size-chart-drawer"
     id="mv-size-chart-drawer-{{ size_chart_uid }}"
+    style="{% render 'product-information-palette', settings: section.settings %}"
+    {% if section.settings.info_palette_enabled != false %}data-product-palette{% endif %}
     data-size-chart-drawer="{{ size_chart_uid }}"
     role="dialog"
     aria-modal="true"
@@ -838,8 +814,8 @@
        ------------------------------------------------------------------ */
     .mv-fit-tabs {
       /* Brand values from the demo style study. */
-      --mv-fit-line: #d8d3ca;
-      --mv-fit-active-bg: #efede7;
+      --mv-fit-line: var(--pi-border, #d8d3ca);
+      --mv-fit-active-bg: var(--pi-soft, #efede7);
       --mv-fit-inset: 3px;
 
       display: block;
@@ -985,10 +961,10 @@
       min-height: 40px;
       margin: 0;
       padding: 0 4px;
-      border: var(--variant-picker-button-border-width, 1px) solid var(--color-variant-border, rgb(var(--color-foreground-rgb) / 15%));
+      border: var(--variant-picker-button-border-width, 1px) solid var(--pi-border, var(--color-variant-border, rgb(var(--color-foreground-rgb) / 15%)));
       border-radius: var(--size-card-radius, var(--variant-picker-button-radius, 0px));
-      background: var(--color-variant-background, transparent);
-      color: var(--color-variant-text, currentColor);
+      background: var(--pi-surface, var(--color-variant-background, transparent));
+      color: var(--pi-text, var(--color-variant-text, currentColor));
       /* Size digits wear the heading (serif) voice, matching the product
          title; paragraph/body families stay as the fallback. */
       font-family: var(--font-heading--family, var(--font-paragraph--family, var(--font-body--family)));
@@ -1008,9 +984,9 @@
     variant-picker[data-block-id='{{ block.id }}']
       .variant-option--matrix
       .variant-option__button-label:hover {
-      border-color: var(--color-variant-hover-border, var(--color-foreground-muted));
-      background: var(--color-variant-hover-background, rgb(var(--color-foreground-rgb) / 3%));
-      color: var(--color-variant-hover-text, var(--color-foreground));
+      border-color: var(--pi-accent, var(--color-variant-hover-border, var(--color-foreground-muted)));
+      background: var(--pi-soft, var(--color-variant-hover-background, rgb(var(--color-foreground-rgb) / 3%)));
+      color: var(--pi-text, var(--color-variant-hover-text, var(--color-foreground)));
     }
 
     variant-picker[data-block-id='{{ block.id }}']
@@ -1019,9 +995,9 @@
     variant-picker[data-block-id='{{ block.id }}']
       .variant-option--matrix
       .variant-option__button-label:has(:checked):hover {
-      border-color: var(--color-selected-variant-border, var(--color-foreground));
-      background: var(--color-selected-variant-background, var(--color-foreground));
-      color: var(--color-selected-variant-text, var(--color-background));
+      border-color: var(--pi-accent, var(--color-selected-variant-border, var(--color-foreground)));
+      background: var(--pi-accent, var(--color-selected-variant-background, var(--color-foreground)));
+      color: var(--pi-on-accent, var(--color-selected-variant-text, var(--color-background)));
     }
 
     variant-picker[data-block-id='{{ block.id }}']
@@ -1231,7 +1207,6 @@
       cursor: pointer;
       border-bottom: 1px solid rgb(var(--color-foreground-rgb) / 70%);
     }
-    .mv-size-chart-trigger-arrow { margin-inline-start: 2px; }
     @media (hover:hover) { .mv-size-chart-trigger:hover { border-color:var(--color-foreground); } }
     .mv-size-chart-trigger:focus-visible { outline:1.5px solid var(--color-foreground); outline-offset:3px; }
 
@@ -1240,8 +1215,8 @@
     }
     .mv-size-chart-overlay.open { display:block; }
     .mv-size-chart-drawer {
-      --sc-border: rgb(var(--color-foreground-rgb) / 10%);
-      --sc-stone: rgb(var(--color-foreground-rgb) / 4%);
+      --sc-border: var(--pi-border, rgb(var(--color-foreground-rgb) / 10%));
+      --sc-stone: var(--pi-soft, rgb(var(--color-foreground-rgb) / 4%));
       --sc-muted: var(--color-foreground-muted, rgb(var(--color-foreground-rgb) / 0.55));
       position:fixed; z-index:2147483645; background:var(--color-background); color:var(--color-foreground);
       display:flex; flex-direction:column; overflow:hidden; visibility:hidden; pointer-events:none;

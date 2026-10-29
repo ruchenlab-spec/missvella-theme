@@ -17,7 +17,7 @@
      --summary-font-case: var(--font-{{ block_settings.type_preset }}--case);
     {% render 'spacing-style', settings: block_settings %}
     {% render 'border-override', settings: block_settings %}
-    {% if block_settings.divider_color != blank %} --color-border: {{ block_settings.divider_color }};{% endif %}
+    {% if block_settings.divider_color != blank %} --color-border: var(--pi-border, {{ block_settings.divider_color }});{% endif %}
   "
   {{ block.shopify_attributes }}
 >

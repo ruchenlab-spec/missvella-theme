@@ -10,7 +10,17 @@
     {% if block_settings.sticky_details_desktop %} sticky-content--desktop{% endif %}
     {% if block_settings.height == 'fill' -%} full-height--desktop{% endif -%}
   "
-  style="--details-position: {{ block_settings.details_position }};"
+  style="
+    --details-position: {{ block_settings.details_position }};
+    --mv-title-size: {{ block_settings.title_font_size | default: 32 }}px;
+    --mv-title-weight: {{ block_settings.title_font_weight | default: 400 }};
+    --mv-title-family: {% if block_settings.title_font_family == 'body' %}var(--font-body--family){% else %}var(--font-heading--family){% endif %};
+    --mv-sku-size: {{ block_settings.sku_font_size | default: 10 }}px;
+    {% if block_settings.title_color != blank %}--mv-title-color: {{ block_settings.title_color }};{% endif %}
+    {% render 'product-information-palette', settings: section.settings %}
+  "
+  {% if section.settings.info_palette_enabled != false %}data-product-palette{% endif %}
+  {% if request.page_type == 'product' %}data-product-editorial{% endif %}
   data-testid="product-information-details"
   {% if settings.transition_to_main_product %}
     data-view-transition-type="product-details"
@@ -37,86 +47,125 @@
   %}
 </div>
 
-{%- comment -%}
-  Price emphasis for the product page only.
-
-  The price that sits under the product title is rendered with the `price`
-  block, which is also used by every product card (collection grids, best
-  sellers, related products, ...). Applying the style globally would make
-  all card prices bold and larger, so the rule is scoped to the product
-  details column of a product page.
-{%- endcomment -%}
-{%- if request.page_type == 'product' -%}
-  {% style %}
-    /* ------------------------------------------------------------------
-       Editorial typography system for the details column (Missvella UI
-       spec): serif display title, quiet functional labels, light price.
-       Layout, spacing and block order stay in the merchant's hands — only
-       type hierarchy, color and weight are set here.
-       ------------------------------------------------------------------ */
-
-    /* Product title — the serif voice of the brand. Size / weight / family /
-       colour are merchant settings on this block (the "产品标题" section in the
-       block settings panel); the defaults reproduce the editorial scale. The
-       second selector outranks the text block's custom-font-size/custom-color
-       variants without resorting to !important. */
-    .product-details {
-      --mv-title-size: {{ block_settings.title_font_size | default: 32 }}px;
-      --mv-title-weight: {{ block_settings.title_font_weight | default: 400 }};
-      --mv-title-family: {% if block_settings.title_font_family == 'body' %}var(--font-body--family){% else %}var(--font-heading--family){% endif %};
-      {% if block_settings.title_color != blank %}--mv-title-color: {{ block_settings.title_color }};{% endif %}
-    }
-
-    .product-details .text-block h1,
-    .product-details .text-block.custom-font-size.custom-color h1 {
-      font-family: var(--mv-title-family);
-      font-weight: var(--mv-title-weight);
-      font-size: clamp(calc(var(--mv-title-size) * 0.8), 2.5vw, var(--mv-title-size));
-      line-height: 1.18;
-      letter-spacing: 0.01em;
-      text-transform: none;
-      text-wrap: balance;
-      color: var(--mv-title-color, var(--color-foreground));
-      margin-block: 0;
-    }
-
-    .product-details .text-block h1 a {
-      color: inherit;
-      text-decoration: none;
-    }
-
-    /* Series / SKU line — quiet functional label above the title. Only the
-       letter spacing / case are set here; family, size and colour come from
-       the block's 系列标题与 SKU settings (via product-series.liquid) so the
-       merchant's controls keep working. */
-    .product-details .product-series__sku {
-      font-size: {{ block_settings.sku_font_size | default: 10 }}px;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      line-height: 1;
-    }
-
-    /* Price — functional sans text, medium weight (never bold display). */
-    .product-details product-price .price {
-      font-weight: 500;
-      font-size: 15px;
-      letter-spacing: 0.02em;
-    }
-
-    /* Accordion headers — the same functional-label standard as the option
-       legends; the theme's 14px body voice is too heavy for this list. */
-    .product-details accordion-custom summary.details__header {
-      font-family: var(--font-body--family);
-      font-size: 11px;
-      font-weight: 500;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      color: var(--color-foreground);
-    }
-  {% endstyle %}
-{%- endif -%}
-
 {% stylesheet %}
+  /* One palette bridge, reused by the details column and portaled dialogs. */
+  [data-product-palette] {
+    --color-foreground: var(--pi-text);
+    --color-foreground-rgb: var(--pi-text-rgb);
+    --color-foreground-muted: var(--pi-muted);
+    --color-foreground-subdued: var(--pi-muted);
+    --color-background: var(--pi-surface);
+    --color-background-rgb: var(--pi-surface-rgb);
+    --color-border: var(--pi-border);
+    --color-primary-button-background: var(--pi-accent);
+    --color-primary-button-text: var(--pi-on-accent);
+    --color-primary-button-border: var(--pi-accent);
+    --color-primary-button-hover-background: color-mix(in srgb, var(--pi-accent) 88%, var(--pi-surface));
+    --color-primary-button-hover-text: var(--pi-on-accent);
+    --color-primary-button-hover-border: var(--color-primary-button-hover-background);
+  }
+
+  .product-details[data-product-palette] {
+    color: var(--pi-text);
+    background: var(--pi-surface);
+  }
+
+  .product-details[data-product-editorial] .text-block h1,
+  .product-details[data-product-editorial] .text-block.custom-font-size.custom-color h1,
+  .product-details[data-product-editorial] [ref='productTitleLink'] :is(p, h1, h2, h3),
+  .product-details[data-product-editorial] .group-block-content:has(> product-price) > .text-block:first-child > :is(p, h1, h2, h3) {
+    font-family: var(--mv-title-family);
+    font-weight: var(--mv-title-weight);
+    font-size: clamp(calc(var(--mv-title-size) * 0.8), 2.5vw, var(--mv-title-size));
+    line-height: 1.18;
+    letter-spacing: 0.01em;
+    text-transform: none;
+    text-wrap: balance;
+    color: var(--pi-text, var(--mv-title-color, var(--color-foreground)));
+    margin-block: 0;
+  }
+
+  .product-details[data-product-editorial] .text-block h1 a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .product-details[data-product-editorial] .product-series__sku {
+    font-size: var(--mv-sku-size);
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    line-height: 1.3;
+  }
+
+  .product-details[data-product-palette] .product-series__sku {
+    color: var(--pi-muted);
+    opacity: 1;
+  }
+
+  .product-details[data-product-palette] .product-series__label { color: var(--pi-text); }
+
+  .product-details[data-product-editorial] product-price .price {
+    font-family: var(--font-body--family);
+    font-size: 15px;
+    font-weight: 400;
+    letter-spacing: 0.02em;
+    color: var(--pi-text, var(--color-foreground));
+  }
+
+  .product-details[data-product-palette] .accordion {
+    --color-border: var(--pi-border);
+    --color-foreground: var(--pi-text);
+    --color-background: var(--pi-surface);
+    color: var(--pi-text);
+  }
+
+  .product-details[data-product-editorial] accordion-custom summary.details__header {
+    min-height: 48px;
+    font-family: var(--font-body--family);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--pi-text, var(--color-foreground));
+  }
+
+  .product-details[data-product-editorial] .details-content {
+    font-family: var(--font-body--family);
+    font-size: 13px;
+    line-height: 1.7;
+    color: var(--pi-muted, var(--color-foreground));
+  }
+
+  .product-details[data-product-editorial] .add-to-cart-button {
+    min-height: 48px;
+    padding-block: 14px;
+    border-radius: 0;
+    font-family: var(--font-body--family);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    transform: none;
+    box-shadow: none;
+    transition: background-color 0.16s ease, color 0.16s ease, opacity 0.16s ease;
+  }
+
+  .product-details[data-product-palette] .add-to-cart-button {
+    --button-background-color: var(--pi-accent);
+    --button-color: var(--pi-on-accent);
+    --button-border-color: var(--pi-accent);
+  }
+
+  .product-details[data-product-palette] > .group-block { background-color: var(--pi-surface); }
+
+  @media (hover: hover) {
+    .product-details[data-product-palette] .add-to-cart-button:hover {
+      --button-background-color: var(--color-primary-button-hover-background);
+      --button-color: var(--pi-on-accent);
+      --button-border-color: var(--color-primary-button-hover-background);
+    }
+  }
+
   /* Clear padding on mobile, if not full-width */
   @media screen and (max-width: 749px) {
     .product-information.section--page-width .product-details > .group-block {
