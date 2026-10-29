@@ -1226,9 +1226,9 @@
       <div class="cs-modal-subtitle-{{ cs_id }}">Crafted to your exact measurements · Included free</div>
     </div>
     <div style="display:flex;align-items:center;gap:10px;">
-      <div class="cs-unit-toggle-{{ cs_id }}" id="cs-unit-{{ cs_id }}" role="group" aria-label="Measurement unit" data-active-unit="cm">
-        <button type="button" class="cs-unit-btn-{{ cs_id }} active" data-cs-unit="cm" aria-pressed="true">CM</button>
-        <button type="button" class="cs-unit-btn-{{ cs_id }}" data-cs-unit="inch" aria-pressed="false">IN</button>
+      <div class="cs-unit-toggle-{{ cs_id }}" id="cs-unit-{{ cs_id }}" role="group" aria-label="Measurement unit" data-active-unit="inch">
+        <button type="button" class="cs-unit-btn-{{ cs_id }}" data-cs-unit="cm" aria-pressed="false">CM</button>
+        <button type="button" class="cs-unit-btn-{{ cs_id }} active" data-cs-unit="inch" aria-pressed="true">IN</button>
       </div>
       <button type="button" class="mv-modal-close" id="cs-close-{{ cs_id }}">
         <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
@@ -1270,8 +1270,8 @@
                 data-key="{{ parts[0] }}"
                 data-cm="{{ parts[2] }}" data-inch="{{ parts[3] }}"
                 data-required="{{ parts[4] }}"
-                placeholder="e.g. {{ parts[2] }} cm">
-              <span class="cs-input-unit-{{ cs_id }}" data-cs-unit-label>cm</span>
+                placeholder="e.g. {{ parts[3] }} in">
+              <span class="cs-input-unit-{{ cs_id }}" data-cs-unit-label>in</span>
             </div>
           </div>
         {%- endfor -%}
@@ -1511,7 +1511,7 @@
       }, 420);
     }
 
-    let currentUnit = 'cm';
+    let currentUnit = 'inch';
     let savedData   = null;
     let pendingData = null;
     let isChecked   = true;
