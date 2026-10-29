@@ -940,6 +940,10 @@ class ProductFormComponent extends Component {
 
       // Fetch and update cart quantity for the new variant
       this.#refreshCart().then((cart) => this.#updateCartQuantity(cart));
+    } catch (error) {
+      // A newer selection cancels the previous request. Event listeners must
+      // consume that rejection while still releasing any queued cart actions.
+      if (error?.name !== 'AbortError') console.warn('[product-form] Variant update failed:', error);
     } finally {
       // Only clear the flag if no newer variant selection has started
       if (generation === this.#variantChangeGeneration) {
