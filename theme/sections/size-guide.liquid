@@ -21,8 +21,8 @@
       {%- if section.settings.show_unit_toggle -%}
         <div class="sg-page__unit-{{ sg_id }}" data-sg-unit="cm" role="group" aria-label="Measurement unit">
           <span class="sg-page__unit-slider-{{ sg_id }}" aria-hidden="true"></span>
-          <button type="button" data-unit="cm" class="active" aria-pressed="true">CM</button>
           <button type="button" data-unit="in" aria-pressed="false">IN</button>
+          <button type="button" data-unit="cm" class="active" aria-pressed="true">CM</button>
         </div>
       {%- endif -%}
     </header>
@@ -170,7 +170,7 @@
     background: #000;
     transition: transform .28s cubic-bezier(.22,.72,.24,1);
   }
-  .sg-page__unit-{{ sg_id }}[data-sg-unit='in'] .sg-page__unit-slider-{{ sg_id }} { transform: translateX(50px); }
+  .sg-page__unit-{{ sg_id }}[data-sg-unit='cm'] .sg-page__unit-slider-{{ sg_id }} { transform: translateX(50px); }
   .sg-page__unit-{{ sg_id }} button {
     position: relative;
     z-index: 1;
@@ -389,7 +389,7 @@
     .sg-page__heading-copy-{{ sg_id }} p { font-size: 12px; }
     .sg-page__unit-{{ sg_id }} { width: 96px; height: 40px; }
     .sg-page__unit-slider-{{ sg_id }} { width: 42px; height: 30px; }
-    .sg-page__unit-{{ sg_id }}[data-sg-unit='in'] .sg-page__unit-slider-{{ sg_id }} { transform: translateX(44px); }
+    .sg-page__unit-{{ sg_id }}[data-sg-unit='cm'] .sg-page__unit-slider-{{ sg_id }} { transform: translateX(44px); }
     .sg-page__tabs-{{ sg_id }} { min-height: 46px; margin-bottom: 18px; }
     .sg-page__table-scroll-{{ sg_id }} { max-height: min({{ section.settings.table_max_height }}px, 62vh); }
     .sg-page__table-{{ sg_id }} { min-width: 470px; font-size: 12px; }
