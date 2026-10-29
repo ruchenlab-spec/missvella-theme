@@ -820,8 +820,17 @@
   }
 }
 /* With fit tabs, the measurement editor lives directly below Custom Fit. */
+.mv-fit-custom variant-picker ~ .custom-sizes-block {
+  margin-block-start: calc(-1 * var(--gap, 0px));
+}
 .cs-block-{{ cs_id }}.has-inline-form .cs-guide-{{ cs_id }} {
   display: none;
+}
+.cs-block-{{ cs_id }}.has-inline-form {
+  font-family: var(--font-body--family);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.5;
 }
 #cs-modal-{{ cs_id }}.cs-inline {
   display: none;
@@ -830,8 +839,9 @@
   width: 100%;
   height: auto;
   max-height: none;
-  margin-block-start: 12px;
+  margin-block-start: 0;
   border: 1px solid var(--mv-pal-border);
+  border-block-start: 0;
   border-radius: 0;
   box-shadow: none;
   transform: none;
@@ -840,6 +850,7 @@
   pointer-events: auto;
   transition: none;
   will-change: auto;
+  font: inherit;
 }
 #cs-modal-{{ cs_id }}.cs-inline.active { display: flex; }
 #cs-modal-{{ cs_id }}.cs-inline::before,
@@ -848,21 +859,157 @@
   overflow: visible;
   flex: none;
 }
-#cs-modal-{{ cs_id }}.cs-inline .cs-modal-header-{{ cs_id }} {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
-  gap: 12px;
-  padding: 16px 18px;
+#cs-modal-{{ cs_id }}.cs-inline .cs-modal-header-{{ cs_id }} { display: none; }
+#cs-modal-{{ cs_id }}.cs-inline .cs-tabs-nav-{{ cs_id }} {
+  align-items: center;
+  gap: 14px;
+  margin: 0 16px;
+  border-block-end: 1px solid var(--mv-pal-border);
 }
-#cs-modal-{{ cs_id }}.cs-inline .cs-modal-title-{{ cs_id }} { font-size: 18px; }
-#cs-modal-{{ cs_id }}.cs-inline .cs-modal-kicker-{{ cs_id }} { display: none; }
-#cs-modal-{{ cs_id }}.cs-inline .cs-tabs-nav-{{ cs_id }} { margin: 0 18px; }
+#cs-modal-{{ cs_id }}.cs-inline .cs-tab-btn-{{ cs_id }} {
+  flex: none;
+  min-height: 42px;
+  padding: 0;
+  border-block-end-width: 1px;
+  font-family: var(--font-body--family);
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  white-space: nowrap;
+}
+#cs-modal-{{ cs_id }}.cs-inline .cs-tab-btn-{{ cs_id }} svg { display: none; }
+#cs-modal-{{ cs_id }}.cs-inline .cs-unit-toggle-{{ cs_id }} {
+  margin-inline-start: auto;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+}
+#cs-modal-{{ cs_id }}.cs-inline .cs-unit-btn-{{ cs_id }} {
+  height: 28px;
+  padding: 0 7px;
+  border-block-end: 1px solid transparent;
+  border-radius: 0;
+  background: transparent;
+  color: var(--mv-pal-muted);
+  font-size: 9px;
+  font-weight: 400;
+  letter-spacing: 0.06em;
+}
+#cs-modal-{{ cs_id }}.cs-inline .cs-unit-btn-{{ cs_id }}.active {
+  color: var(--mv-pal-ink);
+  border-block-end-color: currentColor;
+}
 #cs-modal-{{ cs_id }}.cs-inline .cs-tab-panel-{{ cs_id }}[data-panel='form'] {
-  padding: 18px;
+  padding: 16px;
+}
+#cs-modal-{{ cs_id }}.cs-inline .cs-form-grid-{{ cs_id }} {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px 12px;
+}
+#cs-modal-{{ cs_id }}.cs-inline .cs-form-group-{{ cs_id }} { gap: 5px; }
+#cs-modal-{{ cs_id }}.cs-inline .cs-form-label-{{ cs_id }} {
+  font-family: var(--font-body--family);
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+#cs-modal-{{ cs_id }}.cs-inline .cs-optional-tag-{{ cs_id }} {
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  font-size: 8px;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+}
+#cs-modal-{{ cs_id }}.cs-inline .cs-input-wrap-{{ cs_id }} input {
+  height: 40px;
+  padding: 10px 30px 10px 10px;
+  border: 1px solid var(--mv-pal-border);
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  font-family: var(--font-body--family);
+  font-size: 12px;
+  font-weight: 400;
+}
+#cs-modal-{{ cs_id }}.cs-inline .cs-input-wrap-{{ cs_id }} input:focus {
+  border-color: var(--mv-pal-ink);
+  outline: 1px solid var(--mv-pal-ink);
+  outline-offset: -1px;
+}
+#cs-modal-{{ cs_id }}.cs-inline .cs-input-unit-{{ cs_id }} {
+  right: 10px;
+  font-size: 9px;
+}
+#cs-modal-{{ cs_id }}.cs-inline .cs-form-footer-{{ cs_id }} {
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+  margin-block-start: 18px;
+}
+#cs-modal-{{ cs_id }}.cs-inline .cs-form-footer-{{ cs_id }} button {
+  min-height: 40px;
+  border-radius: 0;
+  box-shadow: none;
+  font-family: var(--font-body--family);
+  font-size: 9px;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 #cs-modal-{{ cs_id }}.cs-inline .cs-btn-confirm-{{ cs_id }} {
-  background: var(--mv-pal-accent);
+  padding: 10px 12px;
+  background: var(--mv-pal-ink);
+  color: var(--mv-pal-surface);
+}
+#cs-modal-{{ cs_id }}.cs-inline .cs-btn-ghost-{{ cs_id }} {
+  flex: 0 0 auto;
+  padding: 0;
+  border: 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+#cs-modal-{{ cs_id }}.cs-inline button:hover { transform: none; }
+#cs-modal-{{ cs_id }}.cs-inline .cs-review-{{ cs_id }},
+#cs-modal-{{ cs_id }}.cs-inline .cs-htm-content-{{ cs_id }} { padding: 16px; }
+#cs-modal-{{ cs_id }}.cs-inline .cs-review-tag-{{ cs_id }} {
+  padding: 10px 0;
+  font-size: 12px;
+}
+#cs-modal-{{ cs_id }}.cs-inline .cs-cart-line-{{ cs_id }} {
+  padding: 12px 0 0;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  font-size: 11px;
+}
+.cs-block-{{ cs_id }}.has-inline-form .cs-summary-{{ cs_id }} {
+  margin: 0;
+  padding: 16px;
+  border-block-start: 0;
+  border-radius: 0;
+}
+.cs-block-{{ cs_id }}.has-inline-form:has(> .cs-inline.active) .cs-summary-{{ cs_id }} {
+  display: none;
+}
+.cs-block-{{ cs_id }}.has-inline-form .cs-summary-title-{{ cs_id }} {
+  font-family: var(--font-body--family);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.cs-block-{{ cs_id }}.has-inline-form .cs-summary-tags-{{ cs_id }} span,
+.cs-block-{{ cs_id }}.has-inline-form .cs-summary-status-{{ cs_id }},
+.cs-block-{{ cs_id }}.has-inline-form .cs-summary-actions-{{ cs_id }} button,
+.cs-block-{{ cs_id }}.has-inline-form .cs-checkbox-box-{{ cs_id }},
+#cs-modal-{{ cs_id }}.cs-inline .cs-htm-image-wrapper-{{ cs_id }} {
+  border-radius: 0;
   box-shadow: none;
 }
 {% endstyle %}
@@ -999,8 +1146,8 @@
       <div class="cs-review-{{ cs_id }} on" id="cs-review-{{ cs_id }}">
         <div id="cs-review-tags-{{ cs_id }}"></div>
         <div class="cs-cart-line-{{ cs_id }}">
-          This is what will be attached to your order line:<br>
-          <code>properties[Custom Size] = <span id="cs-propval-{{ cs_id }}"></span></code>
+          Your measurements will be included with this item.
+          <span id="cs-propval-{{ cs_id }}" hidden></span>
         </div>
         <div class="cs-form-footer-{{ cs_id }}">
           <button type="button" class="cs-btn-ghost-{{ cs_id }}" id="cs-back-{{ cs_id }}">← Back</button>
@@ -1184,6 +1331,11 @@
     const hotspots  = modal.querySelectorAll('[data-htm-hotspot]');
     const unitBtns  = modal.querySelectorAll('[data-cs-unit]');
     const tabsNav   = modal.querySelector('.cs-tabs-nav-' + id);
+    if (usesInlineForm && tabsNav) {
+      const formTab = tabsNav.querySelector('[data-tab="form"]');
+      if (formTab) formTab.textContent = 'Measurements';
+      tabsNav.appendChild(unit);
+    }
 
     let sheetHeightTimer = null;
     function animateMobileSheetHeight(mutator) {
