@@ -1,0 +1,53 @@
+{%- doc -%}
+  The bundled 4:5 measurement illustration with static, theme-native numbering.
+  The SVG annotations are decorative and have no controls or editor positions.
+{%- enddoc -%}
+<div class="measurement-guide-illustration">
+  <img
+    class="measurement-guide-illustration__image"
+    src="{{ 'size-chart-how-to-measure.png' | asset_url }}"
+    alt="Measurement diagram: 1 bust, 2 waist, 3 hips, 4 hollow to floor, 5 height."
+    width="1122"
+    height="1402"
+    loading="lazy"
+  >
+  <svg class="measurement-guide-illustration__labels" viewBox="0 0 1122 1402" aria-hidden="true" focusable="false">
+    <g transform="translate(344 395)"><rect x="-40" y="-40" width="80" height="80"/><text text-anchor="middle" dominant-baseline="central">1</text></g>
+    <g transform="translate(344 526)"><rect x="-40" y="-40" width="80" height="80"/><text text-anchor="middle" dominant-baseline="central">2</text></g>
+    <g transform="translate(344 654)"><rect x="-40" y="-40" width="80" height="80"/><text text-anchor="middle" dominant-baseline="central">3</text></g>
+    <g transform="translate(262 820)"><rect x="-40" y="-40" width="80" height="80"/><text text-anchor="middle" dominant-baseline="central">4</text></g>
+    <g transform="translate(872 692)"><rect x="-40" y="-40" width="80" height="80"/><text text-anchor="middle" dominant-baseline="central">5</text></g>
+  </svg>
+</div>
+
+{% stylesheet %}
+  .measurement-guide-illustration {
+    position: relative;
+    display: block;
+    width: 100%;
+  }
+  .measurement-guide-illustration__image {
+    display: block;
+    width: 100%;
+    height: auto;
+  }
+  .measurement-guide-illustration__labels {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+  .measurement-guide-illustration__labels rect {
+    fill: var(--mv-pal-accent, var(--color-foreground));
+    stroke: none;
+  }
+  .measurement-guide-illustration__labels text {
+    fill: var(--mv-pal-surface, var(--color-background));
+    font-family: var(--font-body--family);
+    font-size: 44px;
+    font-weight: 500;
+    font-style: normal;
+    letter-spacing: 0;
+  }
+{% endstylesheet %}

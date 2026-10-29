@@ -1087,13 +1087,14 @@
   padding: 20px;
 }
 #cs-measure-dialog-{{ cs_id }} .cs-htm-image-wrapper-{{ cs_id }} {
-  width: min(100%, 250px);
+  width: min(100%, 300px);
   border: 0;
   border-radius: 0;
   background: var(--cs-guide-wash);
   box-shadow: none;
 }
-#cs-measure-dialog-{{ cs_id }} .cs-htm-image-{{ cs_id }} { mix-blend-mode: multiply; }
+#cs-measure-dialog-{{ cs_id }} .cs-htm-image-{{ cs_id }},
+#cs-measure-dialog-{{ cs_id }} .measurement-guide-illustration__image { mix-blend-mode: multiply; }
 #cs-measure-dialog-{{ cs_id }} .cs-measurement-step-{{ cs_id }} { padding-block: 9px; }
 #cs-measure-dialog-{{ cs_id }} .cs-measurement-step-{{ cs_id }}:first-child { padding-block-start: 0; }
 #cs-measure-dialog-{{ cs_id }} .cs-measurement-title-{{ cs_id }} {
@@ -1137,7 +1138,7 @@
     gap: 16px;
     padding: 16px;
   }
-  #cs-measure-dialog-{{ cs_id }} .cs-htm-image-wrapper-{{ cs_id }} { max-width: 210px; }
+  #cs-measure-dialog-{{ cs_id }} .cs-htm-image-wrapper-{{ cs_id }} { max-width: 250px; }
 }
 {% endstyle %}
 
@@ -1296,14 +1297,7 @@
               loading="lazy"
             >
           {%- else -%}
-            <img
-              src="{{ 'size-chart-how-to-measure.png' | asset_url }}"
-              alt="How to Measure"
-              class="cs-htm-image-{{ cs_id }}"
-              width="971"
-              height="1619"
-              loading="lazy"
-            >
+            {% render 'measurement-guide-image' %}
           {%- endif -%}
         </div>
         <div>
