@@ -131,127 +131,56 @@
 
 .cs-summary-{{ cs_id }} {
   display: none;
-  margin-top: 8px;
-  padding: 14px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-block-start: 10px;
+  padding: 8px 12px;
   border: 1px solid var(--mv-pal-border);
-  border-radius: 14px;
+  border-radius: 0;
   background: var(--mv-pal-surface);
   box-sizing: border-box;
 }
-.cs-summary-{{ cs_id }}.visible,
-.cs-block-{{ cs_id }}.has-data.expanded .cs-summary-{{ cs_id }} {
-  display: flex;
-  flex-direction: column;
-}
-.cs-block-{{ cs_id }}.has-data:not(.expanded) .cs-summary-{{ cs_id }} { display: none; }
-.cs-summary-label-{{ cs_id }} {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  padding-bottom: 11px;
-  border-bottom: 1px dashed var(--mv-pal-border);
-}
-.cs-summary-title-{{ cs_id }} {
-  display: inline-flex;
-  align-items: center;
-  gap: 7px;
-  font-family: var(--font-heading--family, Georgia, 'Times New Roman', serif);
-  font-size: 13.5px;
-  font-weight: 600;
-  color: var(--mv-pal-ink);
-}
-.cs-summary-title-{{ cs_id }} .cs-ruler-icon { width: 16px; height: 16px; color: var(--mv-pal-accent); }
+.cs-block-{{ cs_id }}.has-data .cs-summary-{{ cs_id }} { display: flex; }
 .cs-summary-status-{{ cs_id }} {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px 9px;
-  border-radius: 999px;
-  font-size: 9.5px;
-  font-weight: 600;
-  letter-spacing: .06em;
-  text-transform: uppercase;
-  color: var(--mv-pal-accent);
-  background: rgb(var(--mv-pal-accent-rgb) / 8%);
+  gap: 7px;
+  min-width: 0;
+  font-family: var(--font-body--family);
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--mv-pal-ink);
   white-space: nowrap;
 }
 .cs-status-dot-{{ cs_id }} {
   width: 6px;
   height: 6px;
+  flex: 0 0 6px;
   border-radius: 50%;
-  background: var(--mv-pal-accent);
+  background: #3d7c54;
 }
-.cs-summary-tags-{{ cs_id }} {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  padding: 11px 0;
-}
-.cs-summary-tags-{{ cs_id }} span {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  min-height: 26px;
-  padding: 4px 9px;
-  border-radius: 999px;
-  background: var(--mv-pal-page);
-  border: 1px solid var(--mv-pal-border);
-  color: var(--mv-pal-muted);
-  font-size: 10.5px;
-  white-space: nowrap;
-}
-.cs-summary-tags-{{ cs_id }} span strong { color: var(--mv-pal-ink); font-weight: 600; }
-.cs-summary-bottom-{{ cs_id }} {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  padding-top: 11px;
-  border-top: 1px dashed var(--mv-pal-border);
-}
-.cs-checkbox-row-{{ cs_id }} {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  cursor: pointer;
-}
-.cs-checkbox-box-{{ cs_id }} {
-  width: 20px;
-  height: 20px;
-  border-radius: 6px;
-  display: grid;
-  place-items: center;
-  color: #fff;
-  background: var(--mv-pal-accent);
-  flex-shrink: 0;
-  transition: background .16s ease, box-shadow .16s ease;
-}
-.cs-checkbox-box-{{ cs_id }}.unchecked {
-  background: var(--mv-pal-surface);
-  box-shadow: inset 0 0 0 1px rgb(var(--color-foreground-rgb) / 0.3);
-}
-.cs-checkbox-box-{{ cs_id }} svg { width: 12px; height: 12px; }
-.cs-checkbox-box-{{ cs_id }}.unchecked svg { display: none; }
-.cs-checkbox-label-{{ cs_id }} { font-size: 11px; color: var(--mv-pal-ink); font-weight: 500; }
-.cs-checkbox-row-{{ cs_id }}.unchecked .cs-checkbox-label-{{ cs_id }} { color: var(--mv-pal-muted); }
-.cs-summary-actions-{{ cs_id }} { display: inline-flex; gap: 7px; flex-shrink: 0; }
+.cs-summary-actions-{{ cs_id }} { display: inline-flex; align-items: center; gap: 12px; flex-shrink: 0; }
 .cs-btn-edit-{{ cs_id }},
 .cs-btn-cancel-{{ cs_id }} {
-  min-height: 32px;
-  padding: 0 14px;
-  border-radius: 999px;
-  font: inherit;
-  font-size: 10.5px;
-  font-weight: 600;
+  min-height: 28px;
+  padding: 4px 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  font-family: var(--font-body--family);
+  font-size: 11px;
+  font-weight: 400;
+  line-height: 1.4;
+  color: var(--mv-pal-muted);
   cursor: pointer;
-  transition: transform .14s ease, background .14s ease, border-color .14s ease;
+  transition: color .16s ease;
 }
-.cs-btn-edit-{{ cs_id }} { border: 1px solid var(--mv-pal-accent); background: var(--mv-pal-accent); color: #fff; }
-.cs-btn-cancel-{{ cs_id }} { border: 1px solid var(--mv-pal-border); background: #fff; color: var(--mv-pal-muted); }
-@media (hover:hover) {
-  .cs-btn-edit-{{ cs_id }}:hover { background: rgb(var(--mv-pal-accent-rgb) / 85%); border-color: rgb(var(--mv-pal-accent-rgb) / 85%); transform: translateY(-1px); }
-  .cs-btn-cancel-{{ cs_id }}:hover { border-color: var(--mv-pal-accent); color: var(--mv-pal-accent); }
+@media (hover: hover) {
+  .cs-btn-edit-{{ cs_id }}:hover,
+  .cs-btn-cancel-{{ cs_id }}:hover { color: var(--mv-pal-accent); }
 }
 
 #cs-overlay-{{ cs_id }} {
@@ -617,15 +546,6 @@
   color: var(--mv-pal-gold);
 }
 
-.cs-guide-title-{{ cs_id }} {
-  margin: 6px 0 0;
-  font-family: var(--font-heading--family, Georgia, 'Times New Roman', serif);
-  font-size: 16px;
-  font-weight: 600;
-  line-height: 1.25;
-  color: var(--mv-pal-ink);
-}
-
 .cs-guide-hint-{{ cs_id }} {
   margin: 6px 0 14px;
   font-family: var(--font-body--family);
@@ -701,44 +621,8 @@
   color: var(--color-primary-button-text, #FFFFFF);
 }
 
-/* ------------------------------------------------------------------
-   Saved state — compact measurement summary
-   ------------------------------------------------------------------ */
-.cs-block-{{ cs_id }} .cs-summary-{{ cs_id }} {
-  display: none;
-  margin-block-start: 14px;
-  padding: 18px 20px;
-  border: 1px solid var(--mv-pal-border);
-  border-radius: 10px;
-  background: var(--mv-pal-surface);
-}
-
-.cs-block-{{ cs_id }}.has-data .cs-summary-{{ cs_id }} {
-  display: flex;
-  flex-direction: column;
-}
-
-.cs-summary-label-{{ cs_id }} {
-  padding-block-end: 12px;
-}
-
-.cs-summary-status-{{ cs_id }} {
-  background: rgb(var(--mv-pal-accent-rgb) / 8%);
-}
-
-.cs-summary-tags-{{ cs_id }} span {
-  min-height: 28px;
-}
-
 @media screen and (max-width: 749px) {
-  .cs-guide-{{ cs_id }} {
-    margin-block-start: 10px;
-    padding: 16px 16px 18px;
-  }
-
-  .cs-block-{{ cs_id }} .cs-summary-{{ cs_id }} {
-    padding: 16px;
-  }
+  .cs-guide-{{ cs_id }} { margin-block-start: 10px; padding: 16px 16px 18px; }
 }
 /* With fit tabs, the measurement editor lives directly below Custom Fit. */
 .mv-fit-custom variant-picker ~ .custom-sizes-block {
@@ -918,27 +802,12 @@
 }
 .cs-block-{{ cs_id }}.has-inline-form .cs-summary-{{ cs_id }} {
   margin: 0;
-  padding: 16px;
   border-color: var(--pi-border, #d8d3ca);
   border-block-start: 0;
   border-radius: 0;
 }
 .cs-block-{{ cs_id }}.has-inline-form:has(> .cs-inline.active) .cs-summary-{{ cs_id }} {
   display: none;
-}
-.cs-block-{{ cs_id }}.has-inline-form .cs-summary-title-{{ cs_id }} {
-  font-family: var(--font-body--family);
-  font-size: 11px;
-  font-weight: 500;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-}
-.cs-block-{{ cs_id }}.has-inline-form .cs-summary-tags-{{ cs_id }} span,
-.cs-block-{{ cs_id }}.has-inline-form .cs-summary-status-{{ cs_id }},
-.cs-block-{{ cs_id }}.has-inline-form .cs-summary-actions-{{ cs_id }} button,
-.cs-block-{{ cs_id }}.has-inline-form .cs-checkbox-box-{{ cs_id }} {
-  border-radius: 0;
-  box-shadow: none;
 }
 #cs-measure-dialog-{{ cs_id }} {
   --cs-guide-secondary: var(--pi-secondary, {{ block.settings.secondary_color | default: '#9c876d' }});
@@ -1022,7 +891,6 @@
     {%- endcomment -%}
     <div class="cs-guide-{{ cs_id }}" id="cs-guide-{{ cs_id }}">
       <p class="cs-guide-kicker-{{ cs_id }}">Complimentary custom sizing</p>
-      <h3 class="cs-guide-title-{{ cs_id }}">Custom Measurements</h3>
       <p class="cs-guide-hint-{{ cs_id }}">Enter your measurements for a more personalized fit.</p>
       <button type="button" class="cs-trigger-{{ cs_id }}" id="cs-trigger-{{ cs_id }}">
         <span class="cs-trigger-icon-{{ cs_id }}">
@@ -1038,34 +906,13 @@
     </div>
 
     <div class="cs-summary-{{ cs_id }}" id="cs-summary-{{ cs_id }}">
-      <div class="cs-summary-label-{{ cs_id }}">
-        <div class="cs-summary-title-{{ cs_id }}">
-          <svg class="cs-ruler-icon" viewBox="0 0 24 24" fill="none">
-            <path d="M4 6h16v12H4V6Z" stroke="currentColor" stroke-width="1.8"/>
-            <path d="M8 6v5M12 6v3M16 6v5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-          </svg>
-          Custom Measurements
-        </div>
-        <div class="cs-summary-status-{{ cs_id }}" id="cs-summary-status-{{ cs_id }}">
-          <span class="cs-status-dot-{{ cs_id }}"></span>
-          Measurements saved
-        </div>
+      <div class="cs-summary-status-{{ cs_id }}" role="status">
+        <span class="cs-status-dot-{{ cs_id }}" aria-hidden="true"></span>
+        Measurements saved
       </div>
-      <div class="cs-summary-tags-{{ cs_id }}" id="cs-summary-tags-{{ cs_id }}"></div>
-      <div class="cs-summary-bottom-{{ cs_id }}">
-        <div class="cs-checkbox-row-{{ cs_id }}" id="cs-checkbox-row-{{ cs_id }}" role="checkbox" aria-checked="true" tabindex="0">
-          <div class="cs-checkbox-box-{{ cs_id }}" id="cs-checkbox-box-{{ cs_id }}">
-            <svg viewBox="0 0 20 20" fill="none" stroke="currentColor"
-              stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-              <path d="M5 10.3 8.3 13.5 15.2 6.5"/>
-            </svg>
-          </div>
-          <span class="cs-checkbox-label-{{ cs_id }}">Include in order</span>
-        </div>
-        <div class="cs-summary-actions-{{ cs_id }}">
-          <button type="button" class="cs-btn-edit-{{ cs_id }}" id="cs-edit-{{ cs_id }}">Edit</button>
-          <button type="button" class="cs-btn-cancel-{{ cs_id }}" id="cs-cancel-{{ cs_id }}">Cancel</button>
-        </div>
+      <div class="cs-summary-actions-{{ cs_id }}">
+        <button type="button" class="cs-btn-edit-{{ cs_id }}" id="cs-edit-{{ cs_id }}">Edit</button>
+        <button type="button" class="cs-btn-cancel-{{ cs_id }}" id="cs-cancel-{{ cs_id }}">Cancel</button>
       </div>
     </div>
 
@@ -1238,11 +1085,6 @@
     const propVal    = document.getElementById('cs-propval-' + id);
     const editBtn   = document.getElementById('cs-edit-' + id);
     const cancelBtn = document.getElementById('cs-cancel-' + id);
-    const summary   = document.getElementById('cs-summary-' + id);
-    const sumTags   = document.getElementById('cs-summary-tags-' + id);
-    const cbRow     = document.getElementById('cs-checkbox-row-' + id);
-    const cbBox     = document.getElementById('cs-checkbox-box-' + id);
-    const trigTitle = document.getElementById('cs-trigger-title-' + id);
 
     if (!overlay || !modal || !measureDialog || !trigger || !closeBtn || !unit || !nextBtn || !backBtn || !confirmBtn || !clearBtn || !editBtn || !cancelBtn) {
       return;
@@ -1345,7 +1187,6 @@
     let currentUnit = 'inch';
     let savedData   = null;
     let pendingData = null;
-    let isChecked   = true;
     let lastStandardSize = null;
 
     const fieldMeta = {
@@ -1451,16 +1292,6 @@
       if (!usesInlineForm) document.body.style.overflow = '';
     }
 
-    function expandSummary() {
-      block.classList.add('expanded');
-      summary?.classList.add('visible');
-    }
-
-    function collapseSummary() {
-      block.classList.remove('expanded');
-      summary?.classList.remove('visible');
-    }
-
     function removePropertyInputs() {
       getProductForms().forEach(form => {
         form.querySelectorAll('input[name="properties[Custom Size]"]').forEach(inp => inp.remove());
@@ -1468,7 +1299,7 @@
     }
 
     function syncProperty() {
-      if (!savedData || !isChecked) {
+      if (!savedData) {
         removePropertyInputs();
         return;
       }
@@ -1546,21 +1377,14 @@
       const { clearInputs = true, switchVariant = false } = options;
       savedData = null;
       pendingData = null;
-      isChecked = true;
       if (clearInputs) inputs.forEach(inp => inp.value = '');
-      cbBox?.classList.remove('unchecked');
-      cbRow?.classList.remove('unchecked');
-      collapseSummary();
       block.classList.remove('has-data');
       removePropertyInputs();
       if (switchVariant) syncNativeSizeVariant(false);
       if (usesInlineForm) openModal();
     }
 
-    trigger.addEventListener('click', () => {
-      if (!savedData) openModal();
-      else block.classList.contains('expanded') ? collapseSummary() : expandSummary();
-    });
+    trigger.addEventListener('click', openModal);
 
     overlay.addEventListener('click', closeModal);
     closeBtn.addEventListener('click', closeModal);
@@ -1629,17 +1453,7 @@
     }
 
     function showSummary() {
-      const u = savedData._unit === 'cm' ? 'cm' : 'in';
-      if (sumTags) {
-        sumTags.innerHTML = Object.entries(fieldMeta)
-          .filter(([k]) => savedData[k] !== undefined)
-          .map(([k, m]) => '<span><strong>' + m.label + '</strong> ' + savedData[k] + u + '</span>')
-          .join('');
-      }
-      summary?.classList.add('visible');
       block.classList.add('has-data');
-      block.classList.add('expanded');
-      if (trigTitle) trigTitle.textContent = 'Enter measurements';
     }
 
     function validateAndCollect() {
@@ -1696,9 +1510,6 @@
     confirmBtn.addEventListener('click', () => {
       if (!pendingData) return;
       savedData = pendingData;
-      isChecked = true;
-      cbBox?.classList.remove('unchecked');
-      cbRow?.classList.remove('unchecked');
 
       showSummary();
       syncProperty();
@@ -1720,22 +1531,6 @@
     }));
 
     clearBtn.addEventListener('click', () => inputs.forEach(inp => inp.value = ''));
-
-    cbRow?.addEventListener('click', () => {
-      isChecked = !isChecked;
-      cbBox?.classList.toggle('unchecked', !isChecked);
-      cbRow.classList.toggle('unchecked', !isChecked);
-      cbRow?.setAttribute('aria-checked', isChecked ? 'true' : 'false');
-      syncProperty();
-      syncNativeSizeVariant(isChecked);
-    });
-
-    // Keyboard support for the "Include in order" switch.
-    cbRow?.addEventListener('keydown', (event) => {
-      if (event.key !== 'Enter' && event.key !== ' ') return;
-      event.preventDefault();
-      cbRow.click();
-    });
 
     // Same clear rule as the example: once the customer chooses a normal Shopify
     // Size again, Custom Size is no longer part of the line item. Registered
@@ -1761,7 +1556,7 @@
       const mode = detail.mode;
       if (mode === 'custom') {
         if (usesInlineForm) openModal();
-        if (savedData && isChecked) syncProperty();
+        if (savedData) syncProperty();
         syncNativeSizeVariant(true);
       } else if (mode === 'standard') {
         if (usesInlineForm) closeModal();
@@ -1804,19 +1599,11 @@
         return;
       }
 
-      if (mode === 'custom') {
-        if (!savedData) {
-          event.preventDefault();
-          event.stopPropagation();
-          showFitError('Please enter your measurements before adding to bag.');
-          if (usesInlineForm) openModal();
-          return;
-        }
-        if (!isChecked) {
-          event.preventDefault();
-          event.stopPropagation();
-          showFitError('Please keep "Include in order" checked to add your custom size.');
-        }
+      if (mode === 'custom' && !savedData) {
+        event.preventDefault();
+        event.stopPropagation();
+        showFitError('Please enter your measurements before adding to bag.');
+        if (usesInlineForm) openModal();
       }
     };
 
