@@ -210,7 +210,7 @@
             aria-controls="mv-fit-panel-standard-{{ size_chart_uid }}"
             data-mv-fit-tab="standard"
           >
-            {% render 'mv-fit-icon', icon: 'shirt' %}
+            {% render 'mv-fit-icon', icon: 'dress' %}
             <span class="mv-fit-tab__text">Standard Size</span>
           </button>
           <button
@@ -222,7 +222,7 @@
             aria-controls="mv-fit-panel-custom-{{ size_chart_uid }}"
             data-mv-fit-tab="custom"
           >
-            {% render 'mv-fit-icon', icon: 'ruler' %}
+            {% render 'mv-fit-icon', icon: 'coat-hanger' %}
             <span class="mv-fit-tab__text">Custom Fit</span>
           </button>
           </div>
@@ -905,11 +905,8 @@
       width: 16px;
       height: 16px;
       flex: 0 0 16px;
-      fill: none;
-      stroke: currentColor;
-      stroke-width: 1.5;
-      stroke-linecap: butt;
-      stroke-linejoin: miter;
+      fill: currentColor;
+      stroke: none;
     }
 
     @media (hover: hover) {
