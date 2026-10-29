@@ -46,7 +46,8 @@
   assign accent_b = accent_color | color_extract: 'blue'
 -%}
 {% style %}
-.cs-block-{{ cs_id }} {
+.cs-block-{{ cs_id }},
+#cs-measure-dialog-{{ cs_id }} {
   --mv-pal-accent: {{ accent_color }};
   --mv-pal-accent-rgb: {{ accent_r }}, {{ accent_g }}, {{ accent_b }};
   --mv-pal-gold: #C9A227;
@@ -1040,6 +1041,78 @@
   border-radius: 0;
   box-shadow: none;
 }
+#cs-measure-dialog-{{ cs_id }} {
+  width: min(640px, calc(100vw - 32px));
+  max-width: none;
+  max-height: min(88dvh, 860px);
+  padding: 0;
+  border: 1px solid #d8d3ca;
+  border-radius: 0;
+  background: var(--mv-pal-surface);
+  color: var(--mv-pal-ink);
+  box-shadow: none;
+}
+#cs-measure-dialog-{{ cs_id }}[open] { display: flex; flex-direction: column; }
+#cs-measure-dialog-{{ cs_id }}::backdrop { background: rgb(0 0 0 / 40%); }
+.cs-measure-dialog-header-{{ cs_id }} {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  flex: 0 0 auto;
+  padding: 14px 20px;
+  border-block-end: 1px solid var(--mv-pal-border);
+}
+.cs-measure-dialog-header-{{ cs_id }} h2 {
+  margin: 0;
+  font-family: var(--font-body--family);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.5;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+.cs-measure-dialog-close-{{ cs_id }} {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+.cs-measure-dialog-close-{{ cs_id }}:focus-visible {
+  outline: 1px solid currentColor;
+  outline-offset: -4px;
+}
+.cs-measure-dialog-body-{{ cs_id }} {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  min-height: 0;
+}
+#cs-measure-dialog-{{ cs_id }} .cs-htm-content-{{ cs_id }} {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1fr);
+  align-items: start;
+  gap: 24px;
+  padding: 20px;
+}
+#cs-measure-dialog-{{ cs_id }} .cs-htm-image-wrapper-{{ cs_id }} {
+  width: 100%;
+  border-radius: 0;
+  box-shadow: none;
+}
+@media screen and (max-width: 549px) {
+  #cs-measure-dialog-{{ cs_id }} .cs-htm-content-{{ cs_id }} {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+    padding: 16px;
+  }
+  #cs-measure-dialog-{{ cs_id }} .cs-htm-image-wrapper-{{ cs_id }} { max-width: 260px; }
+}
 {% endstyle %}
 
 <custom-sizes-{{ cs_id }} class="custom-sizes-block" {{ block.shopify_attributes }}>
@@ -1130,7 +1203,7 @@
       </svg>
       Enter Measurements
     </button>
-    <button type="button" class="cs-tab-btn-{{ cs_id }}" data-tab="htm">
+    <button type="button" class="cs-tab-btn-{{ cs_id }}" data-tab="htm" aria-haspopup="dialog" aria-controls="cs-measure-dialog-{{ cs_id }}">
       <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
         <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
       </svg>
@@ -1258,6 +1331,16 @@
   </div>
 </div>
 
+<dialog id="cs-measure-dialog-{{ cs_id }}" aria-labelledby="cs-measure-dialog-title-{{ cs_id }}">
+  <header class="cs-measure-dialog-header-{{ cs_id }}">
+    <h2 id="cs-measure-dialog-title-{{ cs_id }}">How to Measure</h2>
+    <button type="button" class="cs-measure-dialog-close-{{ cs_id }}" aria-label="Close measurement guide" autofocus>
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.2" aria-hidden="true"><path d="m3 3 10 10M13 3 3 13"/></svg>
+    </button>
+  </header>
+  <div class="cs-measure-dialog-body-{{ cs_id }}"></div>
+</dialog>
+
 <script>
 (function() {
   const id = '{{ cs_id }}';
@@ -1301,11 +1384,15 @@
 
     const overlay   = document.getElementById('cs-overlay-' + id);
     const modal     = document.getElementById('cs-modal-' + id);
+    const measureDialog = document.getElementById('cs-measure-dialog-' + id);
 
     // A previous section render can leave portaled copies in <body>. Drop the
     // stale ones so this init always works with its own elements.
-    document.querySelectorAll('#cs-overlay-' + id + ', #cs-modal-' + id).forEach(function (el) {
-      if (el !== overlay && el !== modal) el.remove();
+    document.querySelectorAll('#cs-overlay-' + id + ', #cs-modal-' + id + ', #cs-measure-dialog-' + id).forEach(function (el) {
+      if (el !== overlay && el !== modal && el !== measureDialog) {
+        if (el instanceof HTMLDialogElement && el.open) el.close();
+        el.remove();
+      }
     });
 
     const trigger   = document.getElementById('cs-trigger-' + id);
@@ -1325,7 +1412,7 @@
     const cbBox     = document.getElementById('cs-checkbox-box-' + id);
     const trigTitle = document.getElementById('cs-trigger-title-' + id);
 
-    if (!overlay || !modal || !trigger || !closeBtn || !unit || !nextBtn || !backBtn || !confirmBtn || !clearBtn || !editBtn || !cancelBtn) {
+    if (!overlay || !modal || !measureDialog || !trigger || !closeBtn || !unit || !nextBtn || !backBtn || !confirmBtn || !clearBtn || !editBtn || !cancelBtn) {
       return;
     }
 
@@ -1345,7 +1432,8 @@
 
     const inputs    = modal.querySelectorAll('[data-key]');
     const tabBtns   = modal.querySelectorAll('[data-tab]');
-    const tabPanels = modal.querySelectorAll('[data-panel]');
+    const guidePanel = modal.querySelector('[data-panel="htm"]');
+    const tabPanels = modal.querySelectorAll('[data-panel]:not([data-panel="htm"])');
     const unitBtns  = modal.querySelectorAll('[data-cs-unit]');
     const tabsNav   = modal.querySelector('.cs-tabs-nav-' + id);
     if (usesInlineForm && tabsNav) {
@@ -1353,6 +1441,36 @@
       if (formTab) formTab.textContent = 'Measurements';
       tabsNav.appendChild(unit);
     }
+    // Native dialog keeps the guide outside document flow and traps focus.
+    document.body.appendChild(measureDialog);
+    if (guidePanel) {
+      measureDialog.querySelector('.cs-measure-dialog-body-' + id).appendChild(guidePanel);
+      guidePanel.classList.add('active');
+    }
+    let guidePreviousOverflow = null;
+    function restoreGuideScroll() {
+      if (guidePreviousOverflow === null) return;
+      document.body.style.overflow = guidePreviousOverflow;
+      guidePreviousOverflow = null;
+    }
+    function openMeasureGuide() {
+      if (measureDialog.open) return;
+      guidePreviousOverflow = document.body.style.overflow;
+      measureDialog.showModal();
+      document.body.style.overflow = 'hidden';
+    }
+    function closeMeasureGuide() {
+      if (measureDialog.open) measureDialog.close();
+      restoreGuideScroll();
+    }
+    measureDialog.querySelector('button').addEventListener('click', closeMeasureGuide);
+    measureDialog.addEventListener('cancel', restoreGuideScroll);
+    measureDialog.addEventListener('close', restoreGuideScroll);
+    measureDialog.addEventListener('click', (event) => {
+      if (event.target !== measureDialog) return;
+      const rect = measureDialog.getBoundingClientRect();
+      if (event.clientX < rect.left || event.clientX > rect.right || event.clientY < rect.top || event.clientY > rect.bottom) closeMeasureGuide();
+    });
 
     let sheetHeightTimer = null;
     function animateMobileSheetHeight(mutator) {
@@ -1495,6 +1613,7 @@
     }
 
     function closeModal() {
+      closeMeasureGuide();
       overlay.classList.remove('active');
       modal.classList.remove('active');
       if (!usesInlineForm) document.body.style.overflow = '';
@@ -1620,7 +1739,10 @@
     });
 
     unitBtns.forEach(btn => btn.addEventListener('click', () => setUnit(btn.dataset.csUnit)));
-    tabBtns.forEach(b => b.addEventListener('click', () => switchTab(b.dataset.tab)));
+    tabBtns.forEach(b => b.addEventListener('click', () => {
+      if (b.dataset.tab === 'htm') openMeasureGuide();
+      else switchTab(b.dataset.tab);
+    }));
 
     function switchTab(tab) {
       const nextPanel = Array.from(tabPanels).find(p => p.dataset.panel === tab);
@@ -1888,6 +2010,7 @@
     };
 
     REGISTRY.keydown = (event) => {
+      if (measureDialog.open) return;
       if (event.key === 'Escape' && !usesInlineForm) closeModal();
     };
 
