@@ -210,7 +210,7 @@
             aria-controls="mv-fit-panel-standard-{{ size_chart_uid }}"
             data-mv-fit-tab="standard"
           >
-            <svg class="mv-fit-tab__icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M3.2 6.2 6.2 3.2 16.8 13.8 13.8 16.8Z"/><path d="m6.1 6.1 2-2M8.7 8.7l1.5-1.5M11.3 11.3l2-2"/></svg>
+            {% render 'mv-fit-icon', icon: 'shirt' %}
             <span class="mv-fit-tab__text">Standard Size</span>
           </button>
           <button
@@ -222,7 +222,7 @@
             aria-controls="mv-fit-panel-custom-{{ size_chart_uid }}"
             data-mv-fit-tab="custom"
           >
-            <svg class="mv-fit-tab__icon" viewBox="0 0 20 20" aria-hidden="true"><path d="m12.9 3.1 4 4M3.2 16.8l3.6-.8L16.1 6.7a1.8 1.8 0 0 0-2.5-2.5L4.3 13.5Z"/><path d="m10.7 5.3 4 4"/></svg>
+            {% render 'mv-fit-icon', icon: 'ruler' %}
             <span class="mv-fit-tab__text">Custom Fit</span>
           </button>
           </div>
@@ -394,6 +394,12 @@
               data-mv-standard-size-panel
             {% endif %}
           >
+            {%- if is_size_option -%}
+              <span class="mv-size-summary" data-mv-size-summary>
+                <span class="mv-size-summary__label">Selected size</span>
+                <span class="mv-size-summary__value" data-mv-size-value>{{ product_option.selected_value | escape }}</span>
+              </span>
+            {%- else -%}
             {{- product_option.name | escape -}}
             <span
               class="variant-option__swatch-value"
@@ -401,6 +407,7 @@
             >
               {{- product_option.selected_value -}}
             </span>
+            {%- endif -%}
           </div>
         {%- elsif variant_style == 'swatch' or variant_style == 'buttons' -%}
           <fieldset
@@ -424,10 +431,14 @@
             ref="fieldsets[]"
             {{ option_id_attribute }}
           >
-            <legend{% if is_size_option and show_size_chart %} class="mv-size-legend"{% endif %}>
-              {%- if is_size_option and show_size_chart -%}
+            <legend{% if is_size_option %} class="mv-size-legend"{% endif %}>
+              {%- if is_size_option -%}
                 <span class="mv-size-legend-row">
-                  <span>{{ product_option.name | escape }}</span>
+                  <span class="mv-size-summary" data-mv-size-summary>
+                    <span class="mv-size-summary__label">Selected size</span>
+                    <span class="mv-size-summary__value" data-mv-size-value>{{ product_option.selected_value | escape }}</span>
+                  </span>
+                  {%- if show_size_chart -%}
                   <button
                     type="button"
                     class="mv-size-chart-trigger"
@@ -438,6 +449,7 @@
                     <span>SIZE GUIDE</span>
                     <span class="mv-size-chart-trigger-arrow" aria-hidden="true">↗</span>
                   </button>
+                  {%- endif -%}
                 </span>
                 {%- elsif is_color_option and variant_style == 'swatch' -%}
                 <span class="mv-color-legend-row">
@@ -554,12 +566,6 @@
               {% endstyle %}
             {% endif %}
           </fieldset>
-          {%- if is_size_matrix -%}
-            <p class="mv-size-summary" data-mv-size-summary>
-              <span class="mv-size-summary__label">Selected size</span>
-              <span class="mv-size-summary__value" data-mv-size-value>{{ product_option.selected_value }}</span>
-            </p>
-          {%- endif -%}
           {%- assign fieldset_index = fieldset_index | plus: 1 -%}
         {%- endif -%}
       {%- endfor -%}
@@ -896,15 +902,14 @@
     }
 
     .mv-fit-tab__icon {
-      width: 14px;
-      height: 14px;
-      flex: 0 0 14px;
+      width: 16px;
+      height: 16px;
+      flex: 0 0 16px;
       fill: none;
       stroke: currentColor;
-      stroke-width: 1.15;
+      stroke-width: 1.5;
       stroke-linecap: round;
       stroke-linejoin: round;
-      opacity: 0.82;
     }
 
     @media (hover: hover) {
@@ -1070,7 +1075,7 @@
       display: flex;
       align-items: baseline;
       gap: 6px;
-      margin: 8px 0 0;
+      margin: 0;
       font-family: var(--font-body--family);
       font-size: 10px;
       font-weight: 500;
@@ -1197,15 +1202,6 @@
       justify-content: space-between;
       gap: 12px;
       width: 100%;
-    }
-    /* The Size legend row stays visible under the fit tabs (brand demo:
-       "SELECT YOUR SIZE" + underlined SIZE GUIDE link). */
-    .mv-size-legend-row > span:first-child {
-      font-size: 10px;
-      font-weight: 600;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--color-foreground);
     }
     .mv-visually-hidden {
       position: absolute;

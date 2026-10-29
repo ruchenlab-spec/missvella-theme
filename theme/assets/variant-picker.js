@@ -244,6 +244,10 @@ export default class VariantPicker extends Component {
         }
       }
       target.checked = true;
+      // Update the heading immediately, including when fit tabs are disabled.
+      const sizePanel = target.closest('[data-mv-standard-size-panel]');
+      const sizeValue = sizePanel?.querySelector('[data-mv-size-value]');
+      if (sizeValue) sizeValue.textContent = target.value;
     }
   }
 
