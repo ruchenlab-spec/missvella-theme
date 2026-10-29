@@ -314,6 +314,10 @@ export default class VariantPicker extends Component {
     this.#abortController = new AbortController();
 
     const deferredEventPromise = ProductSelectEvent.createPromise();
+    // A picker may have no async event subscribers. Handle the base promise's
+    // rejection without changing the promise delivered to subscribers, so an
+    // aborted size request cannot become an unhandled rejection.
+    deferredEventPromise.promise.catch(() => {});
     const selectedOptions = this.getAllSelectedOptions();
 
     this.dispatchEvent(
