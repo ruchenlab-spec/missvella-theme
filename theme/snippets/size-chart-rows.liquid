@@ -3,22 +3,26 @@
   - sections/size-guide.liquid (standalone size guide page)
   - snippets/variant-main-picker.liquid (PDP "SIZE GUIDE" drawer)
 
+  Source: merchant workbook Sheet1!B1:T5, supplied 2026-10-29 (CM).
+  Confirmed mapping: 00 -> 00; 02-16 -> 2-16; 18-30 -> 18W-30W.
+  Extra source sizes 0, 16W and 32W are intentionally omitted.
+
   Single source of truth: edit the measurements HERE only. Both consumers
   convert cm → inches client-side via the data-cm attributes.
 {%- endcomment -%}
-<tr><td>US0</td><td data-cm="80">80</td><td data-cm="63">63</td><td data-cm="89">89</td><td data-cm="147">147</td></tr>
-<tr><td>US2</td><td data-cm="83">83</td><td data-cm="65">65</td><td data-cm="91">91</td><td data-cm="147">147</td></tr>
-<tr><td>US4</td><td data-cm="84">84</td><td data-cm="68">68</td><td data-cm="92">92</td><td data-cm="147">147</td></tr>
-<tr><td>US6</td><td data-cm="88">88</td><td data-cm="70">70</td><td data-cm="96">96</td><td data-cm="150">150</td></tr>
-<tr><td>US8</td><td data-cm="90">90</td><td data-cm="72">72</td><td data-cm="98">98</td><td data-cm="150">150</td></tr>
-<tr><td>US10</td><td data-cm="93">93</td><td data-cm="75">75</td><td data-cm="101">101</td><td data-cm="152">152</td></tr>
-<tr><td>US12</td><td data-cm="97">97</td><td data-cm="79">79</td><td data-cm="105">105</td><td data-cm="152">152</td></tr>
-<tr><td>US14</td><td data-cm="100">100</td><td data-cm="83">83</td><td data-cm="109">109</td><td data-cm="155">155</td></tr>
-<tr><td>US16</td><td data-cm="104">104</td><td data-cm="86">86</td><td data-cm="112">112</td><td data-cm="155">155</td></tr>
-<tr><td>US18+</td><td data-cm="114">114</td><td data-cm="98">98</td><td data-cm="121">121</td><td data-cm="155">155</td></tr>
-<tr><td>US20+</td><td data-cm="119">119</td><td data-cm="104">104</td><td data-cm="126">126</td><td data-cm="155">155</td></tr>
-<tr><td>US22+</td><td data-cm="124">124</td><td data-cm="109">109</td><td data-cm="131">131</td><td data-cm="155">155</td></tr>
-<tr><td>US24+</td><td data-cm="130">130</td><td data-cm="115">115</td><td data-cm="136">136</td><td data-cm="155">155</td></tr>
-<tr><td>US26+</td><td data-cm="135">135</td><td data-cm="124">124</td><td data-cm="141">141</td><td data-cm="155">155</td></tr>
-<tr><td>US28+</td><td data-cm="140">140</td><td data-cm="130">130</td><td data-cm="146">146</td><td data-cm="155">155</td></tr>
-<tr><td>US30+</td><td data-cm="145">145</td><td data-cm="136">136</td><td data-cm="151">151</td><td data-cm="155">155</td></tr>
+<tr><td>00</td><td data-cm="79">79</td><td data-cm="61">61</td><td data-cm="88.5">88.5</td><td data-cm="145">145</td></tr>
+<tr><td>02</td><td data-cm="84">84</td><td data-cm="66">66</td><td data-cm="93.5">93.5</td><td data-cm="147">147</td></tr>
+<tr><td>04</td><td data-cm="86.5">86.5</td><td data-cm="68.5">68.5</td><td data-cm="96">96</td><td data-cm="147">147</td></tr>
+<tr><td>06</td><td data-cm="89">89</td><td data-cm="71">71</td><td data-cm="98.5">98.5</td><td data-cm="150">150</td></tr>
+<tr><td>08</td><td data-cm="91.5">91.5</td><td data-cm="73.5">73.5</td><td data-cm="101">101</td><td data-cm="150">150</td></tr>
+<tr><td>10</td><td data-cm="94">94</td><td data-cm="76">76</td><td data-cm="104">104</td><td data-cm="152">152</td></tr>
+<tr><td>12</td><td data-cm="96.5">96.5</td><td data-cm="80">80</td><td data-cm="108">108</td><td data-cm="152">152</td></tr>
+<tr><td>14</td><td data-cm="100.5">100.5</td><td data-cm="84">84</td><td data-cm="112">112</td><td data-cm="155">155</td></tr>
+<tr><td>16</td><td data-cm="104">104</td><td data-cm="87.5">87.5</td><td data-cm="116">116</td><td data-cm="155">155</td></tr>
+<tr><td>18</td><td data-cm="116">116</td><td data-cm="99">99</td><td data-cm="125">125</td><td data-cm="155">155</td></tr>
+<tr><td>20</td><td data-cm="121">121</td><td data-cm="105">105</td><td data-cm="130">130</td><td data-cm="155">155</td></tr>
+<tr><td>22</td><td data-cm="126">126</td><td data-cm="111">111</td><td data-cm="135">135</td><td data-cm="155">155</td></tr>
+<tr><td>24</td><td data-cm="131">131</td><td data-cm="117">117</td><td data-cm="140">140</td><td data-cm="155">155</td></tr>
+<tr><td>26</td><td data-cm="136">136</td><td data-cm="123">123</td><td data-cm="145">145</td><td data-cm="155">155</td></tr>
+<tr><td>28</td><td data-cm="141">141</td><td data-cm="128">128</td><td data-cm="150">150</td><td data-cm="155">155</td></tr>
+<tr><td>30</td><td data-cm="147.5">147.5</td><td data-cm="135">135</td><td data-cm="157">157</td><td data-cm="155">155</td></tr>
