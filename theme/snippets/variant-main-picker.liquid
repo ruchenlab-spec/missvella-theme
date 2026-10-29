@@ -747,12 +747,7 @@
       <section class="mv-size-chart-panel" data-size-chart-panel="measure">
         <div class="mv-size-chart-htm">
           <div class="mv-size-chart-image-wrap">
-            <img src="{{ 'size-chart-how-to-measure.png' | asset_url }}" alt="How to measure" width="852" height="1394" loading="lazy">
-            <div class="mv-size-chart-hotspot" style="left:calc(23% - 11px);top:calc(25% - 11px);" data-sc-hotspot="1"><span>1</span></div>
-            <div class="mv-size-chart-hotspot" style="left:calc(23% - 11px);top:calc(33% - 11px);" data-sc-hotspot="2"><span>2</span></div>
-            <div class="mv-size-chart-hotspot" style="left:calc(23% - 11px);top:calc(44% - 11px);" data-sc-hotspot="3"><span>3</span></div>
-            <div class="mv-size-chart-hotspot" style="left:calc(13% - 11px);top:calc(57% - 11px);" data-sc-hotspot="4"><span>4</span></div>
-            <div class="mv-size-chart-hotspot" style="left:calc(84% - 11px);top:calc(50% - 11px);" data-sc-hotspot="5"><span>5</span></div>
+            <img src="{{ 'size-chart-how-to-measure.png' | asset_url }}" alt="How to measure" width="971" height="1619" loading="lazy">
           </div>
           <div class="mv-size-chart-accordions">
             <div class="mv-accordion-item" data-sc-step="1"><button type="button" class="mv-accordion-header"><span class="mv-accordion-number">1</span><strong>Bust</strong><svg class="mv-chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4,6 8,10 12,6"/></svg></button><div class="mv-accordion-content"><div class="mv-accordion-text">Measure around the fullest part of your bust, keeping the tape level around your back.</div></div></div>
@@ -1354,9 +1349,6 @@
     .mv-size-chart-htm { padding:20px 22px 28px; display:flex; flex-direction:column; gap:16px; }
     .mv-size-chart-image-wrap { position:relative; width:min(100%,300px); margin:0 auto; border:1px solid var(--sc-border); overflow:hidden; background:var(--color-background); }
     .mv-size-chart-image-wrap img { width:100%; height:auto; display:block; }
-    .mv-size-chart-hotspot { position:absolute; width:22px; height:22px; z-index:3; }
-    .mv-size-chart-hotspot span { width:22px; height:22px; display:grid; place-items:center; border:1.5px solid var(--color-foreground); background:var(--color-background); color:var(--color-foreground); font-size:9px; font-weight:700; transition:background .16s,color .16s,transform .16s; }
-    .mv-size-chart-hotspot.active span { background:var(--color-foreground); color:var(--color-background); transform:scale(1.06); }
     .mv-size-chart-accordions { display:flex; flex-direction:column; gap:8px; }
     .mv-size-chart-accordions .mv-accordion-header { width:100%; border:0; font:inherit; text-align:left; }
     .mv-size-chart-accordions .mv-accordion-header strong { flex:1; font-size:11px; }
@@ -1533,7 +1525,6 @@
         const tabBtns = drawer.querySelectorAll('[data-size-chart-tab]');
         const panels = drawer.querySelectorAll('[data-size-chart-panel]');
         const accordions = drawer.querySelectorAll('[data-sc-step]');
-        const hotspots = drawer.querySelectorAll('[data-sc-hotspot]');
 
         function open() {
           drawer.classList.add('open');
@@ -1584,17 +1575,11 @@
           item.querySelector('.mv-accordion-header')?.addEventListener('click',() => {
             const active = item.classList.contains('active');
             accordions.forEach(a => a.classList.remove('active'));
-            hotspots.forEach(h => h.classList.remove('active'));
             if (!active) {
               item.classList.add('active');
-              drawer.querySelector('[data-sc-hotspot="' + item.dataset.scStep + '"]')?.classList.add('active');
             }
           });
         });
-        hotspots.forEach(h => h.addEventListener('click',() => {
-          const item = drawer.querySelector('[data-sc-step="' + h.dataset.scHotspot + '"]');
-          if (item) item.querySelector('.mv-accordion-header')?.click();
-        }));
       }
 
       initSizeChart();

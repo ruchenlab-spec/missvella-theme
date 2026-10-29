@@ -70,18 +70,20 @@
                 class="sg-page__image"
                 src="{{ 'size-chart-how-to-measure.png' | asset_url }}"
                 alt="How to measure"
-                width="852"
-                height="1394"
+                width="971"
+                height="1619"
                 loading="lazy"
               >
             {%- endif -%}
 
+            {%- if htm_image != blank -%}
             {%- assign hs = section.settings.hotspot_size -%}
             <button type="button" class="sg-page__hotspot-{{ sg_id }}" style="left:calc({{ section.settings.hp1_x }}% - {{ hs | divided_by: 2.0 }}px);top:calc({{ section.settings.hp1_y }}% - {{ hs | divided_by: 2.0 }}px);width:{{ hs }}px;height:{{ hs }}px;" data-hotspot="1" aria-label="Bust"><span>1</span></button>
             <button type="button" class="sg-page__hotspot-{{ sg_id }}" style="left:calc({{ section.settings.hp2_x }}% - {{ hs | divided_by: 2.0 }}px);top:calc({{ section.settings.hp2_y }}% - {{ hs | divided_by: 2.0 }}px);width:{{ hs }}px;height:{{ hs }}px;" data-hotspot="2" aria-label="Waist"><span>2</span></button>
             <button type="button" class="sg-page__hotspot-{{ sg_id }}" style="left:calc({{ section.settings.hp3_x }}% - {{ hs | divided_by: 2.0 }}px);top:calc({{ section.settings.hp3_y }}% - {{ hs | divided_by: 2.0 }}px);width:{{ hs }}px;height:{{ hs }}px;" data-hotspot="3" aria-label="Hips"><span>3</span></button>
             <button type="button" class="sg-page__hotspot-{{ sg_id }}" style="left:calc({{ section.settings.hp4_x }}% - {{ hs | divided_by: 2.0 }}px);top:calc({{ section.settings.hp4_y }}% - {{ hs | divided_by: 2.0 }}px);width:{{ hs }}px;height:{{ hs }}px;" data-hotspot="4" aria-label="Hollow to Floor"><span>4</span></button>
             <button type="button" class="sg-page__hotspot-{{ sg_id }}" style="left:calc({{ section.settings.hp5_x }}% - {{ hs | divided_by: 2.0 }}px);top:calc({{ section.settings.hp5_y }}% - {{ hs | divided_by: 2.0 }}px);width:{{ hs }}px;height:{{ hs }}px;" data-hotspot="5" aria-label="Height"><span>5</span></button>
+            {%- endif -%}
           </div>
 
           <div class="sg-page__accordions-{{ sg_id }}">
