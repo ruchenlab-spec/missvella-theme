@@ -1,0 +1,76 @@
+{%- doc -%}
+  Shared measurement instructions for the size guide and custom-fit dialog.
+  @param {object} [image] - Optional merchant-provided illustration.
+  @param {string} [note] - Optional measurement note (rich text supported).
+{%- enddoc -%}
+<div class="mv-measurement-guide">
+  <div class="mv-measurement-guide__layout">
+    <div class="mv-measurement-guide__image">
+      {%- if image != blank -%}
+        {{ image | image_url: width: 600 | image_tag: loading: 'lazy', alt: 'How to measure' }}
+      {%- else -%}
+        {% render 'measurement-guide-image' %}
+      {%- endif -%}
+    </div>
+    <div>
+      <ol class="mv-measurement-guide__steps">
+        {%- assign steps = 'Bust|Measure around the fullest part of your bust~Waist|Measure around the narrowest part of your natural waistline~Hips|Measure around the fullest part of your hips, about 8 inches below your waist~Hollow to Floor|Measure from the hollow at the base of your throat to the floor~Height|Stand straight and measure from the top of your head to the floor' | split: '~' -%}
+        {%- for step in steps -%}
+          {%- assign parts = step | split: '|' -%}
+          <li class="mv-measurement-guide__step">
+            <h3 class="mv-measurement-guide__title"><span aria-hidden="true">{{ forloop.index }}</span>{{ parts[0] }}</h3>
+            <p class="mv-measurement-guide__description">{{ parts[1] }}</p>
+          </li>
+        {%- endfor -%}
+      </ol>
+      {%- if note != blank -%}
+        <div class="mv-measurement-guide__note">{{ note }}</div>
+      {%- endif -%}
+    </div>
+  </div>
+</div>
+
+{% stylesheet %}
+  .mv-measurement-guide {
+    --measure-ink: var(--pi-text, var(--mv-pal-ink, var(--color-foreground)));
+    --measure-accent: var(--pi-accent, var(--mv-pal-accent, var(--color-foreground)));
+    --measure-surface: var(--pi-surface, var(--mv-pal-surface, var(--color-background)));
+    --measure-muted: var(--pi-muted, var(--mv-pal-muted, var(--color-foreground-muted)));
+    --measure-line: var(--pi-border, var(--mv-pal-border, var(--color-border)));
+    --measure-secondary: var(--pi-secondary, var(--cs-guide-secondary, #9c876d));
+    --measure-wash: color-mix(in srgb, var(--measure-secondary) 7%, var(--measure-surface));
+    container: measurement-guide / inline-size;
+    font-family: var(--font-body--family);
+    color: var(--measure-ink);
+  }
+  .mv-measurement-guide__layout { display: grid; grid-template-columns: minmax(0, 1fr); align-items: start; gap: 20px; }
+  .mv-measurement-guide__image { width: min(100%, 240px); margin-inline: auto; background: var(--measure-wash); }
+  .mv-measurement-guide__image img { display: block; width: 100%; height: auto; mix-blend-mode: multiply; }
+  .mv-measurement-guide__steps { list-style: none; padding: 0; margin: 0; }
+  .mv-measurement-guide__step { padding-block: 9px; border-block-end: 1px solid var(--measure-line); }
+  .mv-measurement-guide__step:first-child { padding-block-start: 0; }
+  .mv-measurement-guide__step:last-child { border-block-end: 0; }
+  .mv-measurement-guide__title {
+    display: flex; align-items: center; gap: 8px; margin: 0;
+    font-family: var(--font-body--family); font-size: 10px; font-weight: 500;
+    line-height: 1.4; letter-spacing: .1em; text-transform: uppercase; color: var(--measure-accent);
+  }
+  .mv-measurement-guide__title span {
+    display: inline-grid; place-items: center; flex: 0 0 18px; width: 18px; height: 18px;
+    background: var(--measure-accent); color: var(--pi-on-accent, var(--measure-surface));
+    font-size: 10px; letter-spacing: 0;
+  }
+  .mv-measurement-guide__description {
+    margin: 4px 0 0 26px; font-family: var(--font-body--family); font-size: 12px;
+    font-weight: 400; line-height: 1.5; letter-spacing: 0; color: var(--measure-muted);
+  }
+  .mv-measurement-guide__note {
+    margin-block-start: 10px; padding: 10px 12px; border-inline-start: 1px solid var(--measure-secondary);
+    background: var(--measure-wash); color: var(--measure-muted); font-size: 11px; line-height: 1.5;
+  }
+  .mv-measurement-guide__note p { margin: 0; }
+  @container measurement-guide (min-width: 500px) {
+    .mv-measurement-guide__layout { grid-template-columns: minmax(0, .85fr) minmax(0, 1fr); }
+    .mv-measurement-guide__image { width: min(100%, 300px); }
+  }
+{% endstylesheet %}

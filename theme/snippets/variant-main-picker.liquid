@@ -676,41 +676,39 @@
     aria-modal="true"
     aria-labelledby="mv-size-chart-title-{{ size_chart_uid }}"
     aria-hidden="true"
+    tabindex="-1"
   >
-    <div class="mv-size-chart-drag" aria-hidden="true"></div>
     <header class="mv-size-chart-header">
       <div>
-        <h2 id="mv-size-chart-title-{{ size_chart_uid }}">SIZE GUIDE</h2>
+        <h2 id="mv-size-chart-title-{{ size_chart_uid }}">Size Guide</h2>
         <p>Find your best fit and learn how to measure.</p>
       </div>
-      <div class="mv-size-chart-header-actions">
-        <div class="mv-size-chart-unit" data-sc-unit="cm" role="group" aria-label="Measurement unit">
-          <span class="mv-size-chart-unit-slider" aria-hidden="true"></span>
-          <button type="button" data-unit="cm" class="active" aria-pressed="true">CM</button>
-          <button type="button" data-unit="in" aria-pressed="false">IN</button>
-        </div>
         <button type="button" class="mv-size-chart-close" data-size-chart-close aria-label="Close size guide">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 5 19 19M19 5 5 19"/></svg>
         </button>
-      </div>
     </header>
 
-    <div class="mv-size-chart-tabs" data-sc-tab="chart">
-      <span class="mv-size-chart-tab-slider" aria-hidden="true"></span>
-      <button type="button" class="active" data-size-chart-tab="chart">Size Chart</button>
-      <button type="button" data-size-chart-tab="measure">How to Measure</button>
+    <div class="mv-size-chart-tabs" data-sc-tab="chart" role="tablist" aria-label="Size guide">
+      <button type="button" class="active" data-size-chart-tab="chart" role="tab" id="sc-tab-chart-{{ size_chart_uid }}" aria-controls="sc-panel-chart-{{ size_chart_uid }}" aria-selected="true">Size Chart</button>
+      <button type="button" data-size-chart-tab="measure" role="tab" id="sc-tab-measure-{{ size_chart_uid }}" aria-controls="sc-panel-measure-{{ size_chart_uid }}" aria-selected="false" tabindex="-1">How to Measure</button>
     </div>
 
     <div class="mv-size-chart-body">
-      <section class="mv-size-chart-panel active" data-size-chart-panel="chart">
+      <section class="mv-size-chart-panel active" data-size-chart-panel="chart" id="sc-panel-chart-{{ size_chart_uid }}" role="tabpanel" aria-labelledby="sc-tab-chart-{{ size_chart_uid }}">
         <div class="size-chart-section">
           <div class="size-chart-heading-row">
-            <h2 class="size-chart-title">Adult Sizes</h2>
-            <div class="size-chart-unit-copy">All measurements in <span data-size-chart-unit-copy>CM</span></div>
+            <div>
+              <h3 class="size-chart-title">Adult Sizes</h3>
+              <div class="size-chart-unit-copy" aria-live="polite">All measurements in <span data-size-chart-unit-copy>IN</span></div>
+            </div>
+            <div class="mv-size-chart-unit" data-sc-unit="in" role="group" aria-label="Measurement unit">
+              <button type="button" data-unit="cm" aria-pressed="false">CM</button>
+              <button type="button" data-unit="in" class="active" aria-pressed="true">IN</button>
+            </div>
           </div>
-          <div class="size-chart-scroll">
+          <div class="size-chart-scroll" tabindex="0" role="region" aria-label="Adult size measurements, scroll for more sizes">
             <table class="size-chart">
-              <thead><tr><th>Size</th><th>Bust</th><th>Waist</th><th>Hips</th><th>Hollow to Hem</th></tr></thead>
+              <thead><tr><th scope="col">Size</th><th scope="col">Bust</th><th scope="col">Waist</th><th scope="col">Hips</th><th scope="col">Hollow to Hem</th></tr></thead>
               <tbody>
               {%- render 'size-chart-rows' -%}
               </tbody>
@@ -719,19 +717,9 @@
         </div>
       </section>
 
-      <section class="mv-size-chart-panel" data-size-chart-panel="measure">
+      <section class="mv-size-chart-panel" data-size-chart-panel="measure" id="sc-panel-measure-{{ size_chart_uid }}" role="tabpanel" aria-labelledby="sc-tab-measure-{{ size_chart_uid }}" hidden>
         <div class="mv-size-chart-htm">
-          <div class="mv-size-chart-image-wrap">
-            {% render 'measurement-guide-image' %}
-          </div>
-          <div class="mv-size-chart-accordions">
-            <div class="mv-accordion-item" data-sc-step="1"><button type="button" class="mv-accordion-header"><span class="mv-accordion-number">1</span><strong>Bust</strong><svg class="mv-chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4,6 8,10 12,6"/></svg></button><div class="mv-accordion-content"><div class="mv-accordion-text">Measure around the fullest part of your bust, keeping the tape level around your back.</div></div></div>
-            <div class="mv-accordion-item" data-sc-step="2"><button type="button" class="mv-accordion-header"><span class="mv-accordion-number">2</span><strong>Waist</strong><svg class="mv-chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4,6 8,10 12,6"/></svg></button><div class="mv-accordion-content"><div class="mv-accordion-text">Measure around the narrowest part of your natural waistline without pulling the tape tight.</div></div></div>
-            <div class="mv-accordion-item" data-sc-step="3"><button type="button" class="mv-accordion-header"><span class="mv-accordion-number">3</span><strong>Hips</strong><svg class="mv-chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4,6 8,10 12,6"/></svg></button><div class="mv-accordion-content"><div class="mv-accordion-text">Measure around the fullest part of your hips, keeping the tape parallel to the floor.</div></div></div>
-            <div class="mv-accordion-item" data-sc-step="4"><button type="button" class="mv-accordion-header"><span class="mv-accordion-number">4</span><strong>Hollow to Floor</strong><svg class="mv-chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4,6 8,10 12,6"/></svg></button><div class="mv-accordion-content"><div class="mv-accordion-text">Measure from the hollow where the collarbones meet at the front of the neck vertically down to the floor, barefoot.</div></div></div>
-            <div class="mv-accordion-item" data-sc-step="5"><button type="button" class="mv-accordion-header"><span class="mv-accordion-number">5</span><strong>Height</strong><svg class="mv-chevron" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4,6 8,10 12,6"/></svg></button><div class="mv-accordion-content"><div class="mv-accordion-text">Stand straight and measure from the top of your head to the floor, barefoot.</div></div></div>
-          </div>
-          <div class="mv-size-chart-note">All measurements should be taken over underwear. For best results, have someone help you measure.</div>
+          {% render 'measurement-guide-content', note: 'All measurements should be taken over underwear. For best results, have someone help you measure.' %}
         </div>
       </section>
     </div>
@@ -741,6 +729,7 @@
 {% render 'swatch-styles' %}
 {% render 'variant-picker-styles' %}
 {% render 'mv-swatch-button-styles' %}
+{% render 'size-guide-styles' %}
 {%- comment -%}
   Compact PDP variant buttons
   - Scoped to this main variant-picker block only
@@ -1209,157 +1198,6 @@
     @media (hover:hover) { .mv-size-chart-trigger:hover { border-color:var(--color-foreground); } }
     .mv-size-chart-trigger:focus-visible { outline:1.5px solid var(--color-foreground); outline-offset:3px; }
 
-    .mv-size-chart-overlay {
-      display:none; position:fixed; inset:0; z-index:2147483644; background:rgb(var(--color-foreground-rgb) / .3);
-    }
-    .mv-size-chart-overlay.open { display:block; }
-    .mv-size-chart-drawer {
-      --sc-border: var(--pi-border, rgb(var(--color-foreground-rgb) / 10%));
-      --sc-stone: var(--pi-soft, rgb(var(--color-foreground-rgb) / 4%));
-      --sc-muted: var(--color-foreground-muted, rgb(var(--color-foreground-rgb) / 0.55));
-      position:fixed; z-index:2147483645; background:var(--color-background); color:var(--color-foreground);
-      display:flex; flex-direction:column; overflow:hidden; visibility:hidden; pointer-events:none;
-      box-shadow:0 20px 70px rgb(var(--color-foreground-rgb) / .16);
-      transition:transform .32s cubic-bezier(.22,.72,.24,1), visibility 0s linear .32s;
-    }
-    .mv-size-chart-drawer.open { visibility:visible; pointer-events:auto; transition-delay:0s; }
-    .mv-size-chart-drag { display:none; }
-    @media screen and (min-width:750px) {
-      .mv-size-chart-drawer { top:0; right:0; width:min(500px,100vw); height:100vh; transform:translateX(100%); }
-      .mv-size-chart-drawer.open { transform:translateX(0); }
-    }
-    @media screen and (max-width:749px) {
-      .mv-size-chart-drawer { left:0; right:0; bottom:0; width:100%; height:min(88vh,760px); transform:translateY(100%); }
-      .mv-size-chart-drawer.open { transform:translateY(0); }
-      .mv-size-chart-drag { display:block; width:38px; height:4px; background:rgb(var(--color-foreground-rgb) / 15%); margin:8px auto -2px; flex:0 0 auto; }
-    }
-    .mv-size-chart-header { display:flex; align-items:flex-start; justify-content:space-between; gap:18px; padding:20px 22px 16px; border-bottom:1px solid var(--sc-border); }
-    .mv-size-chart-header h2 { margin:0; font:inherit; font-size:14px; font-weight:700; letter-spacing:.055em; }
-    .mv-size-chart-header p { margin:4px 0 0; font-size:11px; color:var(--sc-muted); line-height:1.4; }
-    .mv-size-chart-header-actions { display:flex; align-items:center; gap:10px; flex:0 0 auto; }
-    .mv-size-chart-close { width:36px; height:36px; border:1px solid var(--sc-border); background:var(--color-background); color:var(--color-foreground); display:grid; place-items:center; cursor:pointer; padding:0; }
-    .mv-size-chart-close svg { width:18px; height:18px; }
-    .mv-size-chart-unit { position:relative; display:grid; grid-template-columns:1fr 1fr; width:104px; height:40px; padding:4px; border:1px solid var(--sc-border); background:rgb(var(--color-foreground-rgb) / 0.04); overflow:hidden; }
-    .mv-size-chart-unit-slider { position:absolute; top:4px; left:4px; width:46px; height:30px; background:var(--color-foreground); transition:transform .26s cubic-bezier(.22,.72,.24,1); }
-    .mv-size-chart-unit[data-sc-unit='in'] .mv-size-chart-unit-slider { transform:translateX(48px); }
-    .mv-size-chart-unit button { position:relative; z-index:1; border:0; background:transparent; color:var(--sc-muted); font:inherit; font-size:10px; font-weight:500; letter-spacing:0.12em; text-transform:uppercase; cursor:pointer; padding:0; transition:color .2s ease; }
-    .mv-size-chart-unit button.active { color:var(--color-background); }
-
-    .mv-size-chart-tabs { position:relative; margin:14px 22px 0; display:grid; grid-template-columns:1fr 1fr; padding:4px; border:1px solid var(--sc-border); background:rgb(var(--color-foreground-rgb) / 0.04); min-height:44px; }
-    .mv-size-chart-tab-slider { position:absolute; top:4px; left:4px; width:calc(50% - 4px); height:calc(100% - 8px); background:var(--color-foreground); transition:transform .28s cubic-bezier(.22,.72,.24,1); }
-    .mv-size-chart-tabs[data-sc-tab='measure'] .mv-size-chart-tab-slider { transform:translateX(100%); }
-    .mv-size-chart-tabs button { position:relative; z-index:1; border:0; background:transparent; color:var(--sc-muted); font:inherit; font-size:10px; font-weight:500; letter-spacing:0.12em; text-transform:uppercase; cursor:pointer; transition:color .2s ease; }
-    .mv-size-chart-tabs button.active { color:var(--color-background); }
-    .mv-size-chart-body { min-height:0; flex:1; overflow-y:auto; }
-    .mv-size-chart-panel { display:none; }
-    .mv-size-chart-panel.active { display:block; }
-    .size-chart-section { padding:20px 22px 28px; }
-    .size-chart-heading-row { display:flex; align-items:flex-end; justify-content:space-between; gap:12px; margin-bottom:14px; }
-    .size-chart-title { margin:0; font:inherit; font-size:16px; font-weight:700; }
-    .size-chart-unit-copy { font-size:10px; color:var(--sc-muted); white-space:nowrap; }
-    /* The size table owns both scroll axes so sticky header/first column stay reliable. */
-    .size-chart-scroll {
-      position:relative;
-      overflow:auto;
-      max-height:calc(100vh - 285px);
-      border:1px solid var(--sc-border);
-      background:var(--color-background);
-      scrollbar-gutter:stable;
-      overscroll-behavior:contain;
-      -webkit-overflow-scrolling:touch;
-    }
-    .size-chart {
-      width:100%;
-      min-width:470px;
-      border-collapse:separate;
-      border-spacing:0;
-      table-layout:auto;
-      font-size:11px;
-      background:var(--color-background);
-    }
-    .size-chart th {
-      position:sticky;
-      top:0;
-      z-index:3;
-      padding:9px 7px;
-      background:var(--sc-stone);
-      color:var(--color-foreground);
-      font-weight:700;
-      text-align:center;
-      white-space:nowrap;
-      border-bottom:1px solid var(--sc-border);
-    }
-    .size-chart td {
-      padding:8px 7px;
-      text-align:center;
-      border-top:1px solid var(--sc-border);
-      white-space:nowrap;
-      background:var(--color-background);
-    }
-    /* Freeze the Size column while horizontally scrolling. */
-    .size-chart th:first-child,
-    .size-chart td:first-child {
-      position:sticky;
-      left:0;
-      min-width:68px;
-      width:68px;
-      max-width:68px;
-      font-weight:700;
-      box-shadow:1px 0 0 var(--sc-border);
-    }
-    .size-chart td:first-child {
-      z-index:2;
-      background:rgb(var(--color-foreground-rgb) / 0.02);
-    }
-    /* Top-left cell must sit above both sticky axes. */
-    .size-chart th:first-child {
-      z-index:5;
-      background:var(--sc-stone);
-    }
-    .size-chart th:not(:first-child),
-    .size-chart td:not(:first-child) { min-width:82px; }
-    .size-chart th:last-child,
-    .size-chart td:last-child { min-width:108px; }
-    .mv-size-chart-htm { padding:20px 22px 28px; display:flex; flex-direction:column; gap:16px; }
-    .mv-size-chart-image-wrap { position:relative; width:min(100%,300px); margin:0 auto; border:1px solid var(--sc-border); overflow:hidden; background:var(--color-background); }
-    .mv-size-chart-image-wrap img { width:100%; height:auto; display:block; }
-    .mv-size-chart-accordions { display:flex; flex-direction:column; gap:8px; }
-    .mv-size-chart-accordions .mv-accordion-header { width:100%; border:0; font:inherit; text-align:left; }
-    .mv-size-chart-accordions .mv-accordion-header strong { flex:1; font-size:11px; }
-    /* Scope the accordion arrow so global theme SVG rules cannot blow it up. */
-    .mv-size-chart-accordions .mv-chevron {
-      width:16px !important;
-      height:16px !important;
-      min-width:16px !important;
-      max-width:16px !important;
-      min-height:16px !important;
-      max-height:16px !important;
-      flex:0 0 16px !important;
-      display:block !important;
-      overflow:visible;
-      margin-left:auto;
-      transform-origin:50% 50%;
-    }
-    .mv-size-chart-accordions .mv-chevron polyline {
-      vector-effect:non-scaling-stroke;
-    }
-    .mv-size-chart-note { padding:10px 12px; border-left:3px solid var(--color-foreground); background:rgb(var(--color-foreground-rgb) / 0.04); color:var(--sc-muted); font-size:10.5px; line-height:1.55; }
-    @media screen and (max-width:749px) {
-      .mv-size-chart-header { padding:16px 18px 14px; }
-      .mv-size-chart-tabs { margin:12px 18px 0; }
-      .size-chart-section, .mv-size-chart-htm { padding:16px 18px 22px; }
-      .size-chart-scroll { max-height:calc(88vh - 250px); }
-      .size-chart { min-width:450px; }
-      .size-chart th, .size-chart td { padding-inline:6px; }
-      .size-chart th:not(:first-child), .size-chart td:not(:first-child) { min-width:76px; }
-      .size-chart th:last-child, .size-chart td:last-child { min-width:102px; }
-      .mv-size-chart-image-wrap { width:min(100%,280px); }
-      .mv-size-chart-unit { width:92px; }
-      .mv-size-chart-unit-slider { width:40px; }
-      .mv-size-chart-unit[data-sc-unit='in'] .mv-size-chart-unit-slider { transform:translateX(42px); }
-      .mv-size-chart-header p { display:none; }
-    }
-
   {% endstyle %}
 
   <script>
@@ -1474,6 +1312,7 @@
       const uid = {{ size_chart_uid | json }};
       const overlayId = 'mv-size-chart-overlay-' + uid;
       const drawerId = 'mv-size-chart-drawer-' + uid;
+      const controllers = window.__missvellaSizeChartControllers ||= {};
 
       function initSizeChart() {
         let drawer = document.getElementById(drawerId);
@@ -1489,6 +1328,9 @@
         if (overlay.parentElement !== document.body) document.body.appendChild(overlay);
         if (drawer.dataset.initialized === 'true') return;
         drawer.dataset.initialized = 'true';
+        controllers[uid]?.abort();
+        const controller = controllers[uid] = new AbortController();
+        const { signal } = controller;
 
         const closeBtn = drawer.querySelector('[data-size-chart-close]');
         const unit = drawer.querySelector('.mv-size-chart-unit');
@@ -1498,21 +1340,28 @@
         const tabs = drawer.querySelector('.mv-size-chart-tabs');
         const tabBtns = drawer.querySelectorAll('[data-size-chart-tab]');
         const panels = drawer.querySelectorAll('[data-size-chart-panel]');
-        const accordions = drawer.querySelectorAll('[data-sc-step]');
+        let previousFocus = null;
+        let previousOverflow = '';
 
         function open() {
+          if (drawer.classList.contains('open')) return;
+          previousFocus = document.activeElement;
+          previousOverflow = document.body.style.overflow;
           drawer.classList.add('open');
           overlay.classList.add('open');
           drawer.setAttribute('aria-hidden','false');
           overlay.setAttribute('aria-hidden','false');
           document.body.style.overflow = 'hidden';
+          closeBtn?.focus({ preventScroll: true });
         }
         function close() {
+          if (!drawer.classList.contains('open')) return;
           drawer.classList.remove('open');
           overlay.classList.remove('open');
           drawer.setAttribute('aria-hidden','true');
           overlay.setAttribute('aria-hidden','true');
-          document.body.style.overflow = '';
+          document.body.style.overflow = previousOverflow;
+          if (previousFocus instanceof HTMLElement && previousFocus.isConnected) previousFocus.focus({ preventScroll: true });
         }
         function setUnit(next) {
           const isIn = next === 'in';
@@ -1531,29 +1380,48 @@
         }
         function setTab(next) {
           tabs.dataset.scTab = next;
-          tabBtns.forEach(btn => btn.classList.toggle('active',btn.dataset.sizeChartTab === next));
-          panels.forEach(panel => panel.classList.toggle('active',panel.dataset.sizeChartPanel === next));
+          tabBtns.forEach(btn => {
+            const active = btn.dataset.sizeChartTab === next;
+            btn.classList.toggle('active', active);
+            btn.setAttribute('aria-selected', String(active));
+            btn.tabIndex = active ? 0 : -1;
+          });
+          panels.forEach(panel => {
+            const active = panel.dataset.sizeChartPanel === next;
+            panel.classList.toggle('active', active);
+            panel.hidden = !active;
+          });
+          drawer.querySelector('.mv-size-chart-body').scrollTop = 0;
         }
 
         document.addEventListener('click', function (event) {
           const target = event.target instanceof Element ? event.target.closest('[data-size-chart-trigger="' + uid + '"]') : null;
           if (target) open();
-        });
-        overlay.addEventListener('click',close);
-        closeBtn?.addEventListener('click',close);
-        unitBtns.forEach(btn => btn.addEventListener('click',() => setUnit(btn.dataset.unit)));
-        tabBtns.forEach(btn => btn.addEventListener('click',() => setTab(btn.dataset.sizeChartTab)));
-        document.addEventListener('keydown',event => { if (event.key === 'Escape' && drawer.classList.contains('open')) close(); });
+        }, { signal });
+        overlay.addEventListener('click',close, { signal });
+        closeBtn?.addEventListener('click',close, { signal });
+        unitBtns.forEach(btn => btn.addEventListener('click',() => setUnit(btn.dataset.unit), { signal }));
+        tabBtns.forEach(btn => btn.addEventListener('click',() => setTab(btn.dataset.sizeChartTab), { signal }));
+        tabs.addEventListener('keydown', event => {
+          if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+          event.preventDefault();
+          const current = Array.from(tabBtns).findIndex(btn => btn.classList.contains('active'));
+          const index = event.key === 'Home' ? 0 : event.key === 'End' ? tabBtns.length - 1 : (current + (event.key === 'ArrowRight' ? 1 : -1) + tabBtns.length) % tabBtns.length;
+          setTab(tabBtns[index].dataset.sizeChartTab);
+          tabBtns[index].focus();
+        }, { signal });
+        document.addEventListener('keydown', event => {
+          if (!drawer.classList.contains('open')) return;
+          if (event.key === 'Escape') { event.preventDefault(); close(); return; }
+          if (event.key !== 'Tab') return;
+          const focusable = Array.from(drawer.querySelectorAll('button, [tabindex="0"]')).filter(el => el.tabIndex >= 0 && el.getClientRects().length);
+          const first = focusable[0];
+          const last = focusable[focusable.length - 1];
+          if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+          else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+        }, { signal });
 
-        accordions.forEach(item => {
-          item.querySelector('.mv-accordion-header')?.addEventListener('click',() => {
-            const active = item.classList.contains('active');
-            accordions.forEach(a => a.classList.remove('active'));
-            if (!active) {
-              item.classList.add('active');
-            }
-          });
-        });
+        setUnit('in');
       }
 
       initSizeChart();

@@ -563,77 +563,11 @@
   border-radius: 6px;
   word-break: break-all;
 }
-.cs-htm-content-{{ cs_id }} {
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
-  padding: 22px 28px 28px;
-}
-.cs-htm-image-wrapper-{{ cs_id }} {
-  position: relative;
-  width: min(100%, 300px);
-  margin-inline: auto;
-  border-radius: 16px;
-  overflow: hidden;
-  background: var(--mv-pal-page);
-  border: 1px solid var(--mv-pal-border);
-  flex: 0 0 auto;
-}
-.cs-htm-image-{{ cs_id }} {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-.cs-measurement-list-{{ cs_id }} {
-  display: flex;
-  flex-direction: column;
-  gap: 0;
-  width: 100%;
-}
-.cs-measurement-step-{{ cs_id }} {
-  padding-block: 12px;
-  border-block-end: 1px solid var(--mv-pal-border);
-}
-.cs-measurement-step-{{ cs_id }}:first-child { padding-block-start: 0; }
-.cs-measurement-step-{{ cs_id }}:last-child { border-block-end: 0; }
-.cs-measurement-title-{{ cs_id }} {
-  margin: 0;
-  font-family: var(--font-body--family);
-  font-size: 10px;
-  font-weight: 500;
-  line-height: 1.5;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: var(--mv-pal-ink);
-}
-.cs-measurement-title-{{ cs_id }} span {
-  margin-inline-end: 8px;
-  color: var(--mv-pal-muted);
-}
-.cs-measurement-description-{{ cs_id }},
-.cs-htm-note-{{ cs_id }} {
-  margin: 5px 0 0;
-  font-family: var(--font-body--family);
-  font-size: 12px;
-  font-weight: 400;
-  line-height: 1.65;
-  letter-spacing: 0;
-  color: var(--mv-pal-muted);
-}
-.cs-htm-note-{{ cs_id }} {
-  margin-block-start: 12px;
-  padding-block-start: 12px;
-  border-block-start: 1px solid var(--mv-pal-border);
-  font-size: 11px;
-}
-.cs-htm-note-{{ cs_id }} p { margin: 0; }
 @media screen and (max-width: 749px) {
   .cs-modal-body-{{ cs_id }} > .cs-tab-panel-{{ cs_id }}[data-panel='form'] {
     padding: 16px 18px 20px;
   }
   .cs-form-footer-{{ cs_id }} { flex-direction: column; }
-  .cs-htm-content-{{ cs_id }} { padding: 16px 18px 20px; gap: 14px; }
-  .cs-htm-image-wrapper-{{ cs_id }} { width: min(100%, 280px); }
 }
 @keyframes cs-shake-{{ cs_id }} {
   0% { transform: translateX(0); }
@@ -1009,7 +943,6 @@
 #cs-measure-dialog-{{ cs_id }} {
   --cs-guide-secondary: var(--pi-secondary, {{ block.settings.secondary_color | default: '#9c876d' }});
   --cs-guide-line: var(--pi-border, color-mix(in srgb, var(--cs-guide-secondary) 24%, var(--mv-pal-surface)));
-  --cs-guide-wash: color-mix(in srgb, var(--cs-guide-secondary) 7%, var(--mv-pal-surface));
   --mv-pal-border: var(--cs-guide-line);
   --mv-pal-muted: var(--pi-muted, rgb(var(--color-foreground-rgb) / 0.68));
   width: min(760px, calc(100vw - 32px));
@@ -1064,66 +997,11 @@
   overscroll-behavior: contain;
   min-height: 0;
 }
-#cs-measure-dialog-{{ cs_id }} .cs-htm-content-{{ cs_id }} {
-  display: grid;
-  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1fr);
-  align-items: start;
-  gap: 20px;
-  padding: 20px;
-}
-#cs-measure-dialog-{{ cs_id }} .cs-htm-image-wrapper-{{ cs_id }} {
-  width: min(100%, 300px);
-  border: 0;
-  border-radius: 0;
-  background: var(--cs-guide-wash);
-  box-shadow: none;
-}
-#cs-measure-dialog-{{ cs_id }} .cs-htm-image-{{ cs_id }},
-#cs-measure-dialog-{{ cs_id }} .measurement-guide-illustration__image { mix-blend-mode: multiply; }
-#cs-measure-dialog-{{ cs_id }} .cs-measurement-step-{{ cs_id }} { padding-block: 9px; }
-#cs-measure-dialog-{{ cs_id }} .cs-measurement-step-{{ cs_id }}:first-child { padding-block-start: 0; }
-#cs-measure-dialog-{{ cs_id }} .cs-measurement-title-{{ cs_id }} {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--mv-pal-accent);
-  letter-spacing: 0.1em;
-  line-height: 1.3;
-}
-#cs-measure-dialog-{{ cs_id }} .cs-measurement-title-{{ cs_id }} span {
-  display: inline-grid;
-  place-items: center;
-  width: 18px;
-  height: 18px;
-  margin: 0;
-  flex: 0 0 18px;
-  background: var(--mv-pal-accent);
-  color: var(--pi-on-accent, var(--mv-pal-surface));
-  font-size: 10px;
-  letter-spacing: 0;
-}
-#cs-measure-dialog-{{ cs_id }} .cs-measurement-description-{{ cs_id }} {
-  margin: 4px 0 0 26px;
-  font-size: 12px;
-  line-height: 1.45;
-}
-#cs-measure-dialog-{{ cs_id }} .cs-htm-note-{{ cs_id }} {
-  padding: 10px 12px;
-  margin-block-start: 8px;
-  border: 0;
-  border-inline-start: 1px solid var(--cs-guide-secondary);
-  background: var(--cs-guide-wash);
-  line-height: 1.5;
-}
+#cs-measure-dialog-{{ cs_id }} .mv-measurement-guide { padding: 20px; }
 @media screen and (max-width: 549px) {
   .cs-measure-dialog-header-{{ cs_id }} { padding: 6px 16px; }
   .cs-measure-dialog-header-{{ cs_id }} h2 { font-size: 21px; }
-  #cs-measure-dialog-{{ cs_id }} .cs-htm-content-{{ cs_id }} {
-    grid-template-columns: minmax(0, 1fr);
-    gap: 16px;
-    padding: 16px;
-  }
-  #cs-measure-dialog-{{ cs_id }} .cs-htm-image-wrapper-{{ cs_id }} { max-width: 250px; }
+  #cs-measure-dialog-{{ cs_id }} .mv-measurement-guide { padding: 16px; }
 }
 @media screen and (max-width: 374px) {
   #cs-modal-{{ cs_id }}.cs-inline .cs-tabs-nav-{{ cs_id }} {
@@ -1277,37 +1155,7 @@
     </div>
 
     <div class="cs-tab-panel-{{ cs_id }}" data-panel="htm">
-      <div class="cs-htm-content-{{ cs_id }}">
-        <div class="cs-htm-image-wrapper-{{ cs_id }}">
-          {%- if block.settings.htm_image != blank -%}
-            <img
-              src="{{ block.settings.htm_image | image_url: width: 600 }}"
-              alt="How to Measure"
-              class="cs-htm-image-{{ cs_id }}"
-              width="{{ block.settings.htm_image.width | at_most: 600 }}"
-              height="{{ block.settings.htm_image.height | times: 600 | divided_by: block.settings.htm_image.width }}"
-              loading="lazy"
-            >
-          {%- else -%}
-            {% render 'measurement-guide-image' %}
-          {%- endif -%}
-        </div>
-        <div>
-          <div class="cs-measurement-list-{{ cs_id }}">
-            {%- assign htm_fields = "1|Bust|Measure around the fullest part of your bust~2|Waist|Measure around the narrowest part of your natural waistline~3|Hips|Measure around the fullest part of your hips, about 8 inches below your waist~4|Hollow to Floor|Measure from the hollow at the base of your throat to the floor~5|Height|Stand straight and measure from the top of your head to the floor" | split: "~" -%}
-            {%- for hf in htm_fields -%}
-              {%- assign hfparts = hf | split: "|" -%}
-              <section class="cs-measurement-step-{{ cs_id }}">
-                <h3 class="cs-measurement-title-{{ cs_id }}"><span>{{ hfparts[0] }}</span>{{ hfparts[1] }}</h3>
-                <p class="cs-measurement-description-{{ cs_id }}">{{ hfparts[2] }}</p>
-              </section>
-            {%- endfor -%}
-          </div>
-          {%- if block.settings.htm_note != blank -%}
-            <div class="cs-htm-note-{{ cs_id }}">{{ block.settings.htm_note }}</div>
-          {%- endif -%}
-        </div>
-      </div>
+      {% render 'measurement-guide-content', image: block.settings.htm_image, note: block.settings.htm_note %}
     </div>
   </div>
 </div>
