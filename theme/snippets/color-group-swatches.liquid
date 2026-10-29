@@ -110,12 +110,7 @@
       --color-group-card-gap-mobile: {{ group_gap_mobile }}px;
     "
   >
-    <legend class="color-group__label">
-      <span class="color-group__label-text">{{ group_title }}</span>
-      {%- if current_color_label != blank -%}
-        <span class="color-group__current">{{ current_color_label }}</span>
-      {%- endif -%}
-    </legend>
+    {% render 'color-option-heading', label: group_title, value: current_color_label %}
 
     <ul class="color-group__list" role="list">
       {%- for member in group_members -%}

@@ -430,6 +430,9 @@
             ref="fieldsets[]"
             {{ option_id_attribute }}
           >
+            {%- if is_color_option and variant_style == 'swatch' -%}
+              {% render 'color-option-heading', label: product_option.name, value: product_option.selected_value %}
+            {%- else -%}
             <legend{% if is_size_option %} class="mv-size-legend"{% endif %}>
               {%- if is_size_option -%}
                 <span class="mv-size-legend-row">
@@ -449,15 +452,11 @@
                   </button>
                   {%- endif -%}
                 </span>
-                {%- elsif is_color_option and variant_style == 'swatch' -%}
-                <span class="mv-color-legend-row">
-                  <span>{{ product_option.name | escape }}</span>
-                  <span class="mv-color-legend-value">{{ product_option.selected_value }}</span>
-                </span>
                 {%- else -%}
                 {{ product_option.name | escape -}}
                 {%- endif -%}
                 </legend>
+            {%- endif -%}
             {%- assign plus_size_render_started = false -%}
             {%- for product_option_value in product_option.values -%}
               {%- assign current_option_value_name = product_option_value.name | strip | downcase -%}
@@ -748,42 +747,6 @@
     variant-picker[data-block-id='{{ block.id }}']
       .variant-option__button-label--custom-size-placeholder {
       display: none !important;
-    }
-
-    /* Option legend = quiet functional label (spec: 9-11px / 500 / tracked
-       uppercase, muted). flex-basis 100% keeps it on its own line above the
-       swatch row. The selected color name rides the same line, right after
-       the "COLOR" word ("COLOR IVORY") — not beside the swatch. */
-    variant-picker[data-block-id='{{ block.id }}']
-      .variant-option[data-mv-option-kind='color'] > legend {
-    flex-basis: 100%;
-    margin-block-end: 8px;
-    line-height: 1.25;
-    font-family: var(--font-body--family);
-    font-size: 11px;
-    font-weight: 500;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--color-foreground-muted, rgb(var(--color-foreground-rgb) / 0.55));
-    }
-
-    variant-picker[data-block-id='{{ block.id }}']
-      .variant-option[data-mv-option-kind='color'] .mv-color-legend-row {
-    display: inline-flex;
-    align-items: baseline;
-    gap: 8px;
-    }
-
-    /* Selected color name inside the legend: regular weight, full foreground,
-       so it reads as the current value next to the muted label. */
-    variant-picker[data-block-id='{{ block.id }}']
-      .variant-option[data-mv-option-kind='color'] .mv-color-legend-value {
-    font-size: 12px;
-    font-weight: 400;
-    letter-spacing: 0.02em;
-    text-transform: uppercase;
-    white-space: nowrap;
-    color: var(--variant-option-label-color, var(--color-foreground));
     }
 
     /* Square color swatch + selection ring geometry lives in the shared
