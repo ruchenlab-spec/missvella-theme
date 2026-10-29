@@ -1,5 +1,6 @@
 {%- doc -%}
   Lucide fit preference icons: https://lucide.dev (shirt, ruler).
+  Adapted to straight segments, a V neckline and square ruler corners.
   @param {string} icon - Either shirt (standard sizing) or ruler (custom fit).
 {%- enddoc -%}
 <!--
@@ -17,12 +18,12 @@
   ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF
   OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 -->
-<svg class="mv-fit-tab__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+<svg class="mv-fit-tab__icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="butt" stroke-linejoin="miter" aria-hidden="true" focusable="false">
   {%- case icon -%}
     {%- when 'shirt' -%}
-      <path d="M20.38 3.46 16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"/>
+      <path d="M8 3H6L2 6l3 5 2-1v11h10V10l2 1 3-5-4-3h-2l-4 4Z"/>
     {%- when 'ruler' -%}
-      <path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z"/>
+      <path d="m3 7 4-4 14 14-4 4Z"/>
       <path d="m14.5 12.5 2-2"/>
       <path d="m11.5 9.5 2-2"/>
       <path d="m8.5 6.5 2-2"/>
