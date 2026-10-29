@@ -7,7 +7,7 @@
   Appearance is controlled from the variant picker block settings and passed
   in as CSS custom properties:
   --color-group-columns-desktop/-mobile, --color-group-card-gap-desktop/-mobile,
-  --color-group-card-radius, --color-group-tooltip-shadow.
+  --color-group-card-radius.
   The selected style is applied through `data-selected-style` on the fieldset.
   The display style (image cards vs. small colour blocks) is applied through
   `data-display-style`.
@@ -54,7 +54,6 @@
     --color-group-card-radius: 0px;
     --color-group-card-ratio: 4 / 5;
     --color-group-grid: repeat(var(--color-group-columns), minmax(0, 1fr));
-    --color-group-tooltip-shadow: none;
 
     border: none;
     padding: 0;
@@ -206,7 +205,7 @@
     pointer-events: none;
     opacity: 0;
     transform: translate(-50%, 4px);
-    box-shadow: var(--color-group-tooltip-shadow);
+    box-shadow: none;
     transition:
       opacity 0.18s ease,
       transform 0.18s ease;

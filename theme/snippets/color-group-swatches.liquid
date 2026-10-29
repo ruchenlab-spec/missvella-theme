@@ -14,7 +14,6 @@
   @param {number} [columns_mobile] - Cards/swatches per row on mobile.
   @param {number} [card_radius] - Card corner radius in pixels.
   @param {string} [selected_style] - Selected swatch style.
-  @param {boolean} [tooltip_shadow] - Whether the tooltip gets a shadow.
 
   @example
   {% render 'color-group-swatches', product_resource: product, current_product: product %}
@@ -109,7 +108,6 @@
       --color-group-card-radius: {{ group_card_radius }}px;
       --color-group-card-gap-desktop: {{ group_gap_desktop }}px;
       --color-group-card-gap-mobile: {{ group_gap_mobile }}px;
-      {% if tooltip_shadow %}--color-group-tooltip-shadow: 0 8px 20px rgb(var(--color-foreground-rgb) / 0.24);{% else %}--color-group-tooltip-shadow: none;{% endif %}
     "
   >
     <legend class="color-group__label">
