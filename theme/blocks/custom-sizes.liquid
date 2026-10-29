@@ -819,6 +819,52 @@
     padding: 16px;
   }
 }
+/* With fit tabs, the measurement editor lives directly below Custom Fit. */
+.cs-block-{{ cs_id }}.has-inline-form .cs-guide-{{ cs_id }} {
+  display: none;
+}
+#cs-modal-{{ cs_id }}.cs-inline {
+  display: none;
+  position: static;
+  inset: auto;
+  width: 100%;
+  height: auto;
+  max-height: none;
+  margin-block-start: 12px;
+  border: 1px solid var(--mv-pal-border);
+  border-radius: 0;
+  box-shadow: none;
+  transform: none;
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transition: none;
+  will-change: auto;
+}
+#cs-modal-{{ cs_id }}.cs-inline.active { display: flex; }
+#cs-modal-{{ cs_id }}.cs-inline::before,
+#cs-modal-{{ cs_id }}.cs-inline .mv-modal-close { display: none; }
+#cs-modal-{{ cs_id }}.cs-inline .cs-modal-body-{{ cs_id }} {
+  overflow: visible;
+  flex: none;
+}
+#cs-modal-{{ cs_id }}.cs-inline .cs-modal-header-{{ cs_id }} {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 18px;
+}
+#cs-modal-{{ cs_id }}.cs-inline .cs-modal-title-{{ cs_id }} { font-size: 18px; }
+#cs-modal-{{ cs_id }}.cs-inline .cs-modal-kicker-{{ cs_id }} { display: none; }
+#cs-modal-{{ cs_id }}.cs-inline .cs-tabs-nav-{{ cs_id }} { margin: 0 18px; }
+#cs-modal-{{ cs_id }}.cs-inline .cs-tab-panel-{{ cs_id }}[data-panel='form'] {
+  padding: 18px;
+}
+#cs-modal-{{ cs_id }}.cs-inline .cs-btn-confirm-{{ cs_id }} {
+  background: var(--mv-pal-accent);
+  box-shadow: none;
+}
 {% endstyle %}
 
 <custom-sizes-{{ cs_id }} class="custom-sizes-block" {{ block.shopify_attributes }}>
@@ -925,13 +971,14 @@
           {%- assign parts = field | split: "|" -%}
           <div class="cs-form-group-{{ cs_id }}">
             <div class="cs-form-label-row-{{ cs_id }}">
-              <label class="cs-form-label-{{ cs_id }}">{{ parts[1] }}</label>
+              <label class="cs-form-label-{{ cs_id }}" for="cs-input-{{ cs_id }}-{{ parts[0] }}">{{ parts[1] }}</label>
               {%- unless parts[4] == 'true' -%}
                 <span class="cs-optional-tag-{{ cs_id }}">optional</span>
               {%- endunless -%}
             </div>
             <div class="cs-input-wrap-{{ cs_id }}">
               <input type="number" step="0.1" min="0"
+                id="cs-input-{{ cs_id }}-{{ parts[0] }}"
                 class="mv-input{% unless parts[4] == 'true' %} optional{% endunless %}"
                 data-key="{{ parts[0] }}"
                 data-cm="{{ parts[2] }}" data-inch="{{ parts[3] }}"
@@ -1116,11 +1163,19 @@
       return;
     }
 
-    // Keep the visual block in its Theme Editor position. Only the modal/overlay
-    // are portaled to <body>; moving the block inside <variant-picker> would make
-    // Horizon's morph() remove it on the next option change.
+    // Keep the inline editor outside the picker so variant morphs preserve drafts.
+    // Products without fit tabs retain the standalone measurement dialog.
+    const usesInlineForm = !!fitScope()?.querySelector('[data-mv-fit-tab="custom"]');
     if (!overlay.isConnected || overlay.parentElement !== document.body) document.body.appendChild(overlay);
-    if (!modal.isConnected || modal.parentElement !== document.body) document.body.appendChild(modal);
+    if (usesInlineForm) {
+      block.classList.add('has-inline-form');
+      modal.classList.add('cs-inline');
+      modal.setAttribute('role', 'region');
+      modal.setAttribute('aria-label', 'Custom measurements');
+      block.appendChild(modal);
+    } else if (!modal.isConnected || modal.parentElement !== document.body) {
+      document.body.appendChild(modal);
+    }
 
     const inputs    = modal.querySelectorAll('[data-key]');
     const tabBtns   = modal.querySelectorAll('[data-tab]');
@@ -1135,7 +1190,7 @@
       if (typeof mutator !== 'function') return;
       const isMobile = window.matchMedia('(max-width: 749px)').matches;
       const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      if (!isMobile || reduceMotion || !modal.classList.contains('active')) {
+      if (usesInlineForm || !isMobile || reduceMotion || !modal.classList.contains('active')) {
         mutator();
         return;
       }
@@ -1257,9 +1312,11 @@
     }
 
     function openModal() {
-      overlay.classList.add('active');
+      if (!usesInlineForm) {
+        overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
       modal.classList.add('active');
-      document.body.style.overflow = 'hidden';
       if (savedData) {
         inputs.forEach(inp => {
           if (savedData[inp.dataset.key] !== undefined) inp.value = savedData[inp.dataset.key];
@@ -1271,7 +1328,7 @@
     function closeModal() {
       overlay.classList.remove('active');
       modal.classList.remove('active');
-      document.body.style.overflow = '';
+      if (!usesInlineForm) document.body.style.overflow = '';
     }
 
     function expandSummary() {
@@ -1377,6 +1434,7 @@
       block.classList.remove('has-data');
       removePropertyInputs();
       if (switchVariant) syncNativeSizeVariant(false);
+      if (usesInlineForm) openModal();
     }
 
     trigger.addEventListener('click', () => {
@@ -1607,9 +1665,11 @@
       if (detail.productId && String(detail.productId) !== String(PRODUCT_ID)) return;
       const mode = detail.mode;
       if (mode === 'custom') {
+        if (usesInlineForm) openModal();
         if (savedData && isChecked) syncProperty();
         syncNativeSizeVariant(true);
       } else if (mode === 'standard') {
+        if (usesInlineForm) closeModal();
         removePropertyInputs();
         syncNativeSizeVariant(false);
       }
@@ -1654,6 +1714,7 @@
           event.preventDefault();
           event.stopPropagation();
           showFitError('Please enter your measurements before adding to bag.');
+          if (usesInlineForm) openModal();
           return;
         }
         if (!isChecked) {
@@ -1686,13 +1747,14 @@
     };
 
     REGISTRY.keydown = (event) => {
-      if (event.key === 'Escape') closeModal();
+      if (event.key === 'Escape' && !usesInlineForm) closeModal();
     };
 
     document.addEventListener('mv:fit-mode', REGISTRY.fitMode);
     document.addEventListener('submit', REGISTRY.submit, true);
     document.addEventListener('change', REGISTRY.change, true);
     document.addEventListener('keydown', REGISTRY.keydown);
+    if (usesInlineForm && currentFitMode() === 'custom') openModal();
   }
 
   if (document.readyState === 'loading') {
