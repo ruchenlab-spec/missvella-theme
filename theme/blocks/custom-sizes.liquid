@@ -878,6 +878,7 @@
 }
 #cs-modal-{{ cs_id }}.cs-inline .cs-tab-btn-{{ cs_id }} {
   flex: none;
+  gap: 5px;
   min-height: 42px;
   padding: 0;
   border-block-end-width: 1px;
@@ -887,7 +888,14 @@
   letter-spacing: 0.08em;
   white-space: nowrap;
 }
-#cs-modal-{{ cs_id }}.cs-inline .cs-tab-btn-{{ cs_id }} svg { display: none; }
+#cs-modal-{{ cs_id }}.cs-inline .cs-tab-btn-{{ cs_id }} svg {
+  display: block;
+  width: 12px;
+  height: 12px;
+  flex: 0 0 12px;
+  fill: currentColor;
+  stroke: none;
+}
 #cs-modal-{{ cs_id }}.cs-inline .cs-unit-toggle-{{ cs_id }} {
   margin-inline-start: auto;
   padding: 0;
@@ -1225,16 +1233,12 @@
 
   <div class="cs-tabs-nav-{{ cs_id }}" data-active-tab="form">
     <button type="button" class="cs-tab-btn-{{ cs_id }} active" data-tab="form">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-        <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
-      </svg>
-      Enter Measurements
+      {% render 'mv-fit-icon', icon: 'clipboard-text' %}
+      <span data-cs-form-label>Enter Measurements</span>
     </button>
     <button type="button" class="cs-tab-btn-{{ cs_id }}" data-tab="htm" aria-haspopup="dialog" aria-controls="cs-measure-dialog-{{ cs_id }}">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
-        <path d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
-      </svg>
-      How to Measure
+      {% render 'mv-fit-icon', icon: 'magnifying-glass' %}
+      <span>How to Measure</span>
     </button>
   </div>
 
@@ -1426,8 +1430,8 @@
     const unitBtns  = modal.querySelectorAll('[data-cs-unit]');
     const tabsNav   = modal.querySelector('.cs-tabs-nav-' + id);
     if (usesInlineForm && tabsNav) {
-      const formTab = tabsNav.querySelector('[data-tab="form"]');
-      if (formTab) formTab.textContent = 'Measurements';
+      const formLabel = tabsNav.querySelector('[data-cs-form-label]');
+      if (formLabel) formLabel.textContent = 'Measurements';
       tabsNav.appendChild(unit);
     }
     // Native dialog keeps the guide outside document flow and traps focus.
