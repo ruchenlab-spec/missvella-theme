@@ -141,7 +141,14 @@
   box-sizing: border-box;
 }
 .cs-block-{{ cs_id }}.has-data .cs-summary-{{ cs_id }} { display: flex; }
-.cs-summary-footer-{{ cs_id }} { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.cs-summary-footer-{{ cs_id }} {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-block-start: 1px solid var(--mv-pal-border);
+  padding-block-start: 10px;
+}
 .cs-summary-status-{{ cs_id }} {
   display: inline-flex;
   align-items: center;
@@ -174,8 +181,16 @@
   line-height: 1.5;
 }
 .cs-summary-values-{{ cs_id }} > div { display: flex; align-items: baseline; justify-content: space-between; gap: 6px; min-width: 0; }
+.cs-summary-values-{{ cs_id }} > div::after {
+  content: '';
+  order: 1;
+  flex: 1 1 8px;
+  min-width: 8px;
+  align-self: center;
+  border-block-end: 1px dashed var(--mv-pal-border);
+}
 .cs-summary-values-{{ cs_id }} dt { color: var(--mv-pal-muted); font-size: 10px; font-weight: 400; }
-.cs-summary-values-{{ cs_id }} dd { margin: 0; flex-shrink: 0; color: var(--mv-pal-ink); font-variant-numeric: tabular-nums; }
+.cs-summary-values-{{ cs_id }} dd { order: 2; margin: 0; flex-shrink: 0; color: var(--mv-pal-ink); font-variant-numeric: tabular-nums; }
 .cs-btn-edit-{{ cs_id }},
 .cs-btn-cancel-{{ cs_id }} {
   min-height: 30px;
@@ -474,38 +489,6 @@
 }
 .cs-btn-ghost-{{ cs_id }}:hover { border-color: var(--mv-pal-accent); color: var(--mv-pal-accent); }
 
-/* Review step */
-.cs-review-{{ cs_id }} { display: none; }
-.cs-review-{{ cs_id }}.on { display: block; }
-.cs-review-tag-{{ cs_id }} {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  padding: 13px 4px;
-  border-bottom: 1px dashed var(--mv-pal-border);
-  font-size: 13px;
-}
-.cs-review-tag-{{ cs_id }} .k { color: var(--mv-pal-muted); }
-.cs-review-tag-{{ cs_id }} .v { font-weight: 600; }
-.cs-cart-line-{{ cs_id }} {
-  margin-top: 20px;
-  padding: 14px 18px;
-  border-radius: 14px;
-  background: var(--mv-pal-page);
-  border: 1px dashed var(--mv-pal-gold);
-  font-size: 12px;
-  color: var(--mv-pal-muted);
-  line-height: 1.8;
-}
-.cs-cart-line-{{ cs_id }} code {
-  font-family: 'SF Mono', Consolas, monospace;
-  font-size: 11px;
-  color: var(--mv-pal-accent);
-  background: rgb(var(--mv-pal-accent-rgb) / 7%);
-  padding: 2px 6px;
-  border-radius: 6px;
-  word-break: break-all;
-}
 @media screen and (max-width: 749px) {
   .cs-modal-body-{{ cs_id }} > .cs-tab-panel-{{ cs_id }}[data-panel='form'] {
     padding: 16px 18px 20px;
@@ -801,19 +784,6 @@
   text-underline-offset: 3px;
 }
 #cs-modal-{{ cs_id }}.cs-inline button:hover { transform: none; }
-#cs-modal-{{ cs_id }}.cs-inline .cs-review-{{ cs_id }} { padding: 16px; }
-#cs-modal-{{ cs_id }}.cs-inline .cs-review-tag-{{ cs_id }} {
-  padding: 10px 0;
-  font-size: 12px;
-}
-#cs-modal-{{ cs_id }}.cs-inline .cs-cart-line-{{ cs_id }} {
-  padding: 12px 0 0;
-  margin: 0;
-  border: 0;
-  border-radius: 0;
-  background: transparent;
-  font-size: 11px;
-}
 .cs-block-{{ cs_id }}.has-inline-form .cs-summary-{{ cs_id }} {
   margin: 0;
   border-color: var(--pi-border, #d8d3ca);
@@ -1000,21 +970,7 @@
       </div>
       <div class="cs-form-footer-{{ cs_id }}">
         <button type="button" class="cs-btn-ghost-{{ cs_id }}" id="cs-clear-{{ cs_id }}">Clear</button>
-        <button type="button" class="cs-btn-confirm-{{ cs_id }}" id="cs-next-{{ cs_id }}">Continue to Review →</button>
-      </div>
-    </div>
-
-    <div class="cs-tab-panel-{{ cs_id }}" data-panel="review">
-      <div class="cs-review-{{ cs_id }} on" id="cs-review-{{ cs_id }}">
-        <div id="cs-review-tags-{{ cs_id }}"></div>
-        <div class="cs-cart-line-{{ cs_id }}">
-          Your measurements will be included with this item.
-          <span id="cs-propval-{{ cs_id }}" hidden></span>
-        </div>
-        <div class="cs-form-footer-{{ cs_id }}">
-          <button type="button" class="cs-btn-ghost-{{ cs_id }}" id="cs-back-{{ cs_id }}">← Back</button>
-          <button type="button" class="cs-btn-confirm-{{ cs_id }}" id="cs-confirm-{{ cs_id }}">Confirm &amp; Keep</button>
-        </div>
+        <button type="button" class="cs-btn-confirm-{{ cs_id }}" id="cs-confirm-{{ cs_id }}">Save Measurements</button>
       </div>
     </div>
 
@@ -1095,16 +1051,12 @@
     const closeBtn  = document.getElementById('cs-close-' + id);
     const unit      = document.getElementById('cs-unit-' + id);
     const clearBtn  = document.getElementById('cs-clear-' + id);
-    const nextBtn    = document.getElementById('cs-next-' + id);
-    const backBtn    = document.getElementById('cs-back-' + id);
     const confirmBtn = document.getElementById('cs-confirm-' + id);
-    const reviewTags = document.getElementById('cs-review-tags-' + id);
-    const propVal    = document.getElementById('cs-propval-' + id);
     const editBtn   = document.getElementById('cs-edit-' + id);
     const cancelBtn = document.getElementById('cs-cancel-' + id);
     const summaryValues = document.getElementById('cs-summary-values-' + id);
 
-    if (!overlay || !modal || !measureDialog || !trigger || !closeBtn || !unit || !nextBtn || !backBtn || !confirmBtn || !clearBtn || !editBtn || !cancelBtn) {
+    if (!overlay || !modal || !measureDialog || !trigger || !closeBtn || !unit || !confirmBtn || !clearBtn || !editBtn || !cancelBtn) {
       return;
     }
 
@@ -1217,7 +1169,6 @@
 
     let currentUnit = 'inch';
     let savedData   = null;
-    let pendingData = null;
     let lastStandardSize = null;
 
     const fieldMeta = {
@@ -1407,7 +1358,6 @@
     function resetCustomSizeState(options = {}) {
       const { clearInputs = true, switchVariant = false } = options;
       savedData = null;
-      pendingData = null;
       summaryValues?.replaceChildren();
       if (clearInputs) inputs.forEach(inp => inp.value = '');
       block.classList.remove('has-data');
@@ -1524,35 +1474,11 @@
       return valid ? data : null;
     }
 
-    function propStringOf(data) {
-      const u = data._unit === 'cm' ? 'cm' : 'in';
-      return Object.entries(fieldMeta).filter(([k]) => data[k] !== undefined)
-        .map(([k, m]) => m.label + ' ' + data[k] + u).join(' / ');
-    }
-
-    function showReview(data) {
-      if (reviewTags) {
-        reviewTags.innerHTML = Object.entries(fieldMeta).filter(([k]) => data[k] !== undefined)
-          .map(([k, m]) => '<div class="cs-review-tag-' + id + '"><span class="k">' + m.label + '</span><span class="v">' + data[k] + ' ' + (data._unit === 'cm' ? 'cm' : 'in') + '</span></div>').join('');
-      }
-      if (propVal) propVal.textContent = propStringOf(data);
-      tabPanels.forEach(p => p.classList.toggle('active', p.dataset.panel === 'review'));
-      setActiveTabIndicator('form');
-    }
-
-    nextBtn.addEventListener('click', () => {
+    confirmBtn.addEventListener('click', () => {
       const data = validateAndCollect();
       if (!data) return;
       data._unit = currentUnit;
-      pendingData = data;
-      showReview(data);
-    });
-
-    backBtn.addEventListener('click', () => switchTab('form'));
-
-    confirmBtn.addEventListener('click', () => {
-      if (!pendingData) return;
-      savedData = pendingData;
+      savedData = data;
 
       showSummary();
       syncProperty();
