@@ -82,15 +82,19 @@
   {% if s.hover_effect %}
     @media (hover: hover) {
       #icon-features-{{ section.id }} a.icon-features__item-inner:hover {
-        background: #e4e0d9;
-        border-color: #c9c5be;
-        box-shadow: 0 8px 24px rgb(0 0 0 / 0.055);
+        background: color-mix(in srgb, var(--if-card-bg), var(--if-title) 3%);
+        border-color: color-mix(in srgb, var(--if-card-border), var(--if-title) 12%);
       }
     }
   {% endif %}
 
+  #icon-features-{{ section.id }} a.icon-features__item-inner:focus-visible {
+    outline: 2px solid var(--if-title);
+    outline-offset: 4px;
+  }
+
   #icon-features-{{ section.id }} .icon-features__icon-box {
-    flex: 0 0 var(--if-icon-box-size);
+    flex: 0 0 auto;
     width: var(--if-icon-box-size);
     height: var(--if-icon-box-size);
     display: grid;
@@ -100,6 +104,11 @@
     border: 1px solid var(--if-card-border);
     border-radius: var(--if-icon-radius);
     overflow: hidden;
+    {% if s.minimal_icons %}
+      background: transparent;
+      border: 0;
+      border-radius: 0;
+    {% endif %}
   }
 
   #icon-features-{{ section.id }} .icon-features__icon {
@@ -119,10 +128,14 @@
   }
 
   #icon-features-{{ section.id }} .icon-features__icon > svg,
-  #icon-features-{{ section.id }} .icon-features__icon .custom-svg svg {
+  #icon-features-{{ section.id }} .icon-features__icon .custom-svg svg:not([fill]) {
     width: 100%;
     height: 100%;
     color: inherit;
+  }
+
+  #icon-features-{{ section.id }} .icon-features__icon .custom-svg svg {
+    fill: currentColor;
   }
 
   #icon-features-{{ section.id }} .icon-features__icon .custom-svg :is(path, circle, rect, line, polyline, polygon, ellipse) {
@@ -135,26 +148,31 @@
 
   #icon-features-{{ section.id }} .icon-features__text {
     min-width: 0;
-    flex: 1;
+    flex: 1 1 auto;
+    overflow-wrap: anywhere;
   }
 
   #icon-features-{{ section.id }} .icon-features__title {
     margin: 0;
     color: var(--if-title);
-    font-family: var(--font-body--family, inherit);
+    font-family: var(--font-{{ s.title_font | default: 'heading' }}--family);
+    font-style: var(--font-{{ s.title_font | default: 'heading' }}--style);
     font-size: {{ s.title_size }}px;
-    line-height: 1.25;
+    line-height: 1.35;
     font-weight: {{ s.title_weight }};
-    letter-spacing: .01em;
+    letter-spacing: .015em;
+    text-wrap: balance;
   }
 
   #icon-features-{{ section.id }} .icon-features__desc {
     margin: {{ s.title_desc_gap }}px 0 0;
     color: var(--if-desc);
-    font-family: var(--font-body--family, inherit);
+    font-family: var(--font-body--family);
+    font-style: var(--font-body--style);
     font-size: {{ s.desc_size }}px;
-    line-height: 1.45;
-    font-weight: 400;
+    line-height: 1.65;
+    font-weight: var(--font-body--weight, 400);
+    letter-spacing: .01em;
   }
 
   @media screen and (max-width: 749px) {
@@ -214,6 +232,7 @@
     <div class="icon-features__inner">
       <ul class="icon-features__grid" role="list">
         {%- for block in section.blocks -%}
+          {%- assign builtin_icon = block.settings.builtin_icon | default: 'custom' -%}
           <li class="icon-features__item" {{ block.shopify_attributes }}>
             {%- if block.settings.link != blank -%}
               <a class="icon-features__item-inner" href="{{ block.settings.link }}">
@@ -221,10 +240,12 @@
               <div class="icon-features__item-inner">
             {%- endif -%}
 
-              {%- if block.settings.icon_svg != blank or block.settings.icon_image != blank -%}
+              {%- if builtin_icon != 'custom' or block.settings.icon_svg != blank or block.settings.icon_image != blank -%}
                 <div class="icon-features__icon-box" aria-hidden="true">
                   <div class="icon-features__icon">
-                    {%- if block.settings.icon_svg != blank -%}
+                    {%- if builtin_icon != 'custom' -%}
+                      {% render 'mv-feature-icon', icon: builtin_icon %}
+                    {%- elsif block.settings.icon_svg != blank -%}
                       <span class="custom-svg">{{ block.settings.icon_svg }}</span>
                     {%- elsif block.settings.icon_image != blank -%}
                       {{
@@ -309,6 +330,7 @@
     { "type": "checkbox", "id": "hover_effect", "label": "Enable linked-card hover effect", "default": true },
 
     { "type": "header", "content": "Icons" },
+    { "type": "checkbox", "id": "minimal_icons", "label": "Minimal icons (no box background or border)", "default": true },
     { "type": "range", "id": "icon_box_size", "label": "Icon box size", "min": 28, "max": 88, "step": 2, "unit": "px", "default": 44 },
     { "type": "range", "id": "icon_size", "label": "Icon size", "min": 16, "max": 64, "step": 2, "unit": "px", "default": 24 },
     { "type": "color", "id": "icon_bg", "label": "Icon box background", "default": "#FFFFFF" },
@@ -317,10 +339,14 @@
     { "type": "range", "id": "icon_gap", "label": "Icon/text gap", "min": 4, "max": 32, "step": 2, "unit": "px", "default": 12 },
 
     { "type": "header", "content": "Text" },
-    { "type": "range", "id": "title_size", "label": "Title size", "min": 10, "max": 28, "step": 1, "unit": "px", "default": 14 },
-    { "type": "range", "id": "title_weight", "label": "Title weight", "min": 400, "max": 700, "step": 100, "default": 600 },
+    { "type": "select", "id": "title_font", "label": "Title font", "options": [
+      { "value": "heading", "label": "Theme heading" },
+      { "value": "body", "label": "Theme body" }
+    ], "default": "heading" },
+    { "type": "range", "id": "title_size", "label": "Title size", "min": 10, "max": 28, "step": 1, "unit": "px", "default": 18 },
+    { "type": "range", "id": "title_weight", "label": "Title weight", "min": 400, "max": 700, "step": 100, "default": 400 },
     { "type": "color", "id": "title_color", "label": "Title color", "default": "#000000" },
-    { "type": "range", "id": "desc_size", "label": "Description size", "min": 10, "max": 22, "step": 1, "unit": "px", "default": 12 },
+    { "type": "range", "id": "desc_size", "label": "Description size", "min": 10, "max": 22, "step": 1, "unit": "px", "default": 13 },
     { "type": "color", "id": "desc_color", "label": "Description color", "default": "#6C6A67" },
     { "type": "range", "id": "title_desc_gap", "label": "Title/description gap", "min": 0, "max": 20, "step": 1, "unit": "px", "default": 4 },
 
@@ -358,6 +384,13 @@
       "type": "feature",
       "name": "Feature",
       "settings": [
+        { "type": "select", "id": "builtin_icon", "label": "Icon", "options": [
+          { "value": "custom", "label": "Custom SVG / image" },
+          { "value": "fit", "label": "Measuring tape / fit" },
+          { "value": "palette", "label": "Palette / colors" },
+          { "value": "dress", "label": "Dress / made to order" },
+          { "value": "returns", "label": "Returns" }
+        ], "default": "custom", "info": "Built-in icons share the same fine-line style. Custom SVG and image are kept when switching icons." },
         { "type": "image_picker", "id": "icon_image", "label": "Custom icon image" },
         { "type": "textarea", "id": "icon_svg", "label": "Custom SVG code", "info": "Optional. If filled, SVG code is used instead of the image." },
         { "type": "text", "id": "title", "label": "Title", "default": "Feature title" },

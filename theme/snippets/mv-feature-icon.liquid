@@ -1,0 +1,23 @@
+{%- doc -%}
+  Missvella feature icons, drawn on a shared 32px grid.
+  @param {string} icon - fit, palette, dress or returns.
+{%- enddoc -%}
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.25" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+  {%- case icon -%}
+    {%- when 'fit' -%}
+      <ellipse cx="13" cy="9" rx="8" ry="4"/>
+      <ellipse cx="13" cy="9" rx="2.5" ry="1.25"/>
+      <path d="M5 9v12c0 3.3 4.9 6 11 6h9a2 2 0 0 0 2-2V15a2 2 0 0 0-2-2H13m8-4v4M5 16c0 2.2 3.6 4 8 4h14M11 20v3m5-3v4m5-4v3"/>
+    {%- when 'palette' -%}
+      <path d="M17 4a12 12 0 1 0 0 24h1a3 3 0 0 0 2.2-5c-.8-.9-.1-2.5 1.2-2.5H24a5 5 0 0 0 5-5C29 9.1 23.6 4 17 4Z"/>
+      <circle cx="11" cy="10" r="1.5"/>
+      <circle cx="18" cy="8.5" r="1.5"/>
+      <circle cx="24" cy="12" r="1.5"/>
+      <circle cx="8" cy="17" r="1.5"/>
+    {%- when 'dress' -%}
+      <path d="m11 4-3 6 4 5-7 12c6 2 16 2 22 0l-7-12 4-5-3-6h-2a3 3 0 0 1-6 0h-2Zm1 11h8m-9-11 2 6m8-6-2 6m-5 9-2 6m6-6 2 6"/>
+    {%- when 'returns' -%}
+      <path d="M8 10a11 11 0 1 1-2.5 10M8 4v6h6"/>
+      <path d="m11 15 5-2.5 5 2.5v7l-5 2.5-5-2.5v-7Zm0 0 5 2.5 5-2.5m-5 2.5v7"/>
+  {%- endcase -%}
+</svg>
