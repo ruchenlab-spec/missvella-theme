@@ -966,7 +966,7 @@
       {% render 'mv-fit-icon', icon: 'clipboard-text' %}
       <span data-cs-form-label>Enter Measurements</span>
     </button>
-    <button type="button" class="cs-tab-btn-{{ cs_id }}" data-tab="htm" aria-haspopup="dialog" aria-controls="cs-measure-dialog-{{ cs_id }}">
+    <button type="button" class="cs-tab-btn-{{ cs_id }}" data-tab="htm" aria-haspopup="dialog" aria-expanded="false" aria-controls="cs-measure-dialog-{{ cs_id }}">
       {% render 'mv-fit-icon', icon: 'magnifying-glass' %}
       <span>How to Measure</span>
     </button>
@@ -1128,6 +1128,13 @@
     const tabPanels = modal.querySelectorAll('[data-panel]:not([data-panel="htm"])');
     const unitBtns  = modal.querySelectorAll('[data-cs-unit]');
     const tabsNav   = modal.querySelector('.cs-tabs-nav-' + id);
+    function setActiveTabIndicator(tab) {
+      if (tabsNav) tabsNav.dataset.activeTab = tab;
+      tabBtns.forEach(button => {
+        button.classList.toggle('active', button.dataset.tab === tab);
+        if (button.dataset.tab === 'htm') button.setAttribute('aria-expanded', tab === 'htm' ? 'true' : 'false');
+      });
+    }
     if (usesInlineForm && tabsNav) {
       const formLabel = tabsNav.querySelector('[data-cs-form-label]');
       if (formLabel) formLabel.textContent = 'Measurements';
@@ -1149,15 +1156,21 @@
       if (measureDialog.open) return;
       guidePreviousOverflow = document.body.style.overflow;
       measureDialog.showModal();
+      setActiveTabIndicator('htm');
       document.body.style.overflow = 'hidden';
     }
     function closeMeasureGuide() {
       if (measureDialog.open) measureDialog.close();
       restoreGuideScroll();
+      setActiveTabIndicator('form');
     }
     measureDialog.querySelector('button').addEventListener('click', closeMeasureGuide);
     measureDialog.addEventListener('cancel', restoreGuideScroll);
-    measureDialog.addEventListener('close', restoreGuideScroll);
+    measureDialog.addEventListener('close', () => {
+      if (measureDialog.open) return;
+      restoreGuideScroll();
+      setActiveTabIndicator('form');
+    });
     measureDialog.addEventListener('click', (event) => {
       if (event.target !== measureDialog) return;
       const rect = measureDialog.getBoundingClientRect();
@@ -1422,8 +1435,7 @@
     function switchTab(tab) {
       const nextPanel = Array.from(tabPanels).find(p => p.dataset.panel === tab);
       animateMobileSheetHeight(() => {
-        if (tabsNav) tabsNav.dataset.activeTab = tab;
-        tabBtns.forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+        setActiveTabIndicator(tab);
         tabPanels.forEach(p => p.classList.toggle('active', p.dataset.panel === tab));
       });
 
@@ -1525,8 +1537,7 @@
       }
       if (propVal) propVal.textContent = propStringOf(data);
       tabPanels.forEach(p => p.classList.toggle('active', p.dataset.panel === 'review'));
-      tabBtns.forEach(b => b.classList.toggle('active', b.dataset.tab === 'form'));
-      if (tabsNav) tabsNav.dataset.activeTab = 'form';
+      setActiveTabIndicator('form');
     }
 
     nextBtn.addEventListener('click', () => {
