@@ -6,9 +6,6 @@
   @param {boolean} [should_render_clear] - Whether to render the clear button.
   @param {string} [id_prefix] - Unique prefix to avoid duplicate IDs when rendered multiple times.
   @param {number} [filter_index] - Index of the filter in the sidebar, rendered as the group number.
-  @param {number} [price_max_override] - Stable slider ceiling. Shopify's
-    filter.range_max shrinks with the filtered results (apply 0–50 and prices
-    above 50 become unreachable); a fixed override keeps the full range.
 
   @example
   {% render 'price-filter', filter: filter, filter_style: 'vertical', id_prefix: 'dialog' %}
@@ -85,24 +82,8 @@
         data-currency="{{ localization.country.currency.iso_code }}"
         on:change="/updatePriceFilterAndResults"
       >
-        {%- liquid
-  # Stable ceiling: filter.range_max follows the FILTERED results, so applying
-  # 0-50 would trap the slider below 50 and re-pin the thumb on every
-  # section re-render. The block's price_filter_max setting overrides it.
-  assign pf_max = price_max_override | money_without_currency | replace: ',', ''
-  assign pf_range_max = filter.range_max | money_without_currency | replace: ',', ''
-  if pf_max == blank or pf_max == '0.0' or pf_max == '0'
-    assign pf_max = pf_range_max
-  endif
--%}
-{%- comment -%}
-  Native min/max inputs only. The custom range slider was removed: Shopify's
-  filter.range_max follows the filtered results, which trapped the slider and
-  re-pinned its thumb after every section re-render. Typing exact values is
-  deterministic and the applied range still shows in the chips bar above the
-  grid. pf_max (from the block's price_filter_max setting) keeps the native
-  input's data-max stable so typed values are never clamped to a shrunken range.
-{%- endcomment -%}
+        {% comment %} Native min/max inputs follow Shopify's current result range. {% endcomment %}
+        {% assign pf_max = filter.range_max | money_without_currency %}
 
 <div class="facets__inputs-wrapper facets__inputs-wrapper--row">
           <div

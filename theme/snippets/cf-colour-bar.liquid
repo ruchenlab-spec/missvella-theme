@@ -7,7 +7,6 @@
   @param {object} group_lines - Colour group map split into lines, one group per
     line as "Group name:#hex:member, member, member"
   @param {object} builtin_pairs - Built-in colour-name fallback pairs
-  @param {string} [colour_bar_bg] - Optional background colour for the bar
   @param {string} results_url - URL the facet form submits to
   @param {string} collection_id_attribute
   @param {string} collection_handle_attribute
@@ -20,7 +19,7 @@
   @param {string} sort_by - Currently selected sort option
   @param {string} section_id - Section id used by the sort control
 {%- enddoc -%}
-<div class="cf-colour-bar" data-cf-bar{% if colour_bar_bg != blank %} style="background-color: {{ colour_bar_bg }};"{% endif %}>
+<div class="cf-colour-bar" data-cf-bar>
 
   {%- comment -%}
     Group assignment (moved above the header because the pills row now renders

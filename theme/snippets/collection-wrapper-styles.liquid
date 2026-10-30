@@ -420,6 +420,10 @@
   }
 
   /* ===== Colour family bar — square-corner editorial bar (demo port) ===== */
+  .cf-colour-bar {
+    background-color: #fff;
+  }
+
   .cf-bar-pills {
     display: flex;
     width: 100%;
@@ -449,10 +453,10 @@
 
   .cf-pill:last-child { border-right: 0; }
 
-  .cf-pill:hover,
-  .cf-pill.is-open { background: rgb(var(--color-foreground-rgb) / 0.03); }
+  .cf-pill:hover { background: rgb(var(--color-foreground-rgb) / 0.03); }
 
-  .cf-pill.is-active { background: rgb(var(--color-foreground-rgb) / 0.04); }
+  .cf-pill.is-open,
+  .cf-pill.is-active { background: #F5F0EA; }
 
   /* 2px ink underline overlapping the bar's bottom hairline — shown for the
      opened family (demo behaviour) and for a family with real selections.
