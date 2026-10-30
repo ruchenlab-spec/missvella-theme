@@ -371,7 +371,7 @@ Darks:#52443b:Espresso,Dark Navy,Black{%- endif -%}{%- endcapture -%}
       {% if block_settings.enable_sorting %}
         <facets-form-component
           section-id="{{ section.id }}"
-          id="FacetFiltersForm--{{ section.id }}-mobile-sorting-only"
+          id="FacetFiltersFormComponent--{{ section.id }}-mobile-sorting-only"
           {{ collection_id_attribute }}
           {{ collection_handle_attribute }}
           {{ page_type_attribute }}
@@ -386,7 +386,7 @@ Darks:#52443b:Espresso,Dark Navy,Black{%- endif -%}{%- endcapture -%}
               results: results,
               sort_by: sort_by,
               filter_style: 'vertical',
-              suffix: 'mobile',
+              suffix: 'mobile-sorting-only',
               sort_position: 'mobile',
               should_use_select_on_mobile: false,
               section_id: section.id

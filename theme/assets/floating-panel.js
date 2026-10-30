@@ -11,6 +11,32 @@ export class FloatingPanelComponent extends Component {
     // Wait for any view transitions to finish
     if (viewTransition.current) await viewTransition.current;
 
+    if (this.classList.contains('sorting-filter__options')) {
+      const details = this.closest('details');
+      if (!details?.open) return;
+
+      const gutter = 16;
+      const anchor = details.getBoundingClientRect();
+      const spaceBelow = window.innerHeight - anchor.bottom - gutter;
+      const spaceAbove = anchor.top - gutter;
+      const openAbove = spaceBelow < 240 && spaceAbove > spaceBelow;
+      this.style.top = openAbove ? 'auto' : '100%';
+      this.style.bottom = openAbove ? '100%' : 'auto';
+      this.style.insetInlineStart = 'auto';
+      this.style.insetInlineEnd = '0';
+      this.style.transform = 'none';
+      this.style.setProperty('--sorting-panel-max-height', `${Math.max(0, openAbove ? spaceAbove : spaceBelow)}px`);
+
+      const rect = this.getBoundingClientRect();
+      const viewportWidth = document.documentElement.clientWidth;
+      const shift = rect.left < gutter
+        ? gutter - rect.left
+        : Math.min(0, viewportWidth - gutter - rect.right);
+      this.style.transform = `translateX(${shift}px)`;
+      this.#mutationObserver.takeRecords();
+      return;
+    }
+
     const rect = this.getBoundingClientRect();
     const viewportWidth = window.innerWidth;
 
@@ -38,12 +64,18 @@ export class FloatingPanelComponent extends Component {
       parent.open = false;
       parent.removeAttribute('open');
       this.#updatePosition();
+    } else if (this.classList.contains('sorting-filter__options')) {
+      this.#updatePosition();
     }
   }, 100);
 
   connectedCallback() {
     super.connectedCallback();
     window.addEventListener('resize', this.#resizeListener);
+    if (this.classList.contains('sorting-filter__options')) {
+      const details = this.closest('details');
+      if (details) this.#mutationObserver.observe(details, { attributes: true, attributeFilter: ['open'] });
+    }
 
     requestIdleCallback(() => {
       this.#updatePosition();
