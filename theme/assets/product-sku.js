@@ -1,5 +1,4 @@
 import { Component } from '@theme/component';
-import { ThemeEvents } from '@theme/events';
 import { StandardEvents, ProductSelectEvent } from '@shopify/events';
 
 /**
@@ -37,6 +36,11 @@ class ProductSkuComponent extends Component {
    * @param {ProductSelectEvent} event - The product select event.
    */
   #handleProductSelect = (event) => {
+    // A recommendation/card selection must not change the main product SKU.
+    if (event.target instanceof Element) {
+      const card = event.target.closest('product-card');
+      if (card && !card.contains(this)) return;
+    }
     event.promise
       .then(({ detail }) => {
         if (!detail) return;
