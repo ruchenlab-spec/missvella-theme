@@ -93,12 +93,11 @@
 
 > 曾经还有第 3 个基线错误 `templates/product.json` 的 `JSONMissingBlock`（第三方评价 app 区块），已在提交 `651abc0` 随编辑器移除该区块而消失。
 
-**基线告警（19 个，全部来自官方 Horizon 文件，可不处理）**
+**基线告警（18 个，全部来自官方 Horizon 文件，可不处理）**
 - `ValidScopedCSSClass` × 11：官方文件之间互相引用 class
 - `UnusedDocParam` × 5：`snippets/divider.liquid` 官方文档块声明了未使用的参数
 - `ExcessiveSettingsCount` × 1：`sections/header.liquid`
 - `DeprecatedTag` × 1：`sections/header.liquid`
-- `AssetPreload` × 1：`snippets/aboreto-font.liquid`（自研字体，本可预加载但不阻塞）
 
 **自研代码的判定标准**：改动后自研文件（`filters.liquid`、`cf-colour-bar.liquid`、`list-filter.liquid`、`cf2-item.liquid`、`color-facets.liquid`、`circle-collections.liquid`、`custom-sizes.liquid` 等）**不应出现任何 error 或 warning**。
 

@@ -75,7 +75,6 @@ section.circle-collections
 | `snippets/color-facet-swatch.liquid` | 颜色名 → hex 映射（内置色值表 + 自定义覆盖） |
 | `blocks/color-facets.liquid` | 颜色快捷筛选行（独立区块，`flat` / `family` 双模式） |
 | `snippets/collection-wrapper-styles.liquid` | 集合页/搜索页共享布局样式 + 全部 `cf-*` 色板样式 |
-| `snippets/aboreto-font.liquid` + `assets/aboreto-regular.ttf` | 新增字体（`theme.liquid`、`password.liquid` 引入） |
 | `snippets/breadcrumbs.liquid` | 面包屑，改为全局渲染并接入主题设置 |
 
 ### 布局结构
