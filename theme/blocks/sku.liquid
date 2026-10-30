@@ -24,7 +24,7 @@
       if block_settings.font_size != ''
         echo ' custom-font-size'
       endif
-      if block_settings.color != ''
+      if block_settings.text_color != blank
         echo ' custom-color'
       endif
     endif
@@ -40,6 +40,7 @@
 <product-sku-component
   class="text-block {{ text_block_classes }} text-{{ block_settings.alignment }} {{ block_settings.type_preset | default: 'paragraph' }} spacing-style"
   data-product-id="{{ product_resource.id }}"
+  data-product-metadata="sku"
   style="
     {% if sku == blank %}
       display: none;
@@ -47,12 +48,13 @@
       display: block;
     {% endif %}
     {% render 'typography-style', settings: block_settings %}
+    {% if block_settings.text_color != blank %}--color: {{ block_settings.text_color }};{% endif %}
     {% render 'spacing-style', settings: block_settings %}
     --width: {{ block_settings.width }};
   "
   {{ block.shopify_attributes }}
 >
-  {% render 'sku', product_resource: product_resource %}
+  {% render 'sku', product_resource: product_resource, prefix: block_settings.prefix %}
 </product-sku-component>
 
 {% schema %}
@@ -63,6 +65,11 @@
     {
       "type": "paragraph",
       "content": "t:content.resource_reference_product_sku"
+    },
+    {
+      "type": "text",
+      "id": "prefix",
+      "label": "SKU 前缀"
     },
     {
       "type": "header",
@@ -297,6 +304,32 @@
       "visible_if": "{{ block.settings.type_preset == 'custom' }}"
     },
     {
+      "type": "select",
+      "id": "wrap",
+      "label": "t:settings.wrap",
+      "options": [
+        {
+          "value": "pretty",
+          "label": "t:options.pretty"
+        },
+        {
+          "value": "balance",
+          "label": "t:options.balance"
+        },
+        {
+          "value": "nowrap",
+          "label": "t:options.none"
+        }
+      ],
+      "visible_if": "{{ block.settings.type_preset == 'custom' }}"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "t:settings.text_color",
+      "placeholder": "t:settings.default"
+    },
+    {
       "type": "header",
       "content": "t:content.padding"
     },
@@ -344,7 +377,17 @@
   "presets": [
     {
       "name": "t:names.product_sku",
-      "category": "t:categories.product"
+      "category": "t:categories.product",
+      "settings": {
+        "prefix": "SKU:",
+        "type_preset": "custom",
+        "font": "var(--font-body--family)",
+        "font_size": "0.75rem",
+        "line_height": "normal",
+        "letter_spacing": "normal",
+        "case": "none",
+        "wrap": "pretty"
+      }
     }
   ]
 }
