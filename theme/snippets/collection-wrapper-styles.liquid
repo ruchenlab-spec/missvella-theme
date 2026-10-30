@@ -429,11 +429,17 @@
     width: 100%;
     position: relative;
     padding-block: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scrollbar-width: thin;
+    overscroll-behavior-x: contain;
   }
 
   .cf-pill {
     position: relative;
-    flex: 1 1 0;
+    flex: 0 0 auto;
+    width: max-content;
+    max-width: min(220px, 100%);
     display: flex;
     align-items: center;
     gap: 11px;
@@ -514,6 +520,7 @@
   }
 
   .cf-pill__num {
+    flex: 0 0 auto;
     margin-left: auto;
     padding-left: 4px;
     font-size: 10px;
@@ -582,7 +589,9 @@
   }
 
   .cf-bar-head .cf-bar-pills {
-    flex: 1 1 auto;
+    /* Content-sized with a scrolling overflow region: a short colour list
+       stays compact instead of distributing the row's spare width. */
+    flex: 0 1 auto;
     width: auto;
     min-width: 0;
     border-inline: 1px solid rgb(var(--color-foreground-rgb) / 10%);
@@ -592,8 +601,10 @@
      mobile controls take over). */
   .cf-bar-head .cf-head-controls {
     display: flex;
+    flex: 0 0 auto;
     align-items: center;
     gap: 16px;
+    margin-inline-start: auto;
   }
 
   .cf-bar-title {
