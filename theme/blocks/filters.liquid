@@ -571,15 +571,19 @@ Darks:#52443b:Espresso,Dark Navy,Black{%- endif -%}{%- endcapture -%}
       if (reset) reset.classList.remove('is-spinning');
     });
 
-    /* Restore collapsed state before first paint of the sidebar */
+    /* Collections start collapsed; an explicit visitor choice takes priority.
+       Storage may be unavailable, so always apply the page's default too. */
+    var storedCollapsed = null;
     try {
-      if (localStorage.getItem(STORAGE_KEY) === '1') {
-        document.querySelectorAll('.facets-block-wrapper:not(#filters-drawer) .facets').forEach(function (facets) {
-          var wrapper = facets.closest('.collection-wrapper');
-          if (wrapper) setCollapsed(wrapper, true);
-        });
-      }
+      storedCollapsed = localStorage.getItem(STORAGE_KEY);
     } catch (error) {}
+    document.querySelectorAll('.facets-block-wrapper:not(#filters-drawer) .facets').forEach(function (facets) {
+      var wrapper = facets.closest('.collection-wrapper');
+      if (!wrapper) return;
+      var collapsed = storedCollapsed === '1' ||
+        (storedCollapsed !== '0' && wrapper.hasAttribute('data-default-filters-collapsed'));
+      setCollapsed(wrapper, collapsed);
+    });
 
     /* Crossing back to desktop closes the bottom-sheet filter drawer, so no
        right-side drawer is left open after a mobile-to-desktop switch. */

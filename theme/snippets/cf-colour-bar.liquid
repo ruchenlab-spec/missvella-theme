@@ -71,7 +71,7 @@
         type="button"
         class="cf-filter-toggle"
         data-cf-sidebar-toggle
-        aria-expanded="true"
+        aria-expanded="{% if request.page_type == 'collection' %}false{% else %}true{% endif %}"
       >
         <span class="cf-filter-toggle__icon" aria-hidden="true">
           {{ 'icon-filter-sliders.svg' | inline_asset_content }}

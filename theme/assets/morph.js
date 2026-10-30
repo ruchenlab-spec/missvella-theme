@@ -61,6 +61,17 @@ export const MORPH_OPTIONS = {
   onBeforeUpdate(oldNode, newNode) {
     if (!(oldNode instanceof Element) || !(newNode instanceof Element)) return;
 
+    // Filtering and pagination must keep the visitor's sidebar choice rather
+    // than replacing it with the collection's server-rendered default.
+    if (oldNode.classList.contains('collection-wrapper') && newNode.classList.contains('collection-wrapper')) {
+      newNode.classList.toggle('is-filters-collapsed', oldNode.classList.contains('is-filters-collapsed'));
+      const oldToggle = oldNode.querySelector('[data-cf-sidebar-toggle]');
+      const newToggle = newNode.querySelector('[data-cf-sidebar-toggle]');
+      if (oldToggle && newToggle) {
+        newToggle.setAttribute('aria-expanded', oldToggle.getAttribute('aria-expanded') || 'false');
+      }
+    }
+
     // Elements usually carry fewer attributes than the preserved list, so scan the
     // element's own attributes rather than probing each preserved name.
     const oldAttrs = oldNode.attributes;
