@@ -12,21 +12,16 @@
   "
   style="
     --details-position: {{ block_settings.details_position }};
-    --mv-sku-size: {{ block_settings.sku_font_size | default: 10 }}px;
     {% render 'product-information-palette', settings: section.settings %}
   "
   {% if section.settings.info_palette_enabled != false %}data-product-palette{% endif %}
   {% if request.page_type == 'product' %}data-product-editorial{% endif %}
-  {% if block_settings.metadata_blocks %}data-metadata-blocks{% endif %}
   data-testid="product-information-details"
   {% if settings.transition_to_main_product %}
     data-view-transition-type="product-details"
   {% endif %}
 >
   {% capture children %}
-    {% unless block_settings.metadata_blocks %}
-      {% render 'product-series', product: closest.product, settings: block_settings %}
-    {% endunless %}
     <div class="view-product-title">
       <a
         href="{{ closest.product.selected_or_first_available_variant.url }}"
@@ -47,13 +42,6 @@
 </div>
 
 {% stylesheet %}
-  /* Native metadata blocks keep their own text-block typography. */
-  .product-details[data-metadata-blocks] .product-series,
-  .product-details:has([data-product-metadata='sku']) .product-series--sku-only { display: none; }
-  .product-details:has([data-product-metadata='sku']) .product-series__sku { display: none; }
-  .product-details:has(.product-series-block) .product-series__label { display: none; }
-  .product-details:has([data-product-metadata='sku']):has(.product-series-block) .product-series { display: none; }
-
   /* One palette bridge, reused by the details column and portaled dialogs. */
   [data-product-palette] {
     --color-foreground: var(--pi-text);
@@ -75,20 +63,6 @@
     color: var(--pi-text);
     background: var(--pi-surface);
   }
-
-  .product-details[data-product-editorial] .product-series__sku {
-    font-size: var(--mv-sku-size);
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    line-height: 1.3;
-  }
-
-  .product-details[data-product-palette] .product-series__sku {
-    color: var(--pi-muted);
-    opacity: 1;
-  }
-
-  .product-details[data-product-palette] .product-series__label { color: var(--pi-text); }
 
   .product-details[data-product-editorial] product-price .price {
     font-family: var(--font-body--family);
@@ -172,10 +146,6 @@
      block settings. Only the group that actually holds the price is
      affected; the accordion and the other groups keep their spacing.
      ------------------------------------------------------------------ */
-  .product-details .product-series {
-    margin-block-end: 0;
-  }
-
   .product-details .group-block:has(> .group-block-content > product-price) {
     margin-block-start: -4px;
   }
@@ -284,100 +254,6 @@
   ],
   "tag": null,
   "settings": [
-    {
-      "type": "header",
-      "content": "系列标题与 SKU（旧版兼容）"
-    },
-    {
-      "type": "checkbox",
-      "id": "metadata_blocks",
-      "label": "使用独立 SKU / 系列标题区块",
-      "default": false,
-      "info": "开启后停用旧版嵌入显示。请在「标头」分组中添加「产品 SKU」和「系列标题」，分别控制排版、顺序及显示。"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_series",
-      "label": "显示系列标题",
-      "info": "显示在产品标题上方",
-      "default": false,
-      "visible_if": "{{ block.settings.metadata_blocks == false }}"
-    },
-    {
-      "type": "text",
-      "id": "series_text",
-      "label": "系列标题",
-      "info": "点击输入框右侧的数据库图标即可选择产品元字段；留空时按下方回退规则显示",
-      "visible_if": "{{ block.settings.metadata_blocks == false and block.settings.show_series }}"
-    },
-    {
-      "type": "checkbox",
-      "id": "series_fallback_vendor",
-      "label": "留空时使用供应商",
-      "default": true,
-      "visible_if": "{{ block.settings.metadata_blocks == false and block.settings.show_series }}"
-    },
-    {
-      "type": "select",
-      "id": "series_case",
-      "label": "大小写",
-      "options": [
-        {
-          "value": "none",
-          "label": "默认"
-        },
-        {
-          "value": "uppercase",
-          "label": "大写"
-        }
-      ],
-      "default": "none",
-      "visible_if": "{{ block.settings.metadata_blocks == false and block.settings.show_series }}"
-    },
-    {
-      "type": "range",
-      "id": "series_font_size",
-      "label": "字号",
-      "min": 10,
-      "max": 24,
-      "step": 1,
-      "unit": "px",
-      "default": 14,
-      "visible_if": "{{ block.settings.metadata_blocks == false and block.settings.show_series }}"
-    },
-    {
-      "type": "color",
-      "id": "series_color",
-      "label": "颜色",
-      "placeholder": "默认",
-      "visible_if": "{{ block.settings.metadata_blocks == false and block.settings.show_series }}"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_sku",
-      "label": "显示 SKU",
-      "info": "显示在系列标题行右侧（未显示系列标题时单独一行）",
-      "default": false,
-      "visible_if": "{{ block.settings.metadata_blocks == false }}"
-    },
-    {
-      "type": "text",
-      "id": "sku_prefix",
-      "label": "SKU 前缀",
-      "default": "SKU:",
-      "visible_if": "{{ block.settings.metadata_blocks == false and block.settings.show_sku }}"
-    },
-    {
-      "type": "range",
-      "id": "sku_font_size",
-      "label": "SKU 字号",
-      "min": 8,
-      "max": 24,
-      "step": 1,
-      "unit": "px",
-      "default": 10,
-      "visible_if": "{{ block.settings.metadata_blocks == false and block.settings.show_sku }}"
-    },
     {
       "type": "header",
       "content": "t:content.size"
