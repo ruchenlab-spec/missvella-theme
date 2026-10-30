@@ -39,6 +39,14 @@
       data-testid="menu-details"
       style="
         --spacing--size: {{ block_settings.menu_spacing }}px;
+        --menu-heading-family: var(--font-{{ block_settings.heading_font | default: 'heading' }}--family);
+        --menu-heading-style: var(--font-{{ block_settings.heading_font | default: 'heading' }}--style);
+        --menu-heading-weight: var(--font-{{ block_settings.heading_font | default: 'heading' }}--weight);
+        --menu-heading-size: {{ block_settings.heading_size | default: 14 }}px;
+        --menu-link-family: var(--font-{{ block_settings.link_font | default: 'body' }}--family);
+        --menu-link-style: var(--font-{{ block_settings.link_font | default: 'body' }}--style);
+        --menu-link-weight: var(--font-{{ block_settings.link_font | default: 'body' }}--weight);
+        --menu-link-size: {{ block_settings.link_size | default: 14 }}px;
         {% render 'spacing-style', settings: block_settings %}
       "
       {% if show_as_accordion == false %}
@@ -46,7 +54,7 @@
       {% endif %}
       {{ block.shopify_attributes }}
     >
-      <summary class="menu__heading{% if heading == blank and menu.title == blank %} menu__heading--empty{% endif %} {{ block_settings.heading_preset }}">
+      <summary class="menu__heading{% if heading == blank and menu.title == blank %} menu__heading--empty{% endif %}">
         <span class="menu__heading__default">{{ heading | default: menu.title }}</span>
         <span class="menu__heading__accordion">
           {{ heading | default: menu.title }}
@@ -71,7 +79,7 @@
         {% if menu %}
           <ul class="list-unstyled">
             {% for link in menu.links %}
-              <li class="menu__item {{ block_settings.link_preset }}">
+              <li class="menu__item">
                 <a href="{{ link.url }}">
                   {{ link.title }}{% if link.data_sharing_opt_out_icon %}{{ link.data_sharing_opt_out_icon }}{% endif %}
                 </a>
@@ -95,6 +103,22 @@
 {% stylesheet %}
   .menu {
     width: 100%;
+  }
+
+  .menu .menu__heading {
+    font-family: var(--menu-heading-family);
+    font-style: var(--menu-heading-style);
+    font-weight: var(--menu-heading-weight);
+    font-size: var(--menu-heading-size);
+    line-height: 1.4;
+  }
+
+  .menu .menu__item {
+    font-family: var(--menu-link-family);
+    font-style: var(--menu-link-style);
+    font-weight: var(--menu-link-weight);
+    font-size: var(--menu-link-size);
+    line-height: 1.6;
   }
 
   .menu:not(:has(.menu__heading--empty)) .details-content {
@@ -227,83 +251,55 @@
     },
     {
       "type": "select",
-      "id": "heading_preset",
-      "label": "t:settings.heading_preset",
+      "id": "heading_font",
+      "label": "标题字体",
       "options": [
         {
-          "value": "",
-          "label": "t:options.default"
+          "value": "body",
+          "label": "段落"
         },
         {
-          "value": "paragraph",
-          "label": "t:options.paragraph"
-        },
-        {
-          "value": "h1",
-          "label": "t:options.h1"
-        },
-        {
-          "value": "h2",
-          "label": "t:options.h2"
-        },
-        {
-          "value": "h3",
-          "label": "t:options.h3"
-        },
-        {
-          "value": "h4",
-          "label": "t:options.h4"
-        },
-        {
-          "value": "h5",
-          "label": "t:options.h5"
-        },
-        {
-          "value": "h6",
-          "label": "t:options.h6"
+          "value": "heading",
+          "label": "标题"
         }
       ],
-      "default": "h3"
+      "default": "heading"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "label": "标题字体大小",
+      "min": 10,
+      "max": 48,
+      "step": 1,
+      "unit": "px",
+      "default": 14
     },
     {
       "type": "select",
-      "id": "link_preset",
-      "label": "t:settings.link_preset",
+      "id": "link_font",
+      "label": "链接字体",
       "options": [
         {
-          "value": "",
-          "label": "t:options.default"
+          "value": "body",
+          "label": "段落"
         },
         {
-          "value": "paragraph",
-          "label": "t:options.paragraph"
-        },
-        {
-          "value": "h1",
-          "label": "t:options.h1"
-        },
-        {
-          "value": "h2",
-          "label": "t:options.h2"
-        },
-        {
-          "value": "h3",
-          "label": "t:options.h3"
-        },
-        {
-          "value": "h4",
-          "label": "t:options.h4"
-        },
-        {
-          "value": "h5",
-          "label": "t:options.h5"
-        },
-        {
-          "value": "h6",
-          "label": "t:options.h6"
+          "value": "heading",
+          "label": "标题"
         }
       ],
-      "default": "paragraph"
+      "default": "body"
+    },
+    {
+      "type": "range",
+      "id": "link_size",
+      "label": "链接字体大小",
+      "min": 10,
+      "max": 32,
+      "step": 1,
+      "unit": "px",
+      "default": 14
     },
     {
       "type": "header",
