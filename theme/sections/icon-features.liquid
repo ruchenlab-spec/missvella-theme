@@ -8,12 +8,24 @@
 
 {% style %}
   #icon-features-{{ section.id }} {
+    {% if s.color_style == 'custom' %}
     --if-section-bg: {{ s.bg_color }};
     --if-card-bg: {{ s.card_bg }};
     --if-card-border: {{ s.card_border }};
     --if-icon-bg: {{ s.icon_bg }};
     --if-title: {{ s.title_color }};
     --if-desc: {{ s.desc_color }};
+    --if-icon-color: {{ s.icon_color }};
+    {% else %}
+    --if-section-bg: #f7f5f1;
+    --if-card-bg: #f7f5f1;
+    --if-card-border: transparent;
+    --if-icon-bg: #eee8df;
+    --if-title: #3d3833;
+    --if-desc: #706860;
+    --if-icon-color: #8a7561;
+    border-block: 1px solid #e5ded4;
+    {% endif %}
     --if-radius: {{ s.card_radius }}px;
     --if-icon-radius: {{ s.icon_radius }}px;
     --if-icon-size: {{ s.icon_size }}px;
@@ -116,7 +128,7 @@
     height: var(--if-icon-size);
     display: grid;
     place-items: center;
-    color: {{ s.icon_color }};
+    color: var(--if-icon-color);
   }
 
   #icon-features-{{ section.id }} .icon-features__icon > svg,
@@ -128,13 +140,13 @@
   }
 
   #icon-features-{{ section.id }} .icon-features__icon > svg,
-  #icon-features-{{ section.id }} .icon-features__icon .custom-svg svg:not([fill]) {
+  #icon-features-{{ section.id }} .icon-features__icon .custom-svg svg {
     width: 100%;
     height: 100%;
     color: inherit;
   }
 
-  #icon-features-{{ section.id }} .icon-features__icon .custom-svg svg {
+  #icon-features-{{ section.id }} .icon-features__icon .custom-svg svg:not([fill]) {
     fill: currentColor;
   }
 
@@ -159,7 +171,7 @@
     font-style: var(--font-{{ s.title_font | default: 'heading' }}--style);
     font-size: {{ s.title_size }}px;
     line-height: 1.35;
-    font-weight: {{ s.title_weight }};
+    font-weight: 400;
     letter-spacing: .015em;
     text-wrap: balance;
   }
@@ -320,6 +332,10 @@
     { "type": "range", "id": "mob_padding_v", "label": "Mobile vertical padding", "min": 0, "max": 80, "step": 4, "unit": "px", "default": 16 },
 
     { "type": "header", "content": "Background" },
+    { "type": "select", "id": "color_style", "label": "Color style", "options": [
+      { "value": "warm", "label": "Warm ivory / taupe" },
+      { "value": "custom", "label": "Custom colors" }
+    ], "default": "warm", "info": "Warm ivory uses coordinated background, text and icon colors. Choose Custom colors to use the color pickers below." },
     { "type": "color", "id": "bg_color", "label": "Section background", "default": "#FFFFFF" },
 
     { "type": "header", "content": "Feature cards" },
@@ -344,7 +360,6 @@
       { "value": "body", "label": "Theme body" }
     ], "default": "heading" },
     { "type": "range", "id": "title_size", "label": "Title size", "min": 10, "max": 28, "step": 1, "unit": "px", "default": 18 },
-    { "type": "range", "id": "title_weight", "label": "Title weight", "min": 400, "max": 700, "step": 100, "default": 400 },
     { "type": "color", "id": "title_color", "label": "Title color", "default": "#000000" },
     { "type": "range", "id": "desc_size", "label": "Description size", "min": 10, "max": 22, "step": 1, "unit": "px", "default": 13 },
     { "type": "color", "id": "desc_color", "label": "Description color", "default": "#6C6A67" },
