@@ -4,6 +4,7 @@
   assign icon_pos = s.icon_pos
   assign text_align = s.txt_align
   assign mobile_layout = s.mob_layout
+  assign default_icons = 'fit,palette,dress,returns' | split: ','
 -%}
 
 {% style %}
@@ -244,7 +245,12 @@
     <div class="icon-features__inner">
       <ul class="icon-features__grid" role="list">
         {%- for block in section.blocks -%}
-          {%- assign builtin_icon = block.settings.builtin_icon | default: 'custom' -%}
+          {%- liquid
+            assign builtin_icon = block.settings.builtin_icon | default: 'default'
+            if builtin_icon == 'default'
+              assign builtin_icon = default_icons[forloop.index0] | default: 'custom'
+            endif
+          -%}
           <li class="icon-features__item" {{ block.shopify_attributes }}>
             {%- if block.settings.link != blank -%}
               <a class="icon-features__item-inner" href="{{ block.settings.link }}">
@@ -400,12 +406,13 @@
       "name": "Feature",
       "settings": [
         { "type": "select", "id": "builtin_icon", "label": "Icon", "options": [
+          { "value": "default", "label": "Default icon (by position)" },
           { "value": "custom", "label": "Custom SVG / image" },
-          { "value": "fit", "label": "Measuring tape / fit" },
+          { "value": "fit", "label": "Scissors / fit" },
           { "value": "palette", "label": "Palette / colors" },
           { "value": "dress", "label": "Dress / made to order" },
           { "value": "returns", "label": "Returns" }
-        ], "default": "custom", "info": "Built-in icons share the same fine-line style. Custom SVG and image are kept when switching icons." },
+        ], "default": "default", "info": "Phosphor Light defaults: scissors, palette, dress, returns for positions 1-4. Select a specific icon to keep it when reordering. Custom SVG and image remain available." },
         { "type": "image_picker", "id": "icon_image", "label": "Custom icon image" },
         { "type": "textarea", "id": "icon_svg", "label": "Custom SVG code", "info": "Optional. If filled, SVG code is used instead of the image." },
         { "type": "text", "id": "title", "label": "Title", "default": "Feature title" },
