@@ -12,11 +12,7 @@
   "
   style="
     --details-position: {{ block_settings.details_position }};
-    --mv-title-size: {{ block_settings.title_font_size | default: 32 }}px;
-    --mv-title-weight: {{ block_settings.title_font_weight | default: 400 }};
-    --mv-title-family: {% if block_settings.title_font_family == 'body' %}var(--font-body--family){% else %}var(--font-heading--family){% endif %};
     --mv-sku-size: {{ block_settings.sku_font_size | default: 10 }}px;
-    {% if block_settings.title_color != blank %}--mv-title-color: {{ block_settings.title_color }};{% endif %}
     {% render 'product-information-palette', settings: section.settings %}
   "
   {% if section.settings.info_palette_enabled != false %}data-product-palette{% endif %}
@@ -68,26 +64,6 @@
   .product-details[data-product-palette] {
     color: var(--pi-text);
     background: var(--pi-surface);
-  }
-
-  .product-details[data-product-editorial] .text-block h1,
-  .product-details[data-product-editorial] .text-block.custom-font-size.custom-color h1,
-  .product-details[data-product-editorial] [ref='productTitleLink'] :is(p, h1, h2, h3),
-  .product-details[data-product-editorial] .group-block-content:has(> product-price) > .text-block:first-child > :is(p, h1, h2, h3) {
-    font-family: var(--mv-title-family);
-    font-weight: var(--mv-title-weight);
-    font-size: clamp(calc(var(--mv-title-size) * 0.8), 2.5vw, var(--mv-title-size));
-    line-height: 1.18;
-    letter-spacing: 0.01em;
-    text-transform: none;
-    text-wrap: balance;
-    color: var(--pi-text, var(--mv-title-color, var(--color-foreground)));
-    margin-block: 0;
-  }
-
-  .product-details[data-product-editorial] .text-block h1 a {
-    color: inherit;
-    text-decoration: none;
   }
 
   .product-details[data-product-editorial] .product-series__sku {
@@ -298,63 +274,6 @@
   ],
   "tag": null,
   "settings": [
-    {
-      "type": "header",
-      "content": "产品标题"
-    },
-    {
-      "type": "range",
-      "id": "title_font_size",
-      "label": "字号（桌面）",
-      "min": 20,
-      "max": 48,
-      "step": 1,
-      "unit": "px",
-      "default": 32,
-      "info": "小屏自动缩放到 80%"
-    },
-    {
-      "type": "select",
-      "id": "title_font_weight",
-      "label": "字重",
-      "options": [
-        {
-          "value": "400",
-          "label": "常规"
-        },
-        {
-          "value": "500",
-          "label": "中等"
-        },
-        {
-          "value": "600",
-          "label": "半粗"
-        }
-      ],
-      "default": "400"
-    },
-    {
-      "type": "select",
-      "id": "title_font_family",
-      "label": "字体",
-      "options": [
-        {
-          "value": "heading",
-          "label": "衬线（标题字体）"
-        },
-        {
-          "value": "body",
-          "label": "无衬线（正文字体）"
-        }
-      ],
-      "default": "heading"
-    },
-    {
-      "type": "color",
-      "id": "title_color",
-      "label": "颜色",
-      "placeholder": "默认"
-    },
     {
       "type": "header",
       "content": "系列标题与 SKU"
