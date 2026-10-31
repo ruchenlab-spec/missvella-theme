@@ -12,6 +12,7 @@ const KEY = 'missvella_wishlist_v1';
 const icon = read('snippets/wishlist-icon.liquid');
 const configText = read('snippets/wishlist-assets.liquid').match(/type="application\/json">([\s\S]*?)<\/script>/)[1];
 const config = JSON.parse(configText
+  .replace(/{{ settings.wishlist_enabled \| default: true, allow_false: true \| json }}/, 'true')
   .replace(/{{ routes.root_url \| json }}/, '"/"')
   .replace(/{{ wishlist_url \| json }}/, '"/search?wishlist=1"')
   .replace(/{{ localization.country.currency.iso_code \| default: shop.currency \| json }}/, '"USD"')
@@ -19,6 +20,7 @@ const config = JSON.parse(configText
 const card = (handle, title = handle) => `<div class="card-gallery"><a href="/products/${handle}"><div class="fixture-photo"></div></a><wishlist-toggle class="mv-wishlist-toggle" data-handle="${handle}" data-title="${title}" hidden><button type="button" aria-pressed="false">${icon}</button></wishlist-toggle><p>${title}</p></div>`;
 const pageMarkup = read('snippets/wishlist-page.liquid')
   .replace(/{%- comment -%}[\s\S]*?{%- endcomment -%}/, '')
+  .replace(/{% if settings.wishlist_enabled == false %}[\s\S]*?{% else %}([\s\S]*?){% endif %}/, '$1')
   .replace('{{ routes.all_products_collection_url }}', '/collections/all');
 let failProduct = true;
 let active = 0;
@@ -27,7 +29,7 @@ const fixture = (pathname = '') => `<!doctype html><html lang="en"><head><style>
   *{box-sizing:border-box}body{margin:0;font-family:Arial;--font-body--family:Arial;--color-foreground:#302720;--color-foreground-rgb:48 39 32;--color-background:#fff;--color-primary-button-background:#87704f;--color-primary-button-text:#fff;--page-margin:20px}
   [hidden]{display:none!important}a{color:inherit}header{padding:16px;display:flex;justify-content:flex-end;border-bottom:1px solid #ddd}.svg-wrapper{display:flex}
   .fixture-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;padding:20px}.card-gallery{position:relative}.fixture-photo{aspect-ratio:2/3;background:#d2c3b5}.button{display:inline-block;padding:16px 24px;background:#87704f;color:white;text-decoration:none}
-  </style><link rel="stylesheet" href="/assets/mv-wishlist.css"></head><body><header><a data-wishlist-link class="mv-wishlist-link" href="/search?wishlist=1"><span class="svg-wrapper">${icon}</span><span class="mv-wishlist-link__count" data-wishlist-count hidden></span></a></header><main id="MainContent"><div class="fixture-grid">${card('beige-dress')}${card('black-dress')}${card('beige-dress')}</div>${pageMarkup}</main><div class="mv-wishlist-notice" role="status" data-wishlist-notice></div><script id="mv-wishlist-config" type="application/json">${JSON.stringify(pathname.startsWith('/fr/') ? { ...config, root: '/fr/', url: '/fr/search?wishlist=1', currency: 'EUR' } : config)}</script><script>
+  </style><link rel="stylesheet" href="/assets/mv-wishlist.css"></head><body><header><a data-wishlist-link class="mv-wishlist-link" href="/search?wishlist=1"><span class="svg-wrapper">${icon}</span><span class="mv-wishlist-link__count" data-wishlist-count hidden></span></a></header><main id="MainContent"><div class="fixture-grid">${card('beige-dress')}${card('black-dress')}${card('beige-dress')}</div>${pageMarkup}</main><div class="mv-wishlist-notice" role="status" data-wishlist-notice></div><script id="mv-wishlist-config" type="application/json">${JSON.stringify(pathname === '/disabled' ? { ...config, enabled: false } : pathname.startsWith('/fr/') ? { ...config, root: '/fr/', url: '/fr/search?wishlist=1', currency: 'EUR' } : config)}</script><script>
   if(new URLSearchParams(location.search).get('wishlist')==='1'||location.pathname==='/pages/wishlist')document.documentElement.classList.add('mv-wishlist-route');
   </script><script src="/assets/mv-wishlist.js" defer></script></body></html>`;
 const server = http.createServer(async (req, res) => {
@@ -207,6 +209,49 @@ async function run() {
   assert.equal(await page.locator('.mv-wishlist-item__title').getAttribute('href'), '/fr/products/beige-dress');
   assert.match(await page.locator('.mv-wishlist-item__price').textContent(), /€/);
   console.log('PASS locale-aware product links and presentment-currency formatting');
+
+  const beforeDisabled = await page.evaluate((key) => localStorage.getItem(key), KEY);
+  await page.goto(origin + '/disabled');
+  assert.equal(await page.evaluate(() => customElements.get('wishlist-toggle') === undefined), true);
+  assert.equal(await page.locator('wishlist-toggle').first().isHidden(), true);
+  assert.equal(await page.evaluate((key) => localStorage.getItem(key), KEY), beforeDisabled, 'disabling preserves saved data');
+  await page.goto(origin + '/collections/all');
+  assert.equal(await page.locator('wishlist-toggle[data-handle="beige-dress"] button').first().getAttribute('aria-pressed'), 'true');
+  await page.evaluate(() => {
+    const variables = {
+      '--mv-wishlist-background': '#336699', '--mv-wishlist-background-opacity': '0.4',
+      '--mv-wishlist-border-color': '#445566', '--mv-wishlist-border-opacity': '0.7',
+      '--mv-wishlist-border-width': '2px', '--mv-wishlist-icon-color': '#112233',
+      '--mv-wishlist-active-color': '#cc0044', '--mv-wishlist-opacity': '0.6',
+      '--mv-wishlist-radius': '6px', '--mv-wishlist-button-size': '48px', '--mv-wishlist-icon-size': '18px',
+    };
+    for (const [name, value] of Object.entries(variables)) document.documentElement.style.setProperty(name, value);
+  });
+  const styledButton = page.locator('wishlist-toggle[data-handle="black-dress"] button');
+  await page.waitForFunction(() => getComputedStyle(document.querySelector('wishlist-toggle[data-handle="black-dress"] button'), '::before').backgroundColor.includes('/ 0.4)'));
+  const styles = await styledButton.evaluate((button) => {
+    const style = getComputedStyle(button), surface = getComputedStyle(button, '::before');
+    return { color: style.color, opacity: style.opacity, radius: style.borderRadius,
+      width: button.getBoundingClientRect().width, background: surface.backgroundColor,
+      border: surface.borderColor, borderWidth: surface.borderTopWidth, icon: getComputedStyle(button.querySelector('svg')).width };
+  });
+  assert.equal(styles.color, 'rgb(17, 34, 51)');
+  assert.equal(styles.opacity, '0.6');
+  assert.equal(styles.radius, '6px');
+  assert.equal(styles.width, 48);
+  assert.equal(styles.icon, '18px');
+  assert.equal(styles.borderWidth, '2px');
+  assert.match(styles.background, /0\.4/);
+  assert.match(styles.border, /0\.7/);
+  await styledButton.click();
+  assert.equal(await styledButton.evaluate((button) => getComputedStyle(button).color), 'rgb(204, 0, 68)');
+  await page.evaluate(() => {
+    document.documentElement.style.setProperty('--mv-wishlist-background-opacity', '0');
+    document.documentElement.style.setProperty('--mv-wishlist-border-width', '0px');
+    document.documentElement.style.setProperty('--mv-wishlist-button-size', '28px');
+  });
+  assert.equal(await styledButton.evaluate((button) => button.getBoundingClientRect().width), 44, 'small surface keeps a 44px target');
+  console.log('PASS global off/on preserves data; custom colors, opacity, border, size, shape, active color and minimum touch target');
 
   if (process.env.WISHLIST_SCREENSHOT) {
     await seed(page, ['beige-dress', 'black-dress']);

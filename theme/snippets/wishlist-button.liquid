@@ -2,7 +2,7 @@
   Product-card wishlist toggle. Storage and state are shared across the storefront.
   @param {product} product - The product to save.
 {%- enddoc -%}
-{%- if product != blank and product.handle != blank -%}
+{%- if settings.wishlist_enabled != false and product != blank and product.handle != blank -%}
   <wishlist-toggle
     class="mv-wishlist-toggle"
     data-handle="{{ product.handle | escape }}"

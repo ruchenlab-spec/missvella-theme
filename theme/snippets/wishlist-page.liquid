@@ -9,7 +9,7 @@
     <p data-wishlist-summary hidden></p>
   </header>
   <div class="mv-wishlist-page__empty" data-wishlist-empty>
-    <p>Your wishlist is empty.</p>
+    <p>{% if settings.wishlist_enabled == false %}Wishlist is currently unavailable.{% else %}Your wishlist is empty.{% endif %}</p>
     <a class="button" href="{{ routes.all_products_collection_url }}">Continue shopping</a>
   </div>
   <div class="mv-wishlist-page__grid" data-wishlist-grid></div>

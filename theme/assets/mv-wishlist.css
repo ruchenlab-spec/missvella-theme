@@ -1,11 +1,12 @@
-/* A 34px visual button with a full 44px touch target, above the card link. */
+/* Configurable surface with a touch target of at least 44px. */
 .mv-wishlist-toggle {
+  --mv-wishlist-target-size: max(44px, var(--mv-wishlist-button-size, 34px));
   position: absolute;
   inset-block-start: 6px;
   inset-inline-end: 6px;
   z-index: 3;
-  width: 44px;
-  height: 44px;
+  width: var(--mv-wishlist-target-size);
+  height: var(--mv-wishlist-target-size);
 }
 
 .mv-wishlist-toggle[hidden] { display: none; }
@@ -13,13 +14,14 @@
 .mv-wishlist-toggle button {
   display: grid;
   place-items: center;
-  width: 44px;
-  height: 44px;
-  padding: 11px;
+  width: var(--mv-wishlist-target-size);
+  height: var(--mv-wishlist-target-size);
+  padding: 0;
   border: 0;
-  border-radius: 50%;
+  border-radius: var(--mv-wishlist-radius, 50%);
   background: transparent;
-  color: #65513e;
+  color: var(--mv-wishlist-icon-color, #65513e);
+  opacity: var(--mv-wishlist-opacity, 1);
   cursor: pointer;
   position: relative;
   isolation: isolate;
@@ -29,25 +31,26 @@
 .mv-wishlist-toggle button::before {
   content: '';
   position: absolute;
-  inset: 5px;
+  inset: calc((var(--mv-wishlist-target-size) - var(--mv-wishlist-button-size, 34px)) / 2);
   z-index: -1;
-  background: rgb(255 255 255 / 92%);
-  border: 1px solid rgb(101 81 62 / 12%);
+  background: color-mix(in srgb, var(--mv-wishlist-background, #fff) calc(var(--mv-wishlist-background-opacity, 0.92) * 100%), transparent);
+  border: var(--mv-wishlist-border-width, 1px) solid color-mix(in srgb, var(--mv-wishlist-border-color, #65513e) calc(var(--mv-wishlist-border-opacity, 0.12) * 100%), transparent);
   border-radius: inherit;
   transition: background-color 160ms ease;
 }
 
-.mv-wishlist-toggle button svg,
+.mv-wishlist-toggle button svg { width: var(--mv-wishlist-icon-size, 22px); height: var(--mv-wishlist-icon-size, 22px); }
 .mv-wishlist-link svg { width: 22px; height: 22px; }
+.mv-wishlist-toggle button[aria-pressed='true'] { color: var(--mv-wishlist-active-color, #65513e); }
 .mv-wishlist-toggle button[aria-pressed='true'] svg { fill: currentColor; }
-.mv-wishlist-toggle button:hover::before { background: #fff; }
+.mv-wishlist-toggle button:hover::before { filter: brightness(0.97); }
 .mv-wishlist-toggle button:focus-visible,
 .mv-wishlist-link:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
 
 /* A right-hand badge must leave space for the heart without covering the label. */
 .card-gallery:has(> .mv-wishlist-toggle) > .product-badges--top-right {
-  inset-inline-end: 54px;
-  max-width: calc(100% - 64px);
+  inset-inline-end: calc(max(44px, var(--mv-wishlist-button-size, 34px)) + 10px);
+  max-width: calc(100% - max(44px, var(--mv-wishlist-button-size, 34px)) - 20px);
 }
 
 .mv-wishlist-link {

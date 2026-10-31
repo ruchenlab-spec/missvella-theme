@@ -5,8 +5,24 @@
   endif
 -%}
 {{ 'mv-wishlist.css' | asset_url | stylesheet_tag }}
+{% style %}
+  :root {
+    --mv-wishlist-background: {{ settings.wishlist_button_background | default: '#ffffff' | color_modify: 'alpha', 1 }};
+    --mv-wishlist-background-opacity: {{ settings.wishlist_background_opacity | default: 92 | divided_by: 100.0 }};
+    --mv-wishlist-icon-color: {{ settings.wishlist_icon_color | default: '#65513e' }};
+    --mv-wishlist-active-color: {{ settings.wishlist_active_color | default: '#65513e' }};
+    --mv-wishlist-border-color: {{ settings.wishlist_border_color | default: '#65513e' | color_modify: 'alpha', 1 }};
+    --mv-wishlist-border-opacity: {{ settings.wishlist_border_opacity | default: 12 | divided_by: 100.0 }};
+    --mv-wishlist-border-width: {{ settings.wishlist_border_width | default: 1 }}px;
+    --mv-wishlist-opacity: {{ settings.wishlist_button_opacity | default: 100 | divided_by: 100.0 }};
+    --mv-wishlist-radius: {{ settings.wishlist_button_shape | default: '50%' }};
+    --mv-wishlist-button-size: {{ settings.wishlist_button_size | default: 34 }}px;
+    --mv-wishlist-icon-size: {{ settings.wishlist_icon_size | default: 22 }}px;
+  }
+{% endstyle %}
 <script id="mv-wishlist-config" type="application/json">
   {
+    "enabled": {{ settings.wishlist_enabled | default: true, allow_false: true | json }},
     "root": {{ routes.root_url | json }},
     "url": {{ wishlist_url | json }},
     "currency": {{ localization.country.currency.iso_code | default: shop.currency | json }},

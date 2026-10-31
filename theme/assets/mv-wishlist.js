@@ -5,6 +5,7 @@
   const configNode = document.getElementById('mv-wishlist-config');
   if (!configNode || customElements.get('wishlist-toggle')) return;
   const config = JSON.parse(configNode.textContent);
+  if (config.enabled === false) return; // Keep existing device storage untouched.
   const labels = config.labels;
   const KEY = 'missvella_wishlist_v1';
   const COOKIE = 'mv_wishlist_v1';

@@ -2118,6 +2118,139 @@
     ]
   },
   {
+    "name": "愿望单",
+    "settings": [
+      {
+        "type": "checkbox",
+        "id": "wishlist_enabled",
+        "label": "启用愿望单",
+        "default": true,
+        "info": "关闭后隐藏收藏按钮和页头入口，已保存的收藏不会被清除。"
+      },
+      {
+        "type": "checkbox",
+        "id": "wishlist_show_header",
+        "label": "显示页头愿望单入口",
+        "default": true,
+        "visible_if": "{{ settings.wishlist_enabled }}"
+      },
+      {
+        "type": "header",
+        "content": "商品卡收藏按钮"
+      },
+      {
+        "type": "paragraph",
+        "content": "以下样式用于商品卡右上角的爱心按钮。页头入口跟随页头配色。"
+      },
+      {
+        "type": "color",
+        "id": "wishlist_button_background",
+        "label": "背景色",
+        "default": "#ffffff",
+        "visible_if": "{{ settings.wishlist_enabled }}"
+      },
+      {
+        "type": "range",
+        "id": "wishlist_background_opacity",
+        "label": "背景不透明度",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "%",
+        "default": 92,
+        "visible_if": "{{ settings.wishlist_enabled }}"
+      },
+      {
+        "type": "color",
+        "id": "wishlist_icon_color",
+        "label": "爱心描边颜色",
+        "default": "#65513e",
+        "visible_if": "{{ settings.wishlist_enabled }}"
+      },
+      {
+        "type": "color",
+        "id": "wishlist_active_color",
+        "label": "已收藏爱心颜色",
+        "default": "#65513e",
+        "visible_if": "{{ settings.wishlist_enabled }}"
+      },
+      {
+        "type": "color",
+        "id": "wishlist_border_color",
+        "label": "按钮外框描边颜色",
+        "default": "#65513e",
+        "visible_if": "{{ settings.wishlist_enabled }}"
+      },
+      {
+        "type": "range",
+        "id": "wishlist_border_opacity",
+        "label": "外框不透明度",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "%",
+        "default": 12,
+        "visible_if": "{{ settings.wishlist_enabled }}"
+      },
+      {
+        "type": "range",
+        "id": "wishlist_border_width",
+        "label": "外框描边宽度",
+        "min": 0,
+        "max": 3,
+        "step": 0.5,
+        "unit": "px",
+        "default": 1,
+        "visible_if": "{{ settings.wishlist_enabled }}"
+      },
+      {
+        "type": "range",
+        "id": "wishlist_button_opacity",
+        "label": "按钮整体不透明度",
+        "min": 0,
+        "max": 100,
+        "step": 1,
+        "unit": "%",
+        "default": 100,
+        "visible_if": "{{ settings.wishlist_enabled }}"
+      },
+      {
+        "type": "select",
+        "id": "wishlist_button_shape",
+        "label": "按钮形状",
+        "options": [
+          { "value": "50%", "label": "圆形" },
+          { "value": "6px", "label": "圆角方形" },
+          { "value": "0px", "label": "方形" }
+        ],
+        "default": "50%",
+        "visible_if": "{{ settings.wishlist_enabled }}"
+      },
+      {
+        "type": "range",
+        "id": "wishlist_button_size",
+        "label": "按钮大小",
+        "min": 28,
+        "max": 48,
+        "step": 2,
+        "unit": "px",
+        "default": 34,
+        "visible_if": "{{ settings.wishlist_enabled }}"
+      },
+      {
+        "type": "range",
+        "id": "wishlist_icon_size",
+        "label": "爱心大小",
+        "min": 14,
+        "max": 28,
+        "step": 1,
+        "unit": "px",
+        "default": 22,
+        "visible_if": "{{ settings.wishlist_enabled }}"
+      }
+    ]
+  },
+  {
     "name": "面包屑",
     "settings": [
       {

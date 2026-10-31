@@ -22,6 +22,14 @@ The theme detects that page and automatically uses its URL in the header. Its ma
 
 Creating/editing store content stays with the merchant under `AGENTS.md`. Deployment must wait until the merchant has saved any theme-editor changes.
 
+## Theme settings
+
+In **Theme settings → 愿望单**, the merchant can enable/disable the feature and separately show/hide the header entry. Turning the feature off hides the entry points and shows an unavailable message on the wishlist route; it does not read, write, or clear the saved device data. Re-enabling restores the existing list.
+
+Product-card button controls include background color/opacity, heart outline color, saved-heart color, outer-border color/opacity/width, whole-button opacity, shape, surface size, and icon size. The hit area remains at least 44px. Header colors continue to follow the header theme.
+
+These definitions live in `config/settings_schema.json`; merchant-selected values remain in `config/settings_data.json`, which must never be pushed. Deploy schema changes with an exact `--only config/settings_schema.json` scope alongside the changed code files, after confirming the editor is saved. Do not use a `config/*` wildcard.
+
 ## Persistence
 
 - Primary key: `localStorage.missvella_wishlist_v1`. No application expiry.
