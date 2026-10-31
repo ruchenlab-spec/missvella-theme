@@ -9,10 +9,10 @@
 - **原因**：`templates/*.json` 与 `config/settings_data.json` 保存的是商家在编辑器里配置的内容（图片、文案、区块结构与设置值）。Shopify 只把它们写回线上，不同步到本地。全量 `theme push` 用本地旧文件覆盖了线上新内容。
 - **解决**：
   - 日常只推代码：`.\scripts\push-live.ps1`（仅 `assets/ sections/ snippets/ blocks/ layout/ locales/`）
-  - 改模板结构：先 `theme pull --only "templates/*.json" --only "config/settings_data.json" --path theme`，再改再推
+  - 模板结构和实例内容由商家在编辑器修改；禁止推送 `templates/*.json`、`sections/*.json` 和 `config/settings_data.json`，也禁止「pull → 修改 → push」更新实例设置。
   - 已误覆盖时：无法从本地找回，只能重新在编辑器配置（本地应保持 pull 后的版本）
   - **不要为了修改某个设置值去推 `templates/*.json`**：拉取到的快照在你改动之后就已经过期，推回去会连带覆盖商家在这期间做的其他修改（文案、图片、区块）。默认值请改 schema，实例值请商家在编辑器里调整。
-  - **即使只推 section 文件，也可能丢失编辑器中未保存的改动**：推送会触发热重载，商家正在编辑的内容可能被重载冲掉。推送前确认商家已保存且不在编辑状态。
+  - **即使只推 section 文件，也可能丢失编辑器中未保存的改动**：推送会触发热重载。自 2026-10-31 起，商家明确授权检查通过后直接推送，不再逐次询问保存确认；商家自行负责及时保存编辑器中的修改。内容文件禁推规则继续有效。
 
 ### P2 · 模板推送失败：`设置"video"值未指向适用的 Shopify 托管的视频资源`
 - **症状**：整个模板（如 `index.json`）上传失败，其他文件正常。
@@ -38,10 +38,7 @@
 ### P26 · 推送 `templates/*.json` 后线上设置没变
 - **症状**：修改 `templates/index.json` 里的某个设置值并推送成功，但 `theme pull` 回来发现线上仍是旧值。
 - **原因**：主题编辑器保持打开时，编辑器会用自己内存里的模型自动保存并写回线上，覆盖 CLI 刚推送的值（并发写）。
-- **解决**：
-  - 推送模板前让商家在编辑器里完成保存并退出编辑状态（或关闭编辑器标签页）；
-  - 推送后**立即** `theme pull` 校验；
-  - 对单个数值型设置，直接让商家在编辑器里调整最可靠（编辑器是最后写入方）。
+- **当前规则**：不再推送模板，也不通过 CLI 修改线上实例设置。具体数值由商家在编辑器中调整；默认值和新增选项改 schema。此条保留为历史事故说明，不构成模板推送的例外。
 
 ## 二、Shopify 主题架构限制
 
@@ -87,6 +84,10 @@
 - **解决**：忽略。这是本项目 2 个基线错误之一（另一个见下）。
 
 ### P12 · `theme check` 的基线错误与告警（已知，非本次改动引入）
+
+**2026-10-31 当前基线：34 个错误、23 个警告。** 错误为 `MatchingTranslations` × 32（其他语言缺少既有翻译键）、`UnknownFilter` × 2；警告为 `ValidScopedCSSClass` × 12、`UnusedDocParam` × 5、`UndefinedObject` × 4、`ExcessiveSettingsCount` × 1、`LiquidComplexity` × 1。本次改动应与当前基线比较，不能套用下面的旧版数量。
+
+以下为早期基线记录，仅作历史排查参考：
 **基线错误（2 个，判定标准：改动后仍是这 2 个即未引入新问题）**
 1. `blocks/disclosures.liquid`：`applicable_disclosures` filter 误报
 2. `snippets/cart-disclosure-tooltip.liquid`：`applicable_disclosures` filter 误报

@@ -185,13 +185,15 @@ section.main-collection
         ↓
 Shopify 写回线上主题的 templates/*.json、config/settings_data.json
         ↓
-（本地不同步）→ 推送前必须 `theme pull` 这两类文件
+（本地不同步）→ 商家内容保留在线上，禁止用本地快照推送覆盖
         ↓
-开发者/AI 改代码（sections/snippets/blocks/assets/layout/locales）
+开发者/AI 改代码（sections/snippets/blocks/assets/layout/locales，或精确的 config/settings_schema.json）
         ↓
-scripts/push-live.ps1（只推代码）
+检查通过后直接精确推送代码（商家已授权，不再逐次询问）
         ↓
 live 主题更新 → 编辑器刷新可见 → 前台即时生效
+        ↓
+核对线上代码/效果 → 同步项目文档 → Git 提交并推送 origin/main
 ```
 
 ## 七、横向（左右）边距能力

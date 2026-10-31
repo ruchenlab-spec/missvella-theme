@@ -81,7 +81,7 @@
 
 ### D7 · 安全推送：只推代码，不推内容
 - **背景**：全量 `theme push` 会把本地旧版 `templates/*.json`、`config/settings_data.json` 覆盖到线上，导致编辑器里配置的 Banner/图片丢失。
-- **结论**：日常推送仅包含 `assets/ sections/ snippets/ blocks/ layout/ locales/`；改模板结构必须先 pull 线上版本。
+- **结论**：日常推送仅包含 `assets/ sections/*.liquid snippets/ blocks/ layout/ locales/`；设置定义可精确推送 `config/settings_schema.json`。禁止推送内容文件，模板结构由商家在编辑器调整。自 2026-10-31 起，代码检查通过后直接推送，不再逐次确认；收工同步文档、本地 Git 和 `origin/main`。
 - **落地**：`scripts/push-live.ps1`。
 
 ### D8 · 不启用本地预览服务
@@ -130,6 +130,9 @@
 | 2026-10-19 | 自定义尺码 Atelier Rose UI + 可配置强调色 |
 | 2026-10-20 | 色板条视觉迭代：织物纹理、放大色卡、间距调整；排序 / 密度并入同一行 |
 | 2026-10-20 | 维护：移除第三方评价集成及其 JSON-LD 全站污染；补 doc 声明消除 4 个告警；`filters.liquid` 拆分 `cf-colour-bar` snippet |
+| 2026-10-31 | 圆形集合移动端数量扩展至 1–6，移动箭头移至下方，集合标题改为正文常规字重 |
+| 2026-10-31 | 新增持久化愿望单、商品卡爱心、页头入口和全局样式设置；愿望单角标复用购物车气泡组件及 CSS |
+| 2026-10-31 | 商家授权后续代码检查通过后直接推送，不再逐次询问；同步部署规则与 Git 远端工作流 |
 
 ## 五、Git 提交约定
 

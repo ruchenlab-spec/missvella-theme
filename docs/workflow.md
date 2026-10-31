@@ -2,7 +2,7 @@
 
 ## 一、环境
 
-> Git 为**本地仓库**（无远端）；「同步远端」指 Shopify 线上主题（`push-live.ps1`）。
+> Git 远端：`origin` → `https://github.com/ruchenlab-spec/missvella-theme.git`，默认分支 `main`。Shopify 主题推送与 Git 推送是两个步骤，收工时都应完成。
 
 | 组件 | 版本 | 备注 |
 |---|---|---|
@@ -33,6 +33,8 @@ shopify auth logout     # 切换账号时使用
 
 ### 3.1 只改代码（绝大多数情况）
 
+自 2026-10-31 起，商家授权代码修改检查通过后直接推送，不再逐次询问推送或保存确认。编辑器中的修改由商家自行及时保存；若商家明确要求暂缓某次推送，遵从当次指示。
+
 ```powershell
 .\scripts\push-live.ps1
 ```
@@ -40,18 +42,11 @@ shopify auth logout     # 切换账号时使用
 - 推送范围：`assets/ sections/ snippets/ blocks/ layout/ locales/`
 - **不会**触碰 `templates/*.json` 与 `config/settings_data.json`，编辑器里的 Banner、图片、区块配置全部保留
 - 推送后刷新主题编辑器即可看到效果
+- 优先使用 `shopify theme push --only "具体代码路径"` 精确推送本次改动；推送后核对远端文件或前台行为，再更新文档、提交 Git 并执行 `git push origin main`。
 
-### 3.2 需要修改页面结构（`templates/*.json`）
+### 3.2 需要修改页面结构或实例内容
 
-```powershell
-# 1) 先把线上最新版本拉回本地（含商家在编辑器里的配置）
-shopify theme pull --store 6icwx6-yv.myshopify.com --theme 167137378374 --only "templates/index.json" --path theme
-
-# 2) 修改本地文件（用 node 处理 JSON，见 5.2）
-
-# 3) 推送
-.\scripts\push-live.ps1 -IncludeContent
-```
+由商家在主题编辑器或 Shopify 后台操作。禁止推送 `templates/*.json`、`sections/*.json`、`config/settings_data.json`，也不要使用「pull → 修改 → push」更新实例设置。旧脚本的 `-IncludeContent` / `-PullContent` 选项不属于允许工作流，禁止使用。
 
 ### 3.3 修改全局设置（`config/settings_schema.json`）
 
@@ -72,10 +67,11 @@ shopify theme push --store ... --theme 167137378374 --allow-live --path theme --
 
 ## 四之二、推送前检查清单（每次推送都要过一遍）
 
-- [ ] 本次推送的 `--only` 列表**不含** `templates/` 与 `config/`
-- [ ] 商家在编辑器里的改动已保存（推送会触发热重载，可能打断未保存的编辑）
+- [ ] 本次推送的 `--only` 列表仅包含代码；`config/` 只允许精确的 `config/settings_schema.json`
+- [ ] 按商家长期授权直接推送，不再逐次询问保存状态；商家明确要求暂缓时遵从
 - [ ] 没有为了改某个设置值而拉取/推送模板
-- [ ] 推送后用 `theme pull --only templates/index.json` 抽查商家文案是否仍在（发现异常立即停止后续推送并告知）
+- [ ] 推送后将对应代码拉到临时目录核对，或验证前台行为；不覆盖本地商家内容快照
+- [ ] 更新相关文档、提交本地 Git、同步 `origin/main`；不提交临时截图或缓存
 
 ### 4.1 内容类文件（`templates/*.json`、`sections/*.json`）只改本地副本
 
@@ -85,7 +81,7 @@ shopify theme push --store ... --theme 167137378374 --allow-live --path theme --
   - `page.faqs` / `page.about` 的品牌文案与外链（本地已替换为 Missvella 文案 + 站内相对路径）
   - `page.about` 的旧站 hero 图（本地已清空）
   - `footer-group` 的旧站 logo 与社交账号（本地已清空，Instagram 改为 `@missvella`）
-- 后续若要推模板，先 `theme pull` 再改，改完用 `--only "templates/xxx.json"` 单独推。
+- 不推送模板；后续线上结构调整继续由商家在编辑器完成。
 
 ## 五、开发习惯
 
@@ -109,7 +105,7 @@ shopify theme push --store ... --theme 167137378374 --allow-live --path theme --
 - `.gitattributes` 已统一 LF，避免 Windows CRLF 污染 diff。
 
 ### 5.4 验证
-- 结构验证：`shopify theme check --path theme`（已知 2 个基线错误 + 19 个官方文件告警，见 pitfalls）。
+- 结构验证：`shopify theme check --path theme`。2026-10-31 基线为 34 个错误、23 个警告（含其他语言缺失翻译等既有问题）；要求本次改动无新增问题，旧版基线记录见 pitfalls。
 - 渲染验证：`curl http://<预览地址>` 检查关键 class/文案是否出现（无浏览器时）。
 - 视觉验证：开发者在主题编辑器里确认。
 

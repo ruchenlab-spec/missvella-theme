@@ -4,6 +4,7 @@
 
 - Product cards show a heart at the top right. Clicking it saves/removes the product without opening its product page.
 - The header heart shows the saved count and opens the wishlist.
+- The header wishlist count reuses `cart-bubble.liquid` and the same `.header-actions__bubble-icon` CSS as the cart, including sizing, colors, typography, placement, and icon masking. Wishlist counts have no cart refs or IDs and are updated independently.
 - The wishlist provides product links, current prices, removal, an empty state, and retry for temporary request failures. Unpublished or unavailable products remain removable; a failed request never silently deletes a saved item.
 - Product and resource cards inserted by filtering, search, or recommendations pick up their saved state automatically.
 
@@ -20,7 +21,7 @@ For the conventional `/pages/wishlist` address, the merchant can create a **publ
 
 The theme detects that page and automatically uses its URL in the header. Its main content becomes the wishlist view; the existing header and footer remain. No JSON template, page-body code, template assignment, or `settings_data.json` upload is required. Other page content is unaffected.
 
-Creating/editing store content stays with the merchant under `AGENTS.md`. Deployment must wait until the merchant has saved any theme-editor changes.
+Creating/editing store content stays with the merchant under `AGENTS.md`. Since 2026-10-31, the merchant has authorized direct code deployment after checks pass, without repeated deployment or editor-save questions. The merchant is responsible for saving editor changes.
 
 ## Theme settings
 
@@ -28,7 +29,7 @@ In **Theme settings → 愿望单**, the merchant can enable/disable the feature
 
 Product-card button controls include background color/opacity, heart outline color, saved-heart color, outer-border color/opacity/width, whole-button opacity, shape, surface size, and icon size. The hit area remains at least 44px. Header colors continue to follow the header theme.
 
-These definitions live in `config/settings_schema.json`; merchant-selected values remain in `config/settings_data.json`, which must never be pushed. Deploy schema changes with an exact `--only config/settings_schema.json` scope alongside the changed code files, after confirming the editor is saved. Do not use a `config/*` wildcard.
+These definitions live in `config/settings_schema.json`; merchant-selected values remain in `config/settings_data.json`, which must never be pushed. Deploy schema changes with an exact `--only config/settings_schema.json` scope alongside the changed code files under the standing deployment authorization. Do not use a `config/*` wildcard.
 
 ## Persistence
 
@@ -50,3 +51,5 @@ Run `node scripts/test-wishlist.cjs` with Playwright available. Optional environ
 The browser suite covers toggle/removal, duplicated product cards, AJAX insertion/morphing, refresh, actual browser close/reopen with the same profile, cross-tab updates, stale/corrupt storage, cookie fallback, blocked stores, request failures/retry, HTML-safe product titles, request concurrency, and mobile/desktop overflow.
 
 Also run `node --check theme/assets/mv-wishlist.js`, `shopify theme check --path theme --output json`, and `git diff --check`. The repository has existing unrelated Theme Check offenses; compare with the unchanged baseline.
+
+Verified on 2026-10-31 after deployment: wishlist/cart header bubbles match in computed dimensions, offsets, font family/size/weight, text color, and background color. Save, refresh persistence, header navigation/counts, live product loading, responsive layout, and persistent removal passed against the deployed storefront. Theme Check remained at the existing 34 errors and 23 warnings.
