@@ -1,0 +1,180 @@
+/* A 34px visual button with a full 44px touch target, above the card link. */
+.mv-wishlist-toggle {
+  position: absolute;
+  inset-block-start: 6px;
+  inset-inline-end: 6px;
+  z-index: 3;
+  width: 44px;
+  height: 44px;
+}
+
+.mv-wishlist-toggle[hidden] { display: none; }
+
+.mv-wishlist-toggle button {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 11px;
+  border: 0;
+  border-radius: 50%;
+  background: transparent;
+  color: #65513e;
+  cursor: pointer;
+  position: relative;
+  isolation: isolate;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.mv-wishlist-toggle button::before {
+  content: '';
+  position: absolute;
+  inset: 5px;
+  z-index: -1;
+  background: rgb(255 255 255 / 92%);
+  border: 1px solid rgb(101 81 62 / 12%);
+  border-radius: inherit;
+  transition: background-color 160ms ease;
+}
+
+.mv-wishlist-toggle button svg,
+.mv-wishlist-link svg { width: 22px; height: 22px; }
+.mv-wishlist-toggle button[aria-pressed='true'] svg { fill: currentColor; }
+.mv-wishlist-toggle button:hover::before { background: #fff; }
+.mv-wishlist-toggle button:focus-visible,
+.mv-wishlist-link:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+
+/* A right-hand badge must leave space for the heart without covering the label. */
+.card-gallery:has(> .mv-wishlist-toggle) > .product-badges--top-right {
+  inset-inline-end: 54px;
+  max-width: calc(100% - 64px);
+}
+
+.mv-wishlist-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  min-width: 44px;
+  min-height: 44px;
+  color: var(--color-foreground);
+  text-decoration: none;
+}
+
+.mv-wishlist-link__count {
+  position: absolute;
+  inset-block-start: 1px;
+  inset-inline-end: 0;
+  display: grid;
+  place-items: center;
+  min-width: 17px;
+  height: 17px;
+  padding-inline: 3px;
+  border-radius: 50%;
+  background: var(--color-primary-button-background);
+  color: var(--color-primary-button-text);
+  font: 400 10px/1 var(--font-body--family);
+}
+.mv-wishlist-link__count[hidden] { display: none; }
+
+/* This uses a normal Shopify route until a merchant-created wishlist page exists. */
+.mv-wishlist-route #MainContent > :not([data-wishlist-page]) { display: none !important; }
+.mv-wishlist-route [data-wishlist-page] { display: block !important; }
+.mv-wishlist-page {
+  max-width: var(--page-width, 1440px);
+  margin-inline: auto;
+  padding: 56px var(--page-margin, 24px) 72px;
+  min-height: 45vh;
+}
+.mv-wishlist-page__header { margin-block-end: 28px; }
+.mv-wishlist-page h1 { margin: 0; font-weight: 400; }
+.mv-wishlist-page__header p { margin-block: 10px 0; opacity: 0.65; }
+.mv-wishlist-page__empty { text-align: center; padding-block: 32px 64px; }
+.mv-wishlist-page__empty .button { margin-block-start: 16px; }
+.mv-wishlist-page__grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 36px 24px;
+}
+.mv-wishlist-item { min-width: 0; position: relative; }
+.mv-wishlist-item__media {
+  position: relative;
+  display: block;
+  aspect-ratio: 2 / 3;
+  overflow: hidden;
+  background: rgb(var(--color-foreground-rgb) / 4%);
+}
+.mv-wishlist-item__media img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.mv-wishlist-item__title {
+  display: block;
+  margin-block: 12px 6px;
+  color: inherit;
+  text-decoration: none;
+  font: 400 14px/1.5 var(--font-body--family);
+  overflow-wrap: anywhere;
+}
+.mv-wishlist-item__price { margin: 0 0 6px; font-size: 14px; }
+.mv-wishlist-item__message { font-size: 13px; line-height: 1.5; }
+.mv-wishlist-item__action {
+  display: inline-block;
+  padding: 8px 0;
+  min-height: 44px;
+  margin-inline-end: 20px;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 4px;
+  font: 400 13px/1.5 var(--font-body--family);
+  cursor: pointer;
+}
+.mv-wishlist-notice {
+  position: fixed;
+  inset-inline: 20px;
+  bottom: 24px;
+  width: fit-content;
+  max-width: min(480px, calc(100% - 40px));
+  margin-inline: auto;
+  padding: 14px 20px;
+  background: var(--color-foreground);
+  color: var(--color-background);
+  box-shadow: 0 4px 24px rgb(0 0 0 / 12%);
+  font: 400 14px/1.5 var(--font-body--family);
+  z-index: 100;
+  pointer-events: none;
+}
+.mv-wishlist-notice:empty { display: none; }
+@media (max-width: 989px) {
+  .mv-wishlist-page__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (max-width: 749px) {
+  /* Reserve actual action widths so the added heart cannot cover the logo. */
+  #header-component .header__columns:has(.mv-wishlist-link) {
+    --mv-wishlist-actions-width: 88px;
+    grid-template-columns: 44px 44px minmax(0, 1fr) 44px calc(var(--mv-wishlist-actions-width) - 44px);
+  }
+  #header-component .header__columns:has(.mv-wishlist-link):has(shopify-account) {
+    --mv-wishlist-actions-width: 132px;
+  }
+  #header-component[data-menu-style] .header__columns:has(.mv-wishlist-link) .search-action {
+    grid-area: leftB;
+  }
+  #header-component .header__columns:has(.mv-wishlist-link) header-actions {
+    grid-column: 4 / -1;
+    grid-row: 1;
+    margin-inline-start: 0;
+  }
+  #header-component .header__columns:has(.mv-wishlist-link) .header-logo {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    padding-inline: 4px;
+  }
+  #header-component .header__columns:has(.mv-wishlist-link) .header-logo__image {
+    max-width: 100%;
+    height: auto;
+  }
+  .mv-wishlist-page { padding-block: 32px 48px; }
+  .mv-wishlist-page__grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 12px; }
+  .mv-wishlist-toggle { inset-block-start: 2px; inset-inline-end: 2px; }
+}

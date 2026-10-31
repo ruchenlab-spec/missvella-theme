@@ -25,6 +25,7 @@
     {%- render 'theme-styles-variables' -%}
     {%- render 'color-palette' -%}
     {{ 'mv-shared.css' | asset_url | stylesheet_tag }}
+    {% render 'wishlist-assets' %}
 
     {% if request.design_mode %}
       {%- render 'theme-editor' -%}
@@ -164,6 +165,7 @@
           {%- endunless -%}
         {%- endif -%}
         {{ content_for_layout }}
+        {% render 'wishlist-page' %}
       </main>
 
       <footer>
@@ -175,6 +177,7 @@
     {% render 'theme-drawer' %}
 
     {% render 'search-modal' %}
+    <div class="mv-wishlist-notice" data-wishlist-notice role="status" aria-live="polite" aria-atomic="true"></div>
 
     {% if settings.quick_add or settings.mobile_quick_add %}
       {% render 'quick-add-modal' %}

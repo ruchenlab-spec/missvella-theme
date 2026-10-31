@@ -1,0 +1,16 @@
+{%- doc -%}
+  Product-card wishlist toggle. Storage and state are shared across the storefront.
+  @param {product} product - The product to save.
+{%- enddoc -%}
+{%- if product != blank and product.handle != blank -%}
+  <wishlist-toggle
+    class="mv-wishlist-toggle"
+    data-handle="{{ product.handle | escape }}"
+    data-title="{{ product.title | escape }}"
+    hidden
+  >
+    <button type="button" aria-pressed="false" aria-label="Save to wishlist: {{ product.title | escape }}">
+      {% render 'wishlist-icon' %}
+    </button>
+  </wishlist-toggle>
+{%- endif -%}

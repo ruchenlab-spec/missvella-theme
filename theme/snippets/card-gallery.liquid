@@ -246,6 +246,7 @@
     %}
   {%- endif -%}
   {{ children }}
+  {% render 'wishlist-button', product: product %}
 </div>
 
 {% render 'slideshow-styles' %}

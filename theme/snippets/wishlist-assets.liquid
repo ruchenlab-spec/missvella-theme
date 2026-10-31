@@ -1,0 +1,42 @@
+{%- liquid
+  assign wishlist_url = routes.search_url | append: '?wishlist=1'
+  if pages.wishlist != blank
+    assign wishlist_url = pages.wishlist.url
+  endif
+-%}
+{{ 'mv-wishlist.css' | asset_url | stylesheet_tag }}
+<script id="mv-wishlist-config" type="application/json">
+  {
+    "root": {{ routes.root_url | json }},
+    "url": {{ wishlist_url | json }},
+    "currency": {{ localization.country.currency.iso_code | default: shop.currency | json }},
+    "page": {% if request.page_type == 'page' and page.handle == 'wishlist' %}true{% else %}false{% endif %},
+    "labels": {
+      "title": "My Wishlist",
+      "save": "Save to wishlist",
+      "remove": "Remove from wishlist",
+      "removed": "Removed from your wishlist.",
+      "saved": "Saved to your wishlist.",
+      "storageError": "Your browser could not save your wishlist. Please allow website storage and try again.",
+      "limit": "Your wishlist can hold up to 100 products. Remove an item to save another.",
+      "loading": "Loading product…",
+      "unavailable": "This product is no longer available.",
+      "loadError": "This product could not be loaded. Your saved item is still here.",
+      "retry": "Try again",
+      "removeLink": "Remove",
+      "soldOut": "Sold out",
+      "item": "saved item",
+      "items": "saved items"
+    }
+  }
+</script>
+<script>
+  (() => {
+    const config = JSON.parse(document.getElementById('mv-wishlist-config').textContent);
+    if (config.page || (location.pathname.replace(/\/$/, '').endsWith('/search') && new URLSearchParams(location.search).get('wishlist') === '1')) {
+      document.documentElement.classList.add('mv-wishlist-route');
+      document.title = config.labels.title + ' — ' + {{ shop.name | json }};
+    }
+  })();
+</script>
+<script src="{{ 'mv-wishlist.js' | asset_url }}" defer></script>

@@ -1,0 +1,17 @@
+{%- comment -%}
+  A code-only wishlist route works at /search?wishlist=1. When the merchant creates
+  a published page with handle "wishlist", the same view powers /pages/wishlist.
+  No template or merchant instance settings need to be uploaded.
+{%- endcomment -%}
+<section class="mv-wishlist-page" data-wishlist-page hidden aria-labelledby="mv-wishlist-heading">
+  <header class="mv-wishlist-page__header">
+    <h1 id="mv-wishlist-heading" tabindex="-1">My Wishlist</h1>
+    <p data-wishlist-summary hidden></p>
+  </header>
+  <div class="mv-wishlist-page__empty" data-wishlist-empty>
+    <p>Your wishlist is empty.</p>
+    <a class="button" href="{{ routes.all_products_collection_url }}">Continue shopping</a>
+  </div>
+  <div class="mv-wishlist-page__grid" data-wishlist-grid></div>
+  <noscript><p>Please enable JavaScript to view and save your wishlist.</p></noscript>
+</section>

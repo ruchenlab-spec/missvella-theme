@@ -113,6 +113,16 @@
     </div>
   {% endif %}
 
+  <a
+    class="header-actions__action mv-wishlist-link"
+    href="{% if pages.wishlist != blank %}{{ pages.wishlist.url }}{% else %}{{ routes.search_url }}?wishlist=1{% endif %}"
+    aria-label="My Wishlist"
+    data-wishlist-link
+  >
+    <span class="svg-wrapper">{% render 'wishlist-icon' %}</span>
+    <span class="mv-wishlist-link__count" data-wishlist-count hidden></span>
+  </a>
+
   {% if settings.cart_type == 'drawer' and template.name != 'cart' %}
     <button
       class="header-actions__action button-unstyled{% if display_style == 'text' %} header-actions__text-style{% endif %}"
