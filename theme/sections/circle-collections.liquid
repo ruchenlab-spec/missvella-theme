@@ -353,7 +353,52 @@
 
   @container circle-collections (max-width: 749px) {
     .circle-collections .circle-collections__carousel {
+      grid-template-columns: 1fr 44px 44px 1fr;
       column-gap: 4px;
+      row-gap: 8px;
+    }
+
+    .circle-collections .circle-collections__carousel slideshow-container {
+      grid-column: 1 / -1;
+    }
+
+    /* Compact controls below the circles leave the entire row for collections.
+       The visible surface is 32px; the button keeps a 44px touch target. */
+    .circle-collections__arrow {
+      grid-row: 2;
+      justify-self: center;
+      width: 44px;
+      height: 44px;
+      margin-block-start: 0;
+      background: transparent;
+      color: var(--color-foreground);
+      isolation: isolate;
+    }
+
+    .circle-collections__arrow--prev {
+      grid-column: 2;
+    }
+
+    .circle-collections__arrow--next {
+      grid-column: 3;
+    }
+
+    .circle-collections__arrow::before {
+      inset: 6px;
+      z-index: -1;
+      border: 1px solid rgb(var(--color-foreground-rgb) / 12%);
+      border-radius: inherit;
+      background: rgb(var(--color-foreground-rgb) / 4%);
+    }
+
+    .circle-collections__arrow--shape-none::before {
+      border: 0;
+      background: transparent;
+    }
+
+    .circle-collections__arrow-icon {
+      width: 16px;
+      height: 16px;
     }
   }
 
