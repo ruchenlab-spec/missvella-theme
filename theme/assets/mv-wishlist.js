@@ -83,7 +83,8 @@
       link.setAttribute('aria-label', `${labels.title} (${state.items.length})`);
     });
     document.querySelectorAll('[data-wishlist-count]').forEach((badge) => {
-      badge.textContent = String(state.items.length);
+      const text = badge.querySelector('[data-wishlist-count-text]');
+      if (text) text.textContent = String(state.items.length);
       badge.hidden = state.items.length === 0;
     });
   }

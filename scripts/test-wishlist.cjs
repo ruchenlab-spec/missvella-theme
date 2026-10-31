@@ -10,6 +10,9 @@ const repo = path.resolve(__dirname, '..');
 const read = (file) => fs.readFileSync(path.join(repo, 'theme', file), 'utf8');
 const KEY = 'missvella_wishlist_v1';
 const icon = read('snippets/wishlist-icon.liquid');
+const css = (snippet) => read(snippet).match(/{% stylesheet %}([\s\S]*?){% endstylesheet %}/)[1];
+const sharedBubbleCss = css('snippets/cart-bubble.liquid') + css('snippets/header-actions.liquid');
+const bubble = (wishlist) => `<span class="cart-bubble" data-maintain-ratio ${wishlist ? 'data-wishlist-count hidden' : ''}><span class="cart-bubble__background"></span><span class="cart-bubble__text"><span ${wishlist ? 'data-wishlist-count-text' : ''}>${wishlist ? '' : '1'}</span></span></span>`;
 const configText = read('snippets/wishlist-assets.liquid').match(/type="application\/json">([\s\S]*?)<\/script>/)[1];
 const config = JSON.parse(configText
   .replace(/{{ settings.wishlist_enabled \| default: true, allow_false: true \| json }}/, 'true')
@@ -31,7 +34,10 @@ const fixture = (pathname = '') => `<!doctype html><html lang="en"><head><style>
   .fixture-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;padding:20px}.card-gallery{position:relative}.fixture-photo{aspect-ratio:2/3;background:#d2c3b5}.button{display:inline-block;padding:16px 24px;background:#87704f;color:white;text-decoration:none}
   </style><link rel="stylesheet" href="/assets/mv-wishlist.css"></head><body><header><a data-wishlist-link class="mv-wishlist-link" href="/search?wishlist=1"><span class="svg-wrapper">${icon}</span><span class="mv-wishlist-link__count" data-wishlist-count hidden></span></a></header><main id="MainContent"><div class="fixture-grid">${card('beige-dress')}${card('black-dress')}${card('beige-dress')}</div>${pageMarkup}</main><div class="mv-wishlist-notice" role="status" data-wishlist-notice></div><script id="mv-wishlist-config" type="application/json">${JSON.stringify(pathname === '/disabled' ? { ...config, enabled: false } : pathname.startsWith('/fr/') ? { ...config, root: '/fr/', url: '/fr/search?wishlist=1', currency: 'EUR' } : config)}</script><script>
   if(new URLSearchParams(location.search).get('wishlist')==='1'||location.pathname==='/pages/wishlist')document.documentElement.classList.add('mv-wishlist-route');
-  </script><script src="/assets/mv-wishlist.js" defer></script></body></html>`;
+  </script><script src="/assets/mv-wishlist.js" defer></script></body></html>`
+    .replace('</style>', `:root{--cart-bubble-background:#a08c73;--cart-bubble-text:#fff;--font-size--3xs:9px;--style-border-radius-50:50%}${sharedBubbleCss}</style>`)
+    .replace(`<span class="svg-wrapper">${icon}</span><span class="mv-wishlist-link__count" data-wishlist-count hidden></span>`, `<span class="header-actions__bubble-icon"><span class="svg-wrapper">${icon}</span>${bubble(true)}</span>`)
+    .replace('</header>', `<span class="header-actions__cart-icon header-actions__bubble-icon header-actions__cart-icon--has-cart"><span class="svg-wrapper">${icon}</span>${bubble(false)}</span></header>`);
 const server = http.createServer(async (req, res) => {
   const url = new URL(req.url, 'http://localhost');
   if (url.pathname.startsWith('/assets/')) {
@@ -79,6 +85,17 @@ async function run() {
   assert.equal(await page.locator('wishlist-toggle button[aria-pressed="true"]').count(), 2, 'duplicate product hearts sync');
   assert.equal(new URL(page.url()).pathname, '/collections/all', 'heart does not follow product link');
   assert.equal(await page.locator('[data-wishlist-count]').textContent(), '1');
+  assert.equal(await page.locator('[data-wishlist-count] .cart-bubble__background').count(), 1, 'count updates preserve shared bubble markup');
+  const bubbleStyles = await page.evaluate(() => {
+    const measure = (bubble) => {
+      const style = getComputedStyle(bubble), text = getComputedStyle(bubble.querySelector('.cart-bubble__text'));
+      return { width: style.width, height: style.height, top: style.top, right: style.insetInlineEnd,
+        radius: style.borderRadius, color: style.color, font: text.font, lineHeight: text.lineHeight,
+        background: getComputedStyle(bubble.querySelector('.cart-bubble__background')).backgroundColor };
+    };
+    return { wishlist: measure(document.querySelector('[data-wishlist-count]')), cart: measure(document.querySelector('.header-actions__cart-icon .cart-bubble')) };
+  });
+  assert.deepEqual(bubbleStyles.wishlist, bubbleStyles.cart, 'wishlist and cart use the same rendered bubble styles');
   await heart.click();
   assert.equal(await page.locator('[data-wishlist-count]').isHidden(), true);
   await heart.click();

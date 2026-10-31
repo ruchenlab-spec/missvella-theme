@@ -64,22 +64,6 @@
   text-decoration: none;
 }
 
-.mv-wishlist-link__count {
-  position: absolute;
-  inset-block-start: 1px;
-  inset-inline-end: 0;
-  display: grid;
-  place-items: center;
-  min-width: 17px;
-  height: 17px;
-  padding-inline: 3px;
-  border-radius: 50%;
-  background: var(--color-primary-button-background);
-  color: var(--color-primary-button-text);
-  font: 400 10px/1 var(--font-body--family);
-}
-.mv-wishlist-link__count[hidden] { display: none; }
-
 /* This uses a normal Shopify route until a merchant-created wishlist page exists. */
 .mv-wishlist-route #MainContent > :not([data-wishlist-page]) { display: none !important; }
 .mv-wishlist-route [data-wishlist-page] { display: block !important; }

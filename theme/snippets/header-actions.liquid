@@ -20,7 +20,7 @@
 
 {% capture cart_icon %}
   <cart-icon
-    class="header-actions__cart-icon{% if display_style == 'text' %} header-actions__cart-icon--text{% endif %}{% unless cart == empty %} header-actions__cart-icon--has-cart{% endunless %}"
+    class="header-actions__cart-icon header-actions__bubble-icon{% if display_style == 'text' %} header-actions__cart-icon--text{% endif %}{% unless cart == empty %} header-actions__cart-icon--has-cart{% endunless %}"
     data-testid="cart-icon"
   >
     <span class="{% if display_style == 'icon' %}hidden{% else %}mobile:hidden{% endif %}">
@@ -120,8 +120,10 @@
     aria-label="My Wishlist"
     data-wishlist-link
   >
-    <span class="svg-wrapper">{% render 'wishlist-icon' %}</span>
-    <span class="mv-wishlist-link__count" data-wishlist-count hidden></span>
+    <span class="header-actions__bubble-icon">
+      <span class="svg-wrapper">{% render 'wishlist-icon' %}</span>
+      {% render 'cart-bubble', wishlist: true %}
+    </span>
   </a>
   {% endif %}
 
@@ -249,7 +251,7 @@
     margin-inline-start: calc(var(--gap-md) * -1);
   }
 
-  .header-actions__cart-icon {
+  .header-actions__bubble-icon {
     --cart-bubble-size: 20px;
     --cart-bubble-top: 4.5px;
     --cart-bubble-right: 2.5px;
@@ -257,7 +259,7 @@
     position: relative;
   }
 
-  .header-actions__cart-icon .cart-bubble {
+  .header-actions__bubble-icon .cart-bubble {
     position: absolute;
     width: var(--cart-bubble-size, 20px);
     top: var(--cart-bubble-top);
@@ -271,12 +273,13 @@
     }
   }
 
-  .header-actions__cart-icon .cart-bubble__text {
+  .header-actions__bubble-icon .cart-bubble__text {
     font-family: var(--font-paragraph--family);
     font-weight: var(--font-paragraph--weight);
   }
 
-  .header-actions__cart-icon.header-actions__cart-icon--has-cart svg {
+  .header-actions__cart-icon.header-actions__cart-icon--has-cart svg,
+  .header-actions__bubble-icon:has([data-wishlist-count]:not([hidden])) svg {
     /* Create donut mask where the cart bubble sits */
     mask: radial-gradient(
       calc(var(--cart-bubble-size) + 2px) at calc(100% - var(--cart-bubble-right)) var(--cart-bubble-top),
@@ -287,7 +290,8 @@
   }
 
   /* Mask positions are physical; the bubble sits at the inline-end (left in RTL) */
-  [dir='rtl'] .header-actions__cart-icon.header-actions__cart-icon--has-cart svg {
+  [dir='rtl'] .header-actions__cart-icon.header-actions__cart-icon--has-cart svg,
+  [dir='rtl'] .header-actions__bubble-icon:has([data-wishlist-count]:not([hidden])) svg {
     mask: radial-gradient(
       calc(var(--cart-bubble-size) + 2px) at var(--cart-bubble-right) var(--cart-bubble-top),
       transparent 45.45%,
