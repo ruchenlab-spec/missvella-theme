@@ -9,7 +9,8 @@
     with a custom image / video and a custom title, straight in the theme editor.
 
   Arrows: theme slideshow arrows in their own grid columns beside the circles
-  (never overlapping), vertically centered on the circle row.
+  (never overlapping), vertically centered on the circle row on desktop.
+  Mobile controls share the title row on the right.
 {%- endcomment -%}
 
 {% liquid
@@ -77,6 +78,7 @@
     --circle-gap: {{ circle_gap }}px;
     --circle-size: {{ circle_size_css }};
     --circle-arrow-size: {{ arrow_size }}px;
+    --circle-mobile-control-size: {% if arrow_size == 0 %}0px{% else %}44px{% endif %};
     --circle-carousel-gap: {% if arrow_size == 0 %}0px{% else %}8px{% endif %};
     --circle-title-size: {{ section.settings.title_font_size | default: 12 }}px;
     --circle-title-spacing: {{ section.settings.title_letter_spacing | default: 1 }}px;
@@ -84,14 +86,20 @@
     {% if section.settings.title_color != blank %}--circle-title-color: {{ section.settings.title_color }};{% endif %}
   "
 >
-  {%- comment -%} Header: heading blocks rendered with the native text snippet {%- endcomment -%}
-  {%- for block in section.blocks -%}
-    {%- if block.type == 'heading' -%}
-      <div class="circle-collections__header">
-        {%- render 'text', block: block -%}
-      </div>
+  {%- capture heading_blocks -%}
+    {%- for block in section.blocks -%}
+      {%- if block.type == 'heading' -%}
+        <div class="circle-collections__header">
+          {%- render 'text', block: block -%}
+        </div>
+      {%- endif -%}
+    {%- endfor -%}
+  {%- endcapture -%}
+  {%- capture carousel_header -%}
+    {%- if heading_blocks != blank -%}
+      <div class="circle-collections__headings">{{ heading_blocks }}</div>
     {%- endif -%}
-  {%- endfor -%}
+  {%- endcapture -%}
 
   {%- capture slides -%}
     {%- assign circle_index = 0 -%}
@@ -232,6 +240,7 @@
   {%- render 'slideshow',
     ref: 'circleCollections',
     class: 'circle-collections__carousel',
+    header: carousel_header,
     slides: slides,
     slide_count: slide_count,
     show_arrows: false,
@@ -245,6 +254,12 @@
   .circle-collections {
     container-type: inline-size;
     container-name: circle-collections;
+  }
+
+  .circle-collections__headings {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    min-width: 0;
   }
 
   .circle-collections__header {
@@ -267,7 +282,7 @@
 
   .circle-collections .circle-collections__carousel slideshow-container {
     grid-column: 2;
-    grid-row: 1;
+    grid-row: 2;
     min-width: 0;
   }
 
@@ -283,7 +298,7 @@
    */
   .circle-collections__arrow {
     position: relative;
-    grid-row: 1;
+    grid-row: 2;
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -353,19 +368,31 @@
 
   @container circle-collections (max-width: 749px) {
     .circle-collections .circle-collections__carousel {
-      grid-template-columns: 1fr 44px 44px 1fr;
-      column-gap: 4px;
-      row-gap: 8px;
+      grid-template-columns: minmax(0, 1fr) repeat(2, var(--circle-mobile-control-size));
+      column-gap: min(4px, var(--circle-carousel-gap));
+      row-gap: 16px;
+    }
+
+    .circle-collections__headings {
+      grid-column: 1;
+      align-self: center;
+      display: grid;
+      gap: 12px;
+    }
+
+    .circle-collections__header {
+      margin-block-end: 0;
     }
 
     .circle-collections .circle-collections__carousel slideshow-container {
       grid-column: 1 / -1;
+      grid-row: 2;
     }
 
-    /* Compact controls below the circles leave the entire row for collections.
+    /* Controls stay inside the native slideshow and share the title row.
        The visible surface is 32px; the button keeps a 44px touch target. */
     .circle-collections__arrow {
-      grid-row: 2;
+      grid-row: 1;
       justify-self: center;
       width: 44px;
       height: 44px;
