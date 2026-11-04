@@ -203,6 +203,7 @@ live 主题更新 → 编辑器刷新可见 → 前台即时生效
   `carousel, collection-links, collection-list, featured-blog-posts, footer-utilities, footer, hero, logo, main-404, main-cart, main-collection-list, media-with-content, password, product-hotspots, product-list, product-recommendations`
 - `circle-collections` 单独实现：左右边距设置默认 40px，且**仅在 full-width 模式生效**（page-width 模式保持 0，避免与 `--page-margin` 双重留白）。
 - `ins-media-grid-autoplay` 改用原生页面宽度／全宽网格；全宽左右边距默认 0，复用 `spacing-style`，页面宽度不叠加边距。版式及部署记录见 [ins-media.md](ins-media.md)。
+- INS 的「文本样式」本地区块统一复用原生 text schema；`ins-media-text` 将已有文字传给 `text`，字体控制和 CSS 均由原生公共组件处理；样式区块从媒体模板中排除。
 - 不支持该设置的 section（`header`、`header-announcements`、`slideshow`、`layered-slideshow`、`section`、`custom-liquid`、`divider`、`_blocks`）未使用 `spacing-style`，全宽边距需单独改 CSS；其中 header / slideshow 的全宽铺满属于设计意图。
 
 ## 八、依赖关系要点

@@ -33,23 +33,16 @@
     margin-bottom: {{ section.settings.header_gap }}px;
   }
   #ins-{{ section.id }} .ins-eyebrow {
-    opacity: 0.6;
     margin: 0 0 8px;
-    color: {{ section.settings.title_color }};
   }
   #ins-{{ section.id }} .ins-title {
     margin: 0 0 10px;
-    color: {{ section.settings.title_color }};
   }
   #ins-{{ section.id }} .ins-subtitle {
-    opacity: 0.7;
     margin: 0;
-    color: {{ section.settings.title_color }};
   }
   #ins-{{ section.id }} .ins-handle {
     margin-top: 8px;
-    opacity: 0.5;
-    color: {{ section.settings.title_color }};
   }
 
   /* ── Slider ── */
@@ -155,15 +148,11 @@
   {%- endif -%}
 
   #ins-{{ section.id }} .ins-overlay-caption {
-    color: inherit;
-    opacity: 0.92;
     margin: 0;
   }
 
   #ins-{{ section.id }} .ins-caption-below {
-    color: {{ section.settings.caption_color }};
     padding: 6px 2px 0;
-    opacity: 0.75;
     margin: 0;
   }
 
@@ -274,16 +263,16 @@
       or section.settings.instagram_handle != blank -%}
     <div class="ins-header">
       {%- if section.settings.eyebrow != blank -%}
-        <p class="ins-eyebrow {{ section.settings.eyebrow_preset | default: 'paragraph' }}">{{ section.settings.eyebrow }}</p>
+        {% render 'ins-media-text', section: section, role: 'eyebrow', text: section.settings.eyebrow, tag: 'p', class: 'ins-eyebrow', color: section.settings.title_color %}
       {%- endif -%}
       {%- if section.settings.title != blank -%}
-        <h2 class="ins-title {{ section.settings.title_preset | default: 'h2' }}">{{ section.settings.title }}</h2>
+        {% render 'ins-media-text', section: section, role: 'title', text: section.settings.title, tag: 'h2', class: 'ins-title', color: section.settings.title_color %}
       {%- endif -%}
       {%- if section.settings.subtitle != blank -%}
-        <p class="ins-subtitle {{ section.settings.subtitle_preset | default: 'paragraph' }}">{{ section.settings.subtitle }}</p>
+        {% render 'ins-media-text', section: section, role: 'subtitle', text: section.settings.subtitle, tag: 'p', class: 'ins-subtitle', color: section.settings.title_color %}
       {%- endif -%}
       {%- if section.settings.instagram_handle != blank -%}
-        <p class="ins-handle {{ section.settings.handle_preset | default: 'paragraph' }}">{{ section.settings.instagram_handle }}</p>
+        {% render 'ins-media-text', section: section, role: 'handle', text: section.settings.instagram_handle, tag: 'p', class: 'ins-handle', color: section.settings.title_color %}
       {%- endif -%}
     </div>
   {%- endif -%}
@@ -293,6 +282,7 @@
 
       <template id="ins-tpl-{{ section.id }}">
         {%- for block in section.blocks -%}
+          {%- unless block.type == 'media_item' -%}{%- continue -%}{%- endunless -%}
           {%- liquid
             assign has_video = false
             if block.settings.video != blank
@@ -361,14 +351,14 @@
               <div class="ins-overlay">
                 <div class="ins-overlay-content">
                   {%- if block.settings.caption != blank -%}
-                    <p class="ins-overlay-caption {{ section.settings.caption_preset | default: 'paragraph' }}">{{ block.settings.caption }}</p>
+                    {% render 'ins-media-text', section: section, role: 'caption', text: block.settings.caption, class: 'ins-overlay-caption', color: '#ffffff', alignment: 'center' %}
                   {%- endif -%}
                 </div>
               </div>
             </div>
 
             {%- if show_caption and block.settings.caption != blank -%}
-              <p class="ins-caption-below {{ section.settings.caption_preset | default: 'paragraph' }}">{{ block.settings.caption }}</p>
+              {% render 'ins-media-text', section: section, role: 'caption', text: block.settings.caption, class: 'ins-caption-below', color: section.settings.caption_color, alignment: 'left' %}
             {%- endif -%}
           </div>
         {%- endfor -%}
@@ -399,8 +389,8 @@
 
   {%- if section.settings.cta_label != blank and section.settings.cta_link != blank -%}
     <div class="ins-cta">
-      <a class="{{ section.settings.cta_preset | default: 'paragraph' }}" href="{{ section.settings.cta_link }}">
-        {{ section.settings.cta_label }}
+      <a href="{{ section.settings.cta_link }}">
+        {% render 'ins-media-text', section: section, role: 'cta', text: section.settings.cta_label, tag: 'span' %}
       </a>
     </div>
   {%- endif -%}
@@ -755,320 +745,469 @@
   "tag": "section",
   "class": "ins-media-grid-section",
   "settings": [
-    { "type": "header", "content": "版块布局" },
-    {
-      "type": "select",
-      "id": "section_width",
-      "label": "t:settings.width",
-      "options": [
-        {
-          "value": "page-width",
-          "label": "t:options.page"
-        },
-        {
-          "value": "full-width",
-          "label": "t:options.full"
-        }
-      ],
-      "default": "page-width"
-    },
-    {
-      "type": "range",
-      "id": "padding-inline-start",
-      "label": "t:settings.left",
-      "min": 0,
-      "max": 100,
-      "step": 1,
-      "unit": "px",
-      "default": 0,
-      "visible_if": "{{ section.settings.section_width == 'full-width' }}"
-    },
-    {
-      "type": "range",
-      "id": "padding-inline-end",
-      "label": "t:settings.right",
-      "min": 0,
-      "max": 100,
-      "step": 1,
-      "unit": "px",
-      "default": 0,
-      "visible_if": "{{ section.settings.section_width == 'full-width' }}"
-    },
-    { "type": "range", "id": "section_padding_v", "label": "上下内边距（px）", "min": 0, "max": 120, "step": 4, "default": 60 },
-
-    { "type": "header", "content": "桌面端网格" },
-    { "type": "select", "id": "layout_desktop", "label": "桌面端布局行数", "options": [{ "value": "single", "label": "单行" }, { "value": "double", "label": "双行" }], "default": "single" },
-    { "type": "range", "id": "columns_desktop", "label": "桌面端每页列数", "min": 2, "max": 8, "step": 1, "default": 4 },
-    { "type": "range", "id": "grid_gap", "label": "桌面端间距（px）", "min": 0, "max": 40, "step": 2, "default": 4 },
-
-    { "type": "header", "content": "移动端网格" },
-    { "type": "select", "id": "layout_mobile", "label": "移动端布局行数", "options": [{ "value": "single", "label": "单行" }, { "value": "double", "label": "双行" }], "default": "double" },
-    { "type": "range", "id": "columns_mobile", "label": "移动端每页列数", "min": 1, "max": 4, "step": 1, "default": 2 },
-    { "type": "range", "id": "grid_gap_mobile", "label": "移动端间距（px）", "min": 0, "max": 24, "step": 2, "default": 4 },
-
-    { "type": "header", "content": "媒体设置" },
-    { "type": "select", "id": "aspect_ratio", "label": "媒体比例", "options": [{ "value": "square", "label": "正方形（1:1）" }, { "value": "portrait", "label": "竖版（4:5）" }, { "value": "portrait_3_4", "label": "竖版（3:4）" }, { "value": "story", "label": "竖屏视频（9:16）" }, { "value": "landscape", "label": "横版（16:9）" }, { "value": "auto", "label": "原始比例 / 自然高度" }], "default": "square" },
-    { "type": "select", "id": "media_position", "label": "裁切焦点", "options": [{ "value": "center center", "label": "居中" }, { "value": "center top", "label": "顶部" }, { "value": "center bottom", "label": "底部" }], "default": "center center" },
-    { "type": "select", "id": "hover_effect", "label": "悬停效果", "options": [{ "value": "none", "label": "无" }, { "value": "zoom", "label": "缩放" }, { "value": "overlay", "label": "暗色遮罩 + 说明文字" }, { "value": "zoom-overlay", "label": "缩放 + 遮罩" }], "default": "zoom-overlay" },
-    { "type": "checkbox", "id": "show_caption", "label": "在媒体下方显示说明文字", "default": false },
-    {
-      "type": "select",
-      "id": "caption_preset",
-      "label": "说明文字版式",
-      "options": [
-        {
-          "value": "paragraph",
-          "label": "t:options.paragraph"
-        },
-        {
-          "value": "h1",
-          "label": "t:options.h1"
-        },
-        {
-          "value": "h2",
-          "label": "t:options.h2"
-        },
-        {
-          "value": "h3",
-          "label": "t:options.h3"
-        },
-        {
-          "value": "h4",
-          "label": "t:options.h4"
-        },
-        {
-          "value": "h5",
-          "label": "t:options.h5"
-        },
-        {
-          "value": "h6",
-          "label": "t:options.h6"
-        }
-      ],
-      "default": "paragraph",
-      "info": "t:info.edit_presets_in_theme_settings"
-    },
-    { "type": "color", "id": "caption_color", "label": "说明文字颜色", "default": "#333333" },
-
-    { "type": "header", "content": "视频播放" },
-    { "type": "checkbox", "id": "video_autoplay", "label": "视频自动播放", "info": "开启后视频会静音并在进入当前可见网格时自动播放；滑出当前列、离开可视区域或切到后台时自动暂停。", "default": true },
-    { "type": "checkbox", "id": "video_loop", "label": "循环播放", "default": true },
-    { "type": "checkbox", "id": "video_muted", "label": "静音", "default": true },
-    { "type": "checkbox", "id": "video_controls", "label": "显示视频控制条", "info": "如果开启控制条，为避免遮挡播放控件，视频卡片的整块跳转链接将停用。", "default": false },
-
-    { "type": "header", "content": "标题区域" },
-    { "type": "select", "id": "header_align", "label": "标题对齐方式", "options": [{ "value": "left", "label": "左对齐" }, { "value": "center", "label": "居中" }, { "value": "right", "label": "右对齐" }], "default": "center" },
-    { "type": "range", "id": "header_gap", "label": "标题与网格间距（px）", "min": 8, "max": 80, "step": 4, "default": 32 },
-    { "type": "text", "id": "eyebrow", "label": "标题文字", "default": "Follow us" },
-    {
-      "type": "select",
-      "id": "eyebrow_preset",
-      "label": "引导文字版式",
-      "options": [
-        {
-          "value": "paragraph",
-          "label": "t:options.paragraph"
-        },
-        {
-          "value": "h1",
-          "label": "t:options.h1"
-        },
-        {
-          "value": "h2",
-          "label": "t:options.h2"
-        },
-        {
-          "value": "h3",
-          "label": "t:options.h3"
-        },
-        {
-          "value": "h4",
-          "label": "t:options.h4"
-        },
-        {
-          "value": "h5",
-          "label": "t:options.h5"
-        },
-        {
-          "value": "h6",
-          "label": "t:options.h6"
-        }
-      ],
-      "default": "paragraph",
-      "info": "t:info.edit_presets_in_theme_settings"
-    },
-    { "type": "text", "id": "title", "label": "标题", "default": "Our Instagram" },
-    {
-      "type": "select",
-      "id": "title_preset",
-      "label": "标题版式",
-      "options": [
-        {
-          "value": "paragraph",
-          "label": "t:options.paragraph"
-        },
-        {
-          "value": "h1",
-          "label": "t:options.h1"
-        },
-        {
-          "value": "h2",
-          "label": "t:options.h2"
-        },
-        {
-          "value": "h3",
-          "label": "t:options.h3"
-        },
-        {
-          "value": "h4",
-          "label": "t:options.h4"
-        },
-        {
-          "value": "h5",
-          "label": "t:options.h5"
-        },
-        {
-          "value": "h6",
-          "label": "t:options.h6"
-        }
-      ],
-      "default": "h2",
-      "info": "t:info.edit_presets_in_theme_settings"
-    },
-    { "type": "text", "id": "subtitle", "label": "副标题" },
-    {
-      "type": "select",
-      "id": "subtitle_preset",
-      "label": "副标题版式",
-      "options": [
-        {
-          "value": "paragraph",
-          "label": "t:options.paragraph"
-        },
-        {
-          "value": "h1",
-          "label": "t:options.h1"
-        },
-        {
-          "value": "h2",
-          "label": "t:options.h2"
-        },
-        {
-          "value": "h3",
-          "label": "t:options.h3"
-        },
-        {
-          "value": "h4",
-          "label": "t:options.h4"
-        },
-        {
-          "value": "h5",
-          "label": "t:options.h5"
-        },
-        {
-          "value": "h6",
-          "label": "t:options.h6"
-        }
-      ],
-      "default": "paragraph",
-      "info": "t:info.edit_presets_in_theme_settings"
-    },
-    { "type": "text", "id": "instagram_handle", "label": "Instagram 账号", "default": "@yourbrand" },
-    {
-      "type": "select",
-      "id": "handle_preset",
-      "label": "账号版式",
-      "options": [
-        {
-          "value": "paragraph",
-          "label": "t:options.paragraph"
-        },
-        {
-          "value": "h1",
-          "label": "t:options.h1"
-        },
-        {
-          "value": "h2",
-          "label": "t:options.h2"
-        },
-        {
-          "value": "h3",
-          "label": "t:options.h3"
-        },
-        {
-          "value": "h4",
-          "label": "t:options.h4"
-        },
-        {
-          "value": "h5",
-          "label": "t:options.h5"
-        },
-        {
-          "value": "h6",
-          "label": "t:options.h6"
-        }
-      ],
-      "default": "paragraph",
-      "info": "t:info.edit_presets_in_theme_settings"
-    },
-    { "type": "color", "id": "title_color", "label": "标题区文字颜色", "default": "#1a1a1a" },
-
-    { "type": "header", "content": "按钮设置" },
-    { "type": "text", "id": "cta_label", "label": "按钮文字", "default": "View on Instagram" },
-    { "type": "url", "id": "cta_link", "label": "按钮链接" },
-    { "type": "range", "id": "cta_gap", "label": "按钮与网格间距（px）", "min": 8, "max": 80, "step": 4, "default": 32 },
-    {
-      "type": "select",
-      "id": "cta_preset",
-      "label": "按钮文字版式",
-      "options": [
-        {
-          "value": "paragraph",
-          "label": "t:options.paragraph"
-        },
-        {
-          "value": "h1",
-          "label": "t:options.h1"
-        },
-        {
-          "value": "h2",
-          "label": "t:options.h2"
-        },
-        {
-          "value": "h3",
-          "label": "t:options.h3"
-        },
-        {
-          "value": "h4",
-          "label": "t:options.h4"
-        },
-        {
-          "value": "h5",
-          "label": "t:options.h5"
-        },
-        {
-          "value": "h6",
-          "label": "t:options.h6"
-        }
-      ],
-      "default": "paragraph",
-      "info": "t:info.edit_presets_in_theme_settings"
-    },
-    { "type": "range", "id": "cta_padding_v", "label": "按钮上下内边距（px）", "min": 6, "max": 24, "step": 2, "default": 12 },
-    { "type": "range", "id": "cta_padding_h", "label": "按钮左右内边距（px）", "min": 16, "max": 64, "step": 4, "default": 32 },
-    { "type": "color", "id": "cta_text_color", "label": "按钮文字颜色", "default": "#1a1a1a" },
-    { "type": "color", "id": "cta_bg_color", "label": "按钮背景颜色", "default": "#ffffff" },
-    { "type": "color", "id": "cta_border_color", "label": "按钮边框颜色", "default": "#1a1a1a" }
+    {"type":"header","content":"t:content.section_layout"},
+    {"type":"select","id":"section_width","label":"t:settings.width","options":[{"value":"page-width","label":"t:options.page"},{"value":"full-width","label":"t:options.full"}],"default":"page-width"},
+    {"type":"range","id":"padding-inline-start","label":"t:settings.left","min":0,"max":100,"step":1,"unit":"px","default":0,"visible_if":"{{ section.settings.section_width == 'full-width' }}"},
+    {"type":"range","id":"padding-inline-end","label":"t:settings.right","min":0,"max":100,"step":1,"unit":"px","default":0,"visible_if":"{{ section.settings.section_width == 'full-width' }}"},
+    {"type":"range","id":"section_padding_v","label":"上下内边距（px）","min":0,"max":120,"step":4,"default":60},
+    {"type":"header","content":"桌面端网格"},
+    {"type":"select","id":"layout_desktop","label":"桌面端布局行数","options":[{"value":"single","label":"单行"},{"value":"double","label":"双行"}],"default":"single"},
+    {"type":"range","id":"columns_desktop","label":"桌面端每页列数","min":2,"max":8,"step":1,"default":4},
+    {"type":"range","id":"grid_gap","label":"桌面端间距（px）","min":0,"max":40,"step":2,"default":4},
+    {"type":"header","content":"移动端网格"},
+    {"type":"select","id":"layout_mobile","label":"移动端布局行数","options":[{"value":"single","label":"单行"},{"value":"double","label":"双行"}],"default":"double"},
+    {"type":"range","id":"columns_mobile","label":"移动端每页列数","min":1,"max":4,"step":1,"default":2},
+    {"type":"range","id":"grid_gap_mobile","label":"移动端间距（px）","min":0,"max":24,"step":2,"default":4},
+    {"type":"header","content":"媒体设置"},
+    {"type":"select","id":"aspect_ratio","label":"媒体比例","options":[{"value":"square","label":"正方形（1:1）"},{"value":"portrait","label":"竖版（4:5）"},{"value":"portrait_3_4","label":"竖版（3:4）"},{"value":"story","label":"竖屏视频（9:16）"},{"value":"landscape","label":"横版（16:9）"},{"value":"auto","label":"原始比例 / 自然高度"}],"default":"square"},
+    {"type":"select","id":"media_position","label":"裁切焦点","options":[{"value":"center center","label":"居中"},{"value":"center top","label":"顶部"},{"value":"center bottom","label":"底部"}],"default":"center center"},
+    {"type":"select","id":"hover_effect","label":"悬停效果","options":[{"value":"none","label":"无"},{"value":"zoom","label":"缩放"},{"value":"overlay","label":"暗色遮罩 + 说明文字"},{"value":"zoom-overlay","label":"缩放 + 遮罩"}],"default":"zoom-overlay"},
+    {"type":"checkbox","id":"show_caption","label":"在媒体下方显示说明文字","default":false},
+    {"type":"color","id":"caption_color","label":"说明文字颜色","default":"#333333"},
+    {"type":"header","content":"视频播放"},
+    {"type":"checkbox","id":"video_autoplay","label":"视频自动播放","info":"开启后视频会静音并在进入当前可见网格时自动播放；滑出当前列、离开可视区域或切到后台时自动暂停。","default":true},
+    {"type":"checkbox","id":"video_loop","label":"循环播放","default":true},
+    {"type":"checkbox","id":"video_muted","label":"静音","default":true},
+    {"type":"checkbox","id":"video_controls","label":"显示视频控制条","info":"如果开启控制条，为避免遮挡播放控件，视频卡片的整块跳转链接将停用。","default":false},
+    {"type":"header","content":"标题区域"},
+    {"type":"select","id":"header_align","label":"标题对齐方式","options":[{"value":"left","label":"左对齐"},{"value":"center","label":"居中"},{"value":"right","label":"右对齐"}],"default":"center"},
+    {"type":"range","id":"header_gap","label":"标题与网格间距（px）","min":8,"max":80,"step":4,"default":32},
+    {"type":"text","id":"eyebrow","label":"标题文字","default":"Follow us"},
+    {"type":"text","id":"title","label":"标题","default":"Our Instagram"},
+    {"type":"text","id":"subtitle","label":"副标题"},
+    {"type":"text","id":"instagram_handle","label":"Instagram 账号","default":"@yourbrand"},
+    {"type":"color","id":"title_color","label":"标题区文字颜色","default":"#1a1a1a"},
+    {"type":"header","content":"按钮设置"},
+    {"type":"text","id":"cta_label","label":"按钮文字","default":"View on Instagram"},
+    {"type":"url","id":"cta_link","label":"按钮链接"},
+    {"type":"range","id":"cta_gap","label":"按钮与网格间距（px）","min":8,"max":80,"step":4,"default":32},
+    {"type":"range","id":"cta_padding_v","label":"按钮上下内边距（px）","min":6,"max":24,"step":2,"default":12},
+    {"type":"range","id":"cta_padding_h","label":"按钮左右内边距（px）","min":16,"max":64,"step":4,"default":32},
+    {"type":"color","id":"cta_text_color","label":"按钮文字颜色","default":"#1a1a1a"},
+    {"type":"color","id":"cta_bg_color","label":"按钮背景颜色","default":"#ffffff"},
+    {"type":"color","id":"cta_border_color","label":"按钮边框颜色","default":"#1a1a1a"}
   ],
   "blocks": [
     {
       "type": "media_item",
       "name": "媒体项目",
       "settings": [
-        { "type": "image_picker", "id": "image", "label": "图片", "info": "未选择视频时显示此图片。" },
-        { "type": "video", "id": "video", "label": "视频（支持 Shopify 托管视频 / MOV 上传）", "info": "选择视频后优先显示视频；Shopify 会处理上传的视频并输出适合网页播放的格式。" },
-        { "type": "url", "id": "link", "label": "跳转链接" },
-        { "type": "text", "id": "caption", "label": "说明文字（覆盖在图片上）" }
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "图片",
+          "info": "未选择视频时显示此图片。"
+        },
+        {
+          "type": "video",
+          "id": "video",
+          "label": "视频（支持 Shopify 托管视频 / MOV 上传）",
+          "info": "选择视频后优先显示视频；Shopify 会处理上传的视频并输出适合网页播放的格式。"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "跳转链接"
+        },
+        {
+          "type": "text",
+          "id": "caption",
+          "label": "说明文字（覆盖在图片上）"
+        }
+      ]
+    },
+    {
+      "type": "text_style",
+      "name": "文本样式",
+      "settings": [
+        {
+          "type": "select",
+          "id": "text_role",
+          "label": "应用于",
+          "options": [
+            {
+              "value": "eyebrow",
+              "label": "引导文字"
+            },
+            {
+              "value": "title",
+              "label": "标题"
+            },
+            {
+              "value": "subtitle",
+              "label": "副标题"
+            },
+            {
+              "value": "handle",
+              "label": "Instagram 账号"
+            },
+            {
+              "value": "caption",
+              "label": "媒体说明文字"
+            },
+            {
+              "value": "cta",
+              "label": "按钮文字"
+            }
+          ],
+          "default": "title"
+        },
+        {
+          "type": "header",
+          "content": "t:content.layout"
+        },
+        {
+          "type": "select",
+          "id": "width",
+          "label": "t:settings.width",
+          "options": [
+            {
+              "value": "fit-content",
+              "label": "t:options.fit"
+            },
+            {
+              "value": "100%",
+              "label": "t:options.fill"
+            }
+          ],
+          "default": "fit-content"
+        },
+        {
+          "type": "select",
+          "id": "max_width",
+          "label": "t:settings.max_width",
+          "options": [
+            {
+              "value": "narrow",
+              "label": "t:options.narrow"
+            },
+            {
+              "value": "normal",
+              "label": "t:options.normal"
+            },
+            {
+              "value": "none",
+              "label": "t:options.none"
+            }
+          ],
+          "default": "normal"
+        },
+        {
+          "type": "text_alignment",
+          "id": "alignment",
+          "label": "t:settings.alignment",
+          "default": "left",
+          "visible_if": "{{ block.settings.width == '100%' }}"
+        },
+        {
+          "type": "header",
+          "content": "t:content.typography"
+        },
+        {
+          "type": "select",
+          "id": "type_preset",
+          "label": "t:settings.preset",
+          "options": [
+            {
+              "value": "rte",
+              "label": "t:options.default"
+            },
+            {
+              "value": "paragraph",
+              "label": "t:options.paragraph"
+            },
+            {
+              "value": "h1",
+              "label": "t:options.h1"
+            },
+            {
+              "value": "h2",
+              "label": "t:options.h2"
+            },
+            {
+              "value": "h3",
+              "label": "t:options.h3"
+            },
+            {
+              "value": "h4",
+              "label": "t:options.h4"
+            },
+            {
+              "value": "h5",
+              "label": "t:options.h5"
+            },
+            {
+              "value": "h6",
+              "label": "t:options.h6"
+            },
+            {
+              "value": "custom",
+              "label": "t:options.custom"
+            }
+          ],
+          "default": "rte",
+          "info": "t:info.edit_presets_in_theme_settings"
+        },
+        {
+          "type": "select",
+          "id": "font",
+          "label": "t:settings.font",
+          "options": [
+            {
+              "value": "var(--font-body--family)",
+              "label": "t:options.body"
+            },
+            {
+              "value": "var(--font-subheading--family)",
+              "label": "t:options.subheading"
+            },
+            {
+              "value": "var(--font-heading--family)",
+              "label": "t:options.heading"
+            },
+            {
+              "value": "var(--font-accent--family)",
+              "label": "t:options.accent"
+            }
+          ],
+          "default": "var(--font-body--family)",
+          "visible_if": "{{ block.settings.type_preset == 'custom' }}"
+        },
+        {
+          "type": "select",
+          "id": "font_size",
+          "label": "t:settings.size",
+          "options": [
+            {
+              "value": "",
+              "label": "t:options.default"
+            },
+            {
+              "value": "0.625rem",
+              "label": "10px"
+            },
+            {
+              "value": "0.75rem",
+              "label": "12px"
+            },
+            {
+              "value": "0.875rem",
+              "label": "14px"
+            },
+            {
+              "value": "1rem",
+              "label": "16px"
+            },
+            {
+              "value": "1.125rem",
+              "label": "18px"
+            },
+            {
+              "value": "1.25rem",
+              "label": "20px"
+            },
+            {
+              "value": "1.5rem",
+              "label": "24px"
+            },
+            {
+              "value": "2rem",
+              "label": "32px"
+            },
+            {
+              "value": "2.5rem",
+              "label": "40px"
+            },
+            {
+              "value": "3rem",
+              "label": "48px"
+            },
+            {
+              "value": "3.5rem",
+              "label": "56px"
+            },
+            {
+              "value": "4.5rem",
+              "label": "72px"
+            },
+            {
+              "value": "5.5rem",
+              "label": "88px"
+            },
+            {
+              "value": "7.5rem",
+              "label": "120px"
+            },
+            {
+              "value": "9.5rem",
+              "label": "152px"
+            },
+            {
+              "value": "11.5rem",
+              "label": "184px"
+            }
+          ],
+          "default": "1rem",
+          "visible_if": "{{ block.settings.type_preset == 'custom' }}"
+        },
+        {
+          "type": "select",
+          "id": "line_height",
+          "label": "t:settings.line_height",
+          "options": [
+            {
+              "value": "tight",
+              "label": "t:options.tight"
+            },
+            {
+              "value": "normal",
+              "label": "t:options.normal"
+            },
+            {
+              "value": "loose",
+              "label": "t:options.loose"
+            }
+          ],
+          "default": "normal",
+          "visible_if": "{{ block.settings.type_preset == 'custom' }}"
+        },
+        {
+          "type": "select",
+          "id": "letter_spacing",
+          "label": "t:settings.letter_spacing",
+          "options": [
+            {
+              "value": "tight",
+              "label": "t:options.tight"
+            },
+            {
+              "value": "normal",
+              "label": "t:options.normal"
+            },
+            {
+              "value": "loose",
+              "label": "t:options.loose"
+            }
+          ],
+          "default": "normal",
+          "visible_if": "{{ block.settings.type_preset == 'custom' }}"
+        },
+        {
+          "type": "select",
+          "id": "case",
+          "label": "t:settings.case",
+          "info": "提示：若所选字体本身没有小写字形，此设置不会产生可见变化，请先更换字体",
+          "options": [
+            {
+              "value": "none",
+              "label": "t:options.default"
+            },
+            {
+              "value": "uppercase",
+              "label": "t:options.uppercase"
+            }
+          ],
+          "default": "none",
+          "visible_if": "{{ block.settings.type_preset == 'custom' }}"
+        },
+        {
+          "type": "select",
+          "id": "wrap",
+          "label": "t:settings.wrap",
+          "options": [
+            {
+              "value": "pretty",
+              "label": "t:options.pretty"
+            },
+            {
+              "value": "balance",
+              "label": "t:options.balance"
+            },
+            {
+              "value": "nowrap",
+              "label": "t:options.none"
+            }
+          ],
+          "visible_if": "{{ block.settings.type_preset == 'custom' }}"
+        },
+        {
+          "type": "header",
+          "content": "t:content.appearance"
+        },
+        {
+          "type": "color",
+          "id": "text_color",
+          "label": "t:settings.text_color",
+          "placeholder": "t:settings.default"
+        },
+        {
+          "type": "checkbox",
+          "id": "background",
+          "label": "t:settings.background",
+          "default": false
+        },
+        {
+          "type": "color",
+          "id": "background_color",
+          "label": "t:settings.background_color",
+          "alpha": true,
+          "default": "#00000026",
+          "visible_if": "{{ block.settings.background }}"
+        },
+        {
+          "type": "range",
+          "id": "corner_radius",
+          "label": "t:settings.corner_radius",
+          "default": 0,
+          "min": 0,
+          "max": 50,
+          "step": 1,
+          "visible_if": "{{ block.settings.background }}"
+        },
+        {
+          "type": "header",
+          "content": "t:content.padding"
+        },
+        {
+          "type": "range",
+          "id": "padding-block-start",
+          "label": "t:settings.top",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "px",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "padding-block-end",
+          "label": "t:settings.bottom",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "px",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "padding-inline-start",
+          "label": "t:settings.left",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "px",
+          "default": 0
+        },
+        {
+          "type": "range",
+          "id": "padding-inline-end",
+          "label": "t:settings.right",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "unit": "px",
+          "default": 0
+        }
       ]
     }
   ],
@@ -1076,10 +1215,30 @@
     {
       "name": "INS 媒体展示",
       "blocks": [
-        { "type": "media_item" }, { "type": "media_item" },
-        { "type": "media_item" }, { "type": "media_item" },
-        { "type": "media_item" }, { "type": "media_item" },
-        { "type": "media_item" }, { "type": "media_item" }
+        {
+          "type": "media_item"
+        },
+        {
+          "type": "media_item"
+        },
+        {
+          "type": "media_item"
+        },
+        {
+          "type": "media_item"
+        },
+        {
+          "type": "media_item"
+        },
+        {
+          "type": "media_item"
+        },
+        {
+          "type": "media_item"
+        },
+        {
+          "type": "media_item"
+        }
       ]
     }
   ]
