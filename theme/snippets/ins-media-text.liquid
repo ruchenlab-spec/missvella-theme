@@ -9,7 +9,6 @@
   @param {string} [class] - Wrapper class for section spacing
   @param {string} [color] - Fallback color when the text block has no override
   @param {string} [alignment] - Wrapper alignment for fit-width native text blocks
-  @param {boolean} [emphasize_last_word] - Emphasize the final word of a plain multiword title
 {%- enddoc -%}
 
 {%- liquid
@@ -23,23 +22,9 @@
   assign tag = tag | default: 'p'
   assign width = text_style.settings.width | default: '100%'
   assign alignment = alignment | default: section.settings.header_align
-  assign words = text | split: ' '
-  assign emphasize = false
-  if emphasize_last_word and words.size > 1
-    unless text contains '<'
-      assign emphasize = true
-    endunless
-  endif
 -%}
 
-{%- capture content -%}
-  <{{ tag }}>{%- if emphasize -%}
-    {%- for word in words -%}
-      {%- unless forloop.first %} {% endunless -%}
-      {%- if forloop.last -%}<em>{{ word }}</em>{%- else -%}{{ word }}{%- endif -%}
-    {%- endfor -%}
-  {%- else -%}{{ text }}{%- endif -%}</{{ tag }}>
-{%- endcapture -%}
+{%- capture content -%}<{{ tag }}>{{ text }}</{{ tag }}>{%- endcapture -%}
 <div class="{{ class }} text-block--align-{{ alignment }}" style="--text-align: inherit;{% if color != blank %}--color: {{ color }};{% endif %}">
   {% render 'text', block: text_style, fallback_text: content, width: width %}
 </div>
