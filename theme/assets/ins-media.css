@@ -73,7 +73,7 @@
 .ins-media-section .ins-film-caption .text-block > p { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 6px 12px; }
 .ins-media-section .ins-frame-number { white-space: nowrap; }
 .ins-media-section .ins-social-link { display: block; text-decoration: none; }
-.ins-media-section .ins-handle .text-block > span { display: inline-flex; flex-wrap: wrap; align-items: center; justify-content: start; gap: 10px; }
+.ins-media-section .ins-handle .text-block > span { display: inline-flex; flex-wrap: wrap; align-items: center; justify-content: start; gap: 6px; }
 .ins-media-section .ins-social-icon { display: inline-block; width: 20px; height: 20px; flex-shrink: 0; fill: currentColor; vertical-align: middle; }
 .ins-media-section .ins-video-toggle {
   position: absolute;

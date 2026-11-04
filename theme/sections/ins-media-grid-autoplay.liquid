@@ -57,8 +57,8 @@
     <div class="ins-header-body">
       {%- if section.settings.instagram_handle != blank -%}
         {%- capture social_text -%}
-          <span>{{ section.settings.instagram_handle }}</span>
           <svg class="ins-social-icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false">{% render 'icon', icon: section.settings.social_platform %}</svg>
+          <span>{{ section.settings.instagram_handle }}</span>
         {%- endcapture -%}
         {%- if social_link != blank -%}
           <a class="ins-social-link" href="{{ social_link }}" target="_blank" rel="noopener noreferrer" aria-label="{{ section.settings.social_platform | capitalize }} · {{ section.settings.instagram_handle | escape }}">
@@ -692,7 +692,7 @@
     },
     {
       "type": "header",
-      "content": "社交账号"
+      "content": "社交账号与图标"
     },
     {
       "type": "text",
