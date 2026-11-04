@@ -1,6 +1,4 @@
 {%- liquid
-  assign full_width     = section.settings.full_width
-  assign outer_pad      = section.settings.outer_padding
   assign gap_desktop    = section.settings.grid_gap
   assign gap_mobile     = section.settings.grid_gap_mobile
   assign hover_effect   = section.settings.hover_effect
@@ -24,55 +22,33 @@
 
 <style>
   #ins-{{ section.id }} {
-    {%- if full_width -%}
-      width: 100%;
-      padding-left: {{ outer_pad }}px;
-      padding-right: {{ outer_pad }}px;
-    {%- else -%}
-      max-width: {{ section.settings.max_width }}px;
-      margin-left: auto;
-      margin-right: auto;
-      padding-left: 20px;
-      padding-right: 20px;
-    {%- endif -%}
     padding-top: {{ section.settings.section_padding_v }}px;
     padding-bottom: {{ section.settings.section_padding_v }}px;
     box-sizing: border-box;
   }
+  #ins-{{ section.id }} > * { min-width: 0; }
 
   #ins-{{ section.id }} .ins-header {
     text-align: {{ section.settings.header_align }};
     margin-bottom: {{ section.settings.header_gap }}px;
   }
   #ins-{{ section.id }} .ins-eyebrow {
-    font-family: var(--font-body--family);
-    font-size: {{ section.settings.eyebrow_size }}px;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
     opacity: 0.6;
     margin: 0 0 8px;
     color: {{ section.settings.title_color }};
   }
   #ins-{{ section.id }} .ins-title {
-    font-family: var(--font-heading--family);
-    font-size: {{ section.settings.title_size }}px;
-    line-height: 1.15;
     margin: 0 0 10px;
     color: {{ section.settings.title_color }};
   }
   #ins-{{ section.id }} .ins-subtitle {
-    font-family: var(--font-body--family);
-    font-size: {{ section.settings.subtitle_size }}px;
     opacity: 0.7;
     margin: 0;
     color: {{ section.settings.title_color }};
   }
   #ins-{{ section.id }} .ins-handle {
-    font-family: var(--font-body--family);
-    font-size: {{ section.settings.handle_size }}px;
     margin-top: 8px;
     opacity: 0.5;
-    letter-spacing: 0.05em;
     color: {{ section.settings.title_color }};
   }
 
@@ -179,19 +155,14 @@
   {%- endif -%}
 
   #ins-{{ section.id }} .ins-overlay-caption {
-    font-family: var(--font-body--family);
-    font-size: 12px;
-    line-height: 1.4;
+    color: inherit;
     opacity: 0.92;
     margin: 0;
   }
 
   #ins-{{ section.id }} .ins-caption-below {
-    font-family: var(--font-body--family);
-    font-size: {{ section.settings.caption_size }}px;
     color: {{ section.settings.caption_color }};
     padding: 6px 2px 0;
-    line-height: 1.4;
     opacity: 0.75;
     margin: 0;
   }
@@ -273,24 +244,6 @@
     #ins-{{ section.id }} .ins-arrow--next { right: 8px; }
   }
 
-  /* ── Dots ── */
-  #ins-{{ section.id }} .ins-dots {
-    display: flex;
-    justify-content: center;
-    gap: 6px;
-    margin-top: 16px;
-  }
-  #ins-{{ section.id }} .ins-dots[hidden] { display: none; }
-  #ins-{{ section.id }} .ins-dot {
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: #ccc;
-    border: none; padding: 0;
-    cursor: pointer;
-    transition: background 0.2s, transform 0.2s;
-  }
-  #ins-{{ section.id }} .ins-dot.is-active { background: #1a1a1a; transform: scale(1.4); }
-
   /* ── CTA ── */
   #ins-{{ section.id }} .ins-cta {
     text-align: {{ section.settings.header_align }};
@@ -298,10 +251,6 @@
   }
   #ins-{{ section.id }} .ins-cta a {
     display: inline-block;
-    font-family: var(--button-font-family-primary, var(--font-body--family));
-    font-size: {{ section.settings.cta_size }}px;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
     text-decoration: none;
     padding: {{ section.settings.cta_padding_v }}px {{ section.settings.cta_padding_h }}px;
     border: 1px solid {{ section.settings.cta_border_color }};
@@ -313,7 +262,11 @@
   #ins-{{ section.id }} .ins-cta a:hover { opacity: 0.7; }
 </style>
 
-<section id="ins-{{ section.id }}" class="ins-media-section">
+<section
+  id="ins-{{ section.id }}"
+  class="ins-media-section section section--{{ section.settings.section_width }} spacing-style"
+  style="{% render 'spacing-style', settings: section.settings %}"
+>
 
   {%- if section.settings.eyebrow != blank
       or section.settings.title != blank
@@ -321,16 +274,16 @@
       or section.settings.instagram_handle != blank -%}
     <div class="ins-header">
       {%- if section.settings.eyebrow != blank -%}
-        <p class="ins-eyebrow">{{ section.settings.eyebrow }}</p>
+        <p class="ins-eyebrow {{ section.settings.eyebrow_preset | default: 'paragraph' }}">{{ section.settings.eyebrow }}</p>
       {%- endif -%}
       {%- if section.settings.title != blank -%}
-        <h2 class="ins-title">{{ section.settings.title }}</h2>
+        <h2 class="ins-title {{ section.settings.title_preset | default: 'h2' }}">{{ section.settings.title }}</h2>
       {%- endif -%}
       {%- if section.settings.subtitle != blank -%}
-        <p class="ins-subtitle">{{ section.settings.subtitle }}</p>
+        <p class="ins-subtitle {{ section.settings.subtitle_preset | default: 'paragraph' }}">{{ section.settings.subtitle }}</p>
       {%- endif -%}
       {%- if section.settings.instagram_handle != blank -%}
-        <p class="ins-handle">{{ section.settings.instagram_handle }}</p>
+        <p class="ins-handle {{ section.settings.handle_preset | default: 'paragraph' }}">{{ section.settings.instagram_handle }}</p>
       {%- endif -%}
     </div>
   {%- endif -%}
@@ -408,14 +361,14 @@
               <div class="ins-overlay">
                 <div class="ins-overlay-content">
                   {%- if block.settings.caption != blank -%}
-                    <p class="ins-overlay-caption">{{ block.settings.caption }}</p>
+                    <p class="ins-overlay-caption {{ section.settings.caption_preset | default: 'paragraph' }}">{{ block.settings.caption }}</p>
                   {%- endif -%}
                 </div>
               </div>
             </div>
 
             {%- if show_caption and block.settings.caption != blank -%}
-              <p class="ins-caption-below">{{ block.settings.caption }}</p>
+              <p class="ins-caption-below {{ section.settings.caption_preset | default: 'paragraph' }}">{{ block.settings.caption }}</p>
             {%- endif -%}
           </div>
         {%- endfor -%}
@@ -444,11 +397,9 @@
     </button>
   </div>
 
-  <div class="ins-dots" id="ins-dots-{{ section.id }}" hidden></div>
-
   {%- if section.settings.cta_label != blank and section.settings.cta_link != blank -%}
     <div class="ins-cta">
-      <a href="{{ section.settings.cta_link }}">
+      <a class="{{ section.settings.cta_preset | default: 'paragraph' }}" href="{{ section.settings.cta_link }}">
         {{ section.settings.cta_label }}
       </a>
     </div>
@@ -463,7 +414,6 @@
   var sid      = '{{ section.id }}';
   var track    = document.getElementById('ins-track-' + sid);
   var tpl      = document.getElementById('ins-tpl-' + sid);
-  var dotsWrap = document.getElementById('ins-dots-' + sid);
   var btnPrev  = document.getElementById('ins-prev-' + sid);
   var btnNext  = document.getElementById('ins-next-' + sid);
   var videoAutoplay = {{ section.settings.video_autoplay | json }};
@@ -707,35 +657,16 @@
     });
 
     setupVideos();
-    renderNav(cfg);
+    renderNav();
     applyTransform(true);
+    syncArrows();
   }
 
-  /* ── 导航（dots + arrows）── */
-  function renderNav(cfg) {
-    dotsWrap.innerHTML = '';
-    var maxCol = totalCols - visibleCols;
-
-    if (maxCol <= 0) {
-      dotsWrap.hidden = true;
-      btnPrev.hidden  = true;
-      btnNext.hidden  = true;
-      return;
-    }
-
-    dotsWrap.hidden = false;
-    btnPrev.hidden  = false;
-    btnNext.hidden  = false;
-
-    for (var i = 0; i <= maxCol; i++) {
-      var dot = document.createElement('button');
-      dot.className = 'ins-dot' + (i === 0 ? ' is-active' : '');
-      dot.setAttribute('aria-label', '第' + (i + 1) + '步');
-      dot.addEventListener('click', (function (idx) {
-        return function () { goTo(idx); };
-      })(i));
-      dotsWrap.appendChild(dot);
-    }
+  /* ── 箭头导航：内容超过可见列数时显示 ── */
+  function renderNav() {
+    var hasOverflow = totalCols > visibleCols;
+    btnPrev.hidden = !hasOverflow;
+    btnNext.hidden = !hasOverflow;
   }
 
   /* ── 滚动到指定列 ── */
@@ -744,7 +675,6 @@
     col = Math.max(0, Math.min(col, maxCol));
     currentCol = col;
     applyTransform(instant);
-    syncDots();
     syncArrows();
   }
 
@@ -762,12 +692,6 @@
       track.style.transition = 'transform 0.5s cubic-bezier(0.4,0,0.2,1)';
       track.style.transform  = 'translateX(-' + px + 'px)';
     }
-  }
-
-  function syncDots() {
-    Array.from(dotsWrap.querySelectorAll('.ins-dot')).forEach(function (d, i) {
-      d.classList.toggle('is-active', i === currentCol);
-    });
   }
 
   function syncArrows() {
@@ -832,9 +756,44 @@
   "class": "ins-media-grid-section",
   "settings": [
     { "type": "header", "content": "版块布局" },
-    { "type": "checkbox", "id": "full_width", "label": "全屏宽度", "default": false },
-    { "type": "range", "id": "outer_padding", "label": "全屏模式左右边距（px）", "min": 0, "max": 120, "step": 4, "default": 0 },
-    { "type": "range", "id": "max_width", "label": "最大宽度（px，非全屏）", "min": 800, "max": 1920, "step": 40, "default": 1400 },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "t:settings.width",
+      "options": [
+        {
+          "value": "page-width",
+          "label": "t:options.page"
+        },
+        {
+          "value": "full-width",
+          "label": "t:options.full"
+        }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-start",
+      "label": "t:settings.left",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0,
+      "visible_if": "{{ section.settings.section_width == 'full-width' }}"
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-end",
+      "label": "t:settings.right",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 0,
+      "visible_if": "{{ section.settings.section_width == 'full-width' }}"
+    },
     { "type": "range", "id": "section_padding_v", "label": "上下内边距（px）", "min": 0, "max": 120, "step": 4, "default": 60 },
 
     { "type": "header", "content": "桌面端网格" },
@@ -852,7 +811,43 @@
     { "type": "select", "id": "media_position", "label": "裁切焦点", "options": [{ "value": "center center", "label": "居中" }, { "value": "center top", "label": "顶部" }, { "value": "center bottom", "label": "底部" }], "default": "center center" },
     { "type": "select", "id": "hover_effect", "label": "悬停效果", "options": [{ "value": "none", "label": "无" }, { "value": "zoom", "label": "缩放" }, { "value": "overlay", "label": "暗色遮罩 + 说明文字" }, { "value": "zoom-overlay", "label": "缩放 + 遮罩" }], "default": "zoom-overlay" },
     { "type": "checkbox", "id": "show_caption", "label": "在媒体下方显示说明文字", "default": false },
-    { "type": "range", "id": "caption_size", "label": "说明文字大小（px）", "min": 10, "max": 18, "step": 1, "default": 12 },
+    {
+      "type": "select",
+      "id": "caption_preset",
+      "label": "说明文字版式",
+      "options": [
+        {
+          "value": "paragraph",
+          "label": "t:options.paragraph"
+        },
+        {
+          "value": "h1",
+          "label": "t:options.h1"
+        },
+        {
+          "value": "h2",
+          "label": "t:options.h2"
+        },
+        {
+          "value": "h3",
+          "label": "t:options.h3"
+        },
+        {
+          "value": "h4",
+          "label": "t:options.h4"
+        },
+        {
+          "value": "h5",
+          "label": "t:options.h5"
+        },
+        {
+          "value": "h6",
+          "label": "t:options.h6"
+        }
+      ],
+      "default": "paragraph",
+      "info": "t:info.edit_presets_in_theme_settings"
+    },
     { "type": "color", "id": "caption_color", "label": "说明文字颜色", "default": "#333333" },
 
     { "type": "header", "content": "视频播放" },
@@ -865,20 +860,200 @@
     { "type": "select", "id": "header_align", "label": "标题对齐方式", "options": [{ "value": "left", "label": "左对齐" }, { "value": "center", "label": "居中" }, { "value": "right", "label": "右对齐" }], "default": "center" },
     { "type": "range", "id": "header_gap", "label": "标题与网格间距（px）", "min": 8, "max": 80, "step": 4, "default": 32 },
     { "type": "text", "id": "eyebrow", "label": "标题文字", "default": "Follow us" },
-    { "type": "range", "id": "eyebrow_size", "label": "标题字体大小（px）", "min": 10, "max": 20, "step": 1, "default": 12 },
+    {
+      "type": "select",
+      "id": "eyebrow_preset",
+      "label": "引导文字版式",
+      "options": [
+        {
+          "value": "paragraph",
+          "label": "t:options.paragraph"
+        },
+        {
+          "value": "h1",
+          "label": "t:options.h1"
+        },
+        {
+          "value": "h2",
+          "label": "t:options.h2"
+        },
+        {
+          "value": "h3",
+          "label": "t:options.h3"
+        },
+        {
+          "value": "h4",
+          "label": "t:options.h4"
+        },
+        {
+          "value": "h5",
+          "label": "t:options.h5"
+        },
+        {
+          "value": "h6",
+          "label": "t:options.h6"
+        }
+      ],
+      "default": "paragraph",
+      "info": "t:info.edit_presets_in_theme_settings"
+    },
     { "type": "text", "id": "title", "label": "标题", "default": "Our Instagram" },
-    { "type": "range", "id": "title_size", "label": "标题字体大小（px）", "min": 18, "max": 72, "step": 2, "default": 36 },
+    {
+      "type": "select",
+      "id": "title_preset",
+      "label": "标题版式",
+      "options": [
+        {
+          "value": "paragraph",
+          "label": "t:options.paragraph"
+        },
+        {
+          "value": "h1",
+          "label": "t:options.h1"
+        },
+        {
+          "value": "h2",
+          "label": "t:options.h2"
+        },
+        {
+          "value": "h3",
+          "label": "t:options.h3"
+        },
+        {
+          "value": "h4",
+          "label": "t:options.h4"
+        },
+        {
+          "value": "h5",
+          "label": "t:options.h5"
+        },
+        {
+          "value": "h6",
+          "label": "t:options.h6"
+        }
+      ],
+      "default": "h2",
+      "info": "t:info.edit_presets_in_theme_settings"
+    },
     { "type": "text", "id": "subtitle", "label": "副标题" },
-    { "type": "range", "id": "subtitle_size", "label": "副标题字体大小（px）", "min": 12, "max": 24, "step": 1, "default": 15 },
+    {
+      "type": "select",
+      "id": "subtitle_preset",
+      "label": "副标题版式",
+      "options": [
+        {
+          "value": "paragraph",
+          "label": "t:options.paragraph"
+        },
+        {
+          "value": "h1",
+          "label": "t:options.h1"
+        },
+        {
+          "value": "h2",
+          "label": "t:options.h2"
+        },
+        {
+          "value": "h3",
+          "label": "t:options.h3"
+        },
+        {
+          "value": "h4",
+          "label": "t:options.h4"
+        },
+        {
+          "value": "h5",
+          "label": "t:options.h5"
+        },
+        {
+          "value": "h6",
+          "label": "t:options.h6"
+        }
+      ],
+      "default": "paragraph",
+      "info": "t:info.edit_presets_in_theme_settings"
+    },
     { "type": "text", "id": "instagram_handle", "label": "Instagram 账号", "default": "@yourbrand" },
-    { "type": "range", "id": "handle_size", "label": "账号字体大小（px）", "min": 10, "max": 20, "step": 1, "default": 13 },
+    {
+      "type": "select",
+      "id": "handle_preset",
+      "label": "账号版式",
+      "options": [
+        {
+          "value": "paragraph",
+          "label": "t:options.paragraph"
+        },
+        {
+          "value": "h1",
+          "label": "t:options.h1"
+        },
+        {
+          "value": "h2",
+          "label": "t:options.h2"
+        },
+        {
+          "value": "h3",
+          "label": "t:options.h3"
+        },
+        {
+          "value": "h4",
+          "label": "t:options.h4"
+        },
+        {
+          "value": "h5",
+          "label": "t:options.h5"
+        },
+        {
+          "value": "h6",
+          "label": "t:options.h6"
+        }
+      ],
+      "default": "paragraph",
+      "info": "t:info.edit_presets_in_theme_settings"
+    },
     { "type": "color", "id": "title_color", "label": "标题区文字颜色", "default": "#1a1a1a" },
 
     { "type": "header", "content": "按钮设置" },
     { "type": "text", "id": "cta_label", "label": "按钮文字", "default": "View on Instagram" },
     { "type": "url", "id": "cta_link", "label": "按钮链接" },
     { "type": "range", "id": "cta_gap", "label": "按钮与网格间距（px）", "min": 8, "max": 80, "step": 4, "default": 32 },
-    { "type": "range", "id": "cta_size", "label": "按钮字体大小（px）", "min": 10, "max": 20, "step": 1, "default": 12 },
+    {
+      "type": "select",
+      "id": "cta_preset",
+      "label": "按钮文字版式",
+      "options": [
+        {
+          "value": "paragraph",
+          "label": "t:options.paragraph"
+        },
+        {
+          "value": "h1",
+          "label": "t:options.h1"
+        },
+        {
+          "value": "h2",
+          "label": "t:options.h2"
+        },
+        {
+          "value": "h3",
+          "label": "t:options.h3"
+        },
+        {
+          "value": "h4",
+          "label": "t:options.h4"
+        },
+        {
+          "value": "h5",
+          "label": "t:options.h5"
+        },
+        {
+          "value": "h6",
+          "label": "t:options.h6"
+        }
+      ],
+      "default": "paragraph",
+      "info": "t:info.edit_presets_in_theme_settings"
+    },
     { "type": "range", "id": "cta_padding_v", "label": "按钮上下内边距（px）", "min": 6, "max": 24, "step": 2, "default": 12 },
     { "type": "range", "id": "cta_padding_h", "label": "按钮左右内边距（px）", "min": 16, "max": 64, "step": 4, "default": 32 },
     { "type": "color", "id": "cta_text_color", "label": "按钮文字颜色", "default": "#1a1a1a" },
