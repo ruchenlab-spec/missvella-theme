@@ -49,4 +49,5 @@ shopify theme check --path theme
 | [docs/workflow.md](docs/workflow.md) | 环境、登录授权、推送与发布流程、开发习惯与禁止事项 |
 | [docs/architecture.md](docs/architecture.md) | 主题架构、自定义模块清单、区块依赖关系 |
 | [docs/ui-spec.md](docs/ui-spec.md) | UI 规范：设计 token、组件约定、间距字号、响应式断点 |
+| [docs/about-us-demo.md](docs/about-us-demo.md) | About Us 高端杂志风 HTML demo：设计说明、素材与使用方式 |
 | [docs/pitfalls.md](docs/pitfalls.md) | 踩坑点清单（症状 / 原因 / 解决方案） |
