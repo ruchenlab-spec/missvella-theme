@@ -42,7 +42,13 @@ shopify auth logout     # 切换账号时使用
 - 推送范围：`assets/ sections/ snippets/ blocks/ layout/ locales/`
 - **不会**触碰 `templates/*.json` 与 `config/settings_data.json`，编辑器里的 Banner、图片、区块配置全部保留
 - 推送后刷新主题编辑器即可看到效果
-- 优先使用 `shopify theme push --only "具体代码路径"` 精确推送本次改动；推送后核对远端文件或前台行为，再更新文档、提交 Git 并执行 `git push origin main`。
+- 优先使用 `shopify theme push --only "具体代码路径"` 精确推送本次改动；读取 CLI 成功回执后更新文档、提交 Git 并执行 `git push origin main`。前台效果由商家自行检查。
+
+### 3.1.1 快速交付（2026-11-04 商家要求）
+
+普通布局、样式和字段增删只做一次必要静态检查，代码完成后直接推送。简单 schema 改动用 JSON 解析与 Shopify 上传校验即可；Theme Check 按需最多一次，不强制所有改动全主题扫描。
+
+默认跳过浏览器、截图、多尺寸视觉回归、临时渲染／交互测试及远端拉取哈希比对。不重复运行已通过且不受后续修改影响的检查。只有具体报错、行为逻辑确有必要或商家要求时，再做针对性验证。无需安装仅用于非必要验证的依赖或启动预览服务。
 
 ### 3.2 需要修改页面结构或实例内容
 
@@ -63,14 +69,14 @@ shopify theme push --store ... --theme 167137378374 --allow-live --path theme --
 3. ❌ 不要执行全量 `shopify theme push`（无 `--only`）——同样会覆盖商家配置。
 4. ❌ 不要在主题编辑器里改**代码**（`sections/`、`snippets/` 等），后台改动不会回流本地，下次推送即覆盖。
 5. ❌ 不要把 `theme_export_*.zip`、临时脚本提交进仓库。
-6. ⚠️ 推送前先 `shopify theme check --path theme`，确认没有新增错误。
+6. ⚠️ 推送前完成与改动相称的一次必要静态检查；Theme Check 按需运行，不因旧基线错误反复检查。
 
 ## 四之二、推送前检查清单（每次推送都要过一遍）
 
 - [ ] 本次推送的 `--only` 列表仅包含代码；`config/` 只允许精确的 `config/settings_schema.json`
 - [ ] 按商家长期授权直接推送，不再逐次询问保存状态；商家明确要求暂缓时遵从
 - [ ] 没有为了改某个设置值而拉取/推送模板
-- [ ] 推送后将对应代码拉到临时目录核对，或验证前台行为；不覆盖本地商家内容快照
+- [ ] 读取 CLI 实际成功回执；默认不拉取远端、不跑浏览器或截图，商家自行检查前台
 - [ ] 更新相关文档、提交本地 Git、同步 `origin/main`；不提交临时截图或缓存
 
 ### 4.1 内容类文件（`templates/*.json`、`sections/*.json`）只改本地副本
@@ -104,10 +110,11 @@ shopify theme push --store ... --theme 167137378374 --allow-live --path theme --
 - 每次改完即提交，保持工作区干净，便于回滚。
 - `.gitattributes` 已统一 LF，避免 Windows CRLF 污染 diff。
 
-### 5.4 验证
-- 结构验证：`shopify theme check --path theme`。2026-10-31 基线为 34 个错误、23 个警告（含其他语言缺失翻译等既有问题）；要求本次改动无新增问题，旧版基线记录见 pitfalls。
-- 渲染验证：`curl http://<预览地址>` 检查关键 class/文案是否出现（无浏览器时）。
-- 视觉验证：开发者在主题编辑器里确认。
+### 5.4 必要检查与商家自检
+- 简单布局／CSS／字段调整：一次必要静态检查即可；schema JSON 解析、针对性 diff 核对或按需一次 Theme Check，按本次改动选择。
+- 普通任务不运行浏览器、截图、多尺寸回归、临时渲染测试或远端哈希验证。需要补查时说明具体原因，检查通过后不重复。
+- Shopify CLI 回执必须确认为实际成功，不能只看进程退出码；出现上传错误时修复对应问题并重推相关代码。
+- 前台视觉由商家在主题编辑器自行检查。既有 Theme Check 问题与历史基线见 pitfalls，不为旧问题重复跑检查。
 
 ## 六、常用命令速查
 

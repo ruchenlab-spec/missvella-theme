@@ -204,7 +204,7 @@ live 主题更新 → 编辑器刷新可见 → 前台即时生效
 - `circle-collections` 单独实现：左右边距设置默认 40px，且**仅在 full-width 模式生效**（page-width 模式保持 0，避免与 `--page-margin` 双重留白）。
 - `ins-media-grid-autoplay` 改用原生页面宽度／全宽网格；全宽左右边距默认 0，复用 `spacing-style`，页面宽度不叠加边距。版式及部署记录见 [ins-media.md](ins-media.md)。
 - INS 的「文本样式」本地区块统一复用原生 text schema；`ins-media-text` 将已有文字传给 `text`，字体控制和 CSS 均由原生公共组件处理；样式区块从媒体模板中排除。
-- 当前 INS 采用 Demo 02 下半部分的单行画廊：原生 scroll-snap、标题右侧翻页、FRAME 编号、收尾文案与可选 Instagram／Pinterest／Facebook 图标；背景／正文／强调色可配置，没有 banner。全宽内容借用主题 `--page-margin`，详见 [ins-media.md](ins-media.md)。
+- 当前 INS 采用 Demo 02 下半部分的单行画廊：原生 scroll-snap、标题右侧翻页、FRAME 编号；标题上方为社交账号与可选 Instagram／Pinterest／Facebook 图标。引导文字、收尾文案及其设置／代码已移除。背景／正文／强调色可配置，没有 banner。详见 [ins-media.md](ins-media.md)。
 - 不支持该设置的 section（`header`、`header-announcements`、`slideshow`、`layered-slideshow`、`section`、`custom-liquid`、`divider`、`_blocks`）未使用 `spacing-style`，全宽边距需单独改 CSS；其中 header / slideshow 的全宽铺满属于设计意图。
 
 ## 八、依赖关系要点

@@ -1,6 +1,6 @@
 # INS 媒体展示 · Film strip
 
-当前实现采用商家选定的 [Demo 02](https://missvella-social-concepts.abloom-elk-2020.chatgpt.site/02-afterhours.html) **下半部分**：标题与圆形翻页按钮、FRAME 编号横向画廊、收尾文案和社交链接。没有横幅、电影主视觉或独立站导航。
+当前实现采用商家选定的 [Demo 02](https://missvella-social-concepts.abloom-elk-2020.chatgpt.site/02-afterhours.html) **下半部分**：标题与圆形翻页按钮、FRAME 编号横向画廊和标题上方的社交账号／图标。没有横幅、电影主视觉或独立站导航。
 
 ## 文件与复用
 
@@ -16,11 +16,10 @@ section 继续使用原生「页面／全宽」选择器和 `spacing-style`；�
 | 设置 | 默认值／行为 |
 |---|---|
 | 背景色 `background_color` | `#19110e` |
-| 文字颜色 `text_color` | `#eee3d4`，用于引导语、说明和收尾文字 |
+| 文字颜色 `text_color` | `#eee3d4`，用于副标题和媒体说明 |
 | 标题与社交链接颜色 `accent_color` | `#d9af95`，同时用于翻页按钮及细线 |
 | 桌面／手机媒体宽度 | 29%／75%，保留下一张的露出 |
 | 桌面／手机媒体间距 | 22px／16px |
-| 收尾文案 `signoff` | `Some nights stay with you.` |
 | 社交账号文字 `instagram_handle` | 保留原字段 ID；新 section 默认 `@missvella` |
 | 社交图标 `social_platform` | Instagram／Pinterest／Facebook；默认 Instagram |
 | 社交链接 `social_link` | 单独设置目标地址；图标选择不会改写链接 |
@@ -31,11 +30,11 @@ Instagram 链接留空时，代码回退到商家明确提供的 `https://www.in
 
 ## 原生排版
 
-添加「文本样式」本地区块，通过「应用于」选择引导文字、标题、副标题、社交账号、媒体说明或收尾文案。布局、排版、外观、内边距沿用 `blocks/text.liquid` 的原生定义，仅排除内容输入框。一套控件服务所有文字位置，不重复六组字体逻辑。
+添加「文本样式」本地区块，通过「应用于」选择标题、副标题、社交账号或媒体说明。布局、排版、外观、内边距沿用 `blocks/text.liquid` 的原生定义，仅排除内容输入框。一套控件服务所有文字位置，不重复六组字体逻辑。
 
 排版完整提供「默认、段落、标题 1–6、自定义」；自定义字体、字号、行高、字距、大小写、换行按原生条件显示。内容继续在 section／媒体项目原有字段编辑，无需复制。重复选择同一文字位置时，以第一个样式区块为准。
 
-`text_role=cta` 的原始 ID 保留，编辑器名称改为「收尾文案」。原生 H3 与 `<em>` 提供默认收尾排版，不引入私有字体或固定像素字号。标题始终原样渲染，未恢复已移除的拆词斜体逻辑。
+引导文字与收尾文案已删除，对应 schema 设置、排版目标、渲染分支和 CSS 一并移除。社交账号文字与所选平台图标移至标题上方的原引导位置，底部不再重复显示。账号、平台和链接沿用原设置 ID，无需重新填写。标题始终原样渲染。
 
 ## 横向画廊与媒体
 
@@ -47,24 +46,18 @@ Instagram 链接留空时，代码回退到商家明确提供的 `https://www.in
 - 图片尺寸提示随桌面／手机媒体宽度更新；比例、裁切、悬停和 Shopify 托管视频设置继续使用原有内容和设置。
 - 视频可见性、切后台暂停、手动暂停锁和控制条行为保留。开启原生视频控制条时不生成覆盖控件的整卡链接。
 
-原多行／列数／网格间距控制被单行画廊宽度与间距控制替代；旧标题／说明颜色被上表颜色项替代；旧独立 CTA 按钮样式被底部社交链接替代。旧实例值仍留在线上模板中，代码不再使用它们。图片、视频、现有标题等内容保留原字段和区块，不拉取或推送模板做迁移。新 section 的标题默认 `Scenes to keep.`，不会覆盖已保存的标题。
+原多行／列数／网格间距控制被单行画廊宽度与间距控制替代；旧标题／说明颜色被上表颜色项替代；旧独立 CTA 按钮样式被标题上方的社交链接替代。旧实例值仍留在线上模板中，代码不再使用它们。图片、视频、现有标题等内容保留原字段和区块，不拉取或推送模板做迁移。新 section 的标题默认 `Scenes to keep.`，不会覆盖已保存的标题。
 
-## 验证与部署（2026-11-04）
+## 快速交付（2026-11-04）
 
-- Theme Check：修改前 32 error／23 warning，修改后 32 error／21 warning。无新增问题；原 INS 图标 CSS 作用域警告随共享 CSS 抽取消失。
-- schema JSON、内联 JavaScript 语法和 `git diff --check` 通过。
-- 使用实际店铺字体／CSS，以及原店铺图片的本地缓存验证 1440、768、390、320px；箭头、边界、连续编号、三种原生社交图标、链接、深浅色、原生自定义排版、空／少量媒体均通过。
-- 用浏览器 canvas stream 验证视频原生控制条不被链接覆盖，手动暂停后滚动不会自动恢复；独立测试页面无脚本错误。
-- 已精确推送 section 与 CSS 到 live 主题 `Missvella Dev`（`167137378374`）。两个远端文件拉取至独立临时目录，SHA256 与本地完全一致。
-- 已重新打开真实前台核对深色背景、标题色、Instagram 图标和链接、当前 5 个媒体项目的连续编号、桌面／手机翻页及无横向溢出；没有加入 banner。
+本次仅进行 schema JSON 解析、针对性代码核对与 Shopify CLI 上传校验。不运行浏览器、截图、多尺寸回归或远端文件哈希比对，前台由商家自行检查。持续开发规范见 AGENTS.md「快速交付规范」和 workflow.md §3.1.1。
 
-远端 SHA256：
+本次推送范围仅限 section 与 CSS；图片、媒体顺序及商家内容配置不推送。
 
-- section：`4707BD43A9FB5CFC221FCC19A46478267102C3233F16359AD55EEFAD13D2AC2F`
-- CSS：`A01C49F4A31722B1B41AF7D4E103020A3C9DE2D56B8600EA71B7CB7C6EF2FE42`
+已按此流程推送到 live 主题 `Missvella Dev`（`167137378374`），Shopify CLI 返回成功；未运行浏览器或截图验证。
 
 ```powershell
 shopify theme push --store 6icwx6-yv.myshopify.com --theme 167137378374 --allow-live --path theme --only "sections/ins-media-grid-autoplay.liquid" --only "assets/ins-media.css"
 ```
 
-不推送 `templates/*.json`、`sections/*.json` 或 `config/settings_data.json`。临时验证代码、缓存图片及截图不纳入 Git 提交。
+不推送 `templates/*.json`、`sections/*.json` 或 `config/settings_data.json`。临时文件不纳入 Git 提交。

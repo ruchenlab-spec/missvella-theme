@@ -55,8 +55,18 @@
 
   <div class="ins-header">
     <div class="ins-header-body">
-      {%- if section.settings.eyebrow != blank -%}
-        {% render 'ins-media-text', section: section, role: 'eyebrow', text: section.settings.eyebrow, class: 'ins-eyebrow', color: section.settings.text_color, alignment: 'left' %}
+      {%- if section.settings.instagram_handle != blank -%}
+        {%- capture social_text -%}
+          <span>{{ section.settings.instagram_handle }}</span>
+          <svg class="ins-social-icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false">{% render 'icon', icon: section.settings.social_platform %}</svg>
+        {%- endcapture -%}
+        {%- if social_link != blank -%}
+          <a class="ins-social-link" href="{{ social_link }}" target="_blank" rel="noopener noreferrer" aria-label="{{ section.settings.social_platform | capitalize }} · {{ section.settings.instagram_handle | escape }}">
+            {% render 'ins-media-text', section: section, role: 'handle', text: social_text, tag: 'span', class: 'ins-handle', color: section.settings.accent_color, alignment: 'left' %}
+          </a>
+        {%- else -%}
+          {% render 'ins-media-text', section: section, role: 'handle', text: social_text, tag: 'span', class: 'ins-handle', color: section.settings.accent_color, alignment: 'left' %}
+        {%- endif -%}
       {%- endif -%}
       {%- if section.settings.title != blank -%}
         {% render 'ins-media-text', section: section, role: 'title', text: section.settings.title, tag: 'h2', class: 'ins-title', color: section.settings.accent_color %}
@@ -168,27 +178,6 @@
     </div>
   </div>
 
-  {%- if section.settings.signoff != blank or section.settings.instagram_handle != blank -%}
-    <div class="ins-signoff">
-      {%- if section.settings.signoff != blank -%}
-        {%- capture signoff_text -%}<em>{{ section.settings.signoff }}</em>{%- endcapture -%}
-        {% render 'ins-media-text', section: section, role: 'cta', text: signoff_text, tag: 'h3', class: 'ins-signoff-text', color: section.settings.text_color, alignment: 'left' %}
-      {%- endif -%}
-      {%- if section.settings.instagram_handle != blank -%}
-        {%- capture social_text -%}
-          <span>{{ section.settings.instagram_handle }}</span>
-          <svg class="ins-social-icon" viewBox="0 0 20 20" aria-hidden="true" focusable="false">{% render 'icon', icon: section.settings.social_platform %}</svg>
-        {%- endcapture -%}
-        {%- if social_link != blank -%}
-          <a class="ins-social-link" href="{{ social_link }}" target="_blank" rel="noopener noreferrer" aria-label="{{ section.settings.social_platform | capitalize }} · {{ section.settings.instagram_handle | escape }}">
-            {% render 'ins-media-text', section: section, role: 'handle', text: social_text, tag: 'span', class: 'ins-handle', color: section.settings.accent_color, alignment: 'right' %}
-          </a>
-        {%- else -%}
-          {% render 'ins-media-text', section: section, role: 'handle', text: social_text, tag: 'span', class: 'ins-handle', color: section.settings.accent_color, alignment: 'right' %}
-        {%- endif -%}
-      {%- endif -%}
-    </div>
-  {%- endif -%}
 
 </section>
 
@@ -692,11 +681,6 @@
     },
     {
       "type": "text",
-      "id": "eyebrow",
-      "label": "引导文字"
-    },
-    {
-      "type": "text",
       "id": "title",
       "label": "标题",
       "default": "Scenes to keep."
@@ -708,13 +692,7 @@
     },
     {
       "type": "header",
-      "content": "底部文案与社交链接"
-    },
-    {
-      "type": "text",
-      "id": "signoff",
-      "label": "收尾文案",
-      "default": "Some nights stay with you."
+      "content": "社交账号"
     },
     {
       "type": "text",
@@ -788,10 +766,6 @@
           "label": "应用于",
           "options": [
             {
-              "value": "eyebrow",
-              "label": "引导文字"
-            },
-            {
               "value": "title",
               "label": "标题"
             },
@@ -806,10 +780,6 @@
             {
               "value": "caption",
               "label": "媒体说明文字"
-            },
-            {
-              "value": "cta",
-              "label": "收尾文案"
             }
           ],
           "default": "title"
