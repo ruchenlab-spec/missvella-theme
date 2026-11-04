@@ -211,6 +211,7 @@ live 主题更新 → 编辑器刷新可见 → 前台即时生效
 
 - `circle-collections` 依赖：`snippets/slideshow.liquid`、`slideshow-slide`、`slideshow-styles`、`snippets/text.liquid`、`snippets/spacing-style.liquid`、`slideshow.js`（Web Component）。
 - 圆形集合移动端的翻页按钮位于标题行右侧，圆形列表位于第二行，不再在底部排列按钮。标题通过原生 slideshow 的 `header` 插槽传入；按钮仍在组件内，保留原生 ref／点击绑定与 44px 触摸区域。桌面端继续在圆形列表左右显示按钮。
+- 圆形集合与 INS 共用 `snippets/carousel-arrow.liquid` 的描边圆形按钮和原生 `assets/icon-arrow.svg`。公共 CSS 由 snippet stylesheet 统一加载；图标为 18px 块元素，按钮用 Grid 居中且行高为 0，上一页只镜像同一资产。圆形集合保留桌面按钮大小控制，移动端与 INS 默认均为 38px，触摸区域至少 44px；旧形状和重复箭头绘制已移除。
 - 箭头按钮必须位于 `<slideshow-component>` 内且带 `ref="previous" / "next"` + `on:click="/previous"`，否则不会与轮播组件绑定。
 - `mv-shared.css` 与 `fonts.liquid` 必须在 `theme.liquid` 的 `<head>` 中被引用，否则定制样式与字体不生效。
 - 色板条依赖链：`filters.liquid` → `cf-colour-bar.liquid` → `cf2-item.liquid` → `color-facet-swatch.liquid`；`cf-colour-bar` 内的色板项又依赖 `list-filter.liquid` 传下来的 `builtin_pairs`。

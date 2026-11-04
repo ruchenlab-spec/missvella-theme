@@ -31,7 +31,7 @@
     assign circle_size_css = section.settings.circle_size | append: 'px'
   endif
 
-  assign arrow_size = section.settings.arrow_size | default: 48
+  assign arrow_size = section.settings.arrow_size | default: 38
 
   # Full-width sections need their own side gutters (page-width mode already has --page-margin)
   assign pad_inline_start = 0
@@ -39,16 +39,6 @@
   if section.settings.section_width == 'full-width'
     assign pad_inline_start = section.settings.padding_inline_start | default: 40
     assign pad_inline_end = section.settings.padding_inline_end | default: 40
-  endif
-
-  assign arrow_icon = 'arrow'
-  if section.settings.icons_style contains 'chevron'
-    assign arrow_icon = 'caret'
-  endif
-
-  # "large" icon styles get a visibly bigger arrow than the base setting.
-  if section.settings.icons_style contains 'large'
-    assign arrow_size = arrow_size | plus: 16
   endif
 
   # Without arrows the carousel is a single centered column (no reserved gutters).
@@ -196,44 +186,8 @@
 
   {%- if section.settings.icons_style != 'none' -%}
     {%- capture custom_arrows -%}
-      <button
-        type="button"
-        class="
-          circle-collections__arrow circle-collections__arrow--prev
-          circle-collections__arrow--shape-{{ section.settings.icons_shape }}
-          circle-collections__arrow--{{ arrow_icon }} flip-x
-        "
-        ref="previous"
-        on:click="/previous"
-        aria-label="{{ 'accessibility.slideshow_previous' | t }}"
-      >
-        <span class="circle-collections__arrow-icon">
-          {%- if arrow_icon == 'caret' -%}
-            {{- 'icon-caret.svg' | inline_asset_content -}}
-          {%- else -%}
-            {{- 'icon-arrow.svg' | inline_asset_content -}}
-          {%- endif -%}
-        </span>
-      </button>
-      <button
-        type="button"
-        class="
-          circle-collections__arrow circle-collections__arrow--next
-          circle-collections__arrow--shape-{{ section.settings.icons_shape }}
-          circle-collections__arrow--{{ arrow_icon }}
-        "
-        ref="next"
-        on:click="/next"
-        aria-label="{{ 'accessibility.slideshow_next' | t }}"
-      >
-        <span class="circle-collections__arrow-icon">
-          {%- if arrow_icon == 'caret' -%}
-            {{- 'icon-caret.svg' | inline_asset_content -}}
-          {%- else -%}
-            {{- 'icon-arrow.svg' | inline_asset_content -}}
-          {%- endif -%}
-        </span>
-      </button>
+      {% render 'carousel-arrow', action: 'previous', class: 'circle-collections__arrow circle-collections__arrow--prev', slideshow: true %}
+      {% render 'carousel-arrow', action: 'next', class: 'circle-collections__arrow circle-collections__arrow--next', slideshow: true %}
     {%- endcapture -%}
   {%- endif -%}
 
@@ -297,74 +251,14 @@
    * The row keeps its full height, so section padding stays standard.
    */
   .circle-collections__arrow {
-    position: relative;
+    --carousel-arrow-size: var(--circle-arrow-size);
     grid-row: 2;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: var(--circle-arrow-size);
-    height: var(--circle-arrow-size);
+    justify-self: center;
     margin-block-start: calc(-12px - var(--circle-title-size) * 1.2);
-    padding: 0;
-    border: 0;
-    background: transparent;
-    color: var(--color-foreground);
-    cursor: pointer;
-    transition: opacity 0.2s ease, transform 0.2s ease, background-color 0.2s ease;
   }
 
-  /* Keep a 44px tap target even when the visible button is smaller */
-  .circle-collections__arrow::before {
-    content: '';
-    position: absolute;
-    inset: calc((var(--minimum-touch-target, 44px) - var(--circle-arrow-size)) / -2);
-  }
-
-  .circle-collections__arrow--prev {
-    grid-column: 1;
-    justify-self: start;
-  }
-
-  .circle-collections__arrow--next {
-    grid-column: 3;
-    justify-self: end;
-  }
-
-  .circle-collections__arrow--shape-circle {
-    border-radius: 50%;
-    background: var(--color-primary-button-background);
-    color: var(--color-primary-button-text);
-  }
-
-  .circle-collections__arrow--shape-square {
-    background: var(--color-primary-button-background);
-    color: var(--color-primary-button-text);
-  }
-
-  .circle-collections__arrow-icon {
-    display: inline-flex;
-    width: calc(var(--circle-arrow-size) * 0.45);
-    height: calc(var(--circle-arrow-size) * 0.45);
-  }
-
-  .circle-collections__arrow-icon svg {
-    width: 100%;
-    height: 100%;
-  }
-
-  .circle-collections__arrow--caret .circle-collections__arrow-icon svg {
-    rotate: -90deg;
-  }
-
-  .circle-collections__arrow:hover {
-    transform: scale(1.06);
-  }
-
-  .circle-collections__arrow[disabled] {
-    opacity: 0.25;
-    cursor: default;
-    transform: none;
-  }
+  .circle-collections__arrow--prev { grid-column: 1; }
+  .circle-collections__arrow--next { grid-column: 3; }
 
   @container circle-collections (max-width: 749px) {
     .circle-collections .circle-collections__carousel {
@@ -392,41 +286,13 @@
     /* Controls stay inside the native slideshow and share the title row.
        The visible surface is 32px; the button keeps a 44px touch target. */
     .circle-collections__arrow {
+      --carousel-arrow-size: 38px;
       grid-row: 1;
-      justify-self: center;
-      width: 44px;
-      height: 44px;
       margin-block-start: 0;
-      background: transparent;
-      color: var(--color-foreground);
-      isolation: isolate;
     }
+    .circle-collections__arrow--prev { grid-column: 2; }
+    .circle-collections__arrow--next { grid-column: 3; }
 
-    .circle-collections__arrow--prev {
-      grid-column: 2;
-    }
-
-    .circle-collections__arrow--next {
-      grid-column: 3;
-    }
-
-    .circle-collections__arrow::before {
-      inset: 6px;
-      z-index: -1;
-      border: 1px solid rgb(var(--color-foreground-rgb) / 12%);
-      border-radius: inherit;
-      background: rgb(var(--color-foreground-rgb) / 4%);
-    }
-
-    .circle-collections__arrow--shape-none::before {
-      border: 0;
-      background: transparent;
-    }
-
-    .circle-collections__arrow-icon {
-      width: 16px;
-      height: 16px;
-    }
   }
 
   /* This section writes raw pixel gutters (not scaled by spacing-style), so use
@@ -530,7 +396,10 @@
   "class": "circle-collections-section",
   "max_blocks": 24,
   "disabled_on": {
-    "groups": ["header", "footer"]
+    "groups": [
+      "header",
+      "footer"
+    ]
   },
   "blocks": [
     {
@@ -1027,50 +896,18 @@
     {
       "type": "select",
       "id": "icons_style",
-      "label": "箭头样式",
+      "label": "翻页按钮",
       "options": [
         {
           "value": "arrow",
-          "label": "箭头"
-        },
-        {
-          "value": "chevron",
-          "label": "尖括号"
-        },
-        {
-          "value": "arrows_large",
-          "label": "大箭头"
-        },
-        {
-          "value": "chevron_large",
-          "label": "大尖括号"
+          "label": "显示"
         },
         {
           "value": "none",
-          "label": "无"
+          "label": "隐藏"
         }
       ],
       "default": "arrow"
-    },
-    {
-      "type": "select",
-      "id": "icons_shape",
-      "label": "箭头背景",
-      "options": [
-        {
-          "value": "none",
-          "label": "无"
-        },
-        {
-          "value": "circle",
-          "label": "圆形"
-        },
-        {
-          "value": "square",
-          "label": "方形"
-        }
-      ],
-      "default": "circle"
     },
     {
       "type": "range",
@@ -1080,7 +917,7 @@
       "max": 56,
       "step": 2,
       "unit": "px",
-      "default": 36
+      "default": 38
     },
     {
       "type": "header",
@@ -1215,7 +1052,6 @@
         "mobile_columns": "2",
         "circle_gap": 16,
         "icons_style": "arrow",
-        "icons_shape": "circle",
         "section_width": "page-width",
         "padding-block-start": 36,
         "padding-block-end": 36

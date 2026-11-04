@@ -8,6 +8,7 @@
 - `theme/assets/ins-media.css`：本 section 共用的布局和媒体 CSS；不再为每个实例输出整套重复 CSS。
 - `theme/snippets/ins-media-text.liquid`：将原有内容交给原生 `text` 渲染器，继续复用 `typography-style`、`text-block-styles`、`spacing-padding` 和主题字体 CSS。
 - 社交图标复用 `snippets/icon.liquid`；背景复用原生 `contrast-override` 的仅背景模式与 `section-background`。文字颜色通过原生文本变量传递。
+- 翻页按钮与圆形集合轮播共用 `snippets/carousel-arrow.liquid` 和主题现有 `assets/icon-arrow.svg`，不再绘制两条私有箭头路径。共同使用描边圆框、18px 图标、零行高及 Grid 居中；样式由公共 snippet 统一提供，INS 仅传递强调色。原 24×24 私有路径的边界中心偏移已移除。
 
 ## 编辑器控制
 

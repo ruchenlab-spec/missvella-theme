@@ -1,0 +1,67 @@
+{%- doc -%}
+  Shared outlined carousel button using the theme's centered arrow asset.
+
+  @param {string} action - previous or next
+  @param {string} [id] - Optional ID for section event listeners
+  @param {string} [class] - Section positioning classes
+  @param {boolean} [slideshow] - Bind the native slideshow action and ref
+  @param {boolean} [hidden] - Hide until the section calculates overflow
+{%- enddoc -%}
+
+<button
+  type="button"
+  class="carousel-arrow carousel-arrow--{{ action }} {{ class }}"
+  {% if id != blank %}id="{{ id | escape }}"{% endif %}
+  {% if slideshow %}ref="{{ action }}" on:click="/{{ action }}"{% endif %}
+  {% if hidden %}hidden{% endif %}
+  aria-label="{% if action == 'previous' %}{{ 'accessibility.slideshow_previous' | t }}{% else %}{{ 'accessibility.slideshow_next' | t }}{% endif %}"
+>
+  <span class="carousel-arrow__icon">{{- 'icon-arrow.svg' | inline_asset_content -}}</span>
+</button>
+
+{% stylesheet %}
+  .carousel-arrow {
+    position: relative;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+    box-sizing: border-box;
+    width: var(--carousel-arrow-size, 38px);
+    height: var(--carousel-arrow-size, 38px);
+    min-width: 0;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    line-height: 0;
+    appearance: none;
+    border: 1px solid color-mix(in srgb, currentColor 48%, transparent);
+    border-radius: 50%;
+    color: var(--carousel-arrow-color, var(--color-foreground));
+    background: transparent;
+    box-shadow: none;
+    cursor: pointer;
+    transition: background 180ms, opacity 180ms;
+  }
+  .carousel-arrow::before {
+    content: '';
+    position: absolute;
+    inset: min(0px, calc((var(--carousel-arrow-size, 38px) - 44px) / 2));
+  }
+  .carousel-arrow:hover { background: color-mix(in srgb, currentColor 12%, transparent); }
+  .carousel-arrow:disabled { opacity: 0.3; cursor: default; }
+  .carousel-arrow[hidden] { display: none; }
+  .carousel-arrow:focus-visible { outline: 2px solid currentColor; outline-offset: 4px; }
+  .carousel-arrow__icon {
+    --icon-stroke-width: 1.25px;
+    display: block;
+    width: 18px;
+    height: 18px;
+    line-height: 0;
+    pointer-events: none;
+  }
+  .carousel-arrow__icon svg { display: block; width: 100%; height: 100%; }
+  .carousel-arrow--previous .carousel-arrow__icon { transform: scaleX(-1); }
+  [dir='rtl'] .carousel-arrow--next .carousel-arrow__icon { transform: scaleX(-1); }
+  [dir='rtl'] .carousel-arrow--previous .carousel-arrow__icon { transform: none; }
+  @media (prefers-reduced-motion: reduce) { .carousel-arrow { transition: none; } }
+{% endstylesheet %}

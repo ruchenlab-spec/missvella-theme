@@ -76,12 +76,10 @@
       {%- endif -%}
     </div>
     <div class="ins-controls">
-      <button class="ins-arrow ins-arrow--prev" id="ins-prev-{{ section.id }}" type="button" aria-label="上一张" hidden>
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 6-6 6 6 6M8 12h12"/></svg>
-      </button>
-      <button class="ins-arrow ins-arrow--next" id="ins-next-{{ section.id }}" type="button" aria-label="下一张" hidden>
-        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m10 6 6 6-6 6M4 12h12"/></svg>
-      </button>
+      {%- assign previous_button_id = 'ins-prev-' | append: section.id -%}
+      {%- assign next_button_id = 'ins-next-' | append: section.id -%}
+      {% render 'carousel-arrow', action: 'previous', id: previous_button_id, class: 'ins-arrow ins-arrow--prev', hidden: true %}
+      {% render 'carousel-arrow', action: 'next', id: next_button_id, class: 'ins-arrow ins-arrow--next', hidden: true %}
     </div>
   </div>
 
