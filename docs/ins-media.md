@@ -17,7 +17,7 @@
 - 2026-11-04 实际运行 Theme Check：修改前后均为 32 个 error、23 个 warning，无新增问题；INS 文件原有两条图标作用域 warning 保持不变。
 - schema JSON、内联 JavaScript 语法和 `git diff --check` 通过。
 - JavaScript 行为模拟通过：桌面箭头及边界、移动双行和滑动、跨断点重建、空网格及无需翻页的网格。
-- **待上线**：已尝试只推送 `sections/ins-media-grid-autoplay.liquid`，Shopify CLI 返回当前账号无权访问店铺，上传未完成。需先恢复本机 CLI 的店铺授权，再精确推送并核对远端文件或前台效果。
+- **已上线（2026-11-04）**：通过 `shopify auth login` 选回项目账号后，仅推送 `sections/ins-media-grid-autoplay.liquid` 到线上主题 `Missvella Dev`（`167137378374`）。远端文件拉取至独立临时目录，与本地 SHA256 完全一致（`93B4510A8428AAF0EB729559EBE643D95B37B84461D96D864C452BB081046EBF`）；未推送模板或商家设置数据。
 
 ```powershell
 shopify theme push --store 6icwx6-yv.myshopify.com --theme 167137378374 --allow-live --path theme --only "sections/ins-media-grid-autoplay.liquid"
