@@ -150,6 +150,12 @@
 
 ## 五、Git 提交约定
 
+### 2026-11-04 · Philosophy 文字分栏上线
+
+- 从 About Us demo 提取「杂志文字分栏」section，保留总标题及可重复添加的文字栏，删除章节眉栏和列尾标语。
+- 复用原生 Text / Group 区块、字体排版、布局与颜色组件，支持行列数、间距、全宽留白、配色、自动编号与分隔线；仅新增一个 section 文件，不引入 JS。
+- Theme Check 新文件无问题，已按 `--only sections/editorial-text-columns.liquid` 精确推送并收到 CLI 成功回执；商家在主题编辑器自行添加实例。
+
 - 提交信息用英文，首行概括，正文列要点（与历史提交风格一致）。
 - 提交前确认 `git status` 干净、`theme check` 无新增错误。
 - 不要提交：`theme_export_*.zip`、临时脚本、构建产物（已在 `.gitignore`）。

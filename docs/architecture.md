@@ -209,6 +209,8 @@ live 主题更新 → 编辑器刷新可见 → 前台即时生效
 
 ## 八、依赖关系要点
 
+- `sections/editorial-text-columns.liquid`（编辑器名「杂志文字分栏」）：原生静态 Text 总标题 + 可追加的 Group / Text 栏。默认每栏为 Group 内的标题和正文 Text，完全复用原生文字、分组、配色对比度、内边距和间距组件，只补充分栏／编号／分隔线 CSS，不含 JS。操作及控件见 [about-us-demo.md](about-us-demo.md)。
+
 - `circle-collections` 依赖：`snippets/slideshow.liquid`、`slideshow-slide`、`slideshow-styles`、`snippets/text.liquid`、`snippets/spacing-style.liquid`、`slideshow.js`（Web Component）。
 - 圆形集合移动端的翻页按钮位于标题行右侧，圆形列表位于第二行，不再在底部排列按钮。标题通过原生 slideshow 的 `header` 插槽传入；按钮仍在组件内，保留原生 ref／点击绑定与 44px 触摸区域。桌面端继续在圆形列表左右显示按钮。
 - 圆形集合与 INS 共用 `snippets/carousel-arrow.liquid` 的描边圆形按钮和原生 `assets/icon-arrow.svg`。公共 CSS 由 snippet stylesheet 统一加载；图标为 18px 块元素，按钮用 Grid 居中且行高为 0，上一页只镜像同一资产。圆形集合保留桌面按钮大小控制，移动端与 INS 默认均为 38px，触摸区域至少 44px；旧形状和重复箭头绘制已移除。
