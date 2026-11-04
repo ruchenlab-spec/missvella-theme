@@ -32,17 +32,60 @@
     text-align: {{ section.settings.header_align }};
     margin-bottom: {{ section.settings.header_gap }}px;
   }
-  #ins-{{ section.id }} .ins-eyebrow {
-    margin: 0 0 8px;
+  #ins-{{ section.id }}.section--full-width .ins-header {
+    padding-inline: var(--page-margin);
   }
-  #ins-{{ section.id }} .ins-title {
-    margin: 0 0 10px;
+  #ins-{{ section.id }} .ins-header-bar {
+    display: flex;
+    align-items: center;
+    gap: clamp(12px, 2vw, 28px);
+    margin-bottom: clamp(20px, 2.5vw, 36px);
+    color: {{ section.settings.title_color }};
   }
-  #ins-{{ section.id }} .ins-subtitle {
-    margin: 0;
+  #ins-{{ section.id }} .ins-header-label,
+  #ins-{{ section.id }} .ins-header-social {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
   }
-  #ins-{{ section.id }} .ins-handle {
-    margin-top: 8px;
+  #ins-{{ section.id }} .ins-header-label > .ins-eyebrow,
+  #ins-{{ section.id }} .ins-header-social > .ins-handle {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+  #ins-{{ section.id }} .ins-header-rule {
+    flex: 1 0 24px;
+    border-top: 1px solid currentColor;
+    opacity: 0.22;
+  }
+  #ins-{{ section.id }} .ins-header-mark {
+    width: 14px;
+    height: 20px;
+    flex-shrink: 0;
+  }
+  #ins-{{ section.id }} .ins-header-instagram {
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+  #ins-{{ section.id }} .ins-header-body {
+    display: grid;
+    gap: 14px;
+  }
+  @media (max-width: 749px) {
+    #ins-{{ section.id }} .ins-header-bar {
+      flex-wrap: wrap;
+      row-gap: 12px;
+    }
+    #ins-{{ section.id }} .ins-header-label,
+    #ins-{{ section.id }} .ins-header-social {
+      max-width: 100%;
+      gap: 7px;
+    }
+    #ins-{{ section.id }} .ins-header-social {
+      margin-inline-start: auto;
+    }
   }
 
   /* ── Slider ── */
@@ -262,17 +305,38 @@
       or section.settings.subtitle != blank
       or section.settings.instagram_handle != blank -%}
     <div class="ins-header">
-      {%- if section.settings.eyebrow != blank -%}
-        {% render 'ins-media-text', section: section, role: 'eyebrow', text: section.settings.eyebrow, tag: 'p', class: 'ins-eyebrow', color: section.settings.title_color %}
+      {%- if section.settings.eyebrow != blank or section.settings.instagram_handle != blank -%}
+        <div class="ins-header-bar">
+          {%- if section.settings.eyebrow != blank -%}
+            <div class="ins-header-label">
+              <svg class="ins-header-mark" viewBox="0 0 14 20" fill="none" aria-hidden="true">
+                <path d="M7 0C7 7 5 10 0 10c5 0 7 3 7 10 0-7 2-10 7-10C9 10 7 7 7 0Z" fill="currentColor"/>
+              </svg>
+              {% render 'ins-media-text', section: section, role: 'eyebrow', text: section.settings.eyebrow, tag: 'p', class: 'ins-eyebrow', color: section.settings.title_color, alignment: 'left' %}
+            </div>
+          {%- endif -%}
+          <span class="ins-header-rule" aria-hidden="true"></span>
+          {%- if section.settings.instagram_handle != blank -%}
+            <div class="ins-header-social">
+              <svg class="ins-header-instagram" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.25" aria-hidden="true">
+                <rect x="3.5" y="3.5" width="17" height="17" rx="5"/>
+                <circle cx="12" cy="12" r="4"/>
+                <circle cx="17.5" cy="6.8" r="0.9" fill="currentColor" stroke="none"/>
+              </svg>
+              {% render 'ins-media-text', section: section, role: 'handle', text: section.settings.instagram_handle, tag: 'p', class: 'ins-handle', color: section.settings.title_color, alignment: 'right' %}
+            </div>
+          {%- endif -%}
+        </div>
       {%- endif -%}
-      {%- if section.settings.title != blank -%}
-        {% render 'ins-media-text', section: section, role: 'title', text: section.settings.title, tag: 'h2', class: 'ins-title', color: section.settings.title_color %}
-      {%- endif -%}
-      {%- if section.settings.subtitle != blank -%}
-        {% render 'ins-media-text', section: section, role: 'subtitle', text: section.settings.subtitle, tag: 'p', class: 'ins-subtitle', color: section.settings.title_color %}
-      {%- endif -%}
-      {%- if section.settings.instagram_handle != blank -%}
-        {% render 'ins-media-text', section: section, role: 'handle', text: section.settings.instagram_handle, tag: 'p', class: 'ins-handle', color: section.settings.title_color %}
+      {%- if section.settings.title != blank or section.settings.subtitle != blank -%}
+        <div class="ins-header-body">
+          {%- if section.settings.title != blank -%}
+            {% render 'ins-media-text', section: section, role: 'title', text: section.settings.title, tag: 'h2', class: 'ins-title', color: section.settings.title_color, emphasize_last_word: section.settings.header_title_emphasis %}
+          {%- endif -%}
+          {%- if section.settings.subtitle != blank -%}
+            {% render 'ins-media-text', section: section, role: 'subtitle', text: section.settings.subtitle, tag: 'p', class: 'ins-subtitle', color: section.settings.title_color %}
+          {%- endif -%}
+        </div>
       {%- endif -%}
     </div>
   {%- endif -%}
@@ -770,6 +834,7 @@
     {"type":"checkbox","id":"video_muted","label":"静音","default":true},
     {"type":"checkbox","id":"video_controls","label":"显示视频控制条","info":"如果开启控制条，为避免遮挡播放控件，视频卡片的整块跳转链接将停用。","default":false},
     {"type":"header","content":"标题区域"},
+    {"type":"checkbox","id":"header_title_emphasis","label":"标题末词斜体强调","default":true,"info":"为多词标题的最后一个单词添加斜体，使用主题字体；可关闭。"},
     {"type":"select","id":"header_align","label":"标题对齐方式","options":[{"value":"left","label":"左对齐"},{"value":"center","label":"居中"},{"value":"right","label":"右对齐"}],"default":"center"},
     {"type":"range","id":"header_gap","label":"标题与网格间距（px）","min":8,"max":80,"step":4,"default":32},
     {"type":"text","id":"eyebrow","label":"标题文字","default":"Follow us"},

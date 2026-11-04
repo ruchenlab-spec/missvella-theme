@@ -25,15 +25,25 @@ section 中没有最大宽度设置，宽度定义与原生 `product-list` 完�
 
 每个文字位置使用一个样式区块；重复选择同一位置时，以区块顺序中的第一个为准。样式区块没有文本输入框，避免出现两份内容来源。Shopify 不允许 section 本地区块和静态主题区块混用，因此在本地样式区块中声明原生控件，并直接复用原生渲染器。
 
+## 标头设计（2026-11-04）
+
+- 标头改为杂志眉栏结构：引导文字配细长星芒，细线连接右侧 Instagram 图标和账号；主标题及可选副标题独立成行。
+- 全宽媒体保持原来的宽度，标头借用主题 `--page-margin` 留出呼吸空间；页面宽度模式沿用主题已有边距，不叠加。
+- section 新增「标题末词斜体强调」，默认开启：多词纯文本标题的最后一个词使用语义 `<em>`，如 `The MISSVELLA Edit` 的 `Edit`。单词标题及含 HTML 的标题不作拆分。关闭后恢复完整原文渲染。
+- 所有文字仍调用原生 `text` 渲染器，字体、字号、字重及排版预设没有新增 CSS 覆盖；斜体沿用主题字体。图形均为装饰 SVG，使用 `aria-hidden`。
+- 手机眉栏支持换行，长引导语和长账号可收缩换行；标题、引导语、账号、副标题可各自留空，不生成无内容的标头行。
+- 现有文案及实例设置保持在线上原处，只推送 section 和 snippet 代码。
+
 ## 验证与部署状态
 
 - 2026-11-04 实际运行 Theme Check：修改前后均为 32 个 error、23 个 warning，无新增问题；INS 文件原有两条图标作用域 warning 保持不变。
 - schema JSON、内联 JavaScript 语法和 `git diff --check` 通过。
 - Liquid 渲染验证通过：宽度 schema 与原生 section 完全相同，样式控件与原生 text block 完全相同；9 种预设、默认内容、自定义流式字号、样式区块不混入网格和空媒体网格均通过。使用 LiquidJS 执行本地模板验证，未操作线上实例数据。
 - 上一版 JavaScript 行为模拟通过：桌面箭头及边界、移动双行和滑动、跨断点重建、空网格及无需翻页的网格；本次轮播 JavaScript 未修改。
+- 标头设计使用 Chrome 本地渲染检查：1440px、390px、320px、长文案、缺少引导语、仅标题均无横向溢出；已查看桌面和手机截图。预览使用本地主题 CSS 和测试字体变量，最终字体沿用商家的线上主题配置。斜体开关、单词标题和 9 种原生排版预设的 Liquid 渲染检查通过。
 - **已上线（2026-11-04）**：仅推送 section 和新适配 snippet 到线上主题 `Missvella Dev`（`167137378374`）。两个远端文件拉取至独立临时目录，与本地 SHA256 完全一致；未推送模板或商家设置数据，也未代商家添加样式区块。
 
-远端 SHA256：section `04C5C1073A714E4AE07D3C51D82B29651379269FACEE20A3707D074FA61B9131`；snippet `5B95B868B553EB65780C3418351264FAA710B50FF6ED78FA935142797902C904`。
+远端 SHA256（含标头设计）：section `D00030E6246B485A8E973A5A9992DBAEBB14D396C348C334459AE03FB2B82F2E`；snippet `FEF99C4A67FD3440CA198D45C7426D407310EAA845822A3C0E9ACE08197892E0`。
 
 ```powershell
 shopify theme push --store 6icwx6-yv.myshopify.com --theme 167137378374 --allow-live --path theme --only "sections/ins-media-grid-autoplay.liquid" --only "snippets/ins-media-text.liquid"
