@@ -103,6 +103,8 @@ function verify(stack) {
   const focus = stack.cards[selected];
   const start = value(focus, '--mv-card-x'), end = start + stack.widths[selected];
   assert(start >= -1e-7 && end <= stack.width + 1e-7);
+  assert.equal(value(stack, '--mv-stack-controls-right'), end);
+  assert.equal(value(stack, '--mv-stack-controls-bottom'), (stack.stageHeight + stack.heights[selected]) / 2);
   assert.equal(stack.cards.filter((card) => card.attributes.has('data-focus')).length, 1);
   assert.equal(value(focus, '--mv-card-clip-left'), 0); assert.equal(value(focus, '--mv-card-clip-right'), 0);
   stack.cards.forEach((card, index) => {
@@ -164,4 +166,9 @@ auto.visibilityObserver.callback([{ isIntersecting: false }]); assert.equal(time
 auto.visibilityObserver.callback([{ isIntersecting: true }]); assert.equal(timers.size, 1);
 auto.disconnectedCallback(); assert.equal(timers.size, 0); assert(auto.observer.disconnected && auto.visibilityObserver.disconnected);
 assert([...document.events.values()].every((listeners) => listeners.size === 0), 'document listeners leaked');
+const desktop = create(1440, 5);
+desktop.select(0); desktop.stage.emit('pointerleave');
+assert.equal(desktop.active, 0, 'entering the overlaid controls must keep the selected card');
+desktop.emit('pointerleave'); assert.equal(desktop.active, null);
+desktop.disconnectedCallback();
 console.log(`Schema and ${scenarios} geometry scenarios passed, including cyclic edge coverage, two-image fill, focus effects, height stability and autoplay lifecycle.`);

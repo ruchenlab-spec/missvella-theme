@@ -36,6 +36,7 @@
     {%- if section.settings.heading != blank -%}
       <h2 class="mv-hero-stack__heading">{{ section.settings.heading | escape }}</h2>
     {%- endif -%}
+    <div class="mv-hero-stack__media">
     <div class="mv-hero-stack__stage" data-stack-stage>
       {%- for block in section.blocks -%}
         {%- liquid
@@ -137,6 +138,7 @@
       </div>
       {%- endif -%}
     {%- endif -%}
+    </div>
     {%- if section.blocks.size == 0 and request.design_mode -%}
       <p class="mv-hero-stack__empty">请添加图片区块，开始配置堆叠轮播。</p>
     {%- endif -%}

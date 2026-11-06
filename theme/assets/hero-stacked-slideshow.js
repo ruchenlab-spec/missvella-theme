@@ -23,6 +23,8 @@ class HeroStack extends HTMLElement {
     this.stage.addEventListener('pointermove', (event) => this.onPointerMove(event), options);
     this.stage.addEventListener('pointerleave', () => {
       this.lastPointer = null;
+    }, options);
+    this.addEventListener('pointerleave', () => {
       if (!this.mobileQuery.matches && !this.contains(document.activeElement)) this.select(this.editorIndex);
     }, options);
     this.stage.addEventListener('click', (event) => {
@@ -210,6 +212,9 @@ class HeroStack extends HTMLElement {
     const count = this.cards.length;
     const start = active === null ? 0 : this.activeX;
     const end = active === null ? 0 : start + this.widths[active];
+    // Controls share the media wrapper and follow the actual focused card bounds.
+    this.style.setProperty('--mv-stack-controls-right', `${end}px`);
+    this.style.setProperty('--mv-stack-controls-bottom', `${(this.stageHeight + this.heights[active]) / 2}px`);
     const leftCount = Math.floor((count - 1) / 2);
     const order = Array.from({ length: count }, (_, rank) => (active - leftCount + rank + count) % count);
     const advance = 1 - Number(this.dataset.overlap) / 100;
