@@ -5,6 +5,7 @@ class HeroStack extends HTMLElement {
     this.cards = [...this.querySelectorAll('[data-stack-card]')];
     if (!this.stage || !this.cards.length) return;
 
+    this.primary = Math.max(0, this.cards.findIndex((card) => card.dataset.primary === 'true'));
     this.active = null;
     this.editorIndex = null;
     this.abort = new AbortController();
@@ -69,32 +70,47 @@ class HeroStack extends HTMLElement {
     if (!width || !height) return;
     const count = this.cards.length;
     const maxWidth = width * (count === 1 ? 1 : this.mobileQuery.matches ? 0.84 : 0.8);
+    const primaryScale = Math.min(1, Math.max(0.2, (Number(this.dataset.primaryWidth) || 100) / 100));
     this.width = width;
-    this.widths = this.cards.map((card) => {
+    this.widths = this.cards.map((card, index) => {
       const ratio = Number(this.mobileQuery.matches ? card.dataset.mobileRatio : card.dataset.ratio) || 0.75;
-      const cardWidth = Math.min(height * ratio, maxWidth);
+      const cardWidth = Math.min(height * ratio, maxWidth) * (index === this.primary ? primaryScale : 1);
       card.style.setProperty('--mv-card-width', `${cardWidth}px`);
       card.style.setProperty('--mv-card-height', `${cardWidth / ratio}px`);
       return cardWidth;
     });
 
-    // Reserve space for every card, even when the last image is narrower.
-    // For each right edge: sum(previous widths) * advance + current width <= container.
-    let prefix = 0;
-    let advance = 1 - Number(this.dataset.overlap) / 100;
-    this.widths.forEach((cardWidth) => {
-      if (prefix) advance = Math.min(advance, (width - cardWidth) / prefix);
-      prefix += cardWidth;
-    });
-    prefix = 0;
-    this.base = this.widths.map((cardWidth) => {
-      const position = prefix * advance;
-      prefix += cardWidth;
-      return position;
-    });
-    const extent = Math.max(...this.widths.map((cardWidth, index) => this.base[index] + cardWidth));
-    this.base = this.base.map((position) => position + (width - extent) / 2);
-    this.activeX = this.openPosition(this.active);
+    const totalWidth = this.widths.reduce((total, cardWidth) => total + cardWidth, 0);
+    this.stacked = totalWidth > width;
+    this.toggleAttribute('data-stacked', this.stacked);
+    if (!this.stacked) {
+      // Reduce the optional gap before considering overlap. Hover never shifts a fitted row.
+      const gap = count > 1 ? Math.min(16, (width - totalWidth) / (count - 1)) : 0;
+      let position = (width - totalWidth - gap * (count - 1)) / 2;
+      this.base = this.widths.map((cardWidth) => {
+        const start = position;
+        position += cardWidth + gap;
+        return start;
+      });
+    } else {
+      // Reserve space for every card, even when the last image is narrower.
+      // For each right edge: sum(previous widths) * advance + current width <= container.
+      let prefix = 0;
+      let advance = 1 - Number(this.dataset.overlap) / 100;
+      this.widths.forEach((cardWidth) => {
+        if (prefix) advance = Math.min(advance, (width - cardWidth) / prefix);
+        prefix += cardWidth;
+      });
+      prefix = 0;
+      this.base = this.widths.map((cardWidth) => {
+        const position = prefix * advance;
+        prefix += cardWidth;
+        return position;
+      });
+      const extent = Math.max(...this.widths.map((cardWidth, index) => this.base[index] + cardWidth));
+      this.base = this.base.map((position) => position + (width - extent) / 2);
+    }
+    this.activeX = this.openPosition(this.active ?? this.primary);
 
     cancelAnimationFrame(this.instantFrame);
     cancelAnimationFrame(this.settleFrame);
@@ -110,12 +126,13 @@ class HeroStack extends HTMLElement {
     if (index !== null && (index < 0 || index >= this.cards.length)) return;
     if (this.active === index) return;
     this.active = index;
-    this.activeX = this.openPosition(index, pointerX);
+    this.activeX = this.openPosition(index ?? this.primary, pointerX);
     this.layout();
   }
 
   openPosition(index, pointerX) {
     if (index === null || !this.widths) return null;
+    if (!this.stacked) return this.base[index];
     const count = this.cards.length;
     // A wide image near either end must still leave every other card a visible strip.
     const reserve = count > 1 ? Math.min(28, (this.width - Math.max(...this.widths)) / (count - 1)) : 0;
@@ -132,7 +149,7 @@ class HeroStack extends HTMLElement {
 
   layout() {
     if (!this.widths) return;
-    const active = this.active;
+    const active = this.active ?? this.primary;
     const count = this.cards.length;
     const start = active === null ? 0 : this.activeX;
     const end = active === null ? 0 : start + this.widths[active];
@@ -142,7 +159,7 @@ class HeroStack extends HTMLElement {
       let layer = index + 1;
       let clipLeft = 0;
       let clipRight = 0;
-      if (active !== null) {
+      if (this.stacked && active !== null) {
         if (index < active) {
           const strip = start / active;
           position = strip * (index + 1) - this.widths[index];
@@ -162,7 +179,7 @@ class HeroStack extends HTMLElement {
       card.style.setProperty('--mv-card-clip-left', `${clipLeft}px`);
       card.style.setProperty('--mv-card-clip-right', `${clipRight}px`);
       // A lone image needs no interaction before its caption/link becomes available.
-      const selected = index === active || count === 1;
+      const selected = !this.stacked || index === active || count === 1;
       card.toggleAttribute('data-active', selected);
       const caption = card.querySelector('[data-stack-caption]');
       if (caption) caption.inert = !selected;
@@ -182,8 +199,7 @@ class HeroStack extends HTMLElement {
   }
 
   step(direction) {
-    const initial = direction > 0 ? -1 : 0;
-    this.select(((this.active ?? initial) + direction + this.cards.length) % this.cards.length);
+    this.select(((this.active ?? this.primary) + direction + this.cards.length) % this.cards.length);
   }
 
   onKeydown(event) {

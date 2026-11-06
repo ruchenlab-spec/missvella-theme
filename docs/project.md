@@ -117,6 +117,7 @@
 
 | 日期 | 事件 |
 |---|---|
+| 2026-11-06 | 堆叠 Hero 新增「显示翻页按钮」开关、图片区块「设为主要优先图片」及 20%–100% 的优先图展示宽度（默认 100%，等比例缩放）；图片总宽度足够时完整平铺，宽度不足才堆叠，移出后恢复优先图片。324 组布局检查与修改文件 Theme Check 通过；精确推送 Liquid／JS 两个文件，CLI 已确认成功 |
 | 2026-11-06 | 新增独立「Hero Slideshow · 堆叠」section：按图片宽高比、数量和容器宽度自动计算重叠位置，悬停完整展开当前图，其余图片向两侧滑动；支持手机点选／箭头、键盘、编辑器区块选中、独立手机图与可选标题／链接。schema、JS 语法和 48 组定位场景检查通过，Theme Check 新文件无问题；仅精确推送新增 Liquid／CSS／JS 三个文件，CLI 已确认成功。使用方式见 [hero-stacked-slideshow.md](hero-stacked-slideshow.md) |
 | 2026-11-06 | 圆形集合轮播新增预设改为 9 个英文色系项：Blue、Purple、Red、Pink、Green、Yellow、Orange、Neutrals、Black，保持商家指定顺序；对应集合需在编辑器选择，已有实例不受预设变更影响。schema JSON、顺序与变更范围静态检查通过，仅精确推送 `sections/circle-collections.liquid`，CLI 已确认成功 |
 | 2026-11-06 | 首页轮播桌面端叠加文案的上下内边距由 48px 增至 72px，左右由 64px 增至 96px，让靠边文案向中心收拢；移动端继续使用 24px / 20px。一次针对性静态检查通过，仅精确推送 `sections/hero-slideshow.liquid`，CLI 已确认成功 |
