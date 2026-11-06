@@ -437,62 +437,62 @@
 
 {% schema %}
 {
-  "name": "Hero Slideshow",
+  "name": "首页轮播",
   "tag": "section",
   "class": "hero-slideshow-section",
   "settings": [
     {
       "type": "header",
-      "content": "Layout & Height"
+      "content": "布局与高度"
     },
     {
       "type": "select",
       "id": "section_height",
-      "label": "Desktop height",
+      "label": "桌面端高度",
       "options": [
         { "value": "640", "label": "640px" },
         { "value": "960", "label": "960px" },
-        { "value": "auto", "label": "Image height (auto)" }
+        { "value": "auto", "label": "适应图片高度（自动）" }
       ],
       "default": "640"
     },
     {
       "type": "select",
       "id": "section_height_mobile",
-      "label": "Mobile height",
+      "label": "移动端高度",
       "options": [
         { "value": "400", "label": "400px" },
         { "value": "560", "label": "560px" },
         { "value": "700", "label": "700px" },
-        { "value": "auto", "label": "Image height (auto)" }
+        { "value": "auto", "label": "适应图片高度（自动）" }
       ],
       "default": "560"
     },
     {
       "type": "header",
-      "content": "Slideshow"
+      "content": "轮播设置"
     },
     {
       "type": "select",
       "id": "transition_type",
-      "label": "Transition style",
+      "label": "切换效果",
       "options": [
-        { "value": "slide", "label": "Slide" },
-        { "value": "fade", "label": "Fade" },
-        { "value": "zoom", "label": "Zoom + Fade" }
+        { "value": "slide", "label": "滑动" },
+        { "value": "fade", "label": "淡入淡出" },
+        { "value": "zoom", "label": "缩放与淡入淡出" }
       ],
       "default": "slide"
     },
     {
       "type": "checkbox",
       "id": "autoplay",
-      "label": "Auto-play",
+      "label": "自动播放",
       "default": true
     },
     {
       "type": "range",
       "id": "autoplay_speed",
-      "label": "Auto-play speed (seconds)",
+      "label": "自动播放间隔（秒）",
       "min": 2,
       "max": 12,
       "step": 1,
@@ -502,69 +502,69 @@
   "blocks": [
     {
       "type": "slide",
-      "name": "Slide",
+      "name": "幻灯片",
       "settings": [
         {
           "type": "header",
-          "content": "Images"
+          "content": "图片"
         },
         {
           "type": "image_picker",
           "id": "image",
-          "label": "Desktop image"
+          "label": "桌面端图片"
         },
         {
           "type": "image_picker",
           "id": "image_mobile",
-          "label": "Mobile image (optional)"
+          "label": "移动端图片（可选）"
         },
         {
           "type": "header",
-          "content": "Text overlay"
+          "content": "叠加文字"
         },
         {
           "type": "select",
           "id": "content_h_align",
-          "label": "Content position",
+          "label": "内容水平位置",
           "options": [
-            { "value": "flex-start", "label": "Left" },
-            { "value": "center", "label": "Center" },
-            { "value": "flex-end", "label": "Right" }
+            { "value": "flex-start", "label": "靠左" },
+            { "value": "center", "label": "居中" },
+            { "value": "flex-end", "label": "靠右" }
           ],
           "default": "center"
         },
         {
           "type": "select",
           "id": "text_alignment",
-          "label": "Text alignment",
+          "label": "文字对齐方式",
           "options": [
-            { "value": "left", "label": "Left" },
-            { "value": "center", "label": "Center" },
-            { "value": "right", "label": "Right" }
+            { "value": "left", "label": "左对齐" },
+            { "value": "center", "label": "居中" },
+            { "value": "right", "label": "右对齐" }
           ],
           "default": "center"
         },
         {
           "type": "select",
           "id": "content_v_align",
-          "label": "Vertical position",
+          "label": "内容垂直位置",
           "options": [
-            { "value": "flex-start", "label": "Top" },
-            { "value": "center", "label": "Middle" },
-            { "value": "flex-end", "label": "Bottom" }
+            { "value": "flex-start", "label": "顶部" },
+            { "value": "center", "label": "居中" },
+            { "value": "flex-end", "label": "底部" }
           ],
           "default": "center"
         },
         {
           "type": "text",
           "id": "subtitle",
-          "label": "Subtitle",
+          "label": "副标题",
           "default": "New Collection"
         },
         {
           "type": "range",
           "id": "subtitle_size",
-          "label": "Subtitle font size (px)",
+          "label": "副标题字号（px）",
           "min": 10,
           "max": 24,
           "step": 1,
@@ -573,13 +573,13 @@
         {
           "type": "text",
           "id": "title",
-          "label": "Title",
+          "label": "标题",
           "default": "Hero Banner Title"
         },
         {
           "type": "range",
           "id": "title_size",
-          "label": "Title font size (px, desktop)",
+          "label": "桌面端标题字号（px）",
           "min": 24,
           "max": 96,
           "step": 2,
@@ -588,13 +588,13 @@
         {
           "type": "textarea",
           "id": "text",
-          "label": "Body text",
+          "label": "正文",
           "default": "Discover our latest arrivals."
         },
         {
           "type": "range",
           "id": "text_size",
-          "label": "Body text font size (px)",
+          "label": "正文字号（px）",
           "min": 12,
           "max": 28,
           "step": 1,
@@ -603,17 +603,17 @@
         {
           "type": "color",
           "id": "text_color",
-          "label": "Text color",
+          "label": "文字颜色",
           "default": "#ffffff"
         },
         {
           "type": "header",
-          "content": "Content spacing"
+          "content": "内容间距"
         },
         {
           "type": "range",
           "id": "subtitle_spacing_bottom",
-          "label": "Space after subtitle",
+          "label": "副标题下方间距",
           "min": 0,
           "max": 40,
           "step": 2,
@@ -623,7 +623,7 @@
         {
           "type": "range",
           "id": "title_spacing_bottom",
-          "label": "Space after title",
+          "label": "标题下方间距",
           "min": 0,
           "max": 40,
           "step": 2,
@@ -633,7 +633,7 @@
         {
           "type": "range",
           "id": "text_spacing_bottom",
-          "label": "Space after body text",
+          "label": "正文下方间距",
           "min": 0,
           "max": 40,
           "step": 2,
@@ -642,23 +642,23 @@
         },
         {
           "type": "header",
-          "content": "Button"
+          "content": "按钮"
         },
         {
           "type": "text",
           "id": "button_label",
-          "label": "Button label",
+          "label": "按钮文字",
           "default": "Shop Now"
         },
         {
           "type": "url",
           "id": "button_link",
-          "label": "Button link"
+          "label": "按钮链接"
         },
         {
   "type": "range",
   "id": "button_blur",
-  "label": "Glass blur intensity (px)",
+  "label": "毛玻璃模糊强度（px）",
   "min": 4,
   "max": 24,
   "step": 2,
@@ -667,7 +667,7 @@
 {
   "type": "range",
   "id": "button_bg_opacity",
-  "label": "Glass background opacity (%)",
+  "label": "毛玻璃背景不透明度（%）",
   "min": 0,
   "max": 60,
   "step": 5,
@@ -676,13 +676,13 @@
 {
   "type": "color",
   "id": "button_tint_color",
-  "label": "Glass tint color",
+  "label": "毛玻璃底色",
   "default": "#ffffff"
 },
 {
   "type": "range",
   "id": "button_border_opacity",
-  "label": "Glass border opacity (%)",
+  "label": "毛玻璃边框不透明度（%）",
   "min": 0,
   "max": 80,
   "step": 5,
@@ -691,13 +691,13 @@
 {
   "type": "color",
   "id": "button_text_color",
-  "label": "Button text color",
+  "label": "按钮文字颜色",
   "default": "#ffffff"
 },
 {
   "type": "range",
   "id": "button_size",
-  "label": "Button font size (px)",
+  "label": "按钮字号（px）",
   "min": 10,
   "max": 22,
   "step": 1,
@@ -706,7 +706,7 @@
 {
   "type": "range",
   "id": "button_padding_v",
-  "label": "Button padding vertical (px)",
+  "label": "按钮上下内边距（px）",
   "min": 0,
   "max": 28,
   "step": 2,
@@ -715,7 +715,7 @@
 {
   "type": "range",
   "id": "button_padding_h",
-  "label": "Button padding horizontal (px)",
+  "label": "按钮左右内边距（px）",
   "min": 0,
   "max": 72,
   "step": 4,
@@ -724,18 +724,18 @@
 
         {
           "type": "header",
-          "content": "Text protection overlay"
+          "content": "文字保护遮罩"
         },
         {
           "type": "color",
           "id": "overlay_color",
-          "label": "Overlay color",
+          "label": "遮罩颜色",
           "default": "#000000"
         },
         {
           "type": "range",
           "id": "overlay_opacity",
-          "label": "Overlay opacity",
+          "label": "遮罩不透明度",
           "min": 0,
           "max": 100,
           "step": 5,
@@ -747,7 +747,7 @@
   ],
   "presets": [
     {
-      "name": "Hero Slideshow",
+      "name": "首页轮播",
       "blocks": [
         { "type": "slide" },
         { "type": "slide" }

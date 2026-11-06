@@ -128,7 +128,7 @@ section.main-collection
 
 | 文件 | 名称 | 说明 |
 |---|---|---|
-| `sections/hero-slideshow.liquid` | Hero Slideshow | 首页轮播（slide 子区块：图/视频/文案/按钮） |
+| `sections/hero-slideshow.liquid` | 首页轮播 | 原 Hero Slideshow；设置界面已中文化（幻灯片子区块：图片/文案/按钮） |
 | `sections/icon-features.liquid` | Icon Features | 图标特性行（内联 SVG 图标） |
 | `sections/ins-media-grid-autoplay.liquid` | INS 媒体展示 | Film strip 单行横向图片／视频画廊；复用原生文字与社交图标，布局 CSS 独立为 `assets/ins-media.css` |
 | `sections/size-guide.liquid` | 尺码指南 | 独立尺码页区块 |
