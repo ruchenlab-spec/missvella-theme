@@ -10,7 +10,7 @@ class HeroStack extends HTMLElement {
     this.editorIndex = null;
     this.abort = new AbortController();
     const options = { signal: this.abort.signal };
-    this.mobileQuery = matchMedia('(max-width: 749px)');
+    this.mobileQuery = matchMedia('(max-width: 768px)');
     this.mobileQuery.addEventListener('change', () => this.measure(), options);
     this.stage.addEventListener('pointermove', (event) => this.onPointerMove(event), options);
     this.stage.addEventListener('pointerleave', () => {
@@ -66,19 +66,34 @@ class HeroStack extends HTMLElement {
 
   measure() {
     const width = this.stage.clientWidth;
-    const height = this.stage.clientHeight;
-    if (!width || !height) return;
+    if (!width) return;
+    // Read the configured limit, never the stage height that this method writes.
+    // This keeps repeated ResizeObserver updates from progressively shrinking the images.
+    const styles = getComputedStyle(this);
+    const configuredHeight = parseFloat(styles.getPropertyValue(
+      this.mobileQuery.matches ? '--mv-stack-height-mobile' : '--mv-stack-height'
+    ));
+    const autoHeight = !this.mobileQuery.matches && !Number.isFinite(configuredHeight);
+    const height = Number.isFinite(configuredHeight) ? configuredHeight : 400;
     const count = this.cards.length;
     const maxWidth = width * (count === 1 ? 1 : this.mobileQuery.matches ? 0.84 : 0.8);
     const primaryScale = Math.min(1, Math.max(0.2, (Number(this.dataset.primaryWidth) || 100) / 100));
     this.width = width;
+    const heights = [];
     this.widths = this.cards.map((card, index) => {
       const ratio = Number(this.mobileQuery.matches ? card.dataset.mobileRatio : card.dataset.ratio) || 0.75;
-      const cardWidth = Math.min(height * ratio, maxWidth) * (index === this.primary ? primaryScale : 1);
+      const naturalWidth = autoHeight ? Number(card.dataset.imageWidth) || maxWidth : height * ratio;
+      const scale = index === this.primary ? primaryScale : 1;
+      const cardWidth = Math.min(naturalWidth, maxWidth) * scale;
+      const cardHeight = this.mobileQuery.matches || autoHeight ? cardWidth / ratio : height * scale;
+      heights.push(cardHeight);
       card.style.setProperty('--mv-card-width', `${cardWidth}px`);
-      card.style.setProperty('--mv-card-height', `${cardWidth / ratio}px`);
+      card.style.setProperty('--mv-card-height', `${cardHeight}px`);
       return cardWidth;
     });
+    // Mobile and automatic desktop height wrap the actual images without blank bands.
+    const stageHeight = this.mobileQuery.matches || autoHeight ? Math.max(...heights) : height;
+    this.stage.style.height = `${stageHeight}px`;
 
     const totalWidth = this.widths.reduce((total, cardWidth) => total + cardWidth, 0);
     this.stacked = totalWidth > width;

@@ -215,6 +215,7 @@ live 主题更新 → 编辑器刷新可见 → 前台即时生效
 
 - `sections/hero-stacked-slideshow.liquid`（编辑器名「Hero Slideshow · 堆叠」）依赖专用 `assets/hero-stacked-slideshow.css`、`assets/hero-stacked-slideshow.js` 及公共 `spacing-style`／`carousel-arrow`。本地图片区块配置桌面／移动图片、描述、标题、链接及优先标记，分区控制翻页按钮开关和优先图宽度百分比（默认 100%）。独立 `mv-hero-stack` Web Component 按总宽度选择完整平铺或堆叠，堆叠时默认完整展示主要优先图片，并负责两侧展开、键盘与编辑器生命周期。此交互使用绝对定位与裁切，与原生单轨滚动轮播分开实现；原「首页轮播」继续独立使用。操作说明见 [hero-stacked-slideshow.md](hero-stacked-slideshow.md)。
 - 堆叠 Hero 的配色复用原生背景／文本 `color` 控件及 `contrast-override`，分区和全宽背景均使用 `color-custom-{section.id}`。当前主题使用 `color_palette`，不使用未定义的 `color_scheme`／`scheme-1`；颜色留空时继承全局配色。
+- 堆叠 Hero 桌面高度使用与首页轮播一致的 `section_height`（640／960／auto，默认 640）；固定高度用 `object-fit: cover` 铺满卡片，自动高度按图片宽度与比例计算。≤768px 采用手机图片及最大高度上限，区域高度贴合实际图片；手机上下间距独立且按像素生效，避免公共间距缩放和固定高度空白叠加。测量读取 CSS 配置值，防止 `ResizeObserver` 从回写高度反复缩小图片。
 
 - `sections/editorial-text-columns.liquid`（编辑器名「杂志文字分栏」）：原生静态 Text 总标题 + 可追加的 Group / Text 栏。默认每栏为 Group 内的标题和正文 Text，完全复用原生文字、分组、配色对比度、内边距和间距组件，只补充分栏／编号／分隔线 CSS，不含 JS。操作及控件见 [about-us-demo.md](about-us-demo.md)。
 

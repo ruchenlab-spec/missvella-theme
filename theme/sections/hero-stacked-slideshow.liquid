@@ -12,8 +12,10 @@
   class="section section--{{ section.settings.section_width }} spacing-style color-custom-{{ section.id }} mv-hero-stack-section"
   style="
     {% render 'spacing-style', settings: section.settings %}
-    --mv-stack-height: {{ section.settings.image_height }}px;
+    --mv-stack-height: {% if section.settings.section_height == 'auto' %}auto{% else %}{{ section.settings.section_height | default: '640' }}px{% endif %};
     --mv-stack-height-mobile: {{ section.settings.image_height_mobile }}px;
+    --mv-stack-padding-start-mobile: {{ section.settings.padding_top_mobile }}px;
+    --mv-stack-padding-end-mobile: {{ section.settings.padding_bottom_mobile }}px;
     --mv-stack-radius: {{ section.settings.corner_radius }}px;
     --mv-stack-duration: {{ section.settings.animation_duration }}ms;
   "
@@ -22,6 +24,7 @@
     class="mv-hero-stack"
     data-overlap="{{ section.settings.overlap }}"
     data-primary-width="{{ section.settings.primary_width | default: 100 }}"
+    data-desktop-height="{{ section.settings.section_height | default: '640' }}"
     role="region"
     aria-label="{{ section.settings.heading | default: 'Hero Slideshow' | escape }}"
   >
@@ -49,6 +52,7 @@
           data-stack-card
           data-block-id="{{ block.id }}"
           data-ratio="{{ image_ratio }}"
+          data-image-width="{{ image.width | default: 800 }}"
           data-mobile-ratio="{{ mobile_ratio }}"
           data-primary="{{ block.settings.primary }}"
           tabindex="0"
@@ -128,7 +132,14 @@
     { "type": "paragraph", "content": "宽度足够时完整平铺，宽度不足时自动堆叠并优先完整展示主要图片。悬停展开当前图片，其余图片向两侧滑开；移出后恢复优先图片。手机端可点选或使用下方箭头。" },
     { "type": "checkbox", "id": "show_controls", "label": "显示翻页按钮", "default": true },
     { "type": "range", "id": "primary_width", "label": "主要优先图片展示宽度", "info": "相对于该图片的完整展示宽度，100% 为正常大小，调小后等比例缩小。请在对应图片区块勾选「设为主要优先图片」。", "min": 20, "max": 100, "step": 5, "unit": "%", "default": 100 },
-    { "type": "range", "id": "image_height", "label": "桌面端图片最大高度", "min": 240, "max": 840, "step": 20, "unit": "px", "default": 560 },
+    {
+      "type": "select", "id": "section_height", "label": "桌面端高度", "default": "640",
+      "options": [
+        { "value": "640", "label": "640px" },
+        { "value": "960", "label": "960px" },
+        { "value": "auto", "label": "适应图片高度（自动）" }
+      ]
+    },
     { "type": "range", "id": "image_height_mobile", "label": "移动端图片最大高度", "min": 200, "max": 600, "step": 20, "unit": "px", "default": 400 },
     { "type": "range", "id": "overlap", "label": "堆叠重叠程度", "info": "仅宽度不足时生效。图片较多或容器较窄时，自动增加重叠，确保所有图片都有露出。", "min": 20, "max": 85, "step": 5, "unit": "%", "default": 50 },
     { "type": "range", "id": "corner_radius", "label": "图片圆角", "min": 0, "max": 40, "step": 2, "unit": "px", "default": 0 },
@@ -136,6 +147,8 @@
     { "type": "header", "content": "间距" },
     { "type": "range", "id": "padding-block-start", "label": "上边距", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 36 },
     { "type": "range", "id": "padding-block-end", "label": "下边距", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 36 },
+    { "type": "range", "id": "padding_top_mobile", "label": "移动端上边距", "info": "按实际像素生效，不随主题间距比例缩放。", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 36 },
+    { "type": "range", "id": "padding_bottom_mobile", "label": "移动端下边距", "info": "按实际像素生效，不随主题间距比例缩放。", "min": 0, "max": 120, "step": 4, "unit": "px", "default": 36 },
     { "type": "range", "id": "padding-inline-start", "label": "全宽左边距", "min": 0, "max": 100, "step": 2, "unit": "px", "default": 40 },
     { "type": "range", "id": "padding-inline-end", "label": "全宽右边距", "min": 0, "max": 100, "step": 2, "unit": "px", "default": 40 }
   ],
