@@ -219,6 +219,7 @@ live 主题更新 → 编辑器刷新可见 → 前台即时生效
 - 堆叠 Hero 仅渲染原图，始终保留区块顺序，无副本、循环补位或首尾重排。非焦点窗口严格按 `(容器宽度 − 当前焦点图宽度) / 非焦点数量` 均分；焦点横坐标为索引乘窗口宽度，首张贴左、末张贴右。窗口宽度与图片宽度分离：`--mv-card-width` 控制露出窗口，`--mv-image-width` 保持实际图片宽度，`--mv-image-x` 调整窗口内偏移，避免窗口动画缩放图片；不再使用比例分配或重叠程度设置。仅焦点图有 `data-focus`／可用文案，其他原图应用统一黑色遮罩／模糊。分区顶部与图片叠加文案各有独立副标题／标题／描述、字号／对齐／文字色入口。
 - 堆叠 Hero 的手机／桌面自动轮换独立开关，使用单一 timeout、剩余毫秒和 Web Animations SVG 进度环；`IntersectionObserver`、页面可见性、桌面悬停、触摸、键盘／链接焦点、编辑器选中和减少动态效果共同控制暂停。暂停保留时间，恢复继续，切图重置。分区卸载清理监听、两个观察器、定时器和进度动画。回归检查：`node scripts/test-hero-stack.cjs`。
 - 堆叠 Hero 的 `.mv-hero-stack__media` 包裹图片区和绝对定位控件，JS 在每次布局更新焦点图的右／下边缘变量，控件内缩 12px，随卡片移动且不占底部文档流。30px 播放／翻页按钮、14px 箭头及 10px 页码仅在该 section 内缩放；公共 `carousel-arrow` 保持原样。鼠标离开整个组件才恢复优先图，避免移入叠加控件时焦点跳走。
+- 堆叠 Hero 顶部 header 拥有独立的桌面／移动端四向内边距，`--mv-header-padding-*` 变量直接写在 header 上，由局部 CSS 应用；不依赖 section 整体 padding 或 `spacing-style` 缩放。旧固定 28px 外边距已移除，改为可配置的底部内边距，所有方向允许归零。
 
 - `sections/editorial-text-columns.liquid`（编辑器名「杂志文字分栏」）：原生静态 Text 总标题 + 可追加的 Group / Text 栏。默认每栏为 Group 内的标题和正文 Text，完全复用原生文字、分组、配色对比度、内边距和间距组件，只补充分栏／编号／分隔线 CSS，不含 JS。操作及控件见 [about-us-demo.md](about-us-demo.md)。
 
