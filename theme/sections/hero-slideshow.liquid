@@ -166,6 +166,8 @@
     display: flex;
     flex-direction: column;
     padding: 48px 64px;
+    align-items: var(--hero-content-h-align);
+    justify-content: var(--hero-content-v-align);
   }
 
   #slideshow-{{ section.id }} .slide-content-inner {
@@ -173,11 +175,21 @@
     max-width: 720px;
     display: flex;
     flex-direction: column;
+    text-align: var(--hero-text-align);
+    align-items: var(--hero-inner-align);
   }
 
   @media (max-width: 768px) {
     #slideshow-{{ section.id }} .slide-content {
       padding: 24px 20px;
+      align-items: var(--hero-content-h-align-mobile);
+      justify-content: var(--hero-content-v-align-mobile);
+    }
+
+    #slideshow-{{ section.id }} .slide-content-inner {
+      width: var(--hero-content-width-mobile);
+      text-align: var(--hero-text-align-mobile);
+      align-items: var(--hero-inner-align-mobile);
     }
   }
 
@@ -554,6 +566,42 @@
             { "value": "flex-end", "label": "底部" }
           ],
           "default": "center"
+        },
+        {
+          "type": "select",
+          "id": "content_h_align_mobile",
+          "label": "移动端内容水平位置",
+          "options": [
+            { "value": "inherit", "label": "跟随桌面端" },
+            { "value": "flex-start", "label": "靠左" },
+            { "value": "center", "label": "居中" },
+            { "value": "flex-end", "label": "靠右" }
+          ],
+          "default": "inherit"
+        },
+        {
+          "type": "select",
+          "id": "content_v_align_mobile",
+          "label": "移动端内容垂直位置",
+          "options": [
+            { "value": "inherit", "label": "跟随桌面端" },
+            { "value": "flex-start", "label": "顶部" },
+            { "value": "center", "label": "居中" },
+            { "value": "flex-end", "label": "底部" }
+          ],
+          "default": "inherit"
+        },
+        {
+          "type": "select",
+          "id": "text_alignment_mobile",
+          "label": "移动端文字对齐方式",
+          "options": [
+            { "value": "inherit", "label": "跟随桌面端" },
+            { "value": "left", "label": "左对齐" },
+            { "value": "center", "label": "居中" },
+            { "value": "right", "label": "右对齐" }
+          ],
+          "default": "inherit"
         },
         {
           "type": "text",

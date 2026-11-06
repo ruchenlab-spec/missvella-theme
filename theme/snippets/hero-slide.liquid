@@ -5,6 +5,21 @@
   assign h_align         = block.settings.content_h_align
   assign v_align         = block.settings.content_v_align
   assign text_align      = block.settings.text_alignment | default: 'center'
+  assign h_align_mobile = block.settings.content_h_align_mobile | default: 'inherit'
+  assign v_align_mobile = block.settings.content_v_align_mobile | default: 'inherit'
+  assign text_align_mobile = block.settings.text_alignment_mobile | default: 'inherit'
+  assign content_width_mobile = 'fit-content'
+
+  if h_align_mobile == 'inherit'
+    assign h_align_mobile = h_align
+    assign content_width_mobile = '100%'
+  endif
+  if v_align_mobile == 'inherit'
+    assign v_align_mobile = v_align
+  endif
+  if text_align_mobile == 'inherit'
+    assign text_align_mobile = text_align
+  endif
 
   case text_align
     when 'left'
@@ -13,6 +28,15 @@
       assign inner_align = 'flex-end'
     else
       assign inner_align = 'center'
+  endcase
+
+  case text_align_mobile
+    when 'left'
+      assign inner_align_mobile = 'flex-start'
+    when 'right'
+      assign inner_align_mobile = 'flex-end'
+    else
+      assign inner_align_mobile = 'center'
   endcase
 
   # Only the first visible slide may delay LCP: load it eagerly with a high
@@ -81,16 +105,21 @@
   <div
     class="slide-content"
     style="
-      align-items: {{ h_align }};
-      justify-content: {{ v_align }};
+      --hero-content-h-align: {{ h_align }};
+      --hero-content-v-align: {{ v_align }};
+      --hero-content-h-align-mobile: {{ h_align_mobile }};
+      --hero-content-v-align-mobile: {{ v_align_mobile }};
       color: {{ text_color }};
     "
   >
     <div
       class="slide-content-inner"
       style="
-        text-align: {{ text_align }};
-        align-items: {{ inner_align }};
+        --hero-text-align: {{ text_align }};
+        --hero-inner-align: {{ inner_align }};
+        --hero-text-align-mobile: {{ text_align_mobile }};
+        --hero-inner-align-mobile: {{ inner_align_mobile }};
+        --hero-content-width-mobile: {{ content_width_mobile }};
       "
     >
     {%- if block.settings.subtitle != blank -%}

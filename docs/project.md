@@ -117,6 +117,7 @@
 
 | 日期 | 事件 |
 |---|---|
+| 2026-11-06 | 首页轮播的每张幻灯片在「叠加文字」中新增移动端内容水平位置、垂直位置、文字对齐方式，默认跟随桌面端；≤768px 应用独立配置，显式选择水平位置时文字容器按内容收拢以实现左右定位。Theme Check 本次修改文件无问题；仅精确推送 `sections/hero-slideshow.liquid` 与 `snippets/hero-slide.liquid`，CLI 已确认成功，未推送内容文件 |
 | 2026-11-06 | Hero Slideshow 设置界面中文化，编辑器名称为「首页轮播」，子区块为「幻灯片」；共翻译 56 处名称、分组、字段及选项。schema JSON 和变更范围检查通过，仅精确推送 `sections/hero-slideshow.liquid`，CLI 已确认成功；设置 ID、选项值、默认文案和前台逻辑保持不变，未推送内容文件 |
 | 2026-10-17 | 环境安装；Horizon 项目初始化；Git 仓库建立（`theme/` 结构） |
 | 2026-10-17 | 创建 Missvella Dev 开发主题；开发者发布为 live |
