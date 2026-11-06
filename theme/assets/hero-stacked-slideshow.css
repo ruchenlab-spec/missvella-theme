@@ -133,10 +133,6 @@
   filter: blur(var(--mv-stack-blur, 4px));
 }
 
-.mv-hero-stack[data-stacked] .mv-hero-stack__card:not([data-focus]) .mv-hero-stack__image {
-  object-fit: cover;
-}
-
 .mv-hero-stack__placeholder {
   background: color-mix(in srgb, var(--color-foreground) 8%, var(--color-background));
   fill: color-mix(in srgb, var(--color-foreground) 45%, transparent);

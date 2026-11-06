@@ -155,7 +155,20 @@ class HeroStack extends HTMLElement {
         return start;
       });
     } else {
-      this.base = this.widths.map((cardWidth) => (width - cardWidth) / 2);
+      let prefix = 0;
+      let advance = 1 - Number(this.dataset.overlap) / 100;
+      this.widths.forEach((cardWidth) => {
+        if (prefix) advance = Math.min(advance, (width - cardWidth) / prefix);
+        prefix += cardWidth;
+      });
+      prefix = 0;
+      this.base = this.widths.map((cardWidth) => {
+        const position = prefix * advance;
+        prefix += cardWidth;
+        return position;
+      });
+      const extent = Math.max(...this.widths.map((cardWidth, index) => this.base[index] + cardWidth));
+      this.base = this.base.map((position) => position + (width - extent) / 2);
     }
     this.activeX = this.openPosition(this.active ?? this.primary);
 
@@ -182,12 +195,15 @@ class HeroStack extends HTMLElement {
   openPosition(index, pointerX) {
     if (index === null || !this.widths) return null;
     if (!this.stacked) return this.base[index];
-    // Two unique images cannot occupy three regions. Put focus at its natural edge.
-    if (this.cards.length === 2) return index === 0 ? 0 : this.width - this.widths[index];
-    const reserve = Math.min(28, (this.width - this.widths[index]) / 4);
-    const left = reserve;
-    const right = this.width - this.widths[index] - reserve;
-    let position = (this.width - this.widths[index]) / 2;
+    // Move focus within the space its unchanged neighbors can actually cover.
+    // Empty left/right groups naturally pin the first/last card to that edge.
+    const remaining = this.width - this.widths[index];
+    const leftCapacity = this.widths.slice(0, index).reduce((sum, width) => sum + width, 0);
+    const rightCapacity = this.widths.slice(index + 1).reduce((sum, width) => sum + width, 0);
+    const reserve = Math.min(28, remaining / (this.cards.length - 1), Math.min(...this.widths) / 2);
+    const left = Math.max(reserve * index, remaining - rightCapacity);
+    const right = Math.min(remaining - reserve * (this.cards.length - index - 1), leftCapacity);
+    let position = Math.max(left, Math.min(this.base[index], right));
     if (pointerX !== undefined) {
       const min = Math.max(left, pointerX - this.widths[index] + 1);
       const max = Math.min(right, pointerX - 1);
@@ -205,34 +221,31 @@ class HeroStack extends HTMLElement {
     // Controls share the media wrapper and follow the actual focused card bounds.
     this.style.setProperty('--mv-stack-controls-right', `${end}px`);
     this.style.setProperty('--mv-stack-controls-bottom', `${(this.stageHeight + this.heights[active]) / 2}px`);
-    // Preserve the merchant's order. Move one opposite-end card only for endpoint focus.
-    let order = this.cards.map((_, index) => index);
-    if (count > 2 && active === 0) order = [count - 1, ...order.slice(0, -1)];
-    else if (count > 2 && active === count - 1) order = [...order.slice(1), 0];
-    const leftCount = order.indexOf(active);
-    const rightCount = count - leftCount - 1;
-    const leftStrip = leftCount ? start / leftCount : 0;
-    const rightStrip = rightCount ? (this.width - end) / rightCount : 0;
-    const exposure = Math.max(0.15, 1 - Number(this.dataset.overlap) / 100);
+    const leftCapacity = this.widths.slice(0, active).reduce((sum, width) => sum + width, 0);
+    const rightCapacity = this.widths.slice(active + 1).reduce((sum, width) => sum + width, 0);
+    const leftExposure = leftCapacity ? Math.min(1, start / leftCapacity) : 0;
+    const rightExposure = rightCapacity ? Math.min(1, (this.width - end) / rightCapacity) : 0;
+    let leftEdge = 0;
+    let rightEdge = end;
 
     this.cards.forEach((card, index) => {
       let position = this.base[index];
       let layer = index + 1;
       let clipLeft = 0;
       let clipRight = 0;
-      let frameWidth = this.widths[index];
+      const frameWidth = this.widths[index];
       if (this.stacked && active !== null) {
-        const rank = order.indexOf(index);
-        if (rank < leftCount) {
-          frameWidth = Math.max(frameWidth, leftStrip / exposure);
-          position = start - leftStrip * (leftCount - rank - 1) - frameWidth;
-          clipLeft = frameWidth - leftStrip;
-          layer = rank + 1;
-        } else if (rank > leftCount) {
-          position = end + rightStrip * (rank - leftCount - 1);
-          frameWidth = Math.max(frameWidth, rightStrip / exposure);
-          clipRight = frameWidth - rightStrip;
-          layer = count - rank;
+        if (index < active) {
+          const visibleWidth = frameWidth * leftExposure;
+          position = leftEdge + visibleWidth - frameWidth;
+          clipLeft = frameWidth - visibleWidth;
+          leftEdge += visibleWidth;
+        } else if (index > active) {
+          const visibleWidth = frameWidth * rightExposure;
+          position = rightEdge;
+          clipRight = frameWidth - visibleWidth;
+          rightEdge += visibleWidth;
+          layer = count - index;
         } else {
           position = start;
           layer = count + 1;
@@ -244,7 +257,7 @@ class HeroStack extends HTMLElement {
       card.style.setProperty('--mv-card-clip-left', `${clipLeft}px`);
       card.style.setProperty('--mv-card-clip-right', `${clipRight}px`);
       const selected = index === active;
-      card.style.setProperty('--mv-card-height', `${this.stacked && !selected ? this.stageHeight : this.heights[index]}px`);
+      card.style.setProperty('--mv-card-height', `${this.heights[index]}px`);
       card.toggleAttribute('data-focus', selected);
       card.toggleAttribute('data-active', selected);
       const caption = card.querySelector('[data-stack-caption]');

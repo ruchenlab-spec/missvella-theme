@@ -119,22 +119,23 @@ function verify(stack) {
   assert.equal(value(focus, '--mv-card-clip-left'), 0); assert.equal(value(focus, '--mv-card-clip-right'), 0);
   stack.cards.forEach((card, index) => {
     assert.equal(card.querySelector('[data-stack-caption]').inert, index !== selected);
+    assert.equal(value(card, '--mv-card-width'), stack.widths[index], 'focus must not widen any image');
+    assert.equal(value(card, '--mv-card-height'), stack.heights[index], 'focus must not resize any image');
     if (!stack.stacked) assert.equal(value(card, '--mv-card-x'), stack.base[index]);
-    else if (index !== selected) assert.equal(value(card, '--mv-card-height'), stack.stageHeight);
   });
   assert.equal(stack.stage.children.length, stack.cards.length, 'duplicate imagery in stage');
   const spans = stack.cards.map((card, index) => [
     value(card, '--mv-card-x') + value(card, '--mv-card-clip-left'),
     value(card, '--mv-card-x') + value(card, '--mv-card-width') - value(card, '--mv-card-clip-right'), index,
   ]).sort((a, b) => a[0] - b[0]);
-  assert(spans.every(([left, right]) => right > left));
+  assert(spans.every(([left, right]) => right > left), JSON.stringify({ width: stack.width, count: stack.cards.length, selected, spans }));
   if (stack.stacked) {
     assert(Math.abs(spans[0][0]) < 1e-7, 'left edge unfilled');
     assert(Math.abs(spans.at(-1)[1] - stack.width) < 1e-7, 'right edge unfilled');
     for (let i = 1; i < spans.length; i++) assert(Math.abs(spans[i][0] - spans[i - 1][1]) < 1e-7, 'gap or repeat between unique images');
-    if (selected > 0 && selected < stack.cards.length - 1) {
-      assert.deepEqual(spans.map((span) => span[2]), stack.cards.map((_, index) => index), 'ordinary focus must preserve image order');
-    }
+    assert.deepEqual(spans.map((span) => span[2]), stack.cards.map((_, index) => index), 'every focus must preserve image order');
+    if (selected === 0) assert.equal(start, 0, 'first focus must align left');
+    if (selected === stack.cards.length - 1) assert.equal(end, stack.width, 'last focus must align right');
   }
 }
 let scenarios = 0;
@@ -193,4 +194,15 @@ desktop.disconnectedCallback();
 const desktopAuto = create(1440, 5, 640, 100, false, true);
 desktopAuto.visibilityObserver.callback([{ isIntersecting: true }]); assert.equal(timers.size, 1);
 desktopAuto.disconnectedCallback(); assert.equal(timers.size, 0);
-console.log(`Schema and ${scenarios} unique-image scenarios passed, including edge-only wrapping, no duplicate cards, section copy controls, desktop/mobile autoplay and countdown pause/resume.`);
+// Screenshot regression: the fourth of five portrait images is primary.
+const portrait = create(2037, 5);
+portrait.cards.forEach((card) => { card.dataset.ratio = 0.75; card.dataset.mobileRatio = 0.75; });
+portrait.primary = 3; portrait.measure(); verify(portrait);
+assert.equal(value(portrait.cards[4], '--mv-card-width'), 480, 'fifth portrait must not stretch into the remaining side');
+assert.equal(value(portrait.cards[4], '--mv-card-height'), 640);
+for (const overlap of [20, 50, 85]) {
+  portrait.dataset.overlap = overlap; portrait.measure();
+  for (let index = 0; index < 5; index++) { portrait.select(index); verify(portrait); }
+}
+portrait.disconnectedCallback();
+console.log(`Schema and ${scenarios} fixed-size scenarios passed, including fourth-primary/fifth-image regression, original order, edge alignment, gap-free coverage and countdown pause/resume.`);
