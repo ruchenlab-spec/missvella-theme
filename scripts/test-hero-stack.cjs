@@ -18,8 +18,12 @@ for (const settings of [schema.settings, ...schema.blocks.map((block) => block.s
   }
 }
 assert.equal(schema.settings.find((s) => s.id === 'mobile_autoplay').default, false);
+assert.equal(schema.settings.find((s) => s.id === 'desktop_autoplay').default, false);
 assert.equal(schema.settings.find((s) => s.id === 'inactive_effect').default, 'dim');
 for (const id of ['title', 'subtitle', 'text']) assert(schema.blocks[0].settings.some((s) => s.id === id));
+for (const id of ['subtitle', 'heading', 'description', 'heading_size', 'header_subtitle_size', 'description_size', 'header_alignment', 'header_text_color']) {
+  assert(schema.settings.some((s) => s.id === id), `section-level copy control missing: ${id}`);
+}
 
 class Element {
   constructor(tag = 'div') {
@@ -57,6 +61,10 @@ class Element {
   querySelector(selector) { return this.querySelectorAll(selector)[0] || null; }
   contains(node) { return node === this || this.children.some((child) => child.contains(node)); }
   cloneNode() { const copy = new Element(this.tag); copy.className = this.className; return copy; }
+  animate(frames, options) {
+    return { frames, options, playState: 'running',
+      pause() { this.playState = 'paused'; }, play() { this.playState = 'running'; }, cancel() { this.playState = 'idle'; } };
+  }
   focus() { document.activeElement = this; }
   blur() { document.activeElement = null; }
 }
@@ -70,7 +78,7 @@ class Observer {
   disconnect() { this.disconnected = true; }
 }
 const document = new Element('document'); document.createElement = (tag) => new Element(tag);
-const timers = new Map(); let timerId = 0; let Stack; let viewport = 320;
+const timers = new Map(); let timerId = 0; let Stack; let viewport = 320; let now = 0;
 const context = {
   HTMLElement: Element, AbortController: Abort, ResizeObserver: Observer, IntersectionObserver: Observer, document,
   customElements: { get() {}, define(name, Class) { Stack = Class; } },
@@ -80,12 +88,13 @@ const context = {
   } }; },
   setTimeout(callback, delay) { timers.set(++timerId, { callback, delay }); return timerId; },
   clearTimeout(id) { timers.delete(id); }, requestAnimationFrame() { return 1; }, cancelAnimationFrame() {}, queueMicrotask,
+  performance: { now: () => now },
 };
 vm.runInNewContext(read('theme/assets/hero-stacked-slideshow.js'), context);
-function create(width, count, mode = 640, scale = 100, autoplay = false) {
+function create(width, count, mode = 640, scale = 100, autoplay = false, desktopAutoplay = false) {
   viewport = width;
   const stack = new Stack(); stack.heightMode = mode;
-  stack.dataset = { overlap: 50, primaryWidth: scale, mobileAutoplay: String(autoplay), autoplaySpeed: 5000 };
+  stack.dataset = { overlap: 50, primaryWidth: scale, mobileAutoplay: String(autoplay), desktopAutoplay: String(desktopAutoplay), autoplaySpeed: 5000 };
   const stage = new Element(); stage.dataset.stackStage = ''; stage.clientWidth = width; stack.append(stage);
   for (let index = 0; index < count; index++) {
     const card = new Element(); card.dataset = { stackCard: '', blockId: `image-${index}`, ratio: [0.5, 1.8, 0.75, 3, 0.35][index % 5], imageWidth: 1200 };
@@ -95,6 +104,7 @@ function create(width, count, mode = 640, scale = 100, autoplay = false) {
   }
   const counter = new Element(); counter.dataset.stackCounter = ''; stack.append(counter);
   const button = new Element('button'); button.dataset = { stackAutoplay: '', labelPlay: 'Play', labelPause: 'Pause' }; stack.append(button);
+  const ring = new Element('circle'); ring.dataset.stackProgress = ''; button.append(ring);
   stack.connectedCallback(); return stack;
 }
 const value = (element, key) => parseFloat(element.style[key]);
@@ -112,20 +122,18 @@ function verify(stack) {
     if (!stack.stacked) assert.equal(value(card, '--mv-card-x'), stack.base[index]);
     else if (index !== selected) assert.equal(value(card, '--mv-card-height'), stack.stageHeight);
   });
-  for (const direction of ['left', 'right']) {
-    const visible = stack.copies[direction].filter((copy) => !copy.hidden);
-    if (!stack.stacked) { assert.equal(visible.length, 0); continue; }
-    const spans = visible.map((copy) => [value(copy, '--mv-card-x'), value(copy, '--mv-card-x') + value(copy, '--mv-card-width')]).sort((a, b) => a[0] - b[0]);
-    assert(spans.length > 0, `${direction} has no cyclic images`);
-    assert(spans[0][0] <= (direction === 'left' ? 0 : end) + 1e-7);
-    let reach = spans[0][1];
-    for (const span of spans.slice(1)) { assert(span[0] <= reach + 1e-7, 'gap in edge imagery'); reach = Math.max(reach, span[1]); }
-    assert(reach >= (direction === 'left' ? start : stack.width) - 1e-7, 'edge not filled');
-    for (const copy of visible) {
-      assert.equal(copy.attributes.get('aria-hidden'), 'true');
-      assert.equal(copy.querySelector('a'), null); assert.equal(copy.dataset.blockId, undefined);
-      assert.equal(value(copy, '--mv-card-height'), stack.stageHeight);
-      assert.equal(stack.cardIndex(copy.children[0]), Number(copy.dataset.stackSource));
+  assert.equal(stack.stage.children.length, stack.cards.length, 'duplicate imagery in stage');
+  const spans = stack.cards.map((card, index) => [
+    value(card, '--mv-card-x') + value(card, '--mv-card-clip-left'),
+    value(card, '--mv-card-x') + value(card, '--mv-card-width') - value(card, '--mv-card-clip-right'), index,
+  ]).sort((a, b) => a[0] - b[0]);
+  assert(spans.every(([left, right]) => right > left));
+  if (stack.stacked) {
+    assert(Math.abs(spans[0][0]) < 1e-7, 'left edge unfilled');
+    assert(Math.abs(spans.at(-1)[1] - stack.width) < 1e-7, 'right edge unfilled');
+    for (let i = 1; i < spans.length; i++) assert(Math.abs(spans[i][0] - spans[i - 1][1]) < 1e-7, 'gap or repeat between unique images');
+    if (selected > 0 && selected < stack.cards.length - 1) {
+      assert.deepEqual(spans.map((span) => span[2]), stack.cards.map((_, index) => index), 'ordinary focus must preserve image order');
     }
   }
 }
@@ -148,9 +156,14 @@ const auto = create(320, 5, 640, 100, true);
 assert.equal(auto.timer, null, 'offscreen must not rotate');
 auto.visibilityObserver.callback([{ isIntersecting: true }]); assert.equal(timers.size, 1);
 assert.equal(timers.get(auto.timer).delay, 5000);
-auto.syncAutoplay(); auto.syncAutoplay(); assert.equal(timers.size, 1, 'only one timer');
-let scheduled = timers.get(auto.timer); timers.delete(auto.timer); scheduled.callback(); assert.equal(auto.active, 0); assert.equal(timers.size, 1);
-auto.emit('pointerdown'); assert.equal(timers.size, 0); document.emit('pointerup'); assert.equal(timers.size, 1);
+const firstTimer = auto.timer;
+auto.syncAutoplay(); auto.syncAutoplay(); assert.equal(auto.timer, firstTimer, 'unrelated updates must not reset countdown');
+assert.equal(auto.progressAnimation.options.duration, 5000);
+let scheduled = timers.get(auto.timer); now += scheduled.delay; timers.delete(auto.timer); scheduled.callback(); assert.equal(auto.active, 0); assert.equal(timers.size, 1);
+now += 2000; auto.emit('pointerdown'); assert.equal(timers.size, 0); assert.equal(auto.remaining, 3000);
+assert.equal(auto.progressAnimation.playState, 'paused');
+document.emit('pointerup'); assert.equal(timers.size, 1); assert.equal(timers.get(auto.timer).delay, 3000);
+assert.equal(auto.progressAnimation.playState, 'running');
 document.hidden = true; document.emit('visibilitychange'); assert.equal(timers.size, 0);
 document.hidden = false; document.emit('visibilitychange'); assert.equal(timers.size, 1);
 document.emit('shopify:block:select', { detail: { blockId: 'image-2' } }); assert.equal(auto.active, 2); assert.equal(timers.size, 0);
@@ -160,15 +173,24 @@ auto.autoplayButton.emit('click'); assert.equal(timers.size, 1);
 auto.reducedQuery.matches = true; auto.reducedQuery.emit('change'); assert.equal(timers.size, 0);
 auto.reducedQuery.matches = false; auto.reducedQuery.emit('change'); assert.equal(timers.size, 1);
 auto.keyboardFocus = true; auto.syncAutoplay(); assert.equal(timers.size, 0);
-auto.keyboardFocus = false; auto.mobileQuery.matches = false; auto.mobileQuery.emit('change'); assert.equal(timers.size, 0, 'desktop must not rotate');
+auto.keyboardFocus = false; auto.mobileQuery.matches = false; auto.mobileQuery.emit('change'); assert.equal(timers.size, 0, 'desktop autoplay is independently configurable');
+auto.dataset.desktopAutoplay = 'true'; auto.syncAutoplay(); assert.equal(timers.size, 1);
+auto.emit('pointerenter', { pointerType: 'mouse' }); assert.equal(timers.size, 0, 'desktop hover pauses countdown');
+const focused = auto.active; auto.emit('pointerleave'); assert.equal(auto.active, focused); assert.equal(timers.size, 1);
+auto.autoplayButton.focusVisible = true; auto.emit('focusin', { target: auto.autoplayButton });
+assert.equal(auto.keyboardFocus, false, 'play button remains operable with keyboard');
 auto.mobileQuery.matches = true; auto.mobileQuery.emit('change'); assert.equal(timers.size, 1);
 auto.visibilityObserver.callback([{ isIntersecting: false }]); assert.equal(timers.size, 0);
 auto.visibilityObserver.callback([{ isIntersecting: true }]); assert.equal(timers.size, 1);
 auto.disconnectedCallback(); assert.equal(timers.size, 0); assert(auto.observer.disconnected && auto.visibilityObserver.disconnected);
+assert.equal(auto.progressAnimation.playState, 'idle');
 assert([...document.events.values()].every((listeners) => listeners.size === 0), 'document listeners leaked');
 const desktop = create(1440, 5);
 desktop.select(0); desktop.stage.emit('pointerleave');
 assert.equal(desktop.active, 0, 'entering the overlaid controls must keep the selected card');
 desktop.emit('pointerleave'); assert.equal(desktop.active, null);
 desktop.disconnectedCallback();
-console.log(`Schema and ${scenarios} geometry scenarios passed, including cyclic edge coverage, two-image fill, focus effects, height stability and autoplay lifecycle.`);
+const desktopAuto = create(1440, 5, 640, 100, false, true);
+desktopAuto.visibilityObserver.callback([{ isIntersecting: true }]); assert.equal(timers.size, 1);
+desktopAuto.disconnectedCallback(); assert.equal(timers.size, 0);
+console.log(`Schema and ${scenarios} unique-image scenarios passed, including edge-only wrapping, no duplicate cards, section copy controls, desktop/mobile autoplay and countdown pause/resume.`);
