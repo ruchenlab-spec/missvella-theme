@@ -70,6 +70,42 @@
   width: 100%;
   height: 100%;
   object-fit: contain;
+  transition: filter var(--mv-stack-duration) ease;
+}
+
+.mv-hero-stack__card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: #000;
+  opacity: 0;
+  transition: opacity var(--mv-stack-duration) ease;
+}
+
+.mv-hero-stack[data-inactive-effect='dim'] .mv-hero-stack__card:not([data-focus])::after,
+.mv-hero-stack[data-inactive-effect='both'] .mv-hero-stack__card:not([data-focus])::after {
+  opacity: var(--mv-stack-dim, 0.4);
+}
+
+.mv-hero-stack[data-inactive-effect='blur'] .mv-hero-stack__card:not([data-focus]) > :is(img, svg),
+.mv-hero-stack[data-inactive-effect='both'] .mv-hero-stack__card:not([data-focus]) > :is(img, svg) {
+  filter: blur(var(--mv-stack-blur, 4px));
+}
+
+.mv-hero-stack[data-stacked] .mv-hero-stack__card:not([data-focus]) .mv-hero-stack__image {
+  object-fit: cover;
+}
+
+.mv-hero-stack[data-ready] .mv-hero-stack__copy {
+  pointer-events: auto;
+  /* Fill new edge positions immediately while the real cards animate over them. */
+  transition: none;
+}
+
+.mv-hero-stack__copy[hidden] {
+  display: none;
 }
 
 .mv-hero-stack__placeholder {
@@ -85,12 +121,14 @@
   position: absolute;
   inset: auto 0 0;
   display: grid;
-  gap: 12px;
+  gap: 0;
   max-height: 100%;
   overflow: auto;
-  padding: 48px 24px 24px;
-  color: #fff;
-  background: linear-gradient(transparent, rgb(0 0 0 / 65%));
+  padding: 64px clamp(24px, 5vw, 96px) clamp(32px, 4vw, 72px);
+  z-index: 2;
+  color: var(--mv-caption-color, #fff);
+  text-align: var(--mv-caption-align, left);
+  background: linear-gradient(transparent, rgb(0 0 0 / 70%));
   opacity: 0;
   visibility: hidden;
   transition: opacity 180ms ease, visibility 180ms ease;
@@ -101,19 +139,66 @@
   visibility: visible;
 }
 
-.mv-hero-stack__caption h3 {
+.mv-hero-stack__caption :is(h3, p) {
   margin: 0;
   color: inherit;
-  font-size: clamp(20px, 3vw, 36px);
   overflow-wrap: anywhere;
 }
 
+.mv-hero-stack__subtitle {
+  font: 400 var(--mv-caption-subtitle-size, 13px) / 1.4 var(--font-body--family);
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  opacity: 0.85;
+}
+
+.mv-hero-stack__caption .mv-hero-stack__title {
+  margin-block-start: 6px;
+  font-family: var(--font-heading--family);
+  font-size: var(--mv-caption-title-size, 56px);
+  line-height: 1.1;
+  text-wrap: balance;
+}
+
+.mv-hero-stack__caption .mv-hero-stack__description {
+  margin-block-start: 10px;
+  font: 400 var(--mv-caption-text-size, 16px) / 1.5 var(--font-body--family);
+  opacity: 0.9;
+}
+
 .mv-hero-stack__link {
-  justify-self: start;
+  justify-self: stretch;
   padding-block: 10px;
+  margin-block-start: 12px;
   color: inherit;
   text-underline-offset: 5px;
   text-decoration: underline;
+  font-family: var(--font-body--family);
+  font-size: 13px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.mv-hero-stack__autoplay {
+  display: none;
+  place-items: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 0;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  color: inherit;
+  background: transparent;
+  cursor: pointer;
+}
+
+.mv-hero-stack__play-symbol,
+.mv-hero-stack[data-autoplay-paused] .mv-hero-stack__pause-symbol {
+  display: none;
+}
+
+.mv-hero-stack[data-autoplay-paused] .mv-hero-stack__play-symbol {
+  display: inline;
 }
 
 .mv-hero-stack__controls {
@@ -141,6 +226,7 @@
 }
 
 @media (min-width: 769px) {
+  .mv-hero-stack[data-ready] .mv-hero-stack__controls--autoplay-only { display: none; }
   .mv-hero-stack__stage {
     height: var(--mv-stack-height);
   }
@@ -153,6 +239,11 @@
 }
 
 @media (max-width: 768px) {
+  .mv-hero-stack__autoplay { display: grid; }
+  .mv-hero-stack__caption { padding: 44px 20px 24px; }
+  .mv-hero-stack__caption .mv-hero-stack__title {
+    font-size: clamp(24px, calc(var(--mv-caption-title-size, 56px) * 0.6), 48px);
+  }
   .mv-hero-stack-section.spacing-style {
     padding-block:
       calc(var(--mv-stack-padding-start-mobile) + var(--section-top-offset, 0px))
@@ -162,7 +253,10 @@
 
 @media (prefers-reduced-motion: reduce) {
   .mv-hero-stack .mv-hero-stack__card,
-  .mv-hero-stack__caption {
+  .mv-hero-stack__caption,
+  .mv-hero-stack__card::after,
+  .mv-hero-stack__image,
+  .mv-hero-stack__placeholder {
     transition: none;
   }
 }

@@ -18,6 +18,8 @@
     --mv-stack-padding-end-mobile: {{ section.settings.padding_bottom_mobile }}px;
     --mv-stack-radius: {{ section.settings.corner_radius }}px;
     --mv-stack-duration: {{ section.settings.animation_duration }}ms;
+    --mv-stack-dim: {{ section.settings.inactive_opacity | divided_by: 100.0 }};
+    --mv-stack-blur: {{ section.settings.inactive_blur }}px;
   "
 >
   <mv-hero-stack
@@ -25,6 +27,9 @@
     data-overlap="{{ section.settings.overlap }}"
     data-primary-width="{{ section.settings.primary_width | default: 100 }}"
     data-desktop-height="{{ section.settings.section_height | default: '640' }}"
+    data-inactive-effect="{{ section.settings.inactive_effect }}"
+    data-mobile-autoplay="{{ section.settings.mobile_autoplay }}"
+    data-autoplay-speed="{{ section.settings.autoplay_speed | times: 1000 }}"
     role="region"
     aria-label="{{ section.settings.heading | default: 'Hero Slideshow' | escape }}"
   >
@@ -55,6 +60,13 @@
           data-image-width="{{ image.width | default: 800 }}"
           data-mobile-ratio="{{ mobile_ratio }}"
           data-primary="{{ block.settings.primary }}"
+          style="
+            --mv-caption-align: {{ block.settings.text_alignment | default: 'left' }};
+            --mv-caption-color: {{ block.settings.caption_color | default: '#ffffff' }};
+            --mv-caption-title-size: {{ block.settings.title_size }}px;
+            --mv-caption-subtitle-size: {{ block.settings.subtitle_size }}px;
+            --mv-caption-text-size: {{ block.settings.text_size }}px;
+          "
           tabindex="0"
           role="group"
           aria-label="{{ forloop.index }} / {{ section.blocks.size }} — {{ card_label | escape }}"
@@ -80,10 +92,16 @@
           {%- else -%}
             {{ placeholder | placeholder_svg_tag: 'mv-hero-stack__placeholder' }}
           {%- endif -%}
-          {%- if block.settings.title != blank or block.settings.link != blank -%}
+          {%- if block.settings.title != blank or block.settings.subtitle != blank or block.settings.text != blank or block.settings.link != blank -%}
             <div class="mv-hero-stack__caption" data-stack-caption inert>
+              {%- if block.settings.subtitle != blank -%}
+                <p class="mv-hero-stack__subtitle">{{ block.settings.subtitle | escape }}</p>
+              {%- endif -%}
               {%- if block.settings.title != blank -%}
-                <h3>{{ block.settings.title | escape }}</h3>
+                <h3 class="mv-hero-stack__title">{{ block.settings.title | escape }}</h3>
+              {%- endif -%}
+              {%- if block.settings.text != blank -%}
+                <p class="mv-hero-stack__description">{{ block.settings.text | escape | newline_to_br }}</p>
               {%- endif -%}
               {%- if block.settings.link != blank -%}
                 <a class="mv-hero-stack__link" href="{{ block.settings.link }}">
@@ -95,14 +113,29 @@
         </div>
       {%- endfor -%}
     </div>
-    {%- if section.blocks.size > 1 and section.settings.show_controls -%}
-      <div class="mv-hero-stack__controls">
-        {% render 'carousel-arrow', action: 'previous', class: 'mv-hero-stack__previous' %}
+    {%- if section.blocks.size > 1 -%}
+      {%- if section.settings.show_controls or section.settings.mobile_autoplay -%}
+      <div class="mv-hero-stack__controls{% unless section.settings.show_controls %} mv-hero-stack__controls--autoplay-only{% endunless %}">
+        {%- if section.settings.show_controls -%}
+          {% render 'carousel-arrow', action: 'previous', class: 'mv-hero-stack__previous' %}
         <span class="mv-hero-stack__counter" data-stack-counter aria-live="polite" aria-atomic="true">
           {{ section.blocks.size }}
         </span>
         {% render 'carousel-arrow', action: 'next', class: 'mv-hero-stack__next' %}
+        {%- endif -%}
+        {%- if section.settings.mobile_autoplay -%}
+          <button
+            type="button" class="mv-hero-stack__autoplay" data-stack-autoplay
+            data-label-play="{{ 'accessibility.slideshow_play' | t | escape }}"
+            data-label-pause="{{ 'accessibility.slideshow_pause' | t | escape }}"
+            aria-label="{{ 'accessibility.slideshow_pause' | t | escape }}" aria-pressed="true"
+          >
+            <span class="mv-hero-stack__pause-symbol" aria-hidden="true">Ⅱ</span>
+            <span class="mv-hero-stack__play-symbol" aria-hidden="true">▶</span>
+          </button>
+        {%- endif -%}
       </div>
+      {%- endif -%}
     {%- endif -%}
     {%- if section.blocks.size == 0 and request.design_mode -%}
       <p class="mv-hero-stack__empty">请添加图片区块，开始配置堆叠轮播。</p>
@@ -131,6 +164,19 @@
     { "type": "header", "content": "图片堆叠" },
     { "type": "paragraph", "content": "宽度足够时完整平铺，宽度不足时自动堆叠并优先完整展示主要图片。悬停展开当前图片，其余图片向两侧滑开；移出后恢复优先图片。手机端可点选或使用下方箭头。" },
     { "type": "checkbox", "id": "show_controls", "label": "显示翻页按钮", "default": true },
+    { "type": "checkbox", "id": "mobile_autoplay", "label": "移动端自动轮换", "default": false },
+    { "type": "range", "id": "autoplay_speed", "label": "自动轮换间隔", "min": 2, "max": 12, "step": 1, "unit": "s", "default": 5, "visible_if": "{{ section.settings.mobile_autoplay }}" },
+    {
+      "type": "select", "id": "inactive_effect", "label": "非焦点图片效果", "default": "dim",
+      "options": [
+        { "value": "dim", "label": "黑色遮罩" },
+        { "value": "blur", "label": "模糊" },
+        { "value": "both", "label": "模糊与黑色遮罩" },
+        { "value": "none", "label": "无" }
+      ]
+    },
+    { "type": "range", "id": "inactive_opacity", "label": "非焦点黑色遮罩", "min": 0, "max": 80, "step": 5, "unit": "%", "default": 40 },
+    { "type": "range", "id": "inactive_blur", "label": "非焦点模糊强度", "min": 0, "max": 12, "step": 1, "unit": "px", "default": 4 },
     { "type": "range", "id": "primary_width", "label": "主要优先图片展示宽度", "info": "相对于该图片的完整展示宽度，100% 为正常大小，调小后等比例缩小。请在对应图片区块勾选「设为主要优先图片」。", "min": 20, "max": 100, "step": 5, "unit": "%", "default": 100 },
     {
       "type": "select", "id": "section_height", "label": "桌面端高度", "default": "640",
@@ -161,6 +207,16 @@
         { "type": "checkbox", "id": "primary", "label": "设为主要优先图片", "info": "建议仅选一张；多张勾选时使用顺序最靠前的一张，未勾选时使用第一张。", "default": false },
         { "type": "text", "id": "alt", "label": "图片描述", "info": "供屏幕阅读器使用，留空则使用图片自身的描述。" },
         { "type": "text", "id": "title", "label": "图片标题（可留空）" },
+        { "type": "text", "id": "subtitle", "label": "副标题（可留空）" },
+        { "type": "textarea", "id": "text", "label": "描述（可留空）" },
+        { "type": "range", "id": "title_size", "label": "标题字号", "min": 24, "max": 96, "step": 2, "unit": "px", "default": 56 },
+        { "type": "range", "id": "subtitle_size", "label": "副标题字号", "min": 10, "max": 24, "step": 1, "unit": "px", "default": 13 },
+        { "type": "range", "id": "text_size", "label": "描述字号", "min": 12, "max": 28, "step": 1, "unit": "px", "default": 16 },
+        {
+          "type": "select", "id": "text_alignment", "label": "文字对齐", "default": "left",
+          "options": [{ "value": "left", "label": "左对齐" }, { "value": "center", "label": "居中" }, { "value": "right", "label": "右对齐" }]
+        },
+        { "type": "color", "id": "caption_color", "label": "叠加文字颜色", "default": "#ffffff" },
         { "type": "url", "id": "link", "label": "链接" },
         { "type": "text", "id": "link_label", "label": "链接文字", "default": "Explore" }
       ]
