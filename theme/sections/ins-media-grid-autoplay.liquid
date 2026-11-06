@@ -1,6 +1,5 @@
 {%- liquid
   assign hover_effect   = section.settings.hover_effect
-  assign show_caption   = section.settings.show_caption
   assign video_loop     = section.settings.video_loop
   assign video_controls = section.settings.video_controls
   assign media_position = section.settings.media_position
@@ -87,10 +86,8 @@
     <div class="ins-slider-viewport" tabindex="0" role="region" aria-label="{{ section.settings.title | default: 'Media gallery' | escape }}">
 
       <div class="ins-slider-track" id="ins-track-{{ section.id }}">
-        {%- assign media_index = 0 -%}
         {%- for block in section.blocks -%}
           {%- unless block.type == 'media_item' -%}{%- continue -%}{%- endunless -%}
-          {%- assign media_index = media_index | plus: 1 -%}
           {%- liquid
             assign has_video = false
             if block.settings.video != blank
@@ -164,12 +161,6 @@
                 </div>
               </div>
             </div>
-
-            {%- capture film_caption -%}
-              <span class="ins-frame-number">FRAME {% if media_index < 10 %}0{% endif %}{{ media_index }}</span>
-              {%- if show_caption and block.settings.caption != blank -%}<span>{{ block.settings.caption }}</span>{%- endif -%}
-            {%- endcapture -%}
-            {% render 'ins-media-text', section: section, role: 'caption', text: film_caption, class: 'ins-film-caption', color: section.settings.text_color, alignment: 'left' %}
           </div>
         {%- endfor -%}
       </div>
@@ -607,12 +598,6 @@
         }
       ],
       "default": "zoom-overlay"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_caption",
-      "label": "在媒体下方显示说明文字",
-      "default": false
     },
     {
       "type": "header",

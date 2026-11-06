@@ -1,6 +1,6 @@
 # INS 媒体展示 · Film strip
 
-当前实现采用商家选定的 [Demo 02](https://missvella-social-concepts.abloom-elk-2020.chatgpt.site/02-afterhours.html) **下半部分**：标题与圆形翻页按钮、FRAME 编号横向画廊和标题上方的社交账号／图标。没有横幅、电影主视觉或独立站导航。
+当前实现采用商家选定的 [Demo 02](https://missvella-social-concepts.abloom-elk-2020.chatgpt.site/02-afterhours.html) **下半部分**：标题与圆形翻页按钮、单行横向画廊和标题上方的社交账号／图标。媒体底部不再显示分割线、FRAME 编号或独立说明行。没有横幅、电影主视觉或独立站导航。
 
 ## 文件与复用
 
@@ -17,8 +17,8 @@ section 继续使用原生「页面／全宽」选择器和 `spacing-style`；�
 | 设置 | 默认值／行为 |
 |---|---|
 | 背景色 `background_color` | `#19110e` |
-| 文字颜色 `text_color` | `#eee3d4`，用于副标题和媒体说明 |
-| 标题与社交链接颜色 `accent_color` | `#d9af95`，同时用于翻页按钮及细线 |
+| 文字颜色 `text_color` | `#eee3d4`，用于副标题 |
+| 标题与社交链接颜色 `accent_color` | `#d9af95`，同时用于翻页按钮 |
 | 桌面／手机媒体宽度 | 29%／75%，保留下一张的露出 |
 | 桌面／手机媒体间距 | 22px／16px |
 | 社交账号文字 `instagram_handle` | 保留原字段 ID；新 section 默认 `@missvella` |
@@ -44,8 +44,8 @@ Instagram 链接留空时，代码回退到商家明确提供的 `https://www.in
 - 单行浏览器原生滚动与 scroll-snap；触摸、触控板和可聚焦滚动区可直接操作。按钮每次滚动一张，尊重 reduced-motion 偏好，并兼容 RTL 方向。
 - 卡片直接输出到 DOM，不再依赖 template 克隆、JavaScript 网格重建或 translateX。JavaScript 不可用时仍可原生滚动媒体。
 - 翻页按钮移到标题右侧；无溢出时隐藏，到达边界时禁用。ResizeObserver 及窗口尺寸变化同步状态。
-- 只渲染 `media_item` 为卡片；样式区块不会形成空卡片。独立媒体计数生成连续 `FRAME 01` 等编号，顺序跟随商家媒体区块。
-- 说明行保留 FRAME 编号；「显示媒体说明文字」控制已有 caption 是否在编号旁显示。媒体悬停说明继续工作。
+- 只渲染 `media_item` 为卡片；样式区块不会形成空卡片。媒体底部的独立说明行、FRAME 编号、分割线及相关空白均已移除。
+- 已删除「在媒体下方显示说明文字」设置（`show_caption`）和对应渲染分支；每项媒体的 caption 字段继续用于媒体上的悬停说明及链接无障碍标签，原生文本样式的「媒体说明文字」目标继续服务悬停说明。
 - 图片尺寸提示随桌面／手机媒体宽度更新；比例、裁切、悬停和 Shopify 托管视频设置继续使用原有内容和设置。
 - 视频可见性、切后台暂停、手动暂停锁和控制条行为保留。开启原生视频控制条时不生成覆盖控件的整卡链接。
 
@@ -64,3 +64,9 @@ shopify theme push --store 6icwx6-yv.myshopify.com --theme 167137378374 --allow-
 ```
 
 不推送 `templates/*.json`、`sections/*.json` 或 `config/settings_data.json`。临时文件不纳入 Git 提交。
+
+## 2026-11-06 · 清理媒体底部说明行
+
+- 按商家要求删除底部分割线、FRAME 文案及整行说明，清理无用 `media_index`／`film_caption`／`show_caption` 变量和 CSS。
+- 从 section schema 移除「在媒体下方显示说明文字」，现有媒体 caption 内容和悬停说明继续使用原入口。
+- 一次必要静态检查：schema JSON、废弃标记删除、悬停说明绑定及 diff 检查通过；仅精确推送 section 和 CSS，CLI 已确认成功。未推送商家内容文件。

@@ -52,9 +52,6 @@
 .ins-media-section .ins-overlay-content { opacity: 0; transform: translateY(6px); transition: opacity 300ms, transform 300ms; color: white; width: 100%; }
 .ins-media-section:is([data-hover='overlay'], [data-hover='zoom-overlay']) .ins-item:hover .ins-overlay { background: rgb(0 0 0 / 45%); }
 .ins-media-section:is([data-hover='overlay'], [data-hover='zoom-overlay']) .ins-item:hover .ins-overlay-content { opacity: 1; transform: translateY(0); }
-.ins-media-section .ins-film-caption { margin-top: 14px; padding-top: 12px; border-top: 1px solid color-mix(in srgb, var(--ins-accent) 48%, transparent); }
-.ins-media-section .ins-film-caption .text-block > p { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 6px 12px; }
-.ins-media-section .ins-frame-number { white-space: nowrap; }
 .ins-media-section .ins-social-link { display: block; text-decoration: none; }
 .ins-media-section .ins-handle .text-block > span { display: inline-flex; flex-wrap: wrap; align-items: center; justify-content: start; gap: 6px; }
 .ins-media-section .ins-social-icon { display: inline-block; width: 20px; height: 20px; flex-shrink: 0; fill: currentColor; vertical-align: middle; }
