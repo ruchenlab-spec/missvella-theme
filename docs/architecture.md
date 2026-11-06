@@ -52,6 +52,10 @@ section.circle-collections
 | `heading` | section 本地 | 富文本、宽度/最大宽度、排版预设、字体/字号/行高/字距/大小写/换行、文本颜色、背景色+圆角、内边距（与原生文本区块一致） |
 | `circle_collection` | section 本地 | 集合（链接+默认标题）、自定义图片、自定义视频（优先）、自定义标题 |
 
+### 新增区块预设（2026-11-06）
+
+新增「圆形集合轮播」时保留 `Shop by Color` 标题，依次生成 9 个圆形项：Blue、Purple、Red、Pink、Green、Yellow、Orange、Neutrals、Black。名称写在各项 `custom_title` 中；对应集合由商家在主题编辑器选择，未绑定时显示占位图且不生成链接。当前公开集合列表未找到这 9 个对应集合，因此预设不填入未经确认的 collection handle。预设仅影响新增实例，已保存的线上轮播由商家在编辑器调整。
+
 ### Section 设置
 
 `columns`（3–8）、`mobile_columns`（1/2）、`circle_gap`、`circle_size`（0=自动，≤320px）、`title_case` / `title_font_size` / `title_letter_spacing` / `title_color`（圆形下方文字）、`icons_style`（arrow/chevron/large/none）、`icons_shape`（none/circle/square）、`arrow_size`（32–72px）、`section_width`、`background_color`、上下内边距。
