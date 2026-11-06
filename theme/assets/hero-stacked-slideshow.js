@@ -133,6 +133,7 @@ class HeroStack extends HTMLElement {
       const cardHeight = this.mobileQuery.matches || autoHeight ? cardWidth / ratio : height * scale;
       heights.push(cardHeight);
       card.style.setProperty('--mv-card-width', `${cardWidth}px`);
+      card.style.setProperty('--mv-image-width', `${cardWidth}px`);
       card.style.setProperty('--mv-card-height', `${cardHeight}px`);
       return cardWidth;
     });
@@ -155,20 +156,7 @@ class HeroStack extends HTMLElement {
         return start;
       });
     } else {
-      let prefix = 0;
-      let advance = 1 - Number(this.dataset.overlap) / 100;
-      this.widths.forEach((cardWidth) => {
-        if (prefix) advance = Math.min(advance, (width - cardWidth) / prefix);
-        prefix += cardWidth;
-      });
-      prefix = 0;
-      this.base = this.widths.map((cardWidth) => {
-        const position = prefix * advance;
-        prefix += cardWidth;
-        return position;
-      });
-      const extent = Math.max(...this.widths.map((cardWidth, index) => this.base[index] + cardWidth));
-      this.base = this.base.map((position) => position + (width - extent) / 2);
+      this.base = this.widths.map((cardWidth, index) => index * (width - cardWidth) / (count - 1));
     }
     this.activeX = this.openPosition(this.active ?? this.primary);
 
@@ -183,33 +171,20 @@ class HeroStack extends HTMLElement {
     this.syncAutoplay();
   }
 
-  select(index, pointerX) {
+  select(index) {
     if (index !== null && (index < 0 || index >= this.cards.length)) return;
     if (this.active === index) return;
     this.active = index;
-    this.activeX = this.openPosition(index ?? this.primary, pointerX);
+    this.activeX = this.openPosition(index ?? this.primary);
     this.layout();
     this.syncAutoplay({ reset: true });
   }
 
-  openPosition(index, pointerX) {
+  openPosition(index) {
     if (index === null || !this.widths) return null;
     if (!this.stacked) return this.base[index];
-    // Move focus within the space its unchanged neighbors can actually cover.
-    // Empty left/right groups naturally pin the first/last card to that edge.
-    const remaining = this.width - this.widths[index];
-    const leftCapacity = this.widths.slice(0, index).reduce((sum, width) => sum + width, 0);
-    const rightCapacity = this.widths.slice(index + 1).reduce((sum, width) => sum + width, 0);
-    const reserve = Math.min(28, remaining / (this.cards.length - 1), Math.min(...this.widths) / 2);
-    const left = Math.max(reserve * index, remaining - rightCapacity);
-    const right = Math.min(remaining - reserve * (this.cards.length - index - 1), leftCapacity);
-    let position = Math.max(left, Math.min(this.base[index], right));
-    if (pointerX !== undefined) {
-      const min = Math.max(left, pointerX - this.widths[index] + 1);
-      const max = Math.min(right, pointerX - 1);
-      if (min <= max) position = Math.max(min, Math.min(position, max));
-    }
-    return position;
+    // Each nonfocused viewport receives exactly the same share of the remainder.
+    return index * (this.width - this.widths[index]) / (this.cards.length - 1);
   }
 
   layout() {
@@ -221,30 +196,21 @@ class HeroStack extends HTMLElement {
     // Controls share the media wrapper and follow the actual focused card bounds.
     this.style.setProperty('--mv-stack-controls-right', `${end}px`);
     this.style.setProperty('--mv-stack-controls-bottom', `${(this.stageHeight + this.heights[active]) / 2}px`);
-    const leftCapacity = this.widths.slice(0, active).reduce((sum, width) => sum + width, 0);
-    const rightCapacity = this.widths.slice(active + 1).reduce((sum, width) => sum + width, 0);
-    const leftExposure = leftCapacity ? Math.min(1, start / leftCapacity) : 0;
-    const rightExposure = rightCapacity ? Math.min(1, (this.width - end) / rightCapacity) : 0;
-    let leftEdge = 0;
-    let rightEdge = end;
+    const inactiveWidth = count > 1 ? (this.width - this.widths[active]) / (count - 1) : 0;
 
     this.cards.forEach((card, index) => {
       let position = this.base[index];
       let layer = index + 1;
-      let clipLeft = 0;
-      let clipRight = 0;
-      const frameWidth = this.widths[index];
+      let frameWidth = this.widths[index];
+      let imageX = 0;
       if (this.stacked && active !== null) {
         if (index < active) {
-          const visibleWidth = frameWidth * leftExposure;
-          position = leftEdge + visibleWidth - frameWidth;
-          clipLeft = frameWidth - visibleWidth;
-          leftEdge += visibleWidth;
+          position = index * inactiveWidth;
+          frameWidth = inactiveWidth;
+          imageX = frameWidth - this.widths[index];
         } else if (index > active) {
-          const visibleWidth = frameWidth * rightExposure;
-          position = rightEdge;
-          clipRight = frameWidth - visibleWidth;
-          rightEdge += visibleWidth;
+          position = end + (index - active - 1) * inactiveWidth;
+          frameWidth = inactiveWidth;
           layer = count - index;
         } else {
           position = start;
@@ -254,8 +220,9 @@ class HeroStack extends HTMLElement {
       card.style.setProperty('--mv-card-x', `${position}px`);
       card.style.setProperty('--mv-card-width', `${frameWidth}px`);
       card.style.setProperty('--mv-card-layer', String(layer));
-      card.style.setProperty('--mv-card-clip-left', `${clipLeft}px`);
-      card.style.setProperty('--mv-card-clip-right', `${clipRight}px`);
+      card.style.setProperty('--mv-card-clip-left', '0px');
+      card.style.setProperty('--mv-card-clip-right', '0px');
+      card.style.setProperty('--mv-image-x', `${imageX}px`);
       const selected = index === active;
       card.style.setProperty('--mv-card-height', `${this.heights[index]}px`);
       card.toggleAttribute('data-focus', selected);
@@ -322,7 +289,7 @@ class HeroStack extends HTMLElement {
     if (this.lastPointer && Math.hypot(event.clientX - this.lastPointer.x, event.clientY - this.lastPointer.y) < 2) return;
     this.lastPointer = { x: event.clientX, y: event.clientY };
     const index = this.cardIndex(event.target);
-    if (index >= 0) this.select(index, event.clientX - this.stage.getBoundingClientRect().left);
+    if (index >= 0) this.select(index);
   }
 
   step(direction) {

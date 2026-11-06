@@ -92,10 +92,15 @@
   box-shadow: -8px 0 24px rgb(0 0 0 / 12%);
   transition:
     transform var(--mv-stack-duration) cubic-bezier(0.22, 1, 0.36, 1),
+    width var(--mv-stack-duration) cubic-bezier(0.22, 1, 0.36, 1),
     clip-path var(--mv-stack-duration) cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .mv-hero-stack[data-instant] .mv-hero-stack__card {
+  transition: none;
+}
+
+.mv-hero-stack[data-instant] :is(.mv-hero-stack__image, .mv-hero-stack__placeholder) {
   transition: none;
 }
 
@@ -105,11 +110,17 @@
 
 .mv-hero-stack__image,
 .mv-hero-stack__placeholder {
+  position: absolute;
+  top: 0;
+  left: var(--mv-image-x, 0px);
   display: block;
-  width: 100%;
+  width: var(--mv-image-width, 100%);
+  max-width: none;
   height: 100%;
   object-fit: contain;
-  transition: filter var(--mv-stack-duration) ease;
+  transition:
+    filter var(--mv-stack-duration) ease,
+    left var(--mv-stack-duration) cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .mv-hero-stack__card::after {

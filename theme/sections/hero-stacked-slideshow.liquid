@@ -29,7 +29,6 @@
 >
   <mv-hero-stack
     class="mv-hero-stack"
-    data-overlap="{{ section.settings.overlap }}"
     data-primary-width="{{ section.settings.primary_width | default: 100 }}"
     data-desktop-height="{{ section.settings.section_height | default: '640' }}"
     data-inactive-effect="{{ section.settings.inactive_effect }}"
@@ -197,7 +196,7 @@
     { "type": "color", "id": "background_color", "label": "t:settings.background_color", "placeholder": "t:settings.default" },
     { "type": "color", "id": "text_color", "label": "t:settings.text_color", "placeholder": "t:settings.default" },
     { "type": "header", "content": "图片堆叠" },
-    { "type": "paragraph", "content": "宽度足够时完整平铺，宽度不足时按原顺序堆叠，悬停只移动位置、调整遮挡，不改变图片大小。第一张聚焦时贴左，最后一张聚焦时贴右；中间图片根据两侧可用图片宽度定位，无循环补位。手机和桌面均可开启自动播放。" },
+    { "type": "paragraph", "content": "宽度足够时完整平铺，宽度不足时按原顺序堆叠。非焦点图片露出宽度统一为（容器宽度－当前焦点图宽度）÷非焦点数量；图片本身不缩放，只调整露出区域。第一张聚焦贴左，最后一张聚焦贴右，无循环补位。" },
     { "type": "checkbox", "id": "show_controls", "label": "显示翻页按钮", "default": true },
     { "type": "checkbox", "id": "mobile_autoplay", "label": "移动端自动轮换", "default": false },
     { "type": "checkbox", "id": "desktop_autoplay", "label": "桌面端自动轮换", "default": false },
@@ -223,7 +222,6 @@
       ]
     },
     { "type": "range", "id": "image_height_mobile", "label": "移动端图片最大高度", "min": 200, "max": 600, "step": 20, "unit": "px", "default": 400 },
-    { "type": "range", "id": "overlap", "label": "堆叠重叠程度", "info": "仅宽度不足时生效。图片较多或容器较窄时，自动增加重叠，确保所有图片都有露出。", "min": 20, "max": 85, "step": 5, "unit": "%", "default": 50 },
     { "type": "range", "id": "corner_radius", "label": "图片圆角", "min": 0, "max": 40, "step": 2, "unit": "px", "default": 0 },
     { "type": "range", "id": "animation_duration", "label": "滑动动画时长", "min": 200, "max": 1000, "step": 50, "unit": "ms", "default": 500 },
     { "type": "header", "content": "间距" },

@@ -94,7 +94,7 @@ vm.runInNewContext(read('theme/assets/hero-stacked-slideshow.js'), context);
 function create(width, count, mode = 640, scale = 100, autoplay = false, desktopAutoplay = false) {
   viewport = width;
   const stack = new Stack(); stack.heightMode = mode;
-  stack.dataset = { overlap: 50, primaryWidth: scale, mobileAutoplay: String(autoplay), desktopAutoplay: String(desktopAutoplay), autoplaySpeed: 5000 };
+  stack.dataset = { primaryWidth: scale, mobileAutoplay: String(autoplay), desktopAutoplay: String(desktopAutoplay), autoplaySpeed: 5000 };
   const stage = new Element(); stage.dataset.stackStage = ''; stage.clientWidth = width; stack.append(stage);
   for (let index = 0; index < count; index++) {
     const card = new Element(); card.dataset = { stackCard: '', blockId: `image-${index}`, ratio: [0.5, 1.8, 0.75, 3, 0.35][index % 5], imageWidth: 1200 };
@@ -119,7 +119,10 @@ function verify(stack) {
   assert.equal(value(focus, '--mv-card-clip-left'), 0); assert.equal(value(focus, '--mv-card-clip-right'), 0);
   stack.cards.forEach((card, index) => {
     assert.equal(card.querySelector('[data-stack-caption]').inert, index !== selected);
-    assert.equal(value(card, '--mv-card-width'), stack.widths[index], 'focus must not widen any image');
+    const expected = stack.stacked && index !== selected
+      ? (stack.width - stack.widths[selected]) / (stack.cards.length - 1) : stack.widths[index];
+    assert.equal(value(card, '--mv-card-width'), expected, 'nonfocused viewports must share the remainder equally');
+    assert.equal(value(card, '--mv-image-width'), stack.widths[index], 'viewport changes must not resize the image');
     assert.equal(value(card, '--mv-card-height'), stack.heights[index], 'focus must not resize any image');
     if (!stack.stacked) assert.equal(value(card, '--mv-card-x'), stack.base[index]);
   });
@@ -133,6 +136,10 @@ function verify(stack) {
     assert(Math.abs(spans[0][0]) < 1e-7, 'left edge unfilled');
     assert(Math.abs(spans.at(-1)[1] - stack.width) < 1e-7, 'right edge unfilled');
     for (let i = 1; i < spans.length; i++) assert(Math.abs(spans[i][0] - spans[i - 1][1]) < 1e-7, 'gap or repeat between unique images');
+    const expected = (stack.width - stack.widths[selected]) / (stack.cards.length - 1);
+    for (const [left, right, index] of spans) {
+      if (index !== selected) assert(Math.abs(right - left - expected) < 1e-7, 'unequal inactive display widths');
+    }
     assert.deepEqual(spans.map((span) => span[2]), stack.cards.map((_, index) => index), 'every focus must preserve image order');
     if (selected === 0) assert.equal(start, 0, 'first focus must align left');
     if (selected === stack.cards.length - 1) assert.equal(end, stack.width, 'last focus must align right');
@@ -198,11 +205,12 @@ desktopAuto.disconnectedCallback(); assert.equal(timers.size, 0);
 const portrait = create(2037, 5);
 portrait.cards.forEach((card) => { card.dataset.ratio = 0.75; card.dataset.mobileRatio = 0.75; });
 portrait.primary = 3; portrait.measure(); verify(portrait);
-assert.equal(value(portrait.cards[4], '--mv-card-width'), 480, 'fifth portrait must not stretch into the remaining side');
+assert.equal(value(portrait.cards[4], '--mv-image-width'), 480, 'fifth image must retain its original width');
+assert.equal(value(portrait.cards[4], '--mv-card-width'), (2037 - 480) / 4);
 assert.equal(value(portrait.cards[4], '--mv-card-height'), 640);
-for (const overlap of [20, 50, 85]) {
-  portrait.dataset.overlap = overlap; portrait.measure();
+for (const scale of [20, 55, 100]) {
+  portrait.dataset.primaryWidth = scale; portrait.measure();
   for (let index = 0; index < 5; index++) { portrait.select(index); verify(portrait); }
 }
 portrait.disconnectedCallback();
-console.log(`Schema and ${scenarios} fixed-size scenarios passed, including fourth-primary/fifth-image regression, original order, edge alignment, gap-free coverage and countdown pause/resume.`);
+console.log(`Schema and ${scenarios} equal-width scenarios passed, including exact remainder division, fixed image size, fourth-primary regression, edge alignment and countdown pause/resume.`);
