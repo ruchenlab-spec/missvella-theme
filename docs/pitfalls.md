@@ -2,6 +2,11 @@
 
 > 每条格式：**症状 → 原因 → 解决**。按影响面排序，前几条是最容易造成事故的。
 
+### P43 · 新 section 提示「无法显示配色方案」
+- **症状**：主题编辑器的配色控件提示必须在 settings_data 和 settings_schema 中定义方案。
+- **原因**：当前 Horizon 4.1.4 主题使用 `color_palette` 和独立颜色设置；新增 section 直接套用 `color_scheme`／`scheme-1`，没有对应的全局方案定义和颜色 CSS。
+- **解决**：按现有 section 复用 `color` 类型的背景／文字设置、`contrast-override` 及 `color-custom-{section.id}`；留空继承全局配色。不为消除报错而推送 `settings_data.json`。堆叠 Hero 已于 2026-11-06 修复。
+
 ## 一、推送与内容安全（最高优先级）
 
 ### P1 · 推送后主题编辑器里的配置被还原（本项目已发生 3 次）

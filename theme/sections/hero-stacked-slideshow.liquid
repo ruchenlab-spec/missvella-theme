@@ -1,9 +1,15 @@
 {{ 'hero-stacked-slideshow.css' | asset_url | stylesheet_tag }}
 <script src="{{ 'hero-stacked-slideshow.js' | asset_url }}" type="module" fetchpriority="low"></script>
 
-<div class="section-background color-{{ section.settings.color_scheme }}"></div>
+{% render 'contrast-override',
+  background_color: section.settings.background_color,
+  text_color: section.settings.text_color,
+  section_id: section.id
+%}
+
+<div class="section-background color-custom-{{ section.id }}"></div>
 <div
-  class="section section--{{ section.settings.section_width }} spacing-style color-{{ section.settings.color_scheme }} mv-hero-stack-section"
+  class="section section--{{ section.settings.section_width }} spacing-style color-custom-{{ section.id }} mv-hero-stack-section"
   style="
     {% render 'spacing-style', settings: section.settings %}
     --mv-stack-height: {{ section.settings.image_height }}px;
@@ -116,7 +122,8 @@
         { "value": "full-width", "label": "全宽" }
       ]
     },
-    { "type": "color_scheme", "id": "color_scheme", "label": "配色", "default": "scheme-1" },
+    { "type": "color", "id": "background_color", "label": "t:settings.background_color", "placeholder": "t:settings.default" },
+    { "type": "color", "id": "text_color", "label": "t:settings.text_color", "placeholder": "t:settings.default" },
     { "type": "header", "content": "图片堆叠" },
     { "type": "paragraph", "content": "宽度足够时完整平铺，宽度不足时自动堆叠并优先完整展示主要图片。悬停展开当前图片，其余图片向两侧滑开；移出后恢复优先图片。手机端可点选或使用下方箭头。" },
     { "type": "checkbox", "id": "show_controls", "label": "显示翻页按钮", "default": true },
