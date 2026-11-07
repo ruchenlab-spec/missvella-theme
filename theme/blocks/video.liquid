@@ -1,16 +1,23 @@
 {% assign block_settings = block.settings %}
+{% liquid
+  assign video_class = 'spacing-style size-style border-style'
+  if block_settings.aspect_ratio != blank and block_settings.aspect_ratio != 'auto'
+    assign video_class = video_class | append: ' mv-video-block--fixed-ratio'
+  endif
+%}
 
 {% capture video_style %}
   {%  render 'spacing-style', settings: block_settings %}
   {% render 'border-override', settings: block_settings %}
    --size-style-width: {{ block_settings.custom_width }}%; --size-style-width-mobile: {{ block_settings.custom_width_mobile }}%;
-   --size-style-aspect-ratio: {% if block_settings.source == 'uploaded' %}{{ block_settings.video.aspect_ratio | default: 'auto' }}{% elsif block_settings.cover_image == blank %}{{ block_settings.aspect_ratio }}{% else %}auto{% endif %};
+   --size-style-aspect-ratio: {% if block_settings.aspect_ratio != blank and block_settings.aspect_ratio != 'auto' %}{{ block_settings.aspect_ratio }}{% elsif block_settings.source == 'uploaded' %}{{ block_settings.video.aspect_ratio | default: 'auto' }}{% else %}auto{% endif %};
+   --video-object-fit: {{ block_settings.video_fit | default: 'cover' }};
 {% endcapture %}
 
 {% if block_settings.source == 'uploaded' %}
   {% render 'video',
     video: block_settings.video,
-    video_class: 'spacing-style size-style border-style',
+    video_class: video_class,
     video_loop: block_settings.video_loop,
     video_style: video_style,
     video_preview_image: block_settings.video.preview_image,
@@ -20,7 +27,7 @@
   {% render 'video',
     video_from_url: true,
     video: block_settings.video_url.id,
-    video_class: 'spacing-style size-style border-style',
+    video_class: video_class,
     video_type: block_settings.video_url.type,
     video_style: video_style,
     video_alt: block_settings.alt,
@@ -30,6 +37,21 @@
 {% endif %}
 
 {% stylesheet %}
+  .mv-video-block--fixed-ratio.mv-video-block--fixed-ratio {
+    display: block;
+    height: auto;
+    aspect-ratio: var(--size-style-aspect-ratio);
+  }
+
+  .mv-video-block--fixed-ratio.mv-video-block--fixed-ratio > :is(video, iframe, .deferred-media__poster-button) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    padding: inherit;
+    aspect-ratio: auto;
+  }
+
   .placeholder-video {
     aspect-ratio: 5 / 3;
   }
@@ -123,8 +145,7 @@
     {
       "type": "select",
       "id": "aspect_ratio",
-      "label": "t:settings.aspect_ratio",
-      "visible_if": "{{ block.settings.source == 'url' and block.settings.cover_image == blank }}",
+      "label": "视频比例预设",
       "options": [
         {
           "value": "auto",
@@ -138,12 +159,26 @@
           "value": "1/1",
           "label": "t:options.square"
         },
+        { "value": "4/5", "label": "竖版 4:5" },
+        { "value": "2/3", "label": "竖版 2:3" },
+        { "value": "3/2", "label": "横版 3:2" },
         {
           "value": "16/9",
           "label": "t:options.landscape"
         }
       ],
       "default": "auto"
+    },
+    {
+      "type": "select",
+      "id": "video_fit",
+      "label": "视频填充方式",
+      "options": [
+        { "value": "cover", "label": "裁剪填充" },
+        { "value": "contain", "label": "完整显示（可留白）" }
+      ],
+      "default": "cover",
+      "visible_if": "{{ block.settings.source == 'uploaded' and block.settings.aspect_ratio != 'auto' }}"
     },
     {
       "type": "header",

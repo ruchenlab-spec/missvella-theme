@@ -75,7 +75,7 @@
 
   deferred-media img {
     height: 100%;
-    object-fit: cover;
+    object-fit: var(--video-object-fit, cover);
     transition: opacity 0.3s ease;
   }
 
@@ -120,7 +120,7 @@
 
   deferred-media[class] :is(.deferred-media__poster-button img, .deferred-media__poster-button ~ video) {
     /* only apply this on the video block not product media */
-    object-fit: cover;
+    object-fit: var(--video-object-fit, cover);
     height: 100%;
     aspect-ratio: var(--size-style-aspect-ratio, auto);
   }
