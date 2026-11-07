@@ -45,6 +45,14 @@ Use case: photorealistic-natural. Asset type: wide 3:2 luxury fashion editorial 
 
 此次仅交付独立 demo，不执行 Shopify theme push。后续若落地为主题区块，遵循项目内容保护规则：只推新增 section / asset 等代码，实例图片、文案与页面结构由商家在主题编辑器配置。
 
+## 2026-11-07 · 媒体比例预设
+
+在「杂志文字分栏」内选择带背景图片／视频的 Group，在媒体设置旁使用「媒体比例预设」：保持当前布局、1:1、4:5、2:3、3:2、16:9、9:16。固定比例按分组宽度确定高度，桌面与手机均生效；内容较多时允许撑高，避免裁掉文字。
+
+图片位置／视频位置选择填充时按比例裁剪铺满，选择适应／完整显示时保留完整素材并允许留白。默认「保持当前布局」，既有实例外观不变。设置复用原生 Group，因此其他页面的 Group 也可使用。只修改并精确推送 `blocks/group.liquid` 和 `snippets/group.liquid`；实例比例与素材由商家在编辑器自行选择。
+
+验证：schema JSON 解析、设置 ID 唯一性及默认选项校验通过，diff 无空白错误；Shopify CLI 返回 `Theme upload complete`，已上传至当前 live 主题 167137378374。未修改或推送内容文件，前台效果由商家检查。
+
 ## 2026-11-04 · Philosophy 分栏已落地
 
 根据商家后续选择，新增 `theme/sections/editorial-text-columns.liquid`，在主题编辑器的「添加分区」中搜索 **杂志文字分栏** 即可使用。可在不同页面反复添加，默认标题及三个文字栏，桌面三列、手机单列。

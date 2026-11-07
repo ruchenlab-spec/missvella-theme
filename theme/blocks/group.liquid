@@ -284,6 +284,23 @@
       "default": "none"
     },
     {
+      "type": "select",
+      "id": "media_aspect_ratio",
+      "label": "媒体比例预设",
+      "info": "按分组宽度确定媒体高度；填充方式沿用图片位置／视频位置设置。内容较多时分组会自动增高。",
+      "options": [
+        { "value": "auto", "label": "保持当前布局" },
+        { "value": "1 / 1", "label": "正方形 1:1" },
+        { "value": "4 / 5", "label": "竖版 4:5" },
+        { "value": "2 / 3", "label": "竖版 2:3" },
+        { "value": "3 / 2", "label": "横版 3:2" },
+        { "value": "16 / 9", "label": "宽屏 16:9" },
+        { "value": "9 / 16", "label": "竖屏 9:16" }
+      ],
+      "default": "auto",
+      "visible_if": "{{ block.settings.background_media != 'none' }}"
+    },
+    {
       "type": "color",
       "id": "background_color",
       "label": "t:settings.background_color",

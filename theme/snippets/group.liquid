@@ -26,6 +26,7 @@
     group-block
     group-block--height-{{ settings.height }}
     group-block--width-{{ settings.width }}
+    {% if skip_contrast and settings.media_aspect_ratio != blank and settings.media_aspect_ratio != 'auto' %}group-block--media-ratio{% endif %}
     border-style
     spacing-style
     size-style
@@ -36,6 +37,9 @@
     {% render 'border-override', settings: settings %}
     {% render 'spacing-style', settings: settings %}
     {% render 'size-style', settings: settings %}
+    {% if skip_contrast and settings.media_aspect_ratio != blank and settings.media_aspect_ratio != 'auto' %}
+      --group-media-ratio: {{ settings.media_aspect_ratio }};
+    {% endif %}
     {{ style }}
   "
   {{ shopify_attributes }}
@@ -80,6 +84,14 @@
 </div>
 
 {% stylesheet %}
+  .group-block.group-block--media-ratio {
+    aspect-ratio: var(--group-media-ratio);
+    height: auto;
+    min-height: 0;
+    align-self: start;
+    flex: 0 1 auto;
+  }
+
   .group-block__link {
     position: absolute;
     inset: 0;
