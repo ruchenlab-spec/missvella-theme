@@ -1,0 +1,367 @@
+{
+  "version": "2026-11-07",
+  "status": "content-proposal-not-published",
+  "brand": "Missvella",
+  "email": "hello@missvella.com",
+  "title": "Frequently Asked Questions",
+  "intro": "Find answers about choosing your dress, placing an order, delivery, and returns. Need help with your plans? Contact hello@missvella.com and include your order number if you have one.",
+  "policyNote": "These FAQs summarize our store policies. Please read the linked policies for full details. Your mandatory consumer rights are not affected.",
+  "supportTitle": "Still need a hand?",
+  "supportText": "Email hello@missvella.com with your question. For an existing order, include your order number; for help choosing a dress, include the product link and any relevant measurements or event date.",
+  "sources": {
+    "shipping": { "label": "Missvella Shipping Policy", "url": "https://missvella.com/policies/shipping-policy", "basis": "live-policy", "checked": "2026-11-07" },
+    "returns": { "label": "Missvella Return & Refund Policy", "url": "https://missvella.com/policies/refund-policy", "basis": "live-policy", "checked": "2026-11-07" },
+    "terms": { "label": "Missvella Terms of Service", "url": "https://missvella.com/policies/terms-of-service", "basis": "live-policy", "checked": "2026-11-07" },
+    "size": { "label": "Missvella Size Guide", "url": "https://missvella.com/pages/size-guide", "basis": "live-page", "checked": "2026-11-07" },
+    "contact": { "label": "Missvella Contact Information", "url": "https://missvella.com/policies/contact-information", "basis": "live-policy", "checked": "2026-11-07" },
+    "merchant-payment": { "label": "Merchant confirmation: credit cards and PayPal", "basis": "user-confirmed", "checked": "2026-11-07" },
+    "guidance": { "label": "Practical guidance; no additional service promise", "basis": "editorial-guidance" },
+    "conditional-service": { "label": "Availability requires confirmation before ordering", "basis": "conditional-draft" }
+  },
+  "popular": ["delivery-time", "shipping-cost", "choose-size", "return-window", "exchange", "track-order"],
+  "categories": [
+    {
+      "id": "shipping",
+      "title": "Shipping & Delivery",
+      "zhTitle": "运输与到货",
+      "items": [
+        {
+          "id": "processing-time",
+          "question": "When will my order be shipped?",
+          "answerHtml": "<p>Standard order processing takes <strong>2–5 business days</strong> after your order is confirmed and payment is received. This covers preparation, checks, and packing. Carrier transit starts after dispatch and is additional to processing time. Business days exclude weekends and public holidays.</p>",
+          "sources": ["shipping"],
+          "note": "运输政策 §1。删除旧 FAQ 的全店手工、10–15 工作日及 15–30 天制作承诺。"
+        },
+        {
+          "id": "shipping-cost",
+          "question": "What shipping options and prices do you offer?",
+          "answerHtml": "<p>For destinations supported at checkout, our published shipping options are:</p><ul><li><strong>Standard: $15 USD</strong>, with estimated transit of <strong>4–10 business days</strong> after dispatch.</li><li><strong>Express: $30 USD</strong>, with estimated transit of <strong>3–5 business days</strong> after dispatch.</li></ul><p>Processing time is additional. Available options and any destination-specific differences are shown at checkout. See our <a href=\"https://missvella.com/policies/shipping-policy\">Shipping Policy</a>.</p>",
+          "sources": ["shipping"],
+          "note": "运输政策 §2。USD 为费率单位，不据此承诺全店只能用美元结算。"
+        },
+        {
+          "id": "delivery-time",
+          "question": "How long will it take to receive my order?",
+          "answerHtml": "<p>Total delivery time includes processing plus carrier transit:</p><ul><li><strong>Standard: approximately 6–15 business days</strong> in total.</li><li><strong>Express: approximately 5–10 business days</strong> in total.</li></ul><p>These are estimates, not guaranteed arrival dates. Customs, holidays, weather, and carrier disruptions can affect delivery. Allow extra time before an event for fitting and any alterations. Read the <a href=\"https://missvella.com/policies/shipping-policy\">Shipping Policy</a> for details.</p>",
+          "sources": ["shipping"],
+          "note": "运输政策 §3；2–5 + 4–10 = 6–15，2–5 + 3–5 = 5–10。"
+        },
+        {
+          "id": "free-shipping",
+          "question": "How do I qualify for free shipping?",
+          "answerHtml": "<p>Free Standard Shipping applies when your <strong>merchandise subtotal is $180 USD or more after discounts and before shipping charges</strong>, for supported destinations. It is applied automatically when the threshold is met. Express Shipping remains $30 USD unless a specific promotion says otherwise. Review the final shipping charge at checkout.</p>",
+          "sources": ["shipping"],
+          "note": "运输政策 §2；不能简化成任何订单总额满180美元或免加急运费。"
+        },
+        {
+          "id": "international-shipping",
+          "question": "Do you ship to my country?",
+          "answerHtml": "<p>We ship to the countries and regions available at checkout. Enter your full delivery address to see the options for your destination. If your country is not available, contact <a href=\"mailto:hello@missvella.com\">hello@missvella.com</a> before ordering so we can check whether we can help.</p>",
+          "sources": ["shipping"],
+          "note": "运输政策 §6；不承诺全球所有国家。"
+        },
+        {
+          "id": "urgent-event",
+          "question": "Can I get a dress in time for an upcoming event?",
+          "answerHtml": "<p>If your event is soon, email <a href=\"mailto:hello@missvella.com\">hello@missvella.com</a> <strong>before purchasing</strong> with the dress link, size, delivery country or postal code, and event date. We can review the available options. Express Shipping shortens estimated carrier transit; it does not remove the standard processing period. An event date in an order note is not a guaranteed delivery commitment.</p>",
+          "sources": ["shipping", "guidance"],
+          "note": "运输政策 §1–3 支持处理与运输拆分、急单先联系；最后一句为避免误解的编辑说明，不新增加急制作服务。"
+        },
+        {
+          "id": "track-order",
+          "question": "How can I track my order?",
+          "answerHtml": "<p>After dispatch, we send a shipping confirmation email with available tracking information. Use that email to check your shipment. Tracking may take time to update after the carrier receives the parcel. If you cannot find the email or need help, contact <a href=\"mailto:hello@missvella.com\">hello@missvella.com</a> with your order number.</p>",
+          "sources": ["shipping"],
+          "note": "运输政策 §4。不虚构尚未确认的独立追踪页、账户追踪功能或指定快递公司。"
+        },
+        {
+          "id": "duties-taxes",
+          "question": "Will I need to pay customs duties or import taxes?",
+          "answerHtml": "<p>International deliveries may attract customs duties, import taxes, or other local charges. Unless checkout states otherwise, these are not included in your order total and are your responsibility. Any charges collected by Missvella at checkout will be disclosed there. Customs clearance may also affect delivery time; your local customs authority can advise on potential charges.</p>",
+          "sources": ["shipping"],
+          "note": "运输政策 §7；不使用包税或绝不产生关税表述。"
+        },
+        {
+          "id": "delivery-problem",
+          "question": "What if my parcel is delayed, missing, damaged, or marked delivered but not received?",
+          "answerHtml": "<p>Check the latest tracking information and, for a delivered scan, check any safe delivery location or household reception point. Email <a href=\"mailto:hello@missvella.com\">hello@missvella.com</a> with your order number, tracking number, and a description of the issue. Include photos if the parcel or item arrived damaged. We will review the shipment and work with the carrier to investigate and arrange an appropriate resolution. Your mandatory rights for non-delivery or damaged goods remain unaffected.</p>",
+          "sources": ["shipping", "guidance"],
+          "note": "运输政策 §8–9；安全位置检查为实用建议，不转移商家的法定义务。"
+        },
+        {
+          "id": "undeliverable-parcel",
+          "question": "What happens if my parcel is undeliverable or returned to the sender?",
+          "answerHtml": "<p>Contact <a href=\"mailto:hello@missvella.com\">hello@missvella.com</a> with your order and tracking numbers so we can review the reason and next steps. For an incorrect or incomplete address, additional shipping costs may apply if you request reshipment, where permitted by law. Please contact us before refusing a parcel to discuss your options. A parcel returning to the sender is not automatically the same as an approved standard return.</p>",
+          "sources": ["shipping", "returns", "guidance"],
+          "note": "运输政策 §5；退货政策 §3。删除旧FAQ的收到退回包裹即自动退款和一概后果自负。"
+        }
+      ]
+    },
+    {
+      "id": "sizing",
+      "title": "Sizing & Dress Details",
+      "zhTitle": "尺码与礼服细节",
+      "items": [
+        {
+          "id": "choose-size",
+          "question": "How do I choose the right size?",
+          "answerHtml": "<p>Compare your measurements with the size chart for the dress you want to order, rather than relying only on your usual clothing size. Review the fit and product details, and use our <a href=\"https://missvella.com/pages/size-guide\">Size Guide</a> for measuring guidance. If you are unsure, email the product link and your measurements to <a href=\"mailto:hello@missvella.com\">hello@missvella.com</a>.</p>",
+          "sources": ["size", "returns"],
+          "note": "尺码页与退货政策 §10。不保证所有款式与日常尺码完全一致。"
+        },
+        {
+          "id": "how-to-measure",
+          "question": "How should I take my measurements?",
+          "answerHtml": "<p>Take measurements over underwear, and ask someone to help if possible. Measure your bust at the fullest part, waist at the natural waistline, and hips at the fullest part, keeping the tape level without pulling it tight. For hollow-to-floor and height, stand straight and barefoot. Follow the diagrams in our <a href=\"https://missvella.com/pages/size-guide\">Size Guide</a>.</p>",
+          "sources": ["size"],
+          "note": "采用实际尺码页的贴身衣物／赤脚测量方法；删除旧FAQ所有礼服均有内置胸垫及不穿内衣的泛化说法。"
+        },
+        {
+          "id": "between-sizes",
+          "question": "What if I am between sizes or my measurements match different sizes?",
+          "answerHtml": "<p>Do not choose based on just one measurement or assume every style fits the same way. Email <a href=\"mailto:hello@missvella.com\">hello@missvella.com</a> with the dress link and your bust, waist, and hip measurements before ordering. We can help you interpret the chart and consider the style and fabric when discussing sizing.</p>",
+          "sources": ["size", "contact", "guidance"],
+          "note": "实用选码建议；不照搬竞品一律选大一码的结论，不作合身保证。"
+        },
+        {
+          "id": "available-sizes",
+          "question": "Do you offer plus sizes?",
+          "answerHtml": "<p>Available sizes vary by dress. Check the size options and measurements on the product page for the style you want. Our <a href=\"https://missvella.com/pages/size-guide\">Size Guide</a> provides measurement guidance. If you cannot find the option you need, contact <a href=\"mailto:hello@missvella.com\">hello@missvella.com</a> before ordering.</p>",
+          "sources": ["size", "contact"],
+          "note": "尺码页包含成人00–30，但不据此宣称每款每码均有货。"
+        },
+        {
+          "id": "custom-sizing-design",
+          "question": "Can I request custom sizing or a design change?",
+          "answerHtml": "<p>Please email <a href=\"mailto:hello@missvella.com\">hello@missvella.com</a> before ordering with the dress link, your measurements, and a clear description of the request. Ask us to confirm whether the option is available and whether it changes the price or processing time. Do not assume a checkout note alone confirms a custom request. Return eligibility is governed by the published <a href=\"https://missvella.com/policies/refund-policy\">Return & Refund Policy</a> and any mandatory rights that apply.</p>",
+          "sources": ["conditional-service", "contact", "returns"],
+          "note": "条件式询问入口，可用于首版；不承诺所有款式可改、不添加定制一概不可退条款。实际可提供的定制范围与时效待商家进一步确认。"
+        },
+        {
+          "id": "color-appearance",
+          "question": "Will the color look exactly the same as it does on my screen?",
+          "answerHtml": "<p>Color appearance can vary with lighting, photography, screen settings, and fabric finish. Review the available images and product description before ordering. If the fit or color is not your preference, eligible items may be returned under our standard policy; items that are materially different from their description are handled as a separate product issue. See our <a href=\"https://missvella.com/policies/refund-policy\">Return & Refund Policy</a>.</p>",
+          "sources": ["returns"],
+          "note": "退货政策 §7、§10；保留色差与实质不符的区别。"
+        },
+        {
+          "id": "dress-construction",
+          "question": "Where can I check the fabric, lining, stretch, or built-in support?",
+          "answerHtml": "<p>Check the product description and images for the particular dress. Fabric, lining, stretch, and support can differ between styles. If a detail you need is not listed, send the product link and your question to <a href=\"mailto:hello@missvella.com\">hello@missvella.com</a> before purchasing.</p>",
+          "sources": ["contact", "guidance"],
+          "note": "商品问题转客服；不承诺每条礼服都有内置胸垫、不使用全真丝等未核实成分。"
+        },
+        {
+          "id": "dress-care",
+          "question": "How should I care for my dress or remove wrinkles?",
+          "answerHtml": "<p>Follow the care label and any instructions supplied for your dress. Fabrics and embellishments need different treatment, so do not assume that ironing, steaming, machine washing, or dry cleaning is suitable for every style. If you are unsure, email the product link or order number to <a href=\"mailto:hello@missvella.com\">hello@missvella.com</a> before treating the garment.</p>",
+          "sources": ["guidance", "contact"],
+          "note": "保守护理建议，避免照搬竞品全部干洗或全部熨烫的统一方法。"
+        }
+      ]
+    },
+    {
+      "id": "returns",
+      "title": "Returns & Refunds",
+      "zhTitle": "退货与退款",
+      "items": [
+        {
+          "id": "return-window",
+          "question": "Can I return my dress if it does not fit or I change my mind?",
+          "answerHtml": "<p>Yes, you may request a return for an eligible item within <strong>15 calendar days of delivery</strong>, including for fit, color, style preference, or a change of mind. The period starts on the delivery date recorded by the carrier. Items must meet our return conditions. Standard returns go to our designated warehouse in <strong>China</strong>, and you pay return shipping. Read the <a href=\"https://missvella.com/policies/refund-policy\">Return & Refund Policy</a> before ordering.</p>",
+          "sources": ["returns"],
+          "note": "退货政策 §1–2、§4–5；申请时限与寄回时限分开，重要成本在第一条可见。"
+        },
+        {
+          "id": "return-condition",
+          "question": "What condition must my returned item be in?",
+          "answerHtml": "<p>For a standard return, the item must be unworn, unwashed, unaltered, and in its original condition, with all original and security tags intact. It must be free from stains, makeup, perfume, odors, pet hair, and other signs of wear. Return any included accessories or detachable parts. You may carefully try it on, but it must not have been worn for an event or photoshoot. Different rights apply to faulty or incorrectly supplied goods.</p>",
+          "sources": ["returns"],
+          "note": "退货政策 §2；不能移除安全标签后再承诺普通退货。"
+        },
+        {
+          "id": "sale-returns",
+          "question": "Can I return a sale item?",
+          "answerHtml": "<p>Yes. Our published standard return policy also covers products bought during sales or promotional events, provided the item meets the return conditions and you request the return within 15 calendar days of delivery. See the <a href=\"https://missvella.com/policies/refund-policy\">Return & Refund Policy</a> for full details.</p>",
+          "sources": ["returns"],
+          "note": "退货政策 §2明确包含促销品；不套用竞品Final Sale一概不可退。"
+        },
+        {
+          "id": "start-return",
+          "question": "How do I request a return?",
+          "answerHtml": "<p>Email <a href=\"mailto:hello@missvella.com\">hello@missvella.com</a> within 15 calendar days of delivery. Use the subject <strong>Return Request — Order #[your order number]</strong> and include your order number, item name or SKU, and reason for return. We may request photos of the item and tags; for a damaged or incorrect item, include photos showing the issue. Contact us before posting the parcel so we can provide the correct instructions.</p>",
+          "sources": ["returns"],
+          "note": "退货政策 §3；不虚构RMA网页、账户自动申请或第三方退货门户。"
+        },
+        {
+          "id": "return-dispatch-deadline",
+          "question": "How soon do I need to send my return?",
+          "answerHtml": "<p>After you receive return instructions, send the approved package within <strong>14 calendar days</strong>. This is separate from the initial 15-calendar-day period for requesting a return. Include your order number or return reference, keep the shipping receipt, and email the tracking details to <a href=\"mailto:hello@missvella.com\">hello@missvella.com</a>.</p>",
+          "sources": ["returns"],
+          "note": "退货政策 §3 Step 3；替代旧FAQ的3个工作日寄回。"
+        },
+        {
+          "id": "return-address",
+          "question": "Where do I send my return?",
+          "answerHtml": "<p>Our designated return warehouse is in <strong>Lu’an, Anhui, China</strong>. Contact <a href=\"mailto:hello@missvella.com\">hello@missvella.com</a> for return instructions before shipping and use the designated warehouse address. Our business contact address and the address printed on your original parcel may be different and should not be used unless we confirm them. The warehouse details are listed in our <a href=\"https://missvella.com/policies/refund-policy\">Return & Refund Policy</a>.</p>",
+          "sources": ["returns", "contact"],
+          "note": "退货政策 §5、§13；不把商务联系地址当退货地址。"
+        },
+        {
+          "id": "return-shipping-cost",
+          "question": "Who pays for return shipping?",
+          "answerHtml": "<p>For standard returns due to fit, color, style preference, or a change of mind, you arrange and pay for shipping to our warehouse in China. International return costs vary by carrier and location; check them before sending your parcel and use a trackable service. If we require the return of an item confirmed to be defective, damaged, or incorrectly supplied, <strong>Missvella covers the necessary return shipping costs</strong>. Contact us first for the appropriate arrangements.</p>",
+          "sources": ["returns"],
+          "note": "退货政策 §4、§7、§11。不同退货原因分别说明，不能笼统写退货运费全由客户承担。"
+        },
+        {
+          "id": "return-fees",
+          "question": "Are there restocking fees, and is the original shipping fee refunded?",
+          "answerHtml": "<p>We do <strong>not</strong> charge a restocking fee or an additional return handling fee on eligible merchandise refunds. For a standard change-of-mind return, original outbound shipping fees are not refunded and return shipping paid to your carrier is not reimbursed, except where applicable law requires otherwise. Faulty or incorrectly supplied goods and mandatory consumer rights are handled separately under our <a href=\"https://missvella.com/policies/refund-policy\">Return & Refund Policy</a>.</p>",
+          "sources": ["returns"],
+          "note": "退货政策 §4、§6–7、§12；不照搬竞品15%补货费，也不覆盖EU/UK法定普通配送费退款权。"
+        },
+        {
+          "id": "exchange",
+          "question": "Can I exchange my dress for another size, color, or style?",
+          "answerHtml": "<p>We do not currently offer direct exchanges. If you want a different item, request a return for your original purchase within the return period and place a new order separately. The return remains subject to the standard conditions and costs. This does not limit any right to a replacement or other remedy for defective or incorrectly supplied goods.</p>",
+          "sources": ["returns"],
+          "note": "退货政策 §9；不写免费换码或直接换货。"
+        },
+        {
+          "id": "refund-timing",
+          "question": "When and how will I receive my refund?",
+          "answerHtml": "<p>Approved refunds go back to the <strong>original payment method</strong>. We aim to process them within <strong>7 business days after receiving and inspecting the returned item</strong>, subject to any earlier statutory deadline. Your bank or payment provider may take additional time to post the funds. If you need an update, email <a href=\"mailto:hello@missvella.com\">hello@missvella.com</a> with your order number.</p>",
+          "sources": ["returns"],
+          "note": "退货政策 §3、§6；保留aim与银行额外入账时间，不写保证7天到账或24小时退款。"
+        },
+        {
+          "id": "faulty-wrong-item",
+          "question": "What if I receive a damaged, defective, incorrect, or missing item?",
+          "answerHtml": "<p>Contact <a href=\"mailto:hello@missvella.com\">hello@missvella.com</a> as soon as possible with your order number and a description of the issue. Include clear photos of the affected item and packaging where relevant. We will review the case and arrange an appropriate resolution. We recommend reporting damaged or incorrect goods within 15 calendar days so we can investigate promptly; this is not a limit on your statutory rights. Contact us before paying return postage for a reported fault or incorrect item.</p>",
+          "sources": ["returns", "shipping"],
+          "note": "退货政策 §7与运输政策 §9。将15天表述为建议，不给瑕疵货创设绝对申诉截止日。"
+        },
+        {
+          "id": "consumer-rights",
+          "question": "Does this policy affect my statutory consumer rights?",
+          "answerHtml": "<p>No. Our FAQs and standard return policy do not reduce mandatory consumer rights that apply to your purchase. Additional cancellation or refund rights may apply, including for qualifying EU or UK purchases. Please read the consumer-rights section of our <a href=\"https://missvella.com/policies/refund-policy\">Return & Refund Policy</a> and contact us if you need help with a request.</p>",
+          "sources": ["returns"],
+          "note": "退货政策 §12；仅概括已发布政策，不在FAQ另行解释法律适用或新增条款。"
+        }
+      ]
+    },
+    {
+      "id": "orders",
+      "title": "Orders & Changes",
+      "zhTitle": "下单与订单修改",
+      "items": [
+        {
+          "id": "place-order",
+          "question": "How do I place an order?",
+          "answerHtml": "<p>Choose a dress, review the product details and size information, select the available options, and add it to your cart. At checkout, enter your delivery and contact details, review the final total and shipping option, and complete payment. Please check your size, color, address, and email carefully before submitting.</p>",
+          "sources": ["shipping", "guidance"],
+          "note": "运输政策 §4核对订单信息；常规购物步骤，不新增电话下单服务。"
+        },
+        {
+          "id": "confirmation-email",
+          "question": "What should I do if I have not received an order confirmation?",
+          "answerHtml": "<p>Check the email address used at checkout and your spam or junk folder. If you still cannot find the confirmation, contact <a href=\"mailto:hello@missvella.com\">hello@missvella.com</a> with the name and email used for the order and any payment confirmation reference. Do not send full card details or payment passwords.</p>",
+          "sources": ["shipping", "guidance"],
+          "note": "运输政策 §4确认邮件；不保证几分钟内送达，不要求客户提供完整支付凭据。"
+        },
+        {
+          "id": "change-order",
+          "question": "Can I change my size, color, or delivery address after ordering?",
+          "answerHtml": "<p>Email <a href=\"mailto:hello@missvella.com\">hello@missvella.com</a> as soon as possible with your order number and the exact change requested. Address updates before dispatch depend on what is still operationally possible, and changes to items must also be confirmed by our team. Once a parcel has shipped, address changes may not be available. Please wait for confirmation rather than assuming your request has been applied.</p>",
+          "sources": ["shipping", "terms", "contact"],
+          "note": "运输政策 §5及服务条款 §3。尺寸／颜色修改仅受理询问，不承诺无条件可改。"
+        },
+        {
+          "id": "cancel-before-shipping",
+          "question": "Can I cancel my order before it ships?",
+          "answerHtml": "<p>Contact <a href=\"mailto:hello@missvella.com\">hello@missvella.com</a> immediately with your order number and cancellation request. If your order has not shipped and cancellation is still operationally possible, we will cancel it and issue a full refund to the original payment method. Applicable statutory cancellation rights remain unaffected.</p>",
+          "sources": ["returns"],
+          "note": "退货政策 §8优先于旧FAQ和服务条款中的宽泛取消描述；保留运营可行条件。"
+        },
+        {
+          "id": "cancel-after-shipping",
+          "question": "Can I cancel after my order has shipped?",
+          "answerHtml": "<p>After dispatch, we may no longer be able to stop the parcel through our standard pre-shipment cancellation process. Contact <a href=\"mailto:hello@missvella.com\">hello@missvella.com</a> for guidance. After delivery, eligible items may be returned under our standard 15-day return policy. This does not affect any statutory cancellation rights that apply.</p>",
+          "sources": ["returns"],
+          "note": "退货政策 §8；不写发货后所有取消权都消失。"
+        }
+      ]
+    },
+    {
+      "id": "payments",
+      "title": "Payments & Checkout",
+      "zhTitle": "支付与结账",
+      "items": [
+        {
+          "id": "payment-methods",
+          "question": "What payment methods do you accept?",
+          "answerHtml": "<p>Missvella accepts <strong>credit cards and PayPal</strong>. Choose from the payment options shown at checkout for your order. If you need help completing payment, email <a href=\"mailto:hello@missvella.com\">hello@missvella.com</a>.</p>",
+          "sources": ["merchant-payment"],
+          "note": "商家本轮明确确认：信用卡、PayPal。未核实具体卡组织，不额外添加Apple Pay、分期或线下汇款。"
+        },
+        {
+          "id": "payment-declined",
+          "question": "Why was my payment declined or unsuccessful?",
+          "answerHtml": "<p>Check that the payment and billing details are correct, then follow any verification requested by your bank or PayPal. Your provider may be able to explain a decline. If you think you were charged but did not receive confirmation, contact <a href=\"mailto:hello@missvella.com\">hello@missvella.com</a> before placing the same order again. Never email your full card number, security code, or password.</p>",
+          "sources": ["merchant-payment", "guidance"],
+          "note": "排障建议，不承诺所有银行或卡种可用，不把临时授权等同扣款。"
+        },
+        {
+          "id": "payment-currency",
+          "question": "What currency and total will I be charged?",
+          "answerHtml": "<p>Review the currency and final total shown at checkout before paying, including applicable shipping charges and taxes collected there. The shipping rates quoted in these FAQs are in USD. If your payment account uses a different currency, your bank or payment provider may apply its own conversion rate or fees. Import charges not collected at checkout may be separate.</p>",
+          "sources": ["shipping", "terms", "guidance"],
+          "note": "运输政策USD费率与关税条款；服务条款 §4。未承诺具体币种切换功能或免汇兑费。"
+        },
+        {
+          "id": "discount-code",
+          "question": "How do I use a discount code?",
+          "answerHtml": "<p>If you have a valid discount code, apply it at checkout before payment and check that the total updates. Eligibility, expiry, minimum spend, and whether offers can be combined depend on the promotion. For the free Standard Shipping threshold, use the merchandise subtotal <strong>after discounts</strong>. If a code does not work, email the code and relevant product links to <a href=\"mailto:hello@missvella.com\">hello@missvella.com</a>.</p>",
+          "sources": ["terms", "shipping", "guidance"],
+          "note": "服务条款 §4促销条件、运输政策 §2折后门槛；不新增固定折扣或叠加优惠承诺。"
+        },
+        {
+          "id": "safe-checkout",
+          "question": "How should I complete payment safely?",
+          "answerHtml": "<p>Start from <a href=\"https://missvella.com\">missvella.com</a> and use the payment options provided during checkout, including PayPal when selected. Do not email full card details, card security codes, passwords, or verification codes. If you receive a payment request you are unsure about, contact <a href=\"mailto:hello@missvella.com\">hello@missvella.com</a> before acting on it.</p>",
+          "sources": ["merchant-payment", "guidance"],
+          "note": "安全支付建议。删除旧FAQ的100%安全／全站PCI认证等未经核实技术声明。"
+        }
+      ]
+    },
+    {
+      "id": "help",
+      "title": "Contact & Help",
+      "zhTitle": "联系与帮助",
+      "items": [
+        {
+          "id": "contact-support",
+          "question": "How can I contact Missvella?",
+          "answerHtml": "<p>Email <a href=\"mailto:hello@missvella.com\">hello@missvella.com</a> for help with products, sizing, orders, shipping, or returns. Our published contact phone is <a href=\"tel:+8615385939408\">+86 153 8593 9408</a>. Include your order number for an existing purchase. You can also use our <a href=\"https://missvella.com/pages/contact\">Contact Us</a> page.</p>",
+          "sources": ["contact"],
+          "note": "正式联系政策。不承诺24/7在线、指定回复时限或电话下单；电话仅联系用途。"
+        },
+        {
+          "id": "support-information",
+          "question": "What information should I include when asking for help?",
+          "answerHtml": "<p>For an existing order, include the order number and a clear description of the issue. For sizing or pre-purchase questions, send the dress link and relevant measurements or event date. For a damaged or incorrect item, include photos of the item and packaging where relevant. Please do not send payment passwords or full card information.</p>",
+          "sources": ["contact", "shipping", "returns", "guidance"],
+          "note": "收集处理问题所需信息，不要求不必要的敏感支付资料。"
+        },
+        {
+          "id": "official-policies",
+          "question": "Where can I read your full policies?",
+          "answerHtml": "<p>Read our <a href=\"https://missvella.com/policies/shipping-policy\">Shipping Policy</a>, <a href=\"https://missvella.com/policies/refund-policy\">Return & Refund Policy</a>, <a href=\"https://missvella.com/policies/terms-of-service\">Terms of Service</a>, and <a href=\"https://missvella.com/policies/contact-information\">Contact Information</a>. These FAQs are a summary and do not replace the full terms or reduce any mandatory consumer rights.</p>",
+          "sources": ["shipping", "returns", "terms", "contact"],
+          "note": "链接全部使用Missvella真实来源；政策变更时应同步FAQ，不以一句policyprevails替代一致性维护。"
+        }
+      ]
+    }
+  ]
+}

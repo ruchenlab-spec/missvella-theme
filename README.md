@@ -50,5 +50,6 @@ shopify theme check --path theme
 | [docs/architecture.md](docs/architecture.md) | 主题架构、自定义模块清单、区块依赖关系 |
 | [docs/ui-spec.md](docs/ui-spec.md) | UI 规范：设计 token、组件约定、间距字号、响应式断点 |
 | [docs/about-us-demo.md](docs/about-us-demo.md) | About Us 高端杂志风 HTML demo：设计说明、素材与使用方式 |
+| [docs/faq-content-plan-2026-11-07.html](docs/faq-content-plan-2026-11-07.html) | 完整版 FAQ 内容与方案：6 类 43 个英文问答、政策依据与模板预设计划 |
 | [docs/brand-residue-audit-2026-11-07.md](docs/brand-residue-audit-2026-11-07.md) | Jimiss 残留检查：线上页面、线上／本地代码覆盖与 FAQ 修改清单 |
 | [docs/pitfalls.md](docs/pitfalls.md) | 踩坑点清单（症状 / 原因 / 解决方案） |
