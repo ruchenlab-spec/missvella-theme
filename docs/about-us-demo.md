@@ -1,5 +1,13 @@
 # About Us · 高端杂志风 HTML Demo
 
+## 2026-11-07 · 竞品研究与页面方案
+
+新增 [About Us 页面方案](missvella-about-plan-2026-11-07.html)，参考商家指定的 PromGirl、Hello Molly、STACEES 与 KissProm About 页面，包含竞品表达差异、六段页面结构、英文文案草案、配图清单与编辑器配置建议。
+
+建议保留现有杂志风，补充具体品类、实际商品细节与服务入口；真实顾客内容作为可选模块。未确认的品牌背景与生产承诺不写入正式文案。本次只交付方案，未修改 demo、主题代码或线上实例。
+
+## 原版 Demo
+
 2026-11-04，商家要求设计 About Us 页面的 HTML demo。
 
 入口：`demos/about-us-editorial.html`，直接用浏览器打开即可。样式为同目录的 `about-us-editorial.css`；图片放在 `demos/about-us-assets/`。无需安装依赖、构建或启动服务；所有素材均在本地，无外部字体依赖。分享时保留这一目录结构。
