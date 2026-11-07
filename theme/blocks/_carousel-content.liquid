@@ -39,6 +39,15 @@
   {% render 'border-override', settings: block.settings %}
 {% endcapture %}
 
+{% capture carousel_arrows %}
+  {% if show_arrows %}
+    <slideshow-arrows class="mv-carousel-arrows" position="center">
+      {% render 'carousel-arrow', action: 'previous', slideshow: true %}
+      {% render 'carousel-arrow', action: 'next', slideshow: true %}
+    </slideshow-arrows>
+  {% endif %}
+{% endcapture %}
+
 <div
   class="force-full-width"
   style="{{ gutter_style }}"
@@ -47,9 +56,9 @@
     class: slideshow_class,
     style: slideshow_style,
     slides: blocks_content,
-    show_arrows: show_arrows,
-    icon_style: icons_style,
-    icon_shape: section.settings.icons_shape,
+    show_arrows: false,
+    slideshow_arrows: carousel_arrows,
+    animate_arrows: false,
     auto_hide_controls: false,
     infinite: false,
     initial_slide: 0,
@@ -82,15 +91,31 @@
     }
   }
 
-  .carousel-content .slideshow-control[disabled] {
+  .carousel-content .carousel-arrow[disabled] {
     display: none;
   }
 
-  .carousel-content slideshow-arrows {
+  .carousel-content .mv-carousel-arrows {
+    position: absolute;
+    inset: 0;
+    z-index: var(--layer-heightened);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
     padding-inline: var(--util-page-margin-offset);
+    pointer-events: none;
+    mix-blend-mode: normal;
   }
 
-  .carousel-content .slideshow-control--next {
+  .carousel-content .carousel-arrow {
+    pointer-events: auto;
+  }
+
+  .carousel-content:is([disabled='true'], [dragging]) .mv-carousel-arrows {
+    display: none;
+  }
+
+  .carousel-content .carousel-arrow--next {
     margin-inline-start: auto;
   }
 {% endstylesheet %}
