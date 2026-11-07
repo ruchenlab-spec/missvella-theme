@@ -214,6 +214,7 @@ live 主题更新 → 编辑器刷新可见 → 前台即时生效
 ## 八、依赖关系要点
 
 - `sections/footer-utilities.liquid` 的移动端（≤749px）使用两列居中 Grid，让政策和版权按商家区块顺序并排显示，横向间距不超过 16px；社交图标跨两列排到下一行，只有单个区块时跨两列居中。桌面仍保留原有一／二／三块动态网格，政策弹层及区块内容不变。
+- `blocks/social-links.liquid` 的 13 个 URL 设置均无账号默认值；字段说明使用 `your-account` 通用占位示例，空白链接不输出对应图标。示例仅为编辑器提示，不写入预设或链接值。若已有实例仍显示旧品牌地址，属于线上已保存内容，由商家在编辑器清空／替换；不得推送模板或 settings_data 做迁移。2026-11-07 已检查 schema 和渲染范围并精确上传该 block。
 
 - `sections/hero-stacked-slideshow.liquid`（编辑器名「Hero Slideshow · 堆叠」）依赖专用 `assets/hero-stacked-slideshow.css`、`assets/hero-stacked-slideshow.js` 及公共 `spacing-style`／`carousel-arrow`。本地图片区块配置桌面／移动图片、描述、标题、链接及优先标记，分区控制翻页按钮开关和优先图宽度百分比（默认 100%）。独立 `mv-hero-stack` Web Component 按总宽度选择完整平铺或堆叠，堆叠时默认完整展示主要优先图片，并负责两侧展开、键盘与编辑器生命周期。此交互使用绝对定位与裁切，与原生单轨滚动轮播分开实现；原「首页轮播」继续独立使用。操作说明见 [hero-stacked-slideshow.md](hero-stacked-slideshow.md)。
 - 堆叠 Hero 的配色复用原生背景／文本 `color` 控件及 `contrast-override`，分区和全宽背景均使用 `color-custom-{section.id}`。当前主题使用 `color_palette`，不使用未定义的 `color_scheme`／`scheme-1`；颜色留空时继承全局配色。
