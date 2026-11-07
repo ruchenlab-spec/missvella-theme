@@ -230,6 +230,7 @@ live 主题更新 → 编辑器刷新可见 → 前台即时生效
 - 圆形集合移动端的翻页按钮位于标题行右侧，圆形列表位于第二行，不再在底部排列按钮。标题通过原生 slideshow 的 `header` 插槽传入；按钮仍在组件内，保留原生 ref／点击绑定与 44px 触摸区域。桌面端继续在圆形列表左右显示按钮。
 - 圆形集合与 INS 共用 `snippets/carousel-arrow.liquid` 的描边圆形按钮和原生 `assets/icon-arrow.svg`。公共 CSS 由 snippet stylesheet 统一加载；图标为 18px 块元素，按钮用 Grid 居中且行高为 0，上一页只镜像同一资产。圆形集合保留桌面按钮大小控制，移动端与 INS 默认均为 38px，触摸区域至少 44px；旧形状和重复箭头绘制已移除。
 - 通用 `sections/carousel.liquid` 也通过 `blocks/_carousel-content.liquid` 复用公共 `carousel-arrow`，与 INS／堆叠 Hero 使用同一描边圆形箭头。默认 38px／18px 图标，保留两侧居中位置、原生 previous／next 绑定、首尾禁用按钮隐藏及拖动／组件禁用时隐藏规则。通过 `slideshow_arrows` 插槽传入控件，不改公共 slideshow 或其他轮播。编辑器只保留箭头／无选项，删除不再适用的大小／形状选项；旧实例非 none 值继续显示统一箭头。
+- 通用 Carousel 在手机端（≤749px）使用白色箭头／描边，通过 `assets/carousel-media-controls.js` 的 `mv-carousel-media-controls` 包装元素测量当前横向可见面积最大的视频区域，将其中线写入 slideshow-container 的 `--mv-carousel-media-center`；不使用整张卡片或文字区的中线。支持原生 deferred-media、视频背景及视频占位，排除嵌套轮播；scroll、媒体加载、ResizeObserver 和子节点更新触发合并测量。桌面端保留原定位和配色，无可见视频时回退原居中；卸载清理监听、观察器与动画帧。
 - 圆形集合的桌面／移动定位规则使用 `.circle-collections .circle-collections__arrow`，优先级高于公共按钮的 `margin: 0` 重置，避免桌面图片中心补偿被覆盖；移动端同等优先级恢复零补偿并保留标题行位置。
 - 箭头按钮必须位于 `<slideshow-component>` 内且带 `ref="previous" / "next"` + `on:click="/previous"`，否则不会与轮播组件绑定。
 - `mv-shared.css` 与 `fonts.liquid` 必须在 `theme.liquid` 的 `<head>` 中被引用，否则定制样式与字体不生效。

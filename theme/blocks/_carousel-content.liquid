@@ -48,7 +48,7 @@
   {% endif %}
 {% endcapture %}
 
-<div
+<mv-carousel-media-controls
   class="force-full-width"
   style="{{ gutter_style }}"
 >
@@ -67,9 +67,15 @@
     slideshow_gutters: slideshow_gutters,
     attributes: block.shopify_attributes
   %}
-</div>
+</mv-carousel-media-controls>
+
+<script src="{{ 'carousel-media-controls.js' | asset_url }}" type="module" fetchpriority="low"></script>
 
 {% stylesheet %}
+  mv-carousel-media-controls {
+    display: block;
+  }
+
   .carousel-content slideshow-slides {
     --slideshow-gap: var(--carousel-gap);
   }
@@ -117,6 +123,15 @@
 
   .carousel-content .carousel-arrow--next {
     margin-inline-start: auto;
+  }
+
+  @media screen and (max-width: 749px) {
+    .carousel-content .mv-carousel-arrows {
+      --carousel-arrow-color: #fff;
+      top: var(--mv-carousel-media-center, 50%);
+      bottom: auto;
+      transform: translateY(-50%);
+    }
   }
 {% endstylesheet %}
 
