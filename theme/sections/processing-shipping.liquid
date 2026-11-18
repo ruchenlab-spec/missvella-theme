@@ -1,0 +1,236 @@
+{%- liquid
+  assign shipping_methods = section.blocks | where: 'type', 'shipping_method'
+  assign shipping_details = section.blocks | where: 'type', 'shipping_detail'
+  assign policy_url = section.settings.policy_url | default: shop.shipping_policy.url | default: '/policies/shipping-policy'
+  assign returns_url = section.settings.returns_url | default: shop.refund_policy.url | default: '/policies/refund-policy'
+  assign support_email = section.settings.support_email | strip
+  render 'contrast-override', background_color: section.settings.background_color, text_color: section.settings.text_color, section_id: section.id
+-%}
+
+{{ 'processing-shipping.css' | asset_url | stylesheet_tag }}
+
+<div class="section-background color-custom-{{ section.id }}"></div>
+<div class="section page-width-normal color-custom-{{ section.id }}">
+  <div
+    class="shipping-guide spacing-style"
+    style="{% render 'spacing-style', settings: section.settings %}"
+  >
+    <header class="shipping-guide__header">
+      <{{ section.settings.heading_level }} class="shipping-guide__title h2">{{ section.settings.heading | escape }}</{{ section.settings.heading_level }}>
+      {% if section.settings.intro != blank %}
+        <div class="rte">{{ section.settings.intro }}</div>
+      {% endif %}
+    </header>
+
+    {% if shipping_methods.size > 0 %}
+      <table class="shipping-guide__table" aria-describedby="ShippingEstimate-{{ section.id }}">
+        <caption>{{ section.settings.comparison_heading | escape }}</caption>
+        <thead>
+          <tr>
+            <th scope="col">{{ section.settings.detail_label | escape }}</th>
+            {% for block in shipping_methods %}
+              <th scope="col" {{ block.shopify_attributes }}>{{ block.settings.heading | escape }}</th>
+            {% endfor %}
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <th scope="row">{{ section.settings.processing_label | escape }}</th>
+            {% for block in shipping_methods %}<td>{{ block.settings.processing | escape }}</td>{% endfor %}
+          </tr>
+          <tr>
+            <th scope="row">{{ section.settings.transit_label | escape }}</th>
+            {% for block in shipping_methods %}<td>{{ block.settings.transit | escape }}</td>{% endfor %}
+          </tr>
+          <tr class="shipping-guide__total">
+            <th scope="row">{{ section.settings.total_label | escape }}</th>
+            {% for block in shipping_methods %}<td><strong>{{ block.settings.total | escape }}</strong></td>{% endfor %}
+          </tr>
+          <tr>
+            <th scope="row">{{ section.settings.cost_label | escape }}</th>
+            {% for block in shipping_methods %}<td>{{ block.settings.cost | escape }}</td>{% endfor %}
+          </tr>
+        </tbody>
+      </table>
+    {% endif %}
+
+    <div id="ShippingEstimate-{{ section.id }}" class="shipping-guide__note rte">{{ section.settings.estimate_note }}</div>
+
+    <aside class="shipping-guide__notice" aria-labelledby="ShippingFree-{{ section.id }}">
+      <h2 id="ShippingFree-{{ section.id }}" class="h5">{{ section.settings.free_heading | escape }}</h2>
+      <div class="rte">{{ section.settings.free_text }}</div>
+      <div class="rte">{{ section.settings.destinations_note }}</div>
+    </aside>
+
+    {% if shipping_details.size > 0 %}
+      <div class="shipping-guide__details">
+        <h2 class="h4">{{ section.settings.details_heading | escape }}</h2>
+        <div class="shipping-guide__accordion accordion accordion--caret">
+          {% for block in shipping_details %}
+            <div class="shipping-guide__detail" {{ block.shopify_attributes }}>
+              {% capture shipping_detail_content %}
+                <details class="details" {% if block.settings.open_by_default %}open{% endif %}>
+                  <summary class="details__header">
+                    <span>{{ block.settings.heading | escape }}</span>
+                    <span class="svg-wrapper icon-caret icon-animated" aria-hidden="true">
+                      {{- 'icon-caret.svg' | inline_asset_content -}}
+                    </span>
+                  </summary>
+                  <div class="details-content rte">{{ block.settings.content }}</div>
+                </details>
+              {% endcapture %}
+              {% render 'accordion-custom-component',
+                children: shipping_detail_content,
+                open_by_default_on_desktop: block.settings.open_by_default,
+                open_by_default_on_mobile: block.settings.open_by_default
+              %}
+            </div>
+          {% endfor %}
+        </div>
+      </div>
+      {% render 'accordion-styles' %}
+    {% endif %}
+
+    <footer class="shipping-guide__support">
+      <h2 class="h4">{{ section.settings.support_heading | escape }}</h2>
+      <div class="rte">{{ section.settings.support_text }}</div>
+      <div class="shipping-guide__links">
+        {% if support_email != blank %}
+          <a class="button button-secondary" href="mailto:{{ support_email | escape }}">{{ support_email | escape }}</a>
+        {% endif %}
+        <a href="{{ policy_url | escape }}">{{ section.settings.policy_label | escape }}</a>
+        <a href="{{ returns_url | escape }}">{{ section.settings.returns_label | escape }}</a>
+      </div>
+      <div class="shipping-guide__note rte">{{ section.settings.rights_note }}</div>
+    </footer>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Processing & Shipping",
+  "class": "section-wrapper",
+  "enabled_on": { "templates": ["page"] },
+  "max_blocks": 14,
+  "settings": [
+    { "type": "paragraph", "content": "Create a dedicated Page template and add this section. Defaults summarize the published Shipping Policy checked on 18 Nov 2026. Keep content aligned with your policy and checkout." },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Processing & Shipping" },
+    { "type": "select", "id": "heading_level", "label": "Heading level", "options": [{ "value": "h1", "label": "H1 — page title" }, { "value": "h2", "label": "H2 — section title" }], "default": "h1" },
+    { "type": "richtext", "id": "intro", "label": "Introduction", "default": "<p>Plan your delivery with processing and shipping times in one place.</p>" },
+    { "type": "header", "content": "Shipping comparison" },
+    { "type": "text", "id": "comparison_heading", "label": "Table caption", "default": "Compare shipping options" },
+    { "type": "text", "id": "detail_label", "label": "First column heading", "default": "Delivery details" },
+    { "type": "text", "id": "processing_label", "label": "Processing row", "default": "Processing before dispatch" },
+    { "type": "text", "id": "transit_label", "label": "Transit row", "default": "Transit after dispatch" },
+    { "type": "text", "id": "total_label", "label": "Total row", "default": "Estimated total delivery" },
+    { "type": "text", "id": "cost_label", "label": "Cost row", "default": "Shipping cost (USD)" },
+    { "type": "richtext", "id": "estimate_note", "label": "Estimate and checkout note", "default": "<p>Processing starts after order confirmation and successful payment. Business days exclude weekends and public holidays. These are estimates, not guaranteed arrival dates. Available shipping methods, rates and destinations are shown at checkout.</p>" },
+    { "type": "header", "content": "Free shipping and destinations" },
+    { "type": "text", "id": "free_heading", "label": "Free shipping heading", "default": "Free Standard Shipping from $180 USD" },
+    { "type": "richtext", "id": "free_text", "label": "Free shipping conditions", "default": "<p>Free Standard Shipping is applied automatically when the merchandise subtotal reaches <strong>$180 USD after discounts and before shipping charges</strong>. Express Shipping remains $30 USD unless an applicable promotion states otherwise.</p>" },
+    { "type": "richtext", "id": "destinations_note", "label": "Destination conditions", "default": "<p>For supported destinations only. Enter your complete delivery address at checkout to see the available options and any destination-specific differences.</p>" },
+    { "type": "text", "id": "details_heading", "label": "Details heading", "default": "Shipping details" },
+    { "type": "header", "content": "Support and official policies" },
+    { "type": "text", "id": "support_heading", "label": "Support heading", "default": "Need help with your delivery?" },
+    { "type": "richtext", "id": "support_text", "label": "Support introduction", "default": "<p>For an existing order, include your order number and any available tracking details. If you need a dress for a fixed date, contact us before purchasing.</p>" },
+    { "type": "text", "id": "support_email", "label": "Support email", "default": "hello@missvella.com", "info": "Enter an email address only. Also update email links in the detail blocks if this changes." },
+    { "type": "text", "id": "policy_label", "label": "Shipping policy link label", "default": "Read the full Shipping Policy" },
+    { "type": "url", "id": "policy_url", "label": "Shipping policy link", "info": "Leave blank to use the store's official Shipping Policy." },
+    { "type": "text", "id": "returns_label", "label": "Returns link label", "default": "Return & Refund Policy" },
+    { "type": "url", "id": "returns_url", "label": "Returns policy link", "info": "Leave blank to use the store's official Return & Refund Policy." },
+    { "type": "richtext", "id": "rights_note", "label": "Policy and rights note", "default": "<p>This guide summarizes our Shipping Policy. Please read the full policy for details. Your mandatory consumer rights remain unaffected.</p>" },
+    { "type": "header", "content": "Appearance" },
+    { "type": "color", "id": "background_color", "label": "Background", "info": "Leave blank to inherit the theme palette." },
+    { "type": "color", "id": "text_color", "label": "Text", "info": "Leave blank to inherit theme colors and contrast." },
+    { "type": "range", "id": "padding-block-start", "label": "Top spacing", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 40 },
+    { "type": "range", "id": "padding-block-end", "label": "Bottom spacing", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 64 }
+  ],
+  "blocks": [
+    {
+      "type": "shipping_method",
+      "name": "Shipping method",
+      "limit": 2,
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Method", "default": "Standard Shipping" },
+        { "type": "text", "id": "processing", "label": "Processing before dispatch", "default": "2–5 business days" },
+        { "type": "text", "id": "transit", "label": "Transit after dispatch", "default": "4–10 business days" },
+        { "type": "text", "id": "total", "label": "Estimated total delivery", "default": "6–15 business days" },
+        { "type": "text", "id": "cost", "label": "Shipping cost", "default": "$15 USD; free on qualifying orders" }
+      ]
+    },
+    {
+      "type": "shipping_detail",
+      "name": "Shipping detail",
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Heading", "default": "Order processing" },
+        { "type": "richtext", "id": "content", "label": "Content", "default": "<p>Orders require 2–5 business days of processing after confirmation and successful payment. This covers verification, preparation, quality checks and packaging. Carrier transit begins after dispatch and is additional to processing time. Business days exclude weekends and public holidays.</p>" },
+        { "type": "checkbox", "id": "open_by_default", "label": "Open by default", "default": false }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Processing & Shipping",
+      "category": "t:categories.text",
+      "blocks": {
+        "standard": { "type": "shipping_method" },
+        "express": {
+          "type": "shipping_method",
+          "settings": { "heading": "Express Shipping", "processing": "2–5 business days", "transit": "3–5 business days", "total": "5–10 business days", "cost": "$30 USD" }
+        },
+        "processing": { "type": "shipping_detail" },
+        "event": {
+          "type": "shipping_detail",
+          "settings": {
+            "heading": "Ordering for a wedding, prom or event?",
+            "content": "<p>Allow extra time for delivery, fitting and any alterations. If your date is soon, email <a href=\"mailto:hello@missvella.com\">hello@missvella.com</a> before purchasing to discuss available shipping options. Include the dress link, delivery destination and event date so we can review your request.</p><p>Express Shipping has a shorter estimated transit time, but the same 2–5 business days of processing still apply. Delivery estimates are not guaranteed arrival dates.</p>"
+          }
+        },
+        "destinations": {
+          "type": "shipping_detail",
+          "settings": {
+            "heading": "Where we ship",
+            "content": "<p>We offer international shipping to the countries and regions available at checkout. Availability depends on your complete delivery address and the services supported for your order.</p><p>For supported destinations, the published Standard and Express options apply unless otherwise specified at checkout. If your destination is unavailable, contact <a href=\"mailto:hello@missvella.com\">hello@missvella.com</a> for assistance.</p>"
+          }
+        },
+        "customs": {
+          "type": "shipping_detail",
+          "settings": {
+            "heading": "Customs duties and import taxes",
+            "content": "<p>International deliveries may attract customs duties, import taxes or other local charges. Unless checkout states otherwise, these charges are not included in your order total and are your responsibility. Any charges collected by Missvella at checkout will be disclosed there.</p><p>Customs inspections or requests for documentation may affect delivery time. Your local customs authority can advise on potential charges.</p>"
+          }
+        },
+        "tracking": {
+          "type": "shipping_detail",
+          "settings": {
+            "heading": "Order confirmation and tracking",
+            "content": "<p>After placing your order, check your confirmation email and review the item, size, color, shipping address and contact details.</p><p>After dispatch, we send a shipping confirmation email with the available tracking information. Tracking may take time to update after the carrier receives your parcel. For help, email <a href=\"mailto:hello@missvella.com\">hello@missvella.com</a> with your order number.</p>"
+          }
+        },
+        "address": {
+          "type": "shipping_detail",
+          "settings": {
+            "heading": "Address changes and undeliverable parcels",
+            "content": "<p>Provide a complete and accurate address, including any apartment or unit number and your contact details. If you notice an error, contact <a href=\"mailto:hello@missvella.com\">hello@missvella.com</a> as soon as possible.</p><p>We will attempt an address update before dispatch when operationally possible. Changes may not be available after shipment. If a parcel is returned because of an incorrect, incomplete or undeliverable address, contact us for help. Additional shipping charges may apply if you request reshipment, where permitted by law.</p>"
+          }
+        },
+        "delays": {
+          "type": "shipping_detail",
+          "settings": {
+            "heading": "If your shipment is delayed",
+            "content": "<p>Customs, carrier disruptions, severe weather, public holidays, high shipping volumes and address verification can affect processing or delivery.</p><p>If we cannot ship within the promised timeframe, we will notify you and provide appropriate options under applicable law, including a revised shipment date or cancellation and refund where required. If your order has already shipped, email <a href=\"mailto:hello@missvella.com\">hello@missvella.com</a> with your order number and tracking details.</p>"
+          }
+        },
+        "problems": {
+          "type": "shipping_detail",
+          "settings": {
+            "heading": "Lost, damaged or marked delivered but not received?",
+            "content": "<p>Email <a href=\"mailto:hello@missvella.com\">hello@missvella.com</a> with your order number, tracking number and a description of the issue. Include photographs if the parcel or product arrived damaged.</p><p>We will review the shipping information and work with the carrier to investigate. Where applicable, we will provide an appropriate remedy under consumer protection laws. Your statutory rights for non-delivery, transit damage or incorrectly supplied goods remain unaffected.</p>"
+          }
+        }
+      },
+      "block_order": ["standard", "express", "processing", "event", "destinations", "customs", "tracking", "address", "delays", "problems"]
+    }
+  ]
+}
+{% endschema %}
