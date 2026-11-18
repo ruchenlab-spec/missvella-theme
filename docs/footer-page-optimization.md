@@ -8,7 +8,7 @@
 
 | 顺序 | 页脚菜单项 | 目标 | 依赖 | 进度 |
 |---|---|---|---|---|
-| 1 | Processing & Shipping | 导读 Page `/pages/processing-shipping`（待商家创建）＋[正式运输政策](https://missvella.com/policies/shipping-policy) | 当前线上运输政策 | 内容及代码已备；CLI 权限阻塞发布，待商家配置 |
+| 1 | Processing & Shipping | 导读 Page `/pages/processing-shipping`（待商家创建）＋[正式运输政策](https://missvella.com/policies/shipping-policy) | 当前线上运输政策 | 代码已推送线上，待商家配置 |
 | 2 | Returns & Refunds | [退货与退款政策](https://missvella.com/policies/refund-policy) | 当前线上退款政策 | 待开始 |
 | 3 | FAQs | [FAQ](https://missvella.com/pages/faqs) | 第 1、2 项的最终政策口径和现有英文草案 | 43 问草案已完成，待核对和制作预设 |
 | 4 | Size Guide | [尺码指南](https://missvella.com/pages/size-guide) | 当前尺码表和商品页入口 | 待开始 |
@@ -71,19 +71,19 @@
 - 新增代码：`theme/sections/processing-shipping.liquid`、`theme/assets/processing-shipping.css`。主题编辑器预设 **Processing & Shipping**：可编辑表头、2 个运输方式块、8 个详情折叠块、免邮条件、客服／政策入口、H1/H2、颜色和间距；字体与颜色继承主题，详情复用原生 accordion 组件，无新增 JS。
 - Shopify 政策页不提供普通 Page 的可分配 JSON 模板；采用独立 Page 的详细依据、模板创建、页面关联和菜单步骤见交接。正式政策及结账政策入口保持 `/policies/shipping-policy`。未创建／推送模板 JSON，未改政策、Page、菜单或线上实例内容。
 - 必要静态检查：schema JSON、预设块引用与设置 ID 校验通过；一次 Theme Check，新增文件零错误／警告；全主题已有文件报告 32 个 MatchingTranslations 错误、21 个警告（不属于本次改动）。未做前台视觉回归或截图。
-- **发布阻塞**：店铺 `6icwx6-yv.myshopify.com`，目标主题 `167137378374`。`theme list` 与下述精确 push 均返回当前账号无该店铺访问权限；没有 Shopify 上传成功回执，不能标记为已上线，也未能复核目标是否仍为 live。商家需在交互终端恢复正确 Shopify 账号的店铺／主题权限。恢复后先确认当前 live，再推送这两个文件，不需要重复已经通过且未变化的代码检查。
+- **发布完成（2026-11-18）**：首次因 CLI 当前账号无店铺访问权限失败；后续在 PTY 中执行 `shopify auth login`，选择已有授权的 `ruchenlab@gmail.com` 会话后恢复访问。`theme list` 确认 `167137378374`（Missvella Dev）仍为 live，随后仅精确上传两个代码文件并收到 CLI `was pushed successfully` 成功回执。使用 `--nodelete`，未推送任何内容 JSON；代码未变化，未重复静态检查。
 - 结账运费未实测：本次只确认浏览器会话购物车为空，没有完整目的地地址报价；没有已确认的政策／结账冲突，也不能宣称二者已验证一致。主要市场、折扣跨越 $180 边界、币种、税费和例外地址按交接表待核对。
 - 第 3 项 FAQ 可使用交接中的公开政策口径，正式 Shipping Policy 链接保持不变。退货数字与退货条件等待第 2 项确认；不得将未核实结账条件写成保证。
-- Git：本次仅提交上述 2 个代码文件和 2 个文档；`.codebuddy/`、`.playwright-cli/`、`output/` 及检查缓存不纳入提交。提交后同步 `origin/main`，最终回执见本次对话。
+- Git：实现提交 `81d04c8` 已同步 `origin/main`；恢复权限与发布结果另以文档提交同步。`.codebuddy/`、`.playwright-cli/`、`output/` 及检查缓存不纳入提交。
 
-恢复店铺权限后的精确发布命令（先确认 `167137378374` 仍为当前线上主题）：
+本次成功执行的精确发布命令（已先确认当前线上主题）：
 
 ```powershell
 shopify theme list --store 6icwx6-yv.myshopify.com
 shopify theme push --store 6icwx6-yv.myshopify.com --theme 167137378374 --allow-live --path theme --only "sections/processing-shipping.liquid" --only "assets/processing-shipping.css" --nodelete
 ```
 
-CLI 成功后由商家按交接创建模板、添加 section、关联 Page、配置页脚和检查前台，随后将本项状态更新为待验收／已完成。
+代码已上传；下一步由商家按交接创建模板、添加 section、关联 Page、配置页脚和检查前台，随后将本项状态更新为待验收／已完成。
 
 - 对话开始时读本计划和 [AGENTS.md](../AGENTS.md)，核对该项线上页面及上游交接。遇到政策数字、尺码数据或支持范围变化，记录最终确认的来源与口径。
 - 每项结束后更新进度表，附交付物、正式链接、验收结果及下一项依赖。可用状态为待开始、内容已备、待商家配置、待验收、已完成。

@@ -20,7 +20,7 @@ Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 
 ## 二、登录授权
 
-Shopify CLI 使用浏览器 OAuth。**必须在开发者自己的交互终端执行**（AI 侧执行环境非 TTY，会被拒绝并提示 `Flag not specified: --alias`）：
+Shopify CLI 使用浏览器 OAuth。新登录或交互式切换账号需要 TTY；AI 可使用 `exec_command` 的 `tty: true` 开启 PTY。普通非交互执行可能提示 `Flag not specified: --alias`，此时不应直接判定必须由商家重新登录。
 
 ```powershell
 shopify auth login      # 浏览器授权
@@ -28,6 +28,8 @@ shopify auth logout     # 切换账号时使用
 ```
 
 令牌保存在本机，后续免登录。
+
+2026-11-18 实例：`theme list`／push 提示无店铺访问权限时，在 PTY 中执行 `shopify auth login`，选择已有授权的 `ruchenlab@gmail.com` 会话即可恢复。随后通过 `theme list --store 6icwx6-yv.myshopify.com --json` 确认访问及当前 live，再精确推送。无需先 logout 或删除本地凭据；只有确实需要新的浏览器登录／验证码时再请商家协助。
 
 ## 三、日常开发流程（最重要）
 

@@ -97,4 +97,4 @@ Shopify 官方 [模板类型清单](https://shopify.dev/docs/storefronts/themes/
 
 代码及预设完成；schema/预设校验通过，一次 Theme Check 对新增文件零错误／警告（现有文件 32 个翻译错误、21 个警告）。未进行视觉回归。
 
-仅精确尝试上传 `sections/processing-shipping.liquid` 与 `assets/processing-shipping.css`，Shopify CLI 返回店铺访问权限错误，**尚未上线**。恢复正确账号的店铺权限、确认当前 live 后即可按主计划中命令重新上传。Page、模板关联与菜单仍由商家配置；结账实测待办不变。Git 提交和远端同步结果见本次对话，完整交接记录于 `docs/footer-page-optimization.md` 第 1 项。
+2026-11-18 已恢复 CLI 权限：在交互 PTY 中执行 `shopify auth login` 并选择已有授权的 `ruchenlab@gmail.com` 会话；主题列表确认 `167137378374` 仍为 live。随后仅通过两个精确 `--only` 路径及 `--nodelete` 上传 `sections/processing-shipping.liquid` 与 `assets/processing-shipping.css`，收到 Shopify CLI 成功回执，**代码已上线**。未推送内容 JSON。Page、模板关联与菜单仍由商家配置，完整页面尚待商家装配；结账实测待办不变。实现提交 `81d04c8` 已同步 Git，发布记录另以文档提交同步。完整交接记录于 `docs/footer-page-optimization.md` 第 1 项。
