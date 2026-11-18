@@ -57,23 +57,25 @@
     <div id="ShippingEstimate-{{ section.id }}" class="shipping-guide__note rte">{{ section.settings.estimate_note }}</div>
 
     <aside class="shipping-guide__notice" aria-labelledby="ShippingFree-{{ section.id }}">
-      <h2 id="ShippingFree-{{ section.id }}" class="h5">{{ section.settings.free_heading | escape }}</h2>
-      <div class="rte">{{ section.settings.free_text }}</div>
-      <div class="rte">{{ section.settings.destinations_note }}</div>
+      <h2 id="ShippingFree-{{ section.id }}" class="shipping-guide__subheading">{{ section.settings.free_heading | escape }}</h2>
+      <div class="shipping-guide__notice-copy">
+        <div class="rte">{{ section.settings.free_text }}</div>
+        <div class="rte">{{ section.settings.destinations_note }}</div>
+      </div>
     </aside>
 
     {% if shipping_details.size > 0 %}
       <div class="shipping-guide__details">
-        <h2 class="h4">{{ section.settings.details_heading | escape }}</h2>
-        <div class="shipping-guide__accordion accordion accordion--caret">
+        <h2 class="shipping-guide__subheading">{{ section.settings.details_heading | escape }}</h2>
+        <div class="shipping-guide__accordion accordion accordion--plus">
           {% for block in shipping_details %}
             <div class="shipping-guide__detail" {{ block.shopify_attributes }}>
               {% capture shipping_detail_content %}
                 <details class="details" {% if block.settings.open_by_default %}open{% endif %}>
                   <summary class="details__header">
                     <span>{{ block.settings.heading | escape }}</span>
-                    <span class="svg-wrapper icon-caret icon-animated" aria-hidden="true">
-                      {{- 'icon-caret.svg' | inline_asset_content -}}
+                    <span class="svg-wrapper icon-plus" aria-hidden="true">
+                      {{- 'icon-plus.svg' | inline_asset_content -}}
                     </span>
                   </summary>
                   <div class="details-content rte">{{ block.settings.content }}</div>
@@ -92,11 +94,11 @@
     {% endif %}
 
     <footer class="shipping-guide__support">
-      <h2 class="h4">{{ section.settings.support_heading | escape }}</h2>
+      <h2 class="shipping-guide__subheading">{{ section.settings.support_heading | escape }}</h2>
       <div class="rte">{{ section.settings.support_text }}</div>
       <div class="shipping-guide__links">
         {% if support_email != blank %}
-          <a class="button button-secondary" href="mailto:{{ support_email | escape }}">{{ support_email | escape }}</a>
+          <a class="shipping-guide__email" href="mailto:{{ support_email | escape }}">{{ support_email | escape }}</a>
         {% endif %}
         <a href="{{ policy_url | escape }}">{{ section.settings.policy_label | escape }}</a>
         <a href="{{ returns_url | escape }}">{{ section.settings.returns_label | escape }}</a>

@@ -64,6 +64,12 @@ For supported destinations only. Enter your complete delivery address at checkou
 
 ## Shopify 页面实现与商家配置
 
+### 视觉规范更新 · 2026-11-18
+
+商家要求参考 LV、Chanel 一类克制风格，首要目标为清晰的信息识别与传递。本次采用现有主题字体和颜色，不新增品牌标志或装饰素材：56rem 阅读宽度、适度留白、细横线对照表、清楚的数字字重层级；取消表格底色、完整格线、免邮卡片框及客服按钮。小标题使用轻微字距，正文保持正常大小写；运输选项始终并排可比。详情复用原生加减号折叠，链接保留 44px 点击高度、下划线及键盘焦点。手机免邮区域自动纵排，不增加横向表格滚动。
+
+本轮仅改 section 标记及 scoped CSS，不更换设置 ID 或改动已有文案；已装配的 section 刷新即可生效，无需删除重加。代码已经精确上传成功；前台视觉由商家自行检查。
+
 Shopify 官方 [模板类型清单](https://shopify.dev/docs/storefronts/themes/architecture/templates) 没有可分配的 `policy` JSON 模板。官方 [政策管理说明](https://help.shopify.com/en/manual/checkout-settings/refund-privacy-tos) 将政策正文放在 Settings → Policies，并单独支持创建 Pages。结合本主题结构，`/policies/shipping-policy` 不能像普通 Page 一样直接通过“Add section”装配本 section。不得为此上传 `policy.json` 或将 section 混进全站 layout。
 
 采用独立导读 Page，保留正式政策页：

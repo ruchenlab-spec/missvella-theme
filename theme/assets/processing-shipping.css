@@ -1,18 +1,36 @@
+/* Keep this guide quiet and readable; inherit the merchant's fonts and palette. */
 .shipping-guide {
+  --shipping-rule: rgb(var(--color-foreground-rgb) / 0.18);
   width: 100%;
-  max-width: 64rem;
+  max-width: 56rem;
   min-width: 0;
   margin-inline: auto;
   color: var(--color-foreground);
+  font-family: var(--font-paragraph--family);
+  font-style: var(--font-paragraph--style);
+  font-weight: var(--font-paragraph--weight);
+  font-size: max(0.9375rem, var(--font-paragraph--size));
+  line-height: 1.7;
+  text-transform: none;
   overflow-wrap: anywhere;
 }
 
 .shipping-guide__header {
-  margin-block-end: 24px;
+  margin-block-end: 36px;
+  text-align: center;
 }
 
-.shipping-guide__title {
-  margin-block: 0 12px;
+.shipping-guide .shipping-guide__title {
+  margin-block: 0 14px;
+  font-size: clamp(1.75rem, 3vw, 2.375rem);
+  line-height: 1.2;
+  letter-spacing: 0.015em;
+  text-wrap: balance;
+}
+
+.shipping-guide__header .rte {
+  max-width: 54ch;
+  margin-inline: auto;
 }
 
 .shipping-guide .rte > :first-child {
@@ -23,82 +41,121 @@
   margin-block-end: 0;
 }
 
+.shipping-guide .shipping-guide__subheading,
+.shipping-guide__table caption {
+  font-family: var(--font-paragraph--family);
+  font-style: var(--font-paragraph--style);
+  font-size: 0.8125rem;
+  font-weight: 600;
+  line-height: 1.6;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: inherit;
+}
+
 .shipping-guide__table {
   width: 100%;
   table-layout: fixed;
   border-collapse: collapse;
-  line-height: 1.5;
+  border: 0;
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  font-variant-numeric: lining-nums tabular-nums;
 }
 
 .shipping-guide__table caption {
-  padding-block-end: 12px;
+  padding-block-end: 18px;
   text-align: start;
-  font-weight: 600;
 }
 
 .shipping-guide__table :is(th, td) {
-  padding: 16px;
-  border: 1px solid var(--color-border);
+  padding: 20px 16px;
+  border: 0;
+  border-block-end: 1px solid var(--shipping-rule);
   text-align: start;
   vertical-align: top;
+  background: transparent;
+}
+
+.shipping-guide__table tr > :first-child {
+  width: 34%;
+  padding-inline-start: 0;
+}
+
+.shipping-guide__table tr > :last-child {
+  padding-inline-end: 0;
+}
+
+.shipping-guide__table thead th {
+  padding-block: 18px;
+  border-block-start: 1px solid currentColor;
+  font-weight: 600;
 }
 
 .shipping-guide__table tbody th {
   font-weight: 400;
 }
 
-.shipping-guide__table thead,
-.shipping-guide__total {
-  background: rgb(var(--color-foreground-rgb) / 0.04);
+.shipping-guide__table .shipping-guide__total :is(th, strong) {
+  font-weight: 600;
 }
 
 .shipping-guide__note {
-  margin-block-start: 16px;
-  font-size: 0.875em;
-  line-height: 1.6;
+  margin-block-start: 18px;
+  max-width: 78ch;
+  font-size: 0.8125rem;
+  line-height: 1.7;
 }
 
 .shipping-guide__notice {
-  margin-block: 28px 36px;
-  padding: 24px;
-  border: 1px solid var(--color-border);
-  border-inline-start: 3px solid var(--color-foreground);
+  display: grid;
+  grid-template-columns: 34% minmax(0, 1fr);
+  gap: 0;
+  margin-block: 28px 44px;
+  padding-block: 24px 28px;
+  border-block: 1px solid var(--shipping-rule);
 }
 
-.shipping-guide__notice h2,
-.shipping-guide__support h2 {
-  margin-block: 0 12px;
+.shipping-guide__notice .shipping-guide__subheading {
+  margin: 0;
+  padding-inline-end: 24px;
+}
+
+.shipping-guide__notice-copy {
+  min-width: 0;
+  padding-inline-start: 16px;
 }
 
 .shipping-guide__notice .rte + .rte {
   margin-block-start: 12px;
 }
 
-.shipping-guide__details > h2 {
-  margin-block: 0 16px;
+.shipping-guide__details > .shipping-guide__subheading {
+  margin-block: 0 18px;
 }
 
 .shipping-guide__accordion {
   --summary-font-family: var(--font-paragraph--family);
   --summary-font-style: var(--font-paragraph--style);
   --summary-font-weight: var(--font-paragraph--weight);
-  --summary-font-size: var(--font-paragraph--size);
-  --summary-font-line-height: var(--font-paragraph--line-height);
+  --summary-font-size: max(0.9375rem, var(--font-paragraph--size));
+  --summary-font-line-height: 1.5;
   --summary-font-case: none;
 }
 
 .shipping-guide__detail {
-  border-block-start: 1px solid var(--color-border);
+  border-block-start: 1px solid var(--shipping-rule);
 }
 
 .shipping-guide__detail:last-child {
-  border-block-end: 1px solid var(--color-border);
+  border-block-end: 1px solid var(--shipping-rule);
 }
 
 .shipping-guide__detail summary {
   display: flex;
   align-items: center;
-  gap: 16px;
+  gap: 24px;
+  min-height: 56px;
   padding-block: 20px;
   cursor: pointer;
   list-style: none;
@@ -110,29 +167,64 @@
 
 .shipping-guide__detail summary .svg-wrapper {
   flex-shrink: 0;
+  width: 12px;
+  height: 12px;
 }
 
 .shipping-guide__detail .details-content {
-  padding-block-end: 20px;
-  max-width: 75ch;
-  line-height: 1.7;
+  padding-block-end: 24px;
+  padding-inline-end: 36px;
+  max-width: 70ch;
+  line-height: 1.75;
 }
 
 .shipping-guide__support {
-  margin-block-start: 36px;
+  margin-block-start: 44px;
+}
+
+.shipping-guide__support > .shipping-guide__subheading {
+  margin-block: 0 16px;
+}
+
+.shipping-guide__support > .rte {
+  max-width: 66ch;
 }
 
 .shipping-guide__links {
   display: flex;
   align-items: center;
   flex-wrap: wrap;
-  gap: 16px 24px;
-  margin-block: 20px;
+  gap: 0 28px;
+  margin-block: 12px 8px;
 }
 
-.shipping-guide__links a:not(.button) {
-  text-underline-offset: 0.2em;
+.shipping-guide__links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  max-width: 100%;
+  padding-block: 8px;
+  font-size: 0.875rem;
+  color: inherit;
   text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 5px;
+}
+
+.shipping-guide__links .shipping-guide__email {
+  font-weight: 600;
+}
+
+@media (hover: hover) {
+  .shipping-guide__links a:hover {
+    text-decoration-thickness: 2px;
+  }
+
+  .shipping-guide__detail summary:hover > span:first-child {
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-underline-offset: 5px;
+  }
 }
 
 .shipping-guide :is(summary, a):focus-visible {
@@ -141,24 +233,44 @@
 }
 
 @media screen and (max-width: 749px) {
+  .shipping-guide__header {
+    margin-block-end: 28px;
+  }
+
   .shipping-guide__table {
-    font-size: 0.875em;
+    font-size: 0.8125rem;
   }
 
   .shipping-guide__table :is(th, td) {
-    padding: 12px 8px;
+    padding: 16px 8px;
+  }
+
+  .shipping-guide__table thead th {
+    padding-block: 14px;
   }
 
   .shipping-guide__notice {
-    padding: 20px 16px;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+    margin-block: 24px 32px;
+    padding-block: 22px;
+  }
+
+  .shipping-guide__notice .shipping-guide__subheading,
+  .shipping-guide__notice-copy {
+    padding-inline: 0;
+  }
+
+  .shipping-guide__detail .details-content {
+    padding-inline-end: 0;
+  }
+
+  .shipping-guide__support {
+    margin-block-start: 32px;
   }
 
   .shipping-guide__links {
     align-items: flex-start;
     flex-direction: column;
-  }
-
-  .shipping-guide__links .button {
-    max-width: 100%;
   }
 }
