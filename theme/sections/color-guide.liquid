@@ -10,7 +10,7 @@
   <color-guide
     id="{{ anchor | escape }}"
     class="material-guide spacing-style"
-    style="{% render 'spacing-style', settings: section.settings %} --guide-columns: {{ section.settings.columns }}; --guide-mobile-columns: {{ section.settings.mobile_columns }};"
+    style="{% render 'spacing-style', settings: section.settings %} --guide-swatch-size: {{ section.settings.swatch_size }}px;"
   >
     <header class="material-guide__header">
       {% if section.settings.heading != blank %}<h2 class="material-guide__heading">{{ section.settings.heading | escape }}</h2>{% endif %}
@@ -24,6 +24,7 @@
       </select>
     </div>
 
+    <div class="color-guide__groups" data-color-groups>
     <ul class="color-guide__swatches" role="list">
       {% if section.settings.use_store_catalog %}
         {% render 'guide-color-catalog', section: section, mode: 'swatch' %}
@@ -39,7 +40,7 @@
             <a class="color-guide__choice" href="#ColorDetail-{{ section.id }}-{{ block.id }}" data-color-choice>
               <span class="color-guide__swatch{% if swatch == blank %} color-guide__swatch--empty{% endif %}"{% if swatch == blank and block.settings.swatch_color != blank %} style="--guide-swatch: {{ block.settings.swatch_color }};"{% endif %}>
                 {% if swatch != blank %}
-                  {{ swatch | image_url: width: 480 | image_tag: widths: '120, 240, 360, 480', sizes: '(min-width: 750px) 220px, 45vw', loading: 'lazy', alt: swatch_alt }}
+                  {{ swatch | image_url: width: 144 | image_tag: widths: '48, 96, 144', sizes: '72px', loading: 'lazy', alt: swatch_alt }}
                 {% elsif request.design_mode and block.settings.swatch_color == blank %}
                   <span class="material-guide__placeholder">Add a swatch image</span>
                 {% endif %}
@@ -52,6 +53,7 @@
       {% endfor %}
       {% endif %}
     </ul>
+    </div>
 
     <div class="color-guide__details">
       {% if section.settings.use_store_catalog %}
@@ -100,8 +102,7 @@
     { "type": "text", "id": "anchor", "label": "Page anchor", "default": "colors", "info": "Use #colors to link here. Use a different anchor if you add this section more than once." },
     { "type": "text", "id": "filter_label", "label": "Color family filter label", "default": "Color family" },
     { "type": "text", "id": "all_label", "label": "All colors label", "default": "All colors" },
-    { "type": "range", "id": "columns", "label": "Desktop columns", "min": 4, "max": 6, "step": 1, "default": 5 },
-    { "type": "select", "id": "mobile_columns", "label": "Mobile columns", "options": [{ "value": "2", "label": "2" }, { "value": "3", "label": "3" }], "default": "2" },
+    { "type": "range", "id": "swatch_size", "label": "Color chip size", "min": 32, "max": 72, "step": 4, "unit": "px", "default": 48 },
     { "type": "richtext", "id": "note", "label": "Color guidance" },
     { "type": "color", "id": "background_color", "label": "Background" },
     { "type": "color", "id": "text_color", "label": "Text" },

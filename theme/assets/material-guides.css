@@ -79,10 +79,36 @@
   background-color: var(--color-background);
 }
 
+.color-guide__groups--ready {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 28px 40px;
+}
+
+.color-guide__group {
+  min-width: 0;
+  padding-block-start: 16px;
+  border-block-start: 1px solid rgb(var(--color-foreground-rgb) / 0.14);
+}
+
+.material-guide .color-guide__group-heading {
+  margin: 0 0 16px;
+  font: inherit;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  line-height: 1.4;
+  letter-spacing: 0.04em;
+  color: inherit;
+}
+
+.color-guide__groups--ready .color-guide__family {
+  display: none;
+}
+
 .color-guide__swatches {
   display: grid;
-  grid-template-columns: repeat(var(--guide-columns, 5), minmax(0, 1fr));
-  gap: 28px 20px;
+  grid-template-columns: repeat(auto-fill, minmax(76px, 1fr));
+  gap: 16px 12px;
   margin: 0;
   padding: 0;
   list-style: none;
@@ -92,12 +118,15 @@
   display: block;
   height: 100%;
   min-height: 44px;
+  min-width: 44px;
   color: inherit;
   text-decoration: none;
 }
 
 .color-guide__swatch {
   display: grid;
+  width: var(--guide-swatch-size, 48px);
+  max-width: 100%;
   aspect-ratio: 1;
   position: relative;
 }
@@ -123,9 +152,9 @@
 
 .color-guide__name {
   display: block;
-  margin-block-start: 12px;
-  font-size: 0.875rem;
-  line-height: 1.5;
+  margin-block-start: 8px;
+  font-size: 0.75rem;
+  line-height: 1.4;
 }
 
 .color-guide__family {
@@ -184,9 +213,9 @@
 
 .color-guide__custom {
   align-self: center;
-  padding: 20px;
+  padding: 3px;
   text-align: center;
-  font-size: 0.8125rem;
+  font-size: 0.625rem;
 }
 
 .color-guide__chip {
@@ -337,9 +366,9 @@
     font-size: 1rem;
   }
 
-  .color-guide__swatches {
-    grid-template-columns: repeat(var(--guide-mobile-columns, 2), minmax(0, 1fr));
-    gap: 24px 16px;
+  .color-guide__groups--ready {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
   }
 
   .color-guide__detail,

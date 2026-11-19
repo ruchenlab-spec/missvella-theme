@@ -39,7 +39,11 @@
 
 独立页面模板、Page 关联、唯一 H1 和菜单由商家配置。页内入口默认 `#colors`、`#fabrics`；重复 section 使用不同 anchor。若页脚仍指向 `/`，需在后台改为 `/pages/color-fabric-guide`。
 
-颜色保留筛选、详情切换、深链接、编辑器区块联动及无 JS 降级；桌面 4–6 色一行，手机 2–3 色。面料桌面双图＋说明、手机纵排。继承原主题字体和配色，使用细线与克制间距。
+颜色保留筛选、详情切换、深链接、编辑器区块联动及无 JS 降级。2026-11-19 按商家反馈改为紧凑色系分组：JavaScript 按最终 Color family（含区块覆盖）合并同色系卡片，显示色系标题；分组及组内顺序按首次出现顺序。桌面两列分组、手机单列，每组色卡自动换行。未填色系的卡片放在无标题的一组。
+
+色块默认 48px，可通过 **Color chip size** 调至 32–72px；取代旧的桌面／手机列数设置。名称为 12px，色卡间距 12px／16px，保留至少 44px 可点击宽高。缩略图采用最高 144px 的响应式图片。筛选时同时隐藏空组，深链接和编辑器选择可恢复对应组。没有 JavaScript 时仍显示紧凑平铺列表及全部详情，不输出分组标题。
+
+面料保持桌面双图＋说明、手机纵排。继承原主题字体和配色，使用细线与克制间距。
 
 ## 代码与维护
 
@@ -48,7 +52,7 @@
 - `theme/snippets/guide-color-catalog.liquid`、`guide-fabric-catalog.liquid`：自动生成的内容代码。
 - `theme/snippets/guide-color-entry.liquid`、`guide-fabric-entry.liquid`：渲染及同名区块覆盖。
 - `theme/sections/color-guide.liquid`、`fabric-guide.liquid`：开关、schema、预设。
-- `theme/assets/material-guides.css`：样式；`color-guide.js` 本轮未改。
+- `theme/assets/material-guides.css`：共用样式；`color-guide.js`：色系分组、筛选、详情与编辑器联动。
 
 资料库是 2026-11-19 的核对快照，不是元对象实时同步。源条目、图片或商品 URL 变化时，更新数据文件，运行 `node scripts/build-material-guide-catalog.cjs`，精确推送修改代码；不要改写实例 JSON。
 
@@ -59,3 +63,5 @@
 未运行浏览器或截图回归，商家启用资料库后检查前台。发布范围仅两个 section、四个 snippet、一个 CSS；不含模板、section group 或 settings_data JSON，不改变原元对象、商品字段、菜单或线上实例。
 
 发布状态：`theme list` 确认当前 live 为 `167137378374`（Missvella Dev）。仅精确上传上述 7 个代码文件，使用 `--only` 和 `--nodelete`；CLI 已返回 `was pushed successfully`。内容库待商家开启开关，另外两类面料待核实补图。数据、代码和文档纳入本次本地 Git 提交并同步 origin/main，临时素材下载和缓存不纳入提交。
+
+紧凑分组后续调整：一次 JS 语法、schema JSON／设置引用与 diff 静态检查通过。确认 live 后，仅用 `--only` 精确推送 Color Guide section、颜色条目 snippet、共享 CSS 和颜色 JS，CLI 返回 `was pushed successfully`。未启动浏览器或新增渲染测试，未推送内容 JSON。代码及本说明提交并同步 origin/main。
