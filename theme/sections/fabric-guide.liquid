@@ -6,7 +6,7 @@
 
 <div class="section-background color-custom-{{ section.id }}"></div>
 <div class="section page-width-normal color-custom-{{ section.id }}">
-  <div id="{{ anchor | escape }}" class="material-guide spacing-style" style="{% render 'spacing-style', settings: section.settings %} --fabric-image-fit: {{ section.settings.image_fit }};">
+  <div id="{{ anchor | escape }}" class="material-guide fabric-guide spacing-style" style="{% render 'spacing-style', settings: section.settings %} --fabric-image-fit: {{ section.settings.image_fit }};">
     <header class="material-guide__header">
       {% if section.settings.heading != blank %}<h2 class="material-guide__heading">{{ section.settings.heading | escape }}</h2>{% endif %}
       {% if section.settings.intro != blank %}<div class="material-guide__intro rte">{{ section.settings.intro }}</div>{% endif %}
@@ -25,20 +25,25 @@
             if block.settings.closeup != blank or block.settings.garment != blank or request.design_mode
               assign has_media = true
             endif
+            assign has_image_notes = false
+            if block.settings.closeup != blank and block.settings.closeup_caption != blank
+              assign has_image_notes = true
+            endif
+            if block.settings.garment != blank and block.settings.garment_caption != blank
+              assign has_image_notes = true
+            endif
           %}
           <article class="fabric-guide__item{% unless has_media %} fabric-guide__item--text-only{% endunless %}" {{ block.shopify_attributes }}>
             {% if has_media %}
               <div class="fabric-guide__media">
                 {% if block.settings.closeup != blank %}
                   <figure>
-                    {{ block.settings.closeup | image_url: width: 1000 | image_tag: widths: '300, 500, 750, 1000', sizes: '(min-width: 750px) 300px, 50vw', loading: 'lazy', alt: closeup_alt }}
-                    {% if block.settings.closeup_caption != blank %}<figcaption>{{ block.settings.closeup_caption | escape }}</figcaption>{% endif %}
+                    {{ block.settings.closeup | image_url: width: 264 | image_tag: widths: '88, 176, 264', sizes: '(min-width: 750px) 88px, 44px', loading: 'lazy', alt: closeup_alt }}
                   </figure>
                 {% elsif request.design_mode %}<div class="material-guide__placeholder fabric-guide__placeholder">Add a fabric close-up</div>{% endif %}
                 {% if block.settings.garment != blank %}
                   <figure>
-                    {{ block.settings.garment | image_url: width: 1000 | image_tag: widths: '300, 500, 750, 1000', sizes: '(min-width: 750px) 300px, 50vw', loading: 'lazy', alt: garment_alt }}
-                    {% if block.settings.garment_caption != blank %}<figcaption>{{ block.settings.garment_caption | escape }}</figcaption>{% endif %}
+                    {{ block.settings.garment | image_url: width: 264 | image_tag: widths: '88, 176, 264', sizes: '(min-width: 750px) 88px, 44px', loading: 'lazy', alt: garment_alt }}
                   </figure>
                 {% elsif request.design_mode %}<div class="material-guide__placeholder fabric-guide__placeholder">Add a dress photograph</div>{% endif %}
               </div>
@@ -46,6 +51,12 @@
             <div class="material-guide__copy">
               <h3 class="material-guide__item-heading">{{ fabric_name | escape }}</h3>
               {% if block.settings.description != blank %}<div class="rte">{{ block.settings.description }}</div>{% endif %}
+              {% if has_image_notes %}
+                <div class="fabric-guide__image-notes">
+                  {% if block.settings.closeup != blank and block.settings.closeup_caption != blank %}<span>{{ block.settings.closeup_caption | escape }}</span>{% endif %}
+                  {% if block.settings.garment != blank and block.settings.garment_caption != blank %}<span>{{ block.settings.garment_caption | escape }}</span>{% endif %}
+                </div>
+              {% endif %}
               {% if block.settings.finish != blank or block.settings.drape != blank or block.settings.feel != blank %}
                 <dl class="fabric-guide__facts">
                 {% if block.settings.finish != blank %}<div><dt>{{ section.settings.finish_label | escape }}</dt><dd>{{ block.settings.finish | escape }}</dd></div>{% endif %}

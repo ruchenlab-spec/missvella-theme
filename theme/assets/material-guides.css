@@ -173,8 +173,7 @@
   text-underline-offset: 5px;
 }
 
-.color-guide__detail,
-.fabric-guide__item {
+.color-guide__detail {
   display: grid;
   grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
   align-items: start;
@@ -269,12 +268,11 @@
 .fabric-guide__media {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+  gap: 8px;
 }
 
 .fabric-guide__media > :only-child {
-  grid-column: 1 / -1;
-  max-width: 25rem;
+  grid-column: 1;
 }
 
 .fabric-guide__media figure {
@@ -308,7 +306,10 @@
 }
 
 .fabric-guide__facts {
-  margin: 20px 0 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 16px;
+  margin: 0;
 }
 
 .fabric-guide__facts:empty {
@@ -316,20 +317,97 @@
 }
 
 .fabric-guide__facts > div {
-  display: grid;
-  grid-template-columns: minmax(70px, 0.35fr) minmax(0, 1fr);
-  gap: 16px;
-  padding-block: 12px;
-  border-block-end: 1px solid rgb(var(--color-foreground-rgb) / 0.18);
-  font-size: 0.875rem;
+  min-width: 0;
+  font-size: 0.75rem;
+  line-height: 1.5;
 }
 
 .fabric-guide__facts dt {
+  display: inline;
   font-weight: 600;
 }
 
 .fabric-guide__facts dd {
+  display: inline;
   margin: 0;
+  margin-inline-start: 4px;
+}
+
+.fabric-guide .material-guide__header {
+  margin-block-end: 12px;
+}
+
+.fabric-guide .material-guide__intro {
+  margin-block-start: 8px;
+}
+
+.fabric-guide__item {
+  display: grid;
+  grid-template-columns: 184px minmax(0, 1fr);
+  align-items: start;
+  gap: 16px;
+  padding-block: 14px;
+  border-block-start: 1px solid rgb(var(--color-foreground-rgb) / 0.18);
+  scroll-margin-block-start: calc(var(--header-height, 80px) + 24px);
+}
+
+.fabric-guide__item--text-only {
+  grid-template-columns: 184px minmax(0, 1fr);
+}
+
+.fabric-guide__item--text-only > .material-guide__copy {
+  grid-column: 2;
+}
+
+.fabric-guide__item > .material-guide__copy {
+  display: grid;
+  grid-template-columns: 112px minmax(0, 1fr);
+  gap: 6px 16px;
+  max-width: none;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.fabric-guide__item > .material-guide__copy > * {
+  grid-column: 2;
+  margin-block: 0;
+}
+
+.material-guide .fabric-guide__item .material-guide__item-heading {
+  grid-column: 1;
+  grid-row: 1;
+  font-size: 1rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.fabric-guide__image-notes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px 12px;
+  font-size: 0.75rem;
+  line-height: 1.4;
+}
+
+.fabric-guide__image-notes:empty {
+  display: none;
+}
+
+.fabric-guide__item .material-guide__note {
+  max-width: none;
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+.fabric-guide__item .material-guide__link {
+  justify-self: start;
+  padding-block: 2px;
+  font-size: 0.75rem;
+}
+
+.fabric-guide .fabric-guide__placeholder {
+  padding: 4px;
+  font-size: 0.625rem;
 }
 
 .material-guide__placeholder {
@@ -371,10 +449,25 @@
     gap: 24px;
   }
 
-  .color-guide__detail,
-  .fabric-guide__item {
+  .color-guide__detail {
     grid-template-columns: minmax(0, 1fr);
     gap: 24px;
     padding-block: 28px;
+  }
+
+  .fabric-guide__item {
+    grid-template-columns: 96px minmax(0, 1fr);
+    gap: 12px;
+    padding-block: 12px;
+  }
+
+  .fabric-guide__item > .material-guide__copy {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .fabric-guide__item .material-guide__link {
+    align-self: flex-start;
   }
 }

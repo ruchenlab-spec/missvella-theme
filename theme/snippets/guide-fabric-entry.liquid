@@ -41,23 +41,20 @@
         {% if closeup != blank %}
           <figure>
             {% assign closeup_alt = closeup.alt | default: name %}
-            {{ closeup | image_url: width: 1000 | image_tag: widths: '300, 500, 750, 1000', sizes: '(min-width: 750px) 400px, 100vw', loading: 'lazy', alt: closeup_alt }}
-            {% if override.settings.closeup_caption != blank %}<figcaption>{{ override.settings.closeup_caption | escape }}</figcaption>{% endif %}
+            {{ closeup | image_url: width: 264 | image_tag: widths: '88, 176, 264', sizes: '(min-width: 750px) 88px, 44px', loading: 'lazy', alt: closeup_alt }}
           </figure>
         {% elsif catalog_detail != blank %}
           <figure>
             <div class="fabric-guide__crop" style="--guide-detail-origin: {{ detail_position | escape }};">
               {% assign detail_alt = 'Garment detail. ' | append: image_caption %}
-              {{ catalog_detail | image_url: width: 1400 | image_tag: widths: '800, 1000, 1400', sizes: '(min-width: 750px) 600px, 100vw', loading: 'lazy', alt: detail_alt }}
+              {{ catalog_detail | image_url: width: 600 | image_tag: widths: '200, 400, 600', sizes: '(min-width: 750px) 194px, 97px', loading: 'lazy', alt: detail_alt }}
             </div>
-            <figcaption>Garment detail — enlarged from the pictured dress.</figcaption>
           </figure>
         {% endif %}
         {% if garment != blank %}
           <figure>
             {% assign garment_alt = image_caption | default: name %}
-            {{ garment | image_url: width: 1000 | image_tag: widths: '300, 500, 750, 1000', sizes: '(min-width: 750px) 400px, 100vw', loading: 'lazy', alt: garment_alt }}
-            {% if image_caption != blank %}<figcaption>{{ image_caption | escape }}</figcaption>{% endif %}
+            {{ garment | image_url: width: 264 | image_tag: widths: '88, 176, 264', sizes: '(min-width: 750px) 88px, 44px', loading: 'lazy', alt: garment_alt }}
           </figure>
         {% endif %}
       </div>
@@ -65,6 +62,14 @@
     <div class="material-guide__copy">
       <h3 class="material-guide__item-heading">{{ name | escape }}</h3>
       {% if override.settings.description != blank %}<div class="rte">{{ override.settings.description }}</div>{% else %}<p>{{ description | escape }}</p>{% endif %}
+      {% if garment != blank or closeup != blank %}
+        <div class="fabric-guide__image-notes">
+          {% if closeup != blank %}
+            {% if override.settings.closeup_caption != blank %}<span>{{ override.settings.closeup_caption | escape }}</span>{% endif %}
+          {% elsif catalog_detail != blank %}<span>Detail crop from the pictured dress.</span>{% endif %}
+          {% if garment != blank and image_caption != blank %}<span>{{ image_caption | escape }}</span>{% endif %}
+        </div>
+      {% endif %}
       <dl class="fabric-guide__facts">
         <div><dt>{{ section.settings.finish_label | escape }}</dt><dd>{{ finish | escape }}</dd></div>
         <div><dt>{{ section.settings.drape_label | escape }}</dt><dd>{{ drape | escape }}</dd></div>
