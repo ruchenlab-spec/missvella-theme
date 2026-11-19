@@ -1,6 +1,8 @@
 {%- liquid
   render 'contrast-override', background_color: section.settings.background_color, text_color: section.settings.text_color, section_id: section.id
   assign anchor = section.settings.anchor | handleize | default: section.id
+  assign allowed_fabrics = 'satin|chiffon|tulle|mesh|lace|crepe|velvet|sequin fabric' | split: '|'
+  assign fabric_number = 0
 -%}
 {{ 'material-guides.css' | asset_url | stylesheet_tag }}
 
@@ -16,8 +18,17 @@
         {% render 'guide-fabric-catalog', section: section %}
       {% else %}
       {% for block in section.blocks %}
+        {% liquid
+          assign normalized_name = block.settings.name | strip | downcase
+          if normalized_name != blank
+            unless allowed_fabrics contains normalized_name
+              continue
+            endunless
+          endif
+        %}
         {% if block.settings.name != blank or request.design_mode %}
           {% liquid
+            assign fabric_number = fabric_number | plus: 1
             assign fabric_name = block.settings.name | default: 'Fabric'
             assign closeup_alt = block.settings.closeup.alt | default: fabric_name
             assign garment_alt = block.settings.garment.alt | default: fabric_name
@@ -38,19 +49,24 @@
               <div class="fabric-guide__media">
                 {% if block.settings.closeup != blank %}
                   <figure>
-                    {{ block.settings.closeup | image_url: width: 264 | image_tag: widths: '88, 176, 264', sizes: '(min-width: 750px) 88px, 44px', loading: 'lazy', alt: closeup_alt }}
+                    {{ block.settings.closeup | image_url: width: 480 | image_tag: widths: '160, 320, 480', sizes: '(min-width: 750px) 160px, 112px', loading: 'lazy', alt: closeup_alt }}
                   </figure>
                 {% elsif request.design_mode %}<div class="material-guide__placeholder fabric-guide__placeholder">Add a fabric close-up</div>{% endif %}
                 {% if block.settings.garment != blank %}
                   <figure>
-                    {{ block.settings.garment | image_url: width: 264 | image_tag: widths: '88, 176, 264', sizes: '(min-width: 750px) 88px, 44px', loading: 'lazy', alt: garment_alt }}
+                    {{ block.settings.garment | image_url: width: 480 | image_tag: widths: '160, 320, 480', sizes: '(min-width: 750px) 160px, 112px', loading: 'lazy', alt: garment_alt }}
                   </figure>
                 {% elsif request.design_mode %}<div class="material-guide__placeholder fabric-guide__placeholder">Add a dress photograph</div>{% endif %}
               </div>
             {% endif %}
             <div class="material-guide__copy">
+              <span class="fabric-guide__number" aria-hidden="true">{% if fabric_number < 10 %}0{% endif %}{{ fabric_number }}</span>
               <h3 class="material-guide__item-heading">{{ fabric_name | escape }}</h3>
               {% if block.settings.description != blank %}<div class="rte">{{ block.settings.description }}</div>{% endif %}
+              {% if has_image_notes or block.settings.finish != blank or block.settings.drape != blank or block.settings.feel != blank or block.settings.notes != blank %}
+              <details class="fabric-guide__more">
+                <summary>{{ section.settings.details_label | escape }}<span class="visually-hidden"> — {{ fabric_name | escape }}</span></summary>
+                <div class="fabric-guide__more-content">
               {% if has_image_notes %}
                 <div class="fabric-guide__image-notes">
                   {% if block.settings.closeup != blank and block.settings.closeup_caption != blank %}<span>{{ block.settings.closeup_caption | escape }}</span>{% endif %}
@@ -65,6 +81,9 @@
                 </dl>
               {% endif %}
               {% if block.settings.notes != blank %}<div class="material-guide__note rte">{{ block.settings.notes }}</div>{% endif %}
+                </div>
+              </details>
+              {% endif %}
               {% if block.settings.link != blank and block.settings.link_label != blank %}<a class="material-guide__link" href="{{ block.settings.link | escape }}">{{ block.settings.link_label | escape }}</a>{% endif %}
             </div>
           </article>
@@ -83,14 +102,15 @@
   "disabled_on": { "groups": ["header", "footer"] },
   "max_blocks": 16,
   "settings": [
-    { "type": "checkbox", "id": "use_store_catalog", "label": "Use store fabric catalog", "default": false, "info": "13 original types with descriptions; 11 have verified store product images. Stretch Satin and Taffeta await matching images. Use an exact catalog name in a block to override its content." },
-    { "type": "paragraph", "content": "Add verified fabric information and real photographs. Unnamed blocks appear only in the editor. Empty facts and links are omitted on the storefront." },
+    { "type": "checkbox", "id": "use_store_catalog", "label": "Use store fabric catalog", "default": false, "info": "Eight selected fabrics with store imagery: Satin, Chiffon, Tulle, Mesh, Lace, Crepe, Velvet and Sequin Fabric. Use a matching block name to override content." },
+    { "type": "paragraph", "content": "Only the eight selected fabric names appear on the storefront, including in manual mode. Other blocks remain saved but are not displayed. Unnamed blocks appear only in the editor." },
     { "type": "text", "id": "heading", "label": "Heading", "default": "Explore Fabrics" },
     { "type": "richtext", "id": "intro", "label": "Introduction" },
     { "type": "text", "id": "anchor", "label": "Page anchor", "default": "fabrics", "info": "Use #fabrics to link here. Give repeated sections different anchors." },
     { "type": "text", "id": "finish_label", "label": "Finish label", "default": "Finish" },
     { "type": "text", "id": "drape_label", "label": "Drape label", "default": "Drape" },
     { "type": "text", "id": "feel_label", "label": "Feel label", "default": "Feel" },
+    { "type": "text", "id": "details_label", "label": "Fabric details label", "default": "Fabric details" },
     { "type": "richtext", "id": "note", "label": "Fabric guidance" },
     { "type": "select", "id": "image_fit", "label": "Photograph fit", "options": [{ "value": "contain", "label": "Show full image" }, { "value": "cover", "label": "Fill image area" }], "default": "contain" },
     { "type": "color", "id": "background_color", "label": "Background" },

@@ -41,27 +41,31 @@
         {% if closeup != blank %}
           <figure>
             {% assign closeup_alt = closeup.alt | default: name %}
-            {{ closeup | image_url: width: 264 | image_tag: widths: '88, 176, 264', sizes: '(min-width: 750px) 88px, 44px', loading: 'lazy', alt: closeup_alt }}
+            {{ closeup | image_url: width: 480 | image_tag: widths: '160, 320, 480', sizes: '(min-width: 750px) 160px, 112px', loading: 'lazy', alt: closeup_alt }}
           </figure>
         {% elsif catalog_detail != blank %}
           <figure>
             <div class="fabric-guide__crop" style="--guide-detail-origin: {{ detail_position | escape }};">
               {% assign detail_alt = 'Garment detail. ' | append: image_caption %}
-              {{ catalog_detail | image_url: width: 600 | image_tag: widths: '200, 400, 600', sizes: '(min-width: 750px) 194px, 97px', loading: 'lazy', alt: detail_alt }}
+              {{ catalog_detail | image_url: width: 960 | image_tag: widths: '320, 640, 960', sizes: '(min-width: 750px) 352px, 246px', loading: 'lazy', alt: detail_alt }}
             </div>
           </figure>
         {% endif %}
         {% if garment != blank %}
           <figure>
             {% assign garment_alt = image_caption | default: name %}
-            {{ garment | image_url: width: 264 | image_tag: widths: '88, 176, 264', sizes: '(min-width: 750px) 88px, 44px', loading: 'lazy', alt: garment_alt }}
+            {{ garment | image_url: width: 480 | image_tag: widths: '160, 320, 480', sizes: '(min-width: 750px) 160px, 112px', loading: 'lazy', alt: garment_alt }}
           </figure>
         {% endif %}
       </div>
     {% endif %}
     <div class="material-guide__copy">
+      <span class="fabric-guide__number" aria-hidden="true">{{ display_number | escape }}</span>
       <h3 class="material-guide__item-heading">{{ name | escape }}</h3>
       {% if override.settings.description != blank %}<div class="rte">{{ override.settings.description }}</div>{% else %}<p>{{ description | escape }}</p>{% endif %}
+      <details class="fabric-guide__more">
+        <summary>{{ section.settings.details_label | escape }}<span class="visually-hidden"> — {{ name | escape }}</span></summary>
+        <div class="fabric-guide__more-content">
       {% if garment != blank or closeup != blank %}
         <div class="fabric-guide__image-notes">
           {% if closeup != blank %}
@@ -76,6 +80,8 @@
         <div><dt>{{ section.settings.feel_label | escape }}</dt><dd>{{ feel | escape }}</dd></div>
       </dl>
       {% if override.settings.notes != blank %}<div class="material-guide__note rte">{{ override.settings.notes }}</div>{% else %}<p class="material-guide__note">{{ notes | escape }}</p>{% endif %}
+        </div>
+      </details>
       {% if link != blank and link_label != blank %}<a class="material-guide__link" href="{{ link | escape }}">{{ link_label | escape }}</a>{% endif %}
     </div>
   </article>

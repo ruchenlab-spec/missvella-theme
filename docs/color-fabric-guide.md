@@ -6,20 +6,20 @@
 
 - Color：`shopify.color-pattern` → `shopify--color-pattern`，共 58 条。保留 56 个原始 HEX；Custom Color 不虚构色块；Rainbow 使用条目原有 `rainbow.jpg`。
 - 按原 taxonomy 分组，16 个常规色系各选一张店内商品图并逐张核对。图片标注 **Color family reference — shown in …**，不是每个色号的实物色样。58 条英文说明已补齐。
-- Fabric：`dress.fabric` → `dress_std_fabric`，按原 sort_order 展示 13 类型，补齐说明、Finish / Drape / Feel 及选购提示。11 类配有与商品面料元字段一致的店内图及商品链接。
+- Fabric：来源 `dress.fabric` → `dress_std_fabric`，原 13 类型保留在数据档案。按商家最新要求，当前仅展示 **Satin、Chiffon、Tulle、Mesh、Lace、Crepe、Velvet、Sequin Fabric**，严格按该顺序生成资料库。8 类均有与商品元字段一致的店内图片、说明及商品链接。
 - 面料双图为商品局部放大＋完整裙装，局部标注 **Garment detail**，不是独立面料实拍。拼接款注明具体部位：蕾丝上身、绉纱裙摆、欧根纱裙摆、丝绒上身等。没有生成、购买或上传外部素材。
-- 共引用 26 张不同店内图片，已逐张通过 Liquid `images[filename].width` 确认可读取。使用 Shopify 响应式图片和懒加载，不依赖 `all_products` 对象数量限制。
+- 初始资料库核验过 26 张店内图片；当前颜色＋8 类面料实际引用 24 张不同图片，均来自已核验来源。使用 Shopify 响应式图片和懒加载，不依赖 `all_products` 对象数量限制。
 - 读取公开目录 1,020 款用于候选筛选；并非每件都验证面料字段。入选的 11 类面料商品已逐项核对字段。图片只称店内商品图，不承诺其摄影来源。
 - 一般术语参考 [Mood Fabric Dictionary](https://www.moodfabrics.com/pages/fabric-dictionary) 和 [Dress and Textile Specialists](https://www.dressandtextilespecialists.org.uk/wp-content/uploads/2025/08/Identifying-Fibres-and-Fabrics.pdf)。不承诺统一成分、弹性比例、里布或护理方式；Satin 不等于 Silk，Sequin Fabric 不等于零星亮片装饰。
 
-### 素材缺口与原数据问题
+### 原始资料缺口留档（不在当前 8 类展示范围内）
 
 | 类型 | 核实结果 | 当前处理 |
 |---|---|---|
 | Stretch Satin | 标题写 Stretch Satin 的候选原字段为 Satin；两款 Elastic Satin 婚纱字段为空 | 类型及文案齐全，暂缺图，待核实实际面料 |
 | Taffeta | 两款标题写 Taffeta 的候选原字段均为 Satin | 类型及文案齐全，暂缺图，待核实实际面料 |
 
-未把冲突候选误归类，也未修改原字段。Custom Color 无统一实物色样，使用定制咨询提示。
+未把冲突候选误归类，也未修改原字段。Stretch Satin、Taffeta 及 Organza、Stretch Crepe、Knit 已退出当前页面展示；源数据仍保留。Custom Color 无统一实物色样，使用定制咨询提示。
 
 原色值 Navy `#282099`、Slate Blue `#6a5acd` 偏紫，Mauve 为 `#9289bc`。保留原值，并在英文描述中提示数字参考，不根据名称重新染色。
 
@@ -33,9 +33,9 @@
 2. 非空图片、说明、特征、链接覆盖默认内容；留空继续用默认值。颜色的 Fabric or style reference 可填写新图说明。
 3. **Remove built-in catalog photograph** 移除内置图，上传图仍优先；**Hide this catalog entry** 隐藏条目。
 4. Fabric 自填 Fabric close-up 替换默认放大图；自填 Dress photograph 后停止使用原图局部，避免误认为同一套图。
-5. 不匹配名称的区块在资料库模式下不输出。要新增其他类型、按区块重排或完全手动配置，关闭资料库模式。
+5. 不匹配名称的区块在资料库模式下不输出。颜色关闭资料库后可自行增补和重排。面料在资料库和手动模式下均只允许上述 8 种（忽略首尾空格与大小写）；其余已保存区块保留设置但不输出。手动模式仍按区块顺序展示允许的类型。
 
-58 色超过 Shopify 单 section 50 区块上限，所以完整列表由代码渲染，最多 50 个 Color 区块用于覆盖。Fabric 最多 16 块。资料库顺序固定为颜色名称顺序及面料 sort_order，不随覆盖区块重排。
+58 色超过 Shopify 单 section 50 区块上限，所以完整列表由代码渲染，最多 50 个 Color 区块用于覆盖。Fabric 最多 16 块以保留既有 schema 容量，但仅输出当前允许类型。资料库顺序固定为颜色名称顺序及 `fabricDisplayOrder`，不随覆盖区块重排。
 
 独立页面模板、Page 关联、唯一 H1 和菜单由商家配置。页内入口默认 `#colors`、`#fabrics`；重复 section 使用不同 anchor。若页脚仍指向 `/`，需在后台改为 `/pages/color-fabric-guide`。
 
@@ -43,13 +43,13 @@
 
 色块默认 48px，可通过 **Color chip size** 调至 32–72px；取代旧的桌面／手机列数设置。名称为 12px，同行色卡间距 10px，每组上下各 6px（手机 4px），组间不额外留白。色卡可点击宽高至少 44px；滚动区内留 8px，容纳选中边框与键盘焦点。缩略图采用最高 144px 的响应式图片。筛选时同时隐藏空组，深链接和编辑器选择可恢复对应组。没有 JavaScript 时仍显示紧凑平铺列表及全部详情，不输出分组标题。
 
-面料按商家后续要求改为紧凑横向条目：桌面两张 88px 宽缩略图（4:5），图间距 8px，右侧面料名与说明并排；Finish / Drape / Feel 使用紧凑行内排列，空间不够时自然换行。图片说明移至文字区，局部裁切与面料部位提示继续保留。名称 16px、正文 14px、辅助说明 12px；正文块间距 6px，条目上下各 14px。
+面料按最新反馈重新设计为两列图文卡片（990px 以下单列）：每张卡片左侧为面料局部主图与右下角小幅裙装图组合，右侧为轻量编号、20px 面料名称和 14px 简短说明。图片区宽 160px（手机 112px），双图时主图约 136px（手机 96px），保持紧凑；有一张图时正常单图显示，无图时文字占满。
 
-手机继续左图右文，双图各 44px，图片区与文字间距 12px、条目上下各 12px；名称在右侧正文上方，长说明自然换行，不截断内容或强制整段单行。仅有一张图时维持同样图宽，不放大补满。无图条目保持文字列对齐。配图使用缩略尺寸，自动局部图保留放大所需的分辨率。手动模式与资料库模式均应用该布局；颜色区布局保持既有紧凑分组。
+Finish / Drape / Feel、图片部位说明及补充提示收进原生 **Fabric details** 折叠区域，默认收起；点击、键盘或无 JavaScript 环境均可展开。面料名称、说明和商品链接始终可见，未删减正文。Details label 可在 section 中修改。折叠入口与链接保持至少 44px 点击高度，名称较长时自然换行。颜色区的单行色系布局不变。
 
 ## 代码与维护
 
-- `data/material-guide-catalog.json`：原始字段记录、HEX、分类、图片 URL、商品 handle、文案与素材缺口。
+- `data/material-guide-catalog.json`：原始字段记录、HEX、分类、图片 URL、商品 handle、文案与素材缺口；`fabricDisplayOrder` 指定当前 8 类展示范围和顺序。
 - `scripts/build-material-guide-catalog.cjs`：生成两个资料库调用文件，并验证重名和 Liquid 参数。
 - `theme/snippets/guide-color-catalog.liquid`、`guide-fabric-catalog.liquid`：自动生成的内容代码。
 - `theme/snippets/guide-color-entry.liquid`、`guide-fabric-entry.liquid`：渲染及同名区块覆盖。
@@ -71,3 +71,5 @@
 面料紧凑布局后续调整：一次 Theme Check 对改动文件零问题，原有 32 个翻译错误、21 个警告未增加，`git diff --check` 通过。确认当前 live 后，用 `--only` 与 `--nodelete` 仅推送 Fabric Guide section、面料条目 snippet、共享 CSS，CLI 已返回 `was pushed successfully`。未改内容数据或实例设置；文档及代码提交并同步 origin/main。按快速交付规范未做浏览器或截图回归。
 
 颜色单行布局后续调整：仅修改共享 CSS 中颜色分组的布局规则，不改 JavaScript、数据或实例设置。CSS 括号结构、diff 空白检查及规则审阅通过；确认 live 后仅用 `--only assets/material-guides.css` 和 `--nodelete` 精确上传，CLI 已返回 `was pushed successfully`。未启动浏览器或截图回归；代码和文档提交并同步 origin/main。
+
+8 类面料卡片改版：一次 Theme Check 对改动文件零问题，原有 32 个翻译错误／21 个警告未增加。静态验证生成列表恰为指定 8 类且顺序一致，手动模式允许名单一致、图片引用已存在、schema 设置引用和 diff 检查通过。确认当前 live 后，仅精确推送 Fabric Guide section、两个面料 snippet 及共享 CSS，CLI 返回 `was pushed successfully`；数据档案与生成脚本仅进入 Git，不上传内容 JSON。代码、数据和文档提交并同步 origin/main。前台由商家检查，未启动浏览器或截图回归。

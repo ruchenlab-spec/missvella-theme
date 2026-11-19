@@ -1644,5 +1644,15 @@
   "references": [
     "https://www.moodfabrics.com/pages/fabric-dictionary",
     "https://www.dressandtextilespecialists.org.uk/wp-content/uploads/2025/08/Identifying-Fibres-and-Fabrics.pdf"
+  ],
+  "fabricDisplayOrder": [
+    "Satin",
+    "Chiffon",
+    "Tulle",
+    "Mesh",
+    "Lace",
+    "Crepe",
+    "Velvet",
+    "Sequin Fabric"
   ]
 }

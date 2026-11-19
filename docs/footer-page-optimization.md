@@ -68,7 +68,7 @@
 ### Color & Fabric Guide 补充项 · 2026-11-19
 
 - 两个可独立添加的 **Color Guide**、**Fabric Guide** section 已完成，延续极简细线、原生字体／配色和文字链接。颜色提供可选色系筛选、色卡选中大图、详情链接和编辑器区块联动；面料提供近景／裙装双图和 Finish / Drape / Feel 特征行，手机纵排。
-- 2026-11-19 后续补充：新增资料库模式，含原始 58 色、56 个原 HEX 色块、16 组色系示例图和 13 类面料说明；11 类面料有字段一致的商品图及局部放大，Stretch Satin／Taffeta 因候选标题与字段冲突暂缺图。商家开启 **Use store color/fabric catalog** 后生效；同名区块可覆盖图片与文案。未修改页面实例、原元字段或菜单。[配置、来源与素材缺口](color-fabric-guide.md)。
+- 2026-11-19 后续补充：资料库含原始 58 色、56 个原 HEX 色块、16 组色系示例图。按最新要求，面料仅显示 Satin、Chiffon、Tulle、Mesh、Lace、Crepe、Velvet、Sequin Fabric；均有字段一致的店内图片。面料改为两列图文卡片，细节主图配裙装小图，详细特征可展开；颜色保持名称左侧、色卡单行横排。商家开启 **Use store color/fabric catalog** 后生效；同名区块可覆盖图片与文案。未修改页面实例、原元字段或菜单。[配置与素材来源](color-fabric-guide.md)。
 - 一次 Theme Check 对新增文件零问题，schema／设置引用和 JS 语法校验通过；现有 32 个翻译错误、21 个警告未变化。未做浏览器或截图回归。
 - 确认 `167137378374` 仍为 live 后，仅精确推送两个 section、`assets/material-guides.css` 和 `assets/color-guide.js`，CLI 已返回成功。Page、模板 JSON、关联和页脚菜单均未代改；商家配置并验收后将页脚指向 `/pages/color-fabric-guide`。
 
