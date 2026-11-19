@@ -15,6 +15,7 @@
 | 5 | How to Measure | [尺码指南里的测量标签](https://missvella.com/pages/size-guide) | 第 4 项确认的尺码页结构，待接入直达链接 | 待开始 |
 | 6 | Our Story | [About Us](https://missvella.com/pages/about-us) | 已有内容方案与实际商品图 | 方案已完成，待确认素材和落地 |
 | 7 | My Account | [Shopify 客户账户入口](https://missvella.com/account) | 验收订单视图时使用已授权的测试账户 | 已确认入口跳转，待配置和验收 |
+| 补充 | Color & Fabric Guide | `/pages/color-fabric-guide`（待商家创建与关联） | 实拍色卡、面料／裙装图及确认后的内容 | Color Guide / Fabric Guide 代码已上线，待商家配置 |
 
 进度表里的链接用于打开当前页面。第 5 项验收通过后，补上可直接打开测量标签的完整地址。
 
@@ -63,6 +64,13 @@
 验收时，页脚能进入店铺账户登录流程。登录及订单视图需使用已授权的测试账户验证，通过后再登记完整验收。页脚使用 `/account`，由 Shopify 处理跳转。
 
 ## 对话交接和上线
+
+### Color & Fabric Guide 补充项 · 2026-11-19
+
+- 两个可独立添加的 **Color Guide**、**Fabric Guide** section 已完成，延续极简细线、原生字体／配色和文字链接。颜色提供可选色系筛选、色卡选中大图、详情链接和编辑器区块联动；面料提供近景／裙装双图和 Finish / Drape / Feel 特征行，手机纵排。
+- 图片和具体颜色／面料信息留空，由商家配置。未命名区块及编辑器占位文字不会输出至前台，未配置链接不显示入口。[配置、交互及素材说明](color-fabric-guide.md)。
+- 一次 Theme Check 对新增文件零问题，schema／设置引用和 JS 语法校验通过；现有 32 个翻译错误、21 个警告未变化。未做浏览器或截图回归。
+- 确认 `167137378374` 仍为 live 后，仅精确推送两个 section、`assets/material-guides.css` 和 `assets/color-guide.js`，CLI 已返回成功。Page、模板 JSON、关联和页脚菜单均未代改；商家配置并验收后将页脚指向 `/pages/color-fabric-guide`。
 
 ### 第 1 项交接 · 2026-11-18
 

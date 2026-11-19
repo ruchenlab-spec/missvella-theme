@@ -1,0 +1,121 @@
+{%- liquid
+  render 'contrast-override', background_color: section.settings.background_color, text_color: section.settings.text_color, section_id: section.id
+  assign anchor = section.settings.anchor | handleize | default: section.id
+-%}
+{{ 'material-guides.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'color-guide.js' | asset_url }}" type="module"></script>
+
+<div class="section-background color-custom-{{ section.id }}"></div>
+<div class="section page-width-normal color-custom-{{ section.id }}">
+  <color-guide
+    id="{{ anchor | escape }}"
+    class="material-guide spacing-style"
+    style="{% render 'spacing-style', settings: section.settings %} --guide-columns: {{ section.settings.columns }}; --guide-mobile-columns: {{ section.settings.mobile_columns }};"
+  >
+    <header class="material-guide__header">
+      {% if section.settings.heading != blank %}<h2 class="material-guide__heading">{{ section.settings.heading | escape }}</h2>{% endif %}
+      {% if section.settings.intro != blank %}<div class="material-guide__intro rte">{{ section.settings.intro }}</div>{% endif %}
+    </header>
+
+    <div class="material-guide__filter" data-color-filter-wrap hidden>
+      <label for="ColorFamily-{{ section.id }}">{{ section.settings.filter_label | escape }}</label>
+      <select id="ColorFamily-{{ section.id }}" data-color-filter>
+        <option value="">{{ section.settings.all_label | escape }}</option>
+      </select>
+    </div>
+
+    <ul class="color-guide__swatches" role="list">
+      {% for block in section.blocks %}
+        {% if block.settings.name != blank or request.design_mode %}
+          {% liquid
+            assign color_name = block.settings.name | default: 'Color'
+            assign swatch = block.settings.swatch_image | default: block.settings.detail_image
+            assign swatch_alt = swatch.alt | default: color_name
+          %}
+          <li data-color-card data-block-id="{{ block.id }}" data-family="{{ block.settings.family | strip | escape }}" {{ block.shopify_attributes }}>
+            <a class="color-guide__choice" href="#ColorDetail-{{ section.id }}-{{ block.id }}" data-color-choice>
+              <span class="color-guide__swatch{% if swatch == blank %} color-guide__swatch--empty{% endif %}"{% if swatch == blank and block.settings.swatch_color != blank %} style="--guide-swatch: {{ block.settings.swatch_color }};"{% endif %}>
+                {% if swatch != blank %}
+                  {{ swatch | image_url: width: 480 | image_tag: widths: '120, 240, 360, 480', sizes: '(min-width: 750px) 220px, 45vw', loading: 'lazy', alt: swatch_alt }}
+                {% elsif request.design_mode and block.settings.swatch_color == blank %}
+                  <span class="material-guide__placeholder">Add a swatch image</span>
+                {% endif %}
+              </span>
+              <span class="color-guide__name">{{ color_name | escape }}</span>
+              {% if block.settings.family != blank %}<span class="color-guide__family">{{ block.settings.family | escape }}</span>{% endif %}
+            </a>
+          </li>
+        {% endif %}
+      {% endfor %}
+    </ul>
+
+    <div class="color-guide__details">
+      {% for block in section.blocks %}
+        {% if block.settings.name != blank or request.design_mode %}
+          {% liquid
+            assign color_name = block.settings.name | default: 'Color'
+            assign detail_image = block.settings.detail_image | default: block.settings.swatch_image
+            assign detail_alt = detail_image.alt | default: color_name
+          %}
+          <article id="ColorDetail-{{ section.id }}-{{ block.id }}" class="color-guide__detail{% if detail_image == blank %} color-guide__detail--text-only{% endif %}" data-color-panel>
+            {% if detail_image != blank %}
+              <div class="color-guide__photo">
+                {{ detail_image | image_url: width: 1200 | image_tag: widths: '360, 600, 900, 1200', sizes: '(min-width: 750px) 480px, 100vw', loading: 'lazy', alt: detail_alt }}
+              </div>
+            {% endif %}
+            <div class="material-guide__copy">
+              {% if block.settings.family != blank %}<p class="material-guide__eyebrow">{{ block.settings.family | escape }}</p>{% endif %}
+              <h3 class="material-guide__item-heading" tabindex="-1" data-color-title>{{ color_name | escape }}</h3>
+              {% if block.settings.fabric != blank %}<p class="material-guide__meta">{{ block.settings.fabric | escape }}</p>{% endif %}
+              {% if block.settings.description != blank %}<div class="rte">{{ block.settings.description }}</div>{% endif %}
+              {% if block.settings.link != blank and block.settings.link_label != blank %}<a class="material-guide__link" href="{{ block.settings.link | escape }}">{{ block.settings.link_label | escape }}</a>{% endif %}
+            </div>
+          </article>
+        {% endif %}
+      {% endfor %}
+    </div>
+    {% if section.settings.note != blank %}<div class="material-guide__note rte">{{ section.settings.note }}</div>{% endif %}
+  </color-guide>
+</div>
+
+{% schema %}
+{
+  "name": "Color Guide",
+  "class": "section-wrapper",
+  "disabled_on": { "groups": ["header", "footer"] },
+  "max_blocks": 40,
+  "settings": [
+    { "type": "paragraph", "content": "Add real color names and photographs. Blank, unnamed blocks appear only in the editor. Color families create a filter automatically. Solid colors are navigation references, not fabric photographs." },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Explore Colors" },
+    { "type": "richtext", "id": "intro", "label": "Introduction" },
+    { "type": "text", "id": "anchor", "label": "Page anchor", "default": "colors", "info": "Use #colors to link here. Use a different anchor if you add this section more than once." },
+    { "type": "text", "id": "filter_label", "label": "Color family filter label", "default": "Color family" },
+    { "type": "text", "id": "all_label", "label": "All colors label", "default": "All colors" },
+    { "type": "range", "id": "columns", "label": "Desktop columns", "min": 4, "max": 6, "step": 1, "default": 5 },
+    { "type": "select", "id": "mobile_columns", "label": "Mobile columns", "options": [{ "value": "2", "label": "2" }, { "value": "3", "label": "3" }], "default": "2" },
+    { "type": "richtext", "id": "note", "label": "Color guidance" },
+    { "type": "color", "id": "background_color", "label": "Background" },
+    { "type": "color", "id": "text_color", "label": "Text" },
+    { "type": "range", "id": "padding-block-start", "label": "Top spacing", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 40 },
+    { "type": "range", "id": "padding-block-end", "label": "Bottom spacing", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 40 }
+  ],
+  "blocks": [
+    {
+      "type": "color",
+      "name": "Color",
+      "settings": [
+        { "type": "text", "id": "name", "label": "Color name" },
+        { "type": "text", "id": "family", "label": "Color family", "info": "Use the same family name to group related colors." },
+        { "type": "image_picker", "id": "swatch_image", "label": "Swatch photograph" },
+        { "type": "color", "id": "swatch_color", "label": "Fallback navigation color", "info": "Used only when no photograph is configured." },
+        { "type": "image_picker", "id": "detail_image", "label": "Large detail photograph", "info": "Falls back to the swatch photograph. Set image alt text in the image editor." },
+        { "type": "text", "id": "fabric", "label": "Fabric or style reference" },
+        { "type": "richtext", "id": "description", "label": "Description" },
+        { "type": "text", "id": "link_label", "label": "Link label", "default": "Explore this color" },
+        { "type": "url", "id": "link", "label": "Product, collection or help link" }
+      ]
+    }
+  ],
+  "presets": [{ "name": "Color Guide", "category": "t:categories.text", "blocks": { "color_1": { "type": "color" }, "color_2": { "type": "color" }, "color_3": { "type": "color" }, "color_4": { "type": "color" } }, "block_order": ["color_1", "color_2", "color_3", "color_4"] }]
+}
+{% endschema %}

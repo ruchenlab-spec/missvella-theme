@@ -1,0 +1,105 @@
+{%- liquid
+  render 'contrast-override', background_color: section.settings.background_color, text_color: section.settings.text_color, section_id: section.id
+  assign anchor = section.settings.anchor | handleize | default: section.id
+-%}
+{{ 'material-guides.css' | asset_url | stylesheet_tag }}
+
+<div class="section-background color-custom-{{ section.id }}"></div>
+<div class="section page-width-normal color-custom-{{ section.id }}">
+  <div id="{{ anchor | escape }}" class="material-guide spacing-style" style="{% render 'spacing-style', settings: section.settings %} --fabric-image-fit: {{ section.settings.image_fit }};">
+    <header class="material-guide__header">
+      {% if section.settings.heading != blank %}<h2 class="material-guide__heading">{{ section.settings.heading | escape }}</h2>{% endif %}
+      {% if section.settings.intro != blank %}<div class="material-guide__intro rte">{{ section.settings.intro }}</div>{% endif %}
+    </header>
+    <div class="fabric-guide__items">
+      {% for block in section.blocks %}
+        {% if block.settings.name != blank or request.design_mode %}
+          {% liquid
+            assign fabric_name = block.settings.name | default: 'Fabric'
+            assign closeup_alt = block.settings.closeup.alt | default: fabric_name
+            assign garment_alt = block.settings.garment.alt | default: fabric_name
+            assign has_media = false
+            if block.settings.closeup != blank or block.settings.garment != blank or request.design_mode
+              assign has_media = true
+            endif
+          %}
+          <article class="fabric-guide__item{% unless has_media %} fabric-guide__item--text-only{% endunless %}" {{ block.shopify_attributes }}>
+            {% if has_media %}
+              <div class="fabric-guide__media">
+                {% if block.settings.closeup != blank %}
+                  <figure>
+                    {{ block.settings.closeup | image_url: width: 1000 | image_tag: widths: '300, 500, 750, 1000', sizes: '(min-width: 750px) 300px, 50vw', loading: 'lazy', alt: closeup_alt }}
+                    {% if block.settings.closeup_caption != blank %}<figcaption>{{ block.settings.closeup_caption | escape }}</figcaption>{% endif %}
+                  </figure>
+                {% elsif request.design_mode %}<div class="material-guide__placeholder fabric-guide__placeholder">Add a fabric close-up</div>{% endif %}
+                {% if block.settings.garment != blank %}
+                  <figure>
+                    {{ block.settings.garment | image_url: width: 1000 | image_tag: widths: '300, 500, 750, 1000', sizes: '(min-width: 750px) 300px, 50vw', loading: 'lazy', alt: garment_alt }}
+                    {% if block.settings.garment_caption != blank %}<figcaption>{{ block.settings.garment_caption | escape }}</figcaption>{% endif %}
+                  </figure>
+                {% elsif request.design_mode %}<div class="material-guide__placeholder fabric-guide__placeholder">Add a dress photograph</div>{% endif %}
+              </div>
+            {% endif %}
+            <div class="material-guide__copy">
+              <h3 class="material-guide__item-heading">{{ fabric_name | escape }}</h3>
+              {% if block.settings.description != blank %}<div class="rte">{{ block.settings.description }}</div>{% endif %}
+              {% if block.settings.finish != blank or block.settings.drape != blank or block.settings.feel != blank %}
+                <dl class="fabric-guide__facts">
+                {% if block.settings.finish != blank %}<div><dt>{{ section.settings.finish_label | escape }}</dt><dd>{{ block.settings.finish | escape }}</dd></div>{% endif %}
+                {% if block.settings.drape != blank %}<div><dt>{{ section.settings.drape_label | escape }}</dt><dd>{{ block.settings.drape | escape }}</dd></div>{% endif %}
+                {% if block.settings.feel != blank %}<div><dt>{{ section.settings.feel_label | escape }}</dt><dd>{{ block.settings.feel | escape }}</dd></div>{% endif %}
+                </dl>
+              {% endif %}
+              {% if block.settings.notes != blank %}<div class="material-guide__note rte">{{ block.settings.notes }}</div>{% endif %}
+              {% if block.settings.link != blank and block.settings.link_label != blank %}<a class="material-guide__link" href="{{ block.settings.link | escape }}">{{ block.settings.link_label | escape }}</a>{% endif %}
+            </div>
+          </article>
+        {% endif %}
+      {% endfor %}
+    </div>
+    {% if section.settings.note != blank %}<div class="material-guide__note rte">{{ section.settings.note }}</div>{% endif %}
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Fabric Guide",
+  "class": "section-wrapper",
+  "disabled_on": { "groups": ["header", "footer"] },
+  "max_blocks": 16,
+  "settings": [
+    { "type": "paragraph", "content": "Add verified fabric information and real photographs. Unnamed blocks appear only in the editor. Empty facts and links are omitted on the storefront." },
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Explore Fabrics" },
+    { "type": "richtext", "id": "intro", "label": "Introduction" },
+    { "type": "text", "id": "anchor", "label": "Page anchor", "default": "fabrics", "info": "Use #fabrics to link here. Give repeated sections different anchors." },
+    { "type": "text", "id": "finish_label", "label": "Finish label", "default": "Finish" },
+    { "type": "text", "id": "drape_label", "label": "Drape label", "default": "Drape" },
+    { "type": "text", "id": "feel_label", "label": "Feel label", "default": "Feel" },
+    { "type": "richtext", "id": "note", "label": "Fabric guidance" },
+    { "type": "select", "id": "image_fit", "label": "Photograph fit", "options": [{ "value": "contain", "label": "Show full image" }, { "value": "cover", "label": "Fill image area" }], "default": "contain" },
+    { "type": "color", "id": "background_color", "label": "Background" },
+    { "type": "color", "id": "text_color", "label": "Text" },
+    { "type": "range", "id": "padding-block-start", "label": "Top spacing", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 40 },
+    { "type": "range", "id": "padding-block-end", "label": "Bottom spacing", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 40 }
+  ],
+  "blocks": [{
+    "type": "fabric",
+    "name": "Fabric",
+    "settings": [
+      { "type": "text", "id": "name", "label": "Fabric name" },
+      { "type": "image_picker", "id": "closeup", "label": "Fabric close-up" },
+      { "type": "text", "id": "closeup_caption", "label": "Close-up caption" },
+      { "type": "image_picker", "id": "garment", "label": "Dress photograph" },
+      { "type": "text", "id": "garment_caption", "label": "Dress caption" },
+      { "type": "richtext", "id": "description", "label": "Description" },
+      { "type": "text", "id": "finish", "label": "Finish" },
+      { "type": "text", "id": "drape", "label": "Drape" },
+      { "type": "text", "id": "feel", "label": "Feel" },
+      { "type": "richtext", "id": "notes", "label": "Specific style or care notes" },
+      { "type": "text", "id": "link_label", "label": "Link label", "default": "Explore these dresses" },
+      { "type": "url", "id": "link", "label": "Product, collection or help link" }
+    ]
+  }],
+  "presets": [{ "name": "Fabric Guide", "category": "t:categories.text", "blocks": { "fabric_1": { "type": "fabric" }, "fabric_2": { "type": "fabric" }, "fabric_3": { "type": "fabric" } }, "block_order": ["fabric_1", "fabric_2", "fabric_3"] }]
+}
+{% endschema %}
