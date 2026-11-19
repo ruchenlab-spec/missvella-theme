@@ -1,62 +1,61 @@
 # Color & Fabric Guide
 
-2026-11-19：按商家确认的页面方案实现两个独立 section。代码已上传当前线上主题 `167137378374`（Missvella Dev）；图片、内容、页面模板实例及菜单由商家配置。
+2026-11-19：两个独立 section 增加店铺资料库模式。依据实际元字段和元对象制作内置内容，不修改商家模板、实例设置或原始元对象。
 
-## 文件及设计
+## 来源与已补齐内容
 
-| 文件 | 用途 |
-|---|---|
-| `theme/sections/color-guide.liquid` | Color Guide；色卡、可选色系、对应大图及商品／集合／客服链接 |
-| `theme/sections/fabric-guide.liquid` | Fabric Guide；近景图＋裙装图、说明及 Finish / Drape / Feel |
-| `theme/assets/material-guides.css` | 共用极简样式：主题字体／配色、细线、统一图幅、文字链接、明确焦点 |
-| `theme/assets/color-guide.js` | 渐进增强色系筛选、详情切换、深链接、编辑器区块选择及事件清理 |
+- Color：`shopify.color-pattern` → `shopify--color-pattern`，共 58 条。保留 56 个原始 HEX；Custom Color 不虚构色块；Rainbow 使用条目原有 `rainbow.jpg`。
+- 按原 taxonomy 分组，16 个常规色系各选一张店内商品图并逐张核对。图片标注 **Color family reference — shown in …**，不是每个色号的实物色样。58 条英文说明已补齐。
+- Fabric：`dress.fabric` → `dress_std_fabric`，按原 sort_order 展示 13 类型，补齐说明、Finish / Drape / Feel 及选购提示。11 类配有与商品面料元字段一致的店内图及商品链接。
+- 面料双图为商品局部放大＋完整裙装，局部标注 **Garment detail**，不是独立面料实拍。拼接款注明具体部位：蕾丝上身、绉纱裙摆、欧根纱裙摆、丝绒上身等。没有生成、购买或上传外部素材。
+- 共引用 26 张不同店内图片，已逐张通过 Liquid `images[filename].width` 确认可读取。使用 Shopify 响应式图片和懒加载，不依赖 `all_products` 对象数量限制。
+- 读取公开目录 1,020 款用于候选筛选；并非每件都验证面料字段。入选的 11 类面料商品已逐项核对字段。图片只称店内商品图，不承诺其摄影来源。
+- 一般术语参考 [Mood Fabric Dictionary](https://www.moodfabrics.com/pages/fabric-dictionary) 和 [Dress and Textile Specialists](https://www.dressandtextilespecialists.org.uk/wp-content/uploads/2025/08/Identifying-Fibres-and-Fabrics.pdf)。不承诺统一成分、弹性比例、里布或护理方式；Satin 不等于 Silk，Sequin Fabric 不等于零星亮片装饰。
 
-不预填任何颜色名称、面料特性、商品链接或实物照片；只有结构性英文标题和字段标签。新预设分别包含 4 个空 Color 区块和 3 个空 Fabric 区块。未填写名称的区块只在编辑器展示，前台不输出；编辑器中的图片占位说明不对顾客显示。空说明、事实字段及未配置链接不输出。
+### 素材缺口与原数据问题
 
-## 商家配置步骤
+| 类型 | 核实结果 | 当前处理 |
+|---|---|---|
+| Stretch Satin | 标题写 Stretch Satin 的候选原字段为 Satin；两款 Elastic Satin 婚纱字段为空 | 类型及文案齐全，暂缺图，待核实实际面料 |
+| Taffeta | 两款标题写 Taffeta 的候选原字段均为 Satin | 类型及文案齐全，暂缺图，待核实实际面料 |
 
-1. **Online Store → Themes → 当前主题 → Edit theme → Pages → Create template**：创建 `color-fabric-guide`，基于 Default page，避免修改共用默认模板。
-2. 使用原生 Page 标题或 Heading/Text 区块设置唯一 H1：**Color & Fabric Guide**。两个 Guide section 自身使用 H2，区块名称用 H3。
-3. 在新模板主体中添加 **Color Guide**，然后添加 **Fabric Guide**。
-4. Color Guide 的每个 Color 区块配置准确名称、色系、色卡实拍图、大图、面料／款式说明、正文和链接。未填链接时没有空按钮；可使用商品、集合或客服入口。不要添加不存在的色样购买入口。
-5. Fabric Guide 的每个 Fabric 区块配置准确名称、面料近景与对应裙装图、可选图片说明、正文，以及经过确认的 Finish（表面效果）、Drape（垂坠／轮廓）、Feel（触感／厚薄）。额外注意事项可填入 Specific style or care notes；留空的特征不显示。
-6. 给图片填写准确 alt 文本。未设置 alt 时回退区块名称。Color 的大图默认完整显示，不裁切；缩略图为方形裁切。Fabric 图片默认 Show full image（完整显示），也可在 section 设置里选择 Fill image area（填满 4:5 图框）。
-7. 可在两个 section 的 Introduction / guidance 中填写色差和选购说明，或添加原生 Text/Accordion/Contact 区块完成 **Before You Choose / Need Help Choosing?**。这些内容未由代码自动写入。
-8. 在 **Online Store → Pages** 创建 `Color & Fabric Guide`，handle 设置为 `color-fabric-guide`，关联新模板。正文是否显示取决于所保留的原生 Page 区块，避免重复标题或说明。
-9. 配置图片和文案并检查后，在 **Content → Menus** 中将页脚 **Color & Fabric Guide** 从 `/` 指向该 Page。菜单和页面关联由商家完成，代码任务没有代改。
+未把冲突候选误归类，也未修改原字段。Custom Color 无统一实物色样，使用定制咨询提示。
 
-## Color Guide 使用细节
+原色值 Navy `#282099`、Slate Blue `#6a5acd` 偏紫，Mauve 为 `#9289bc`。保留原值，并在英文描述中提示数字参考，不根据名称重新染色。
 
-- 支持最多 40 个颜色；桌面每行 4–6 个，默认 5；手机每行 2–3 个，默认 2。顺序按编辑器区块顺序。
-- Color family 填写相同文本的区块归为同组；字段首尾空白会去除，大小写不同视为不同名称。配置后自动生成色系筛选，未配置色系时不显示筛选器。无色系区块仍在 All colors 中展示。
-- 点击色卡会显示对应大图／说明并跳转到详情位置；当前色卡有细线选中边框和名称下划线。链接为真实片段地址，可复制、刷新及使用浏览器返回。
-- 筛选后若原选择不在该色系，显示该色系首个颜色。打开其他色系的详情深链接或在编辑器选中被筛掉的区块时，恢复 All colors 并展示目标颜色。
-- 可只提供一张图片：缺少大图时使用色卡图；缺少色卡图时使用大图。两者都没有时，不虚构实物纹理；可配置 Fallback navigation color 作为纯色导航提示，大图区域省略。
-- 不加载 JavaScript 时所有已配置详情正常显示，色卡链接直接跳转到对应详情，筛选器不显示。
-- 每个 section 实例独立运行；编辑器重载／重新连接时重新初始化，并清理旧事件监听。
+## 编辑器启用与修改
 
-## Fabric Guide 使用细节
+现有页面：在 **Color Guide** 开启 **Use store color catalog**，在 **Fabric Guide** 开启 **Use store fabric catalog**，保存。新开关默认关闭，保护原手动配置。
 
-- 支持最多 16 种面料；桌面为左侧双图、右侧说明，手机先双图再说明。所有面料默认直接展开，便于连续比较。
-- 只配置一张照片时，前台显示单图；两张都没有时使用纯文字版式。编辑器始终保留缺图提示，便于继续配置。
-- 字段名 Finish / Drape / Feel 可在 section 设置中修改；内容在每个 Fabric 区块中修改。不要根据面料名称推断或承诺纤维成分、弹性、里布、透明度或统一护理方式。
+新增页面：可直接添加 **Color Guide — Catalog** 和 **Fabric Guide — Catalog** 预设；已开启资料库并填好介绍。原空白预设继续保留。
 
-## 页内入口与风格设置
+1. 要改某条内容，添加 Color / Fabric 区块，名称填写原名称，例如 `Dusty Blue`、`Stretch Satin`。匹配忽略大小写及首尾空格，同名只使用首个区块。
+2. 非空图片、说明、特征、链接覆盖默认内容；留空继续用默认值。颜色的 Fabric or style reference 可填写新图说明。
+3. **Remove built-in catalog photograph** 移除内置图，上传图仍优先；**Hide this catalog entry** 隐藏条目。
+4. Fabric 自填 Fabric close-up 替换默认放大图；自填 Dress photograph 后停止使用原图局部，避免误认为同一套图。
+5. 不匹配名称的区块在资料库模式下不输出。要新增其他类型、按区块重排或完全手动配置，关闭资料库模式。
 
-- 默认页内地址：`/pages/color-fabric-guide#colors`、`/pages/color-fabric-guide#fabrics`。可用原生文本或按钮区块配置两个页内入口。
-- Page anchor 会转为适合 URL 的格式；同页添加多个同类 section 时，为各实例设置不同的 anchor。颜色详情 ID 自带 section/block ID，不会跨实例冲突。
-- 留空背景和文字颜色继承主题配色；每个 section 都有独立上下间距。使用当前 Horizon 的 `contrast-override`，未新增不存在的 color scheme。
-- 本页用实拍细节传达颜色和面料，不使用 AI 图片或 CSS 纹理冒充实物色卡。图片和描述需与实际商品对应。
+58 色超过 Shopify 单 section 50 区块上限，所以完整列表由代码渲染，最多 50 个 Color 区块用于覆盖。Fabric 最多 16 块。资料库顺序固定为颜色名称顺序及面料 sort_order，不随覆盖区块重排。
 
-## 检查与发布记录
+独立页面模板、Page 关联、唯一 H1 和菜单由商家配置。页内入口默认 `#colors`、`#fabrics`；重复 section 使用不同 anchor。若页脚仍指向 `/`，需在后台改为 `/pages/color-fabric-guide`。
 
-- 一次 Theme Check：新增文件零错误／警告；全主题仍为现有 32 个 MatchingTranslations 错误、21 个警告。
-- 两个 schema JSON、区块预设和设置引用通过校验；`node --check theme/assets/color-guide.js` 通过。
-- 未进行浏览器交互／视觉回归或截图；商家配置后检查色系筛选、选择大图、链接和手机排版。
-- `theme list` 已确认目标主题为 live；以下精确上传收到 Shopify CLI `was pushed successfully` 回执，未推送 `templates/*.json`、`sections/*.json` 或 `config/settings_data.json`。
+颜色保留筛选、详情切换、深链接、编辑器区块联动及无 JS 降级；桌面 4–6 色一行，手机 2–3 色。面料桌面双图＋说明、手机纵排。继承原主题字体和配色，使用细线与克制间距。
 
-```powershell
-shopify theme push --store 6icwx6-yv.myshopify.com --theme 167137378374 --allow-live --path theme --only "sections/color-guide.liquid" --only "sections/fabric-guide.liquid" --only "assets/material-guides.css" --only "assets/color-guide.js" --nodelete
-```
+## 代码与维护
 
-状态：代码已上线，待商家配置内容、关联页面和菜单后检查前台。Git 提交及同步回执见本次对话。
+- `data/material-guide-catalog.json`：原始字段记录、HEX、分类、图片 URL、商品 handle、文案与素材缺口。
+- `scripts/build-material-guide-catalog.cjs`：生成两个资料库调用文件，并验证重名和 Liquid 参数。
+- `theme/snippets/guide-color-catalog.liquid`、`guide-fabric-catalog.liquid`：自动生成的内容代码。
+- `theme/snippets/guide-color-entry.liquid`、`guide-fabric-entry.liquid`：渲染及同名区块覆盖。
+- `theme/sections/color-guide.liquid`、`fabric-guide.liquid`：开关、schema、预设。
+- `theme/assets/material-guides.css`：样式；`color-guide.js` 本轮未改。
+
+资料库是 2026-11-19 的核对快照，不是元对象实时同步。源条目、图片或商品 URL 变化时，更新数据文件，运行 `node scripts/build-material-guide-catalog.cjs`，精确推送修改代码；不要改写实例 JSON。
+
+## 检查与交付
+
+本轮一次 Theme Check：改动文件零问题；原有 32 个 MatchingTranslations 错误、21 个警告未增加。验证了 58 色／13 面料、全部名称和 HEX、26 张图片解析、两个 schema 及默认开关／预设。局部放大增量另检查 Liquid 分支和 `git diff --check`，未重复全主题扫描。
+
+未运行浏览器或截图回归，商家启用资料库后检查前台。发布范围仅两个 section、四个 snippet、一个 CSS；不含模板、section group 或 settings_data JSON，不改变原元对象、商品字段、菜单或线上实例。
+
+发布状态：`theme list` 确认当前 live 为 `167137378374`（Missvella Dev）。仅精确上传上述 7 个代码文件，使用 `--only` 和 `--nodelete`；CLI 已返回 `was pushed successfully`。内容库待商家开启开关，另外两类面料待核实补图。数据、代码和文档纳入本次本地 Git 提交并同步 origin/main，临时素材下载和缓存不纳入提交。

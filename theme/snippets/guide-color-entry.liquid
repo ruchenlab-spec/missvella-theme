@@ -1,0 +1,67 @@
+{%- liquid
+  assign override = nil
+  assign lookup_name = name | downcase
+  for candidate in section.blocks
+    assign candidate_name = candidate.settings.name | strip | downcase
+    if candidate_name == lookup_name
+      assign override = candidate
+      break
+    endif
+  endfor
+  assign detail_image = images[image_file]
+  assign swatch_image = override.settings.swatch_image
+  if override.settings.suppress_catalog_image
+    assign detail_image = nil
+  endif
+  assign detail_image = override.settings.detail_image | default: swatch_image | default: detail_image
+  assign family = override.settings.family | default: family
+  assign hex = override.settings.swatch_color | default: hex
+  assign entry_id = override.id | default: entry_id
+  assign link = override.settings.link
+  assign link_label = override.settings.link_label
+  if link == blank and product_handle != blank
+    assign link = routes.root_url | append: '/products/' | append: product_handle | replace: '//', '/'
+    assign link_label = 'View the pictured dress'
+  endif
+  if override.settings.detail_image != blank or swatch_image != blank
+    assign image_caption = override.settings.fabric
+  endif
+-%}
+{% unless override.settings.hide_in_catalog %}
+  {% if mode == 'swatch' %}
+    <li data-color-card data-block-id="{{ entry_id }}" data-family="{{ family | strip | escape }}" {{ override.shopify_attributes }}>
+      <a class="color-guide__choice" href="#ColorDetail-{{ section.id }}-{{ entry_id }}" data-color-choice>
+        <span class="color-guide__swatch color-guide__swatch--empty"{% if hex != blank %} style="--guide-swatch: {{ hex | escape }};"{% endif %}>
+          {% if swatch_image != blank %}
+            {{ swatch_image | image_url: width: 480 | image_tag: widths: '120, 240, 360, 480', sizes: '(min-width: 750px) 220px, 45vw', loading: 'lazy', alt: name }}
+          {% elsif hex == blank and detail_image != blank %}
+            {{ detail_image | image_url: width: 480 | image_tag: widths: '120, 240, 360, 480', sizes: '(min-width: 750px) 220px, 45vw', loading: 'lazy', alt: name }}
+          {% elsif hex == blank %}
+            <span class="color-guide__custom">{{ name | escape }}</span>
+          {% endif %}
+        </span>
+        <span class="color-guide__name">{{ name | escape }}</span>
+        <span class="color-guide__family">{{ family | escape }}</span>
+      </a>
+    </li>
+  {% else %}
+    <article id="ColorDetail-{{ section.id }}-{{ entry_id }}" class="color-guide__detail{% if detail_image == blank %} color-guide__detail--text-only{% endif %}" data-color-panel>
+      {% if detail_image != blank %}
+        <figure class="color-guide__photo">
+          {% assign image_alt = image_caption | default: name %}
+          {{ detail_image | image_url: width: 1000 | image_tag: widths: '360, 600, 800, 1000', sizes: '(min-width: 750px) 480px, 100vw', loading: 'lazy', alt: image_alt }}
+          {% if image_caption != blank %}<figcaption>{{ image_caption | escape }}</figcaption>{% endif %}
+        </figure>
+      {% endif %}
+      <div class="material-guide__copy">
+        <p class="material-guide__eyebrow">{{ family | escape }}</p>
+        <h3 class="material-guide__item-heading" tabindex="-1" data-color-title>{{ name | escape }}</h3>
+        {% if hex != blank %}<p class="material-guide__meta"><span class="color-guide__chip" style="--guide-swatch: {{ hex | escape }};" aria-hidden="true"></span>Digital color reference</p>{% endif %}
+        {% if override.settings.fabric != blank %}<p class="material-guide__meta">{{ override.settings.fabric | escape }}</p>{% endif %}
+        {% if override.settings.description != blank %}<div class="rte">{{ override.settings.description }}</div>{% else %}<p>{{ description | escape }}</p>{% endif %}
+        <p class="material-guide__note">Screen settings, lighting and fabric finish can change how a color appears. Check the chosen dress for its color options.</p>
+        {% if link != blank and link_label != blank %}<a class="material-guide__link" href="{{ link | escape }}">{{ link_label | escape }}</a>{% endif %}
+      </div>
+    </article>
+  {% endif %}
+{% endunless %}

@@ -12,6 +12,9 @@
       {% if section.settings.intro != blank %}<div class="material-guide__intro rte">{{ section.settings.intro }}</div>{% endif %}
     </header>
     <div class="fabric-guide__items">
+      {% if section.settings.use_store_catalog %}
+        {% render 'guide-fabric-catalog', section: section %}
+      {% else %}
       {% for block in section.blocks %}
         {% if block.settings.name != blank or request.design_mode %}
           {% liquid
@@ -56,6 +59,7 @@
           </article>
         {% endif %}
       {% endfor %}
+      {% endif %}
     </div>
     {% if section.settings.note != blank %}<div class="material-guide__note rte">{{ section.settings.note }}</div>{% endif %}
   </div>
@@ -68,6 +72,7 @@
   "disabled_on": { "groups": ["header", "footer"] },
   "max_blocks": 16,
   "settings": [
+    { "type": "checkbox", "id": "use_store_catalog", "label": "Use store fabric catalog", "default": false, "info": "13 original types with descriptions; 11 have verified store product images. Stretch Satin and Taffeta await matching images. Use an exact catalog name in a block to override its content." },
     { "type": "paragraph", "content": "Add verified fabric information and real photographs. Unnamed blocks appear only in the editor. Empty facts and links are omitted on the storefront." },
     { "type": "text", "id": "heading", "label": "Heading", "default": "Explore Fabrics" },
     { "type": "richtext", "id": "intro", "label": "Introduction" },
@@ -87,6 +92,8 @@
     "name": "Fabric",
     "settings": [
       { "type": "text", "id": "name", "label": "Fabric name" },
+      { "type": "checkbox", "id": "hide_in_catalog", "label": "Hide this catalog entry", "default": false },
+      { "type": "checkbox", "id": "suppress_catalog_image", "label": "Remove built-in catalog photograph", "default": false, "info": "Your uploaded images still take priority." },
       { "type": "image_picker", "id": "closeup", "label": "Fabric close-up" },
       { "type": "text", "id": "closeup_caption", "label": "Close-up caption" },
       { "type": "image_picker", "id": "garment", "label": "Dress photograph" },
@@ -100,6 +107,9 @@
       { "type": "url", "id": "link", "label": "Product, collection or help link" }
     ]
   }],
-  "presets": [{ "name": "Fabric Guide", "category": "t:categories.text", "blocks": { "fabric_1": { "type": "fabric" }, "fabric_2": { "type": "fabric" }, "fabric_3": { "type": "fabric" } }, "block_order": ["fabric_1", "fabric_2", "fabric_3"] }]
+  "presets": [
+    { "name": "Fabric Guide", "category": "t:categories.text", "blocks": { "fabric_1": { "type": "fabric" }, "fabric_2": { "type": "fabric" }, "fabric_3": { "type": "fabric" } }, "block_order": ["fabric_1", "fabric_2", "fabric_3"] },
+    { "name": "Fabric Guide — Catalog", "category": "t:categories.text", "settings": { "use_store_catalog": true, "intro": "<p>Compare surface, drape and texture across our fabric types. The images show selected dresses; individual styles may combine more than one material.</p>" } }
+  ]
 }
 {% endschema %}

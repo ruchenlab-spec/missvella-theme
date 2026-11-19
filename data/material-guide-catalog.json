@@ -1,0 +1,1648 @@
+{
+  "updated": "2026-11-19",
+  "store": "missvella.com",
+  "colorField": "shopify.color-pattern",
+  "colorMetaobject": "shopify--color-pattern",
+  "fabricField": "dress.fabric",
+  "fabricMetaobject": "dress_std_fabric",
+  "imagePolicy": "Existing store CDN images; family references are labeled and are not individual color swatches. No new fiber, stretch percentage, care or availability claims.",
+  "colors": [
+    {
+      "name": "Black",
+      "hex": "#000000",
+      "family": "Black",
+      "source": {
+        "color": "#000000",
+        "color_taxonomy_reference": [
+          "gid://shopify/TaxonomyValue/1"
+        ],
+        "label": "Black",
+        "pattern_taxonomy_reference": "gid://shopify/TaxonomyValue/2874"
+      },
+      "description": "A deep, clean neutral. Compare matte surfaces with embellished finishes to choose the amount of contrast you prefer.",
+      "image": {
+        "file": "soren-mermaid-one-shoulder-black-sequins-long-prom-dresses-with-sequins-flowers_1_b8b22b72-5813-45ff-9227-a010d9098ca4.webp",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/soren-mermaid-one-shoulder-black-sequins-long-prom-dresses-with-sequins-flowers_1_b8b22b72-5813-45ff-9227-a010d9098ca4.webp?v=1794897796",
+        "width": 800,
+        "height": 1200
+      },
+      "imageCaption": "Color family reference — shown in Black. Not an exact swatch for every shade.",
+      "product": "black-one-shoulder-sequin-prom-dress-missvella",
+      "imageStatus": "family-reference"
+    },
+    {
+      "name": "Blue",
+      "hex": "#005BD3",
+      "family": "Blue",
+      "source": {
+        "color": "#005BD3",
+        "color_taxonomy_reference": [
+          "gid://shopify/TaxonomyValue/2"
+        ],
+        "label": "Blue",
+        "pattern_taxonomy_reference": "gid://shopify/TaxonomyValue/2874"
+      },
+      "description": "A clear blue direction. Explore the lighter and deeper shades in this family before choosing a specific style.",
+      "image": {
+        "file": "harlin-sky-blue-halter-mermaid-satin-beaded-long-formal-prom-dresses-with-slit_ec4abdeb-76f5-4a06-8579-11f6c666fae9.webp",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/harlin-sky-blue-halter-mermaid-satin-beaded-long-formal-prom-dresses-with-slit_ec4abdeb-76f5-4a06-8579-11f6c666fae9.webp?v=1794331547",
+        "width": 800,
+        "height": 1200
+      },
+      "imageCaption": "Color family reference — shown in Sky Blue. Not an exact swatch for every shade.",
+      "product": "sky-blue-beaded-halter-mermaid-prom-dress-missvella",
+      "imageStatus": "family-reference"
+    },
+    {
+      "name": "Blushing Pink",
+      "hex": "#fde9e9",
+      "family": "Pink",
+      "source": {
+        "color": "#fde9e9",
+        "color_taxonomy_reference": [
+          "gid://shopify/TaxonomyValue/11"
+        ],
+        "label": "Blushing Pink",
+        "pattern_taxonomy_reference": "gid://shopify/TaxonomyValue/2874"
+      },
+      "description": "A very pale pink reference with a gentle, warm cast.",
+      "image": {
+        "file": "vynna-pink-mermaid-v-neck-satin-long-prom-dresses-with-train77_d0b604e1-61f2-40a2-8fc0-7431b4276d44.webp",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/vynna-pink-mermaid-v-neck-satin-long-prom-dresses-with-train77_d0b604e1-61f2-40a2-8fc0-7431b4276d44.webp?v=1794996987",
+        "width": 800,
+        "height": 1200
+      },
+      "imageCaption": "Color family reference — shown in Pink. Not an exact swatch for every shade.",
+      "product": "blush-pink-satin-mermaid-prom-dress-missvella",
+      "imageStatus": "family-reference"
+    },
+    {
+      "name": "Burgundy",
+      "hex": "#751e15",
+      "family": "Red",
+      "source": {
+        "color": "#751e15",
+        "color_taxonomy_reference": [
+          "gid://shopify/TaxonomyValue/13"
+        ],
+        "label": "Burgundy",
+        "pattern_taxonomy_reference": "gid://shopify/TaxonomyValue/2874"
+      },
+      "description": "A deep red reference with a warm, wine-toned character.",
+      "image": {
+        "file": "BurgundyLaceBeadedA-LineV-NeckMaxiDress_1.jpg",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/BurgundyLaceBeadedA-LineV-NeckMaxiDress_1.jpg?v=1794907129",
+        "width": 1792,
+        "height": 2400
+      },
+      "imageCaption": "Color family reference — shown in Burgundy. Not an exact swatch for every shade.",
+      "product": "burgundy-lace-beaded-a-line-v-neck-maxi-dress",
+      "imageStatus": "family-reference"
+    },
+    {
+      "name": "Butter",
+      "hex": "#fcddae",
+      "family": "Yellow",
+      "source": {
+        "color": "#fcddae",
+        "color_taxonomy_reference": [
+          "gid://shopify/TaxonomyValue/14"
+        ],
+        "label": "Butter",
+        "pattern_taxonomy_reference": "gid://shopify/TaxonomyValue/2874"
+      },
+      "description": "A soft, creamy yellow reference with a warm undertone.",
+      "image": {
+        "file": "tamira-yellow-strapless-chiffon-ruffled-a-line-long-prom-dresses-with-appliques6_ae190c6c-aa94-4016-9620-040b72a6c9e1.webp",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/tamira-yellow-strapless-chiffon-ruffled-a-line-long-prom-dresses-with-appliques6_ae190c6c-aa94-4016-9620-040b72a6c9e1.webp?v=1794995301",
+        "width": 800,
+        "height": 1200
+      },
+      "imageCaption": "Color family reference — shown in Yellow. Not an exact swatch for every shade.",
+      "product": "yellow-strapless-lace-corset-prom-dress-missvella",
+      "imageStatus": "family-reference"
+    },
+    {
+      "name": "Cabernet",
+      "hex": "#722f37",
+      "family": "Red",
+      "source": {
+        "color": "#722f37",
+        "color_taxonomy_reference": [
+          "gid://shopify/TaxonomyValue/13"
+        ],
+        "label": "Cabernet",
+        "pattern_taxonomy_reference": "gid://shopify/TaxonomyValue/2874"
+      },
+      "description": "A muted wine-red reference with a subtle purple undertone.",
+      "image": {
+        "file": "BurgundyLaceBeadedA-LineV-NeckMaxiDress_1.jpg",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/BurgundyLaceBeadedA-LineV-NeckMaxiDress_1.jpg?v=1794907129",
+        "width": 1792,
+        "height": 2400
+      },
+      "imageCaption": "Color family reference — shown in Burgundy. Not an exact swatch for every shade.",
+      "product": "burgundy-lace-beaded-a-line-v-neck-maxi-dress",
+      "imageStatus": "family-reference"
+    },
+    {
+      "name": "Champagne",
+      "hex": "#f1e9d2",
+      "family": "Beige & Champagne",
+      "source": {
+        "color": "#f1e9d2",
+        "color_taxonomy_reference": [
+          "gid://shopify/TaxonomyValue/6"
+        ],
+        "label": "Champagne",
+        "pattern_taxonomy_reference": "gid://shopify/TaxonomyValue/2874"
+      },
+      "description": "A light, warm neutral with a creamy beige cast.",
+      "image": {
+        "file": "ChampagneBeadedTulleA-LineShortSleeveFloor-LengthDress_1.jpg",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/ChampagneBeadedTulleA-LineShortSleeveFloor-LengthDress_1.jpg?v=1794909942",
+        "width": 1792,
+        "height": 2400
+      },
+      "imageCaption": "Color family reference — shown in Champagne. Not an exact swatch for every shade.",
+      "product": "champagne-beaded-tulle-a-line-short-sleeve-floor-length-dress",
+      "imageStatus": "family-reference"
+    },
+    {
+      "name": "Cinnamon",
+      "hex": "#c35d32",
+      "family": "Orange & Terracotta",
+      "source": {
+        "color": "#c35d32",
+        "color_taxonomy_reference": [
+          "gid://shopify/TaxonomyValue/10"
+        ],
+        "label": "Cinnamon",
+        "pattern_taxonomy_reference": "gid://shopify/TaxonomyValue/2874"
+      },
+      "description": "A warm orange-brown reference with a copper-like character.",
+      "image": {
+        "file": "DM_20261109151758_001.jpg",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/DM_20261109151758_001.jpg?v=1794208796",
+        "width": 624,
+        "height": 883
+      },
+      "imageCaption": "Color family reference — shown in Terracotta. Not an exact swatch for every shade.",
+      "product": "terracotta-cowl-neck-satin-prom-dress-with-cascading-ruffle",
+      "imageStatus": "family-reference"
+    },
+    {
+      "name": "Coral",
+      "hex": "#ff777f",
+      "family": "Pink",
+      "source": {
+        "color": "#ff777f",
+        "color_taxonomy_reference": [
+          "gid://shopify/TaxonomyValue/11"
+        ],
+        "label": "Coral",
+        "pattern_taxonomy_reference": "gid://shopify/TaxonomyValue/2874"
+      },
+      "description": "A lively pink reference with warm coral undertones.",
+      "image": {
+        "file": "vynna-pink-mermaid-v-neck-satin-long-prom-dresses-with-train77_d0b604e1-61f2-40a2-8fc0-7431b4276d44.webp",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/vynna-pink-mermaid-v-neck-satin-long-prom-dresses-with-train77_d0b604e1-61f2-40a2-8fc0-7431b4276d44.webp?v=1794996987",
+        "width": 800,
+        "height": 1200
+      },
+      "imageCaption": "Color family reference — shown in Pink. Not an exact swatch for every shade.",
+      "product": "blush-pink-satin-mermaid-prom-dress-missvella",
+      "imageStatus": "family-reference"
+    },
+    {
+      "name": "Custom Color",
+      "hex": "",
+      "family": "Multicolor & Custom",
+      "source": {
+        "color_taxonomy_reference": [
+          "gid://shopify/TaxonomyValue/2865"
+        ],
+        "label": "Custom Color",
+        "pattern_taxonomy_reference": "gid://shopify/TaxonomyValue/24509"
+      },
+      "description": "Have a particular shade in mind? Ask us about your chosen dress and preferred color before ordering. Availability depends on the style.",
+      "image": null,
+      "imageCaption": "",
+      "product": "",
+      "imageStatus": "no-single-color-photo"
+    },
+    {
+      "name": "Daffodil",
+      "hex": "#ffe9a1",
+      "family": "Yellow",
+      "source": {
+        "color": "#ffe9a1",
+        "color_taxonomy_reference": [
+          "gid://shopify/TaxonomyValue/14"
+        ],
+        "label": "Daffodil",
+        "pattern_taxonomy_reference": "gid://shopify/TaxonomyValue/2874"
+      },
+      "description": "A light, warm yellow reference with a softly golden cast.",
+      "image": {
+        "file": "tamira-yellow-strapless-chiffon-ruffled-a-line-long-prom-dresses-with-appliques6_ae190c6c-aa94-4016-9620-040b72a6c9e1.webp",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/tamira-yellow-strapless-chiffon-ruffled-a-line-long-prom-dresses-with-appliques6_ae190c6c-aa94-4016-9620-040b72a6c9e1.webp?v=1794995301",
+        "width": 800,
+        "height": 1200
+      },
+      "imageCaption": "Color family reference — shown in Yellow. Not an exact swatch for every shade.",
+      "product": "yellow-strapless-lace-corset-prom-dress-missvella",
+      "imageStatus": "family-reference"
+    },
+    {
+      "name": "Dark Navy",
+      "hex": "#000046",
+      "family": "Navy",
+      "source": {
+        "color": "#000046",
+        "color_taxonomy_reference": [
+          "gid://shopify/TaxonomyValue/15"
+        ],
+        "label": "Dark Navy",
+        "pattern_taxonomy_reference": "gid://shopify/TaxonomyValue/2874"
+      },
+      "description": "A very deep blue reference for a restrained, dark palette.",
+      "image": {
+        "file": "DarkNavySatinTrumpetBateau-NeckSleevelessGown_3.jpg",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/DarkNavySatinTrumpetBateau-NeckSleevelessGown_3.jpg?v=1794882628",
+        "width": 1740,
+        "height": 2320
+      },
+      "imageCaption": "Color family reference — shown in Dark Navy. Not an exact swatch for every shade.",
+      "product": "dark-navy-satin-trumpet-bateau-neck-sleeveless-gown",
+      "imageStatus": "family-reference"
+    },
+    {
+      "name": "Dusty Blue",
+      "hex": "#8397a6",
+      "family": "Blue",
+      "source": {
+        "color": "#8397a6",
+        "color_taxonomy_reference": [
+          "gid://shopify/TaxonomyValue/2"
+        ],
+        "label": "Dusty Blue",
+        "pattern_taxonomy_reference": "gid://shopify/TaxonomyValue/2874"
+      },
+      "description": "A muted blue reference softened with grey.",
+      "image": {
+        "file": "harlin-sky-blue-halter-mermaid-satin-beaded-long-formal-prom-dresses-with-slit_ec4abdeb-76f5-4a06-8579-11f6c666fae9.webp",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/harlin-sky-blue-halter-mermaid-satin-beaded-long-formal-prom-dresses-with-slit_ec4abdeb-76f5-4a06-8579-11f6c666fae9.webp?v=1794331547",
+        "width": 800,
+        "height": 1200
+      },
+      "imageCaption": "Color family reference — shown in Sky Blue. Not an exact swatch for every shade.",
+      "product": "sky-blue-beaded-halter-mermaid-prom-dress-missvella",
+      "imageStatus": "family-reference"
+    },
+    {
+      "name": "Dusty Rose",
+      "hex": "#d3b6b6",
+      "family": "Pink",
+      "source": {
+        "color": "#d3b6b6",
+        "color_taxonomy_reference": [
+          "gid://shopify/TaxonomyValue/11"
+        ],
+        "label": "Dusty Rose",
+        "pattern_taxonomy_reference": "gid://shopify/TaxonomyValue/2874"
+      },
+      "description": "A soft, muted pink reference with a greyed rose character.",
+      "image": {
+        "file": "vynna-pink-mermaid-v-neck-satin-long-prom-dresses-with-train77_d0b604e1-61f2-40a2-8fc0-7431b4276d44.webp",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/vynna-pink-mermaid-v-neck-satin-long-prom-dresses-with-train77_d0b604e1-61f2-40a2-8fc0-7431b4276d44.webp?v=1794996987",
+        "width": 800,
+        "height": 1200
+      },
+      "imageCaption": "Color family reference — shown in Pink. Not an exact swatch for every shade.",
+      "product": "blush-pink-satin-mermaid-prom-dress-missvella",
+      "imageStatus": "family-reference"
+    },
+    {
+      "name": "Dusty Sage",
+      "hex": "#a3bf9f",
+      "family": "Green",
+      "source": {
+        "color": "#a3bf9f",
+        "color_taxonomy_reference": [
+          "gid://shopify/TaxonomyValue/9"
+        ],
+        "label": "Dusty Sage",
+        "pattern_taxonomy_reference": "gid://shopify/TaxonomyValue/2874"
+      },
+      "description": "A subdued pale green reference with a soft grey cast.",
+      "image": {
+        "file": "eosinia-gray-green-off-the-shoulder-tulle-prom-dress-with-appliquesf_2b2b8730-1151-4806-b72d-01eb1cda7f18.webp",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/eosinia-gray-green-off-the-shoulder-tulle-prom-dress-with-appliquesf_2b2b8730-1151-4806-b72d-01eb1cda7f18.webp?v=1794996294",
+        "width": 800,
+        "height": 1200
+      },
+      "imageCaption": "Color family reference — shown in Sage Green. Not an exact swatch for every shade.",
+      "product": "sage-green-tulle-corset-prom-dress-missvella",
+      "imageStatus": "family-reference"
+    },
+    {
+      "name": "Emerald",
+      "hex": "#134c36",
+      "family": "Green",
+      "source": {
+        "color": "#134c36",
+        "color_taxonomy_reference": [
+          "gid://shopify/TaxonomyValue/9"
+        ],
+        "label": "Emerald",
+        "pattern_taxonomy_reference": "gid://shopify/TaxonomyValue/2874"
+      },
+      "description": "A deep green reference with a rich, cool character.",
+      "image": {
+        "file": "eosinia-gray-green-off-the-shoulder-tulle-prom-dress-with-appliquesf_2b2b8730-1151-4806-b72d-01eb1cda7f18.webp",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/eosinia-gray-green-off-the-shoulder-tulle-prom-dress-with-appliquesf_2b2b8730-1151-4806-b72d-01eb1cda7f18.webp?v=1794996294",
+        "width": 800,
+        "height": 1200
+      },
+      "imageCaption": "Color family reference — shown in Sage Green. Not an exact swatch for every shade.",
+      "product": "sage-green-tulle-corset-prom-dress-missvella",
+      "imageStatus": "family-reference"
+    },
+    {
+      "name": "Espresso",
+      "hex": "#52443b",
+      "family": "Brown",
+      "source": {
+        "color": "#52443b",
+        "color_taxonomy_reference": [
+          "gid://shopify/TaxonomyValue/7"
+        ],
+        "label": "Espresso",
+        "pattern_taxonomy_reference": "gid://shopify/TaxonomyValue/2874"
+      },
+      "description": "A dark brown reference with a muted, warm cast.",
+      "image": {
+        "file": "MochaLaceMermaidV-NeckCapSleeveGown_1.jpg",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/MochaLaceMermaidV-NeckCapSleeveGown_1.jpg?v=1794907529",
+        "width": 1792,
+        "height": 2400
+      },
+      "imageCaption": "Color family reference — shown in Mocha. Not an exact swatch for every shade.",
+      "product": "mocha-lace-mermaid-v-neck-cap-sleeve-gown",
+      "imageStatus": "family-reference"
+    },
+    {
+      "name": "Forest Green",
+      "hex": "#12392e",
+      "family": "Green",
+      "source": {
+        "color": "#12392e",
+        "color_taxonomy_reference": [
+          "gid://shopify/TaxonomyValue/9"
+        ],
+        "label": "Forest Green",
+        "pattern_taxonomy_reference": "gid://shopify/TaxonomyValue/2874"
+      },
+      "description": "A very deep green reference with a shaded woodland character.",
+      "image": {
+        "file": "eosinia-gray-green-off-the-shoulder-tulle-prom-dress-with-appliquesf_2b2b8730-1151-4806-b72d-01eb1cda7f18.webp",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/eosinia-gray-green-off-the-shoulder-tulle-prom-dress-with-appliquesf_2b2b8730-1151-4806-b72d-01eb1cda7f18.webp?v=1794996294",
+        "width": 800,
+        "height": 1200
+      },
+      "imageCaption": "Color family reference — shown in Sage Green. Not an exact swatch for every shade.",
+      "product": "sage-green-tulle-corset-prom-dress-missvella",
+      "imageStatus": "family-reference"
+    },
+    {
+      "name": "Gold",
+      "hex": "#efcc93",
+      "family": "Gold",
+      "source": {
+        "color": "#efcc93",
+        "color_taxonomy_reference": [
+          "gid://shopify/TaxonomyValue/4"
+        ],
+        "label": "Gold",
+        "pattern_taxonomy_reference": "gid://shopify/TaxonomyValue/2874"
+      },
+      "description": "A warm, pale golden reference. A solid color chip does not represent metallic reflection or sparkle.",
+      "image": {
+        "file": "GoldSequinA-LineV-NeckSpaghettiStrapFloor-LengthDress_4.jpg",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/GoldSequinA-LineV-NeckSpaghettiStrapFloor-LengthDress_4.jpg?v=1794881557",
+        "width": 1792,
+        "height": 2400
+      },
+      "imageCaption": "Color family reference — shown in Gold. Not an exact swatch for every shade.",
+      "product": "gold-sequin-a-line-v-neck-spaghetti-strap-floor-length-dress-7b1e5382",
+      "imageStatus": "family-reference"
+    },
+    {
+      "name": "Green",
+      "hex": "#05AA3D",
+      "family": "Green",
+      "source": {
+        "color": "#05AA3D",
+        "color_taxonomy_reference": [
+          "gid://shopify/TaxonomyValue/9"
+        ],
+        "label": "Green",
+        "pattern_taxonomy_reference": "gid://shopify/TaxonomyValue/2874"
+      },
+      "description": "A clear, vivid green direction within the wider green family.",
+      "image": {
+        "file": "eosinia-gray-green-off-the-shoulder-tulle-prom-dress-with-appliquesf_2b2b8730-1151-4806-b72d-01eb1cda7f18.webp",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/eosinia-gray-green-off-the-shoulder-tulle-prom-dress-with-appliquesf_2b2b8730-1151-4806-b72d-01eb1cda7f18.webp?v=1794996294",
+        "width": 800,
+        "height": 1200
+      },
+      "imageCaption": "Color family reference — shown in Sage Green. Not an exact swatch for every shade.",
+      "product": "sage-green-tulle-corset-prom-dress-missvella",
+      "imageStatus": "family-reference"
+    },
+    {
+      "name": "Grey",
+      "hex": "#adaca9",
+      "family": "Grey",
+      "source": {
+        "color": "#adaca9",
+        "color_taxonomy_reference": [
+          "gid://shopify/TaxonomyValue/8"
+        ],
+        "label": "Grey",
+        "pattern_taxonomy_reference": "gid://shopify/TaxonomyValue/2874"
+      },
+      "description": "A balanced, muted grey reference with a gently warm cast.",
+      "image": {
+        "file": "GreyLaceAppliqueIllusionA-Line34SleeveGown_3.jpg",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/GreyLaceAppliqueIllusionA-Line34SleeveGown_3.jpg?v=1794971309",
+        "width": 1792,
+        "height": 2400
+      },
+      "imageCaption": "Color family reference — shown in Grey. Not an exact swatch for every shade.",
+      "product": "grey-lace-applique-illusion-a-line-3-4-sleeve-gown",
+      "imageStatus": "family-reference"
+    },
+    {
+      "name": "Ivory",
+      "hex": "#f6f5f0",
+      "family": "White & Ivory",
+      "source": {
+        "color": "#f6f5f0",
+        "color_taxonomy_reference": [
+          "gid://shopify/TaxonomyValue/3"
+        ],
+        "label": "Ivory",
+        "pattern_taxonomy_reference": "gid://shopify/TaxonomyValue/2874"
+      },
+      "description": "A softly warm off-white reference. Compare it with White when coordinating more than one garment.",
+      "image": {
+        "file": "WhiteSatinOff-the-ShoulderDrapedMermaidMaxiDress_3.jpg",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/WhiteSatinOff-the-ShoulderDrapedMermaidMaxiDress_3.jpg?v=1794979546",
+        "width": 1792,
+        "height": 2400
+      },
+      "imageCaption": "Color family reference — shown in White. Not an exact swatch for every shade.",
+      "product": "white-satin-off-the-shoulder-draped-mermaid-maxi-dress",
+      "imageStatus": "family-reference"
+    },
+    {
+      "name": "Lavender",
+      "hex": "#b59eb0",
+      "family": "Purple",
+      "source": {
+        "color": "#b59eb0",
+        "color_taxonomy_reference": [
+          "gid://shopify/TaxonomyValue/12"
+        ],
+        "label": "Lavender",
+        "pattern_taxonomy_reference": "gid://shopify/TaxonomyValue/2874"
+      },
+      "description": "A muted purple reference with a soft rose-grey cast.",
+      "image": {
+        "file": "WisteriaOrganzaStraplessSweetheartBallGown_2.jpg",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/WisteriaOrganzaStraplessSweetheartBallGown_2.jpg?v=1795068267",
+        "width": 1548,
+        "height": 2064
+      },
+      "imageCaption": "Color family reference — shown in Wisteria. Not an exact swatch for every shade.",
+      "product": "wisteria-organza-strapless-sweetheart-ball-gown",
+      "imageStatus": "family-reference"
+    },
+    {
+      "name": "Lemon",
+      "hex": "#fff27b",
+      "family": "Yellow",
+      "source": {
+        "color": "#fff27b",
+        "color_taxonomy_reference": [
+          "gid://shopify/TaxonomyValue/14"
+        ],
+        "label": "Lemon",
+        "pattern_taxonomy_reference": "gid://shopify/TaxonomyValue/2874"
+      },
+      "description": "A light, bright yellow reference with a fresh character.",
+      "image": {
+        "file": "tamira-yellow-strapless-chiffon-ruffled-a-line-long-prom-dresses-with-appliques6_ae190c6c-aa94-4016-9620-040b72a6c9e1.webp",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/tamira-yellow-strapless-chiffon-ruffled-a-line-long-prom-dresses-with-appliques6_ae190c6c-aa94-4016-9620-040b72a6c9e1.webp?v=1794995301",
+        "width": 800,
+        "height": 1200
+      },
+      "imageCaption": "Color family reference — shown in Yellow. Not an exact swatch for every shade.",
+      "product": "yellow-strapless-lace-corset-prom-dress-missvella",
+      "imageStatus": "family-reference"
+    },
+    {
+      "name": "Lilac",
+      "hex": "#e5d6df",
+      "family": "Purple",
+      "source": {
+        "color": "#e5d6df",
+        "color_taxonomy_reference": [
+          "gid://shopify/TaxonomyValue/12"
+        ],
+        "label": "Lilac",
+        "pattern_taxonomy_reference": "gid://shopify/TaxonomyValue/2874"
+      },
+      "description": "A very pale purple reference with a soft pink cast.",
+      "image": {
+        "file": "WisteriaOrganzaStraplessSweetheartBallGown_2.jpg",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/WisteriaOrganzaStraplessSweetheartBallGown_2.jpg?v=1795068267",
+        "width": 1548,
+        "height": 2064
+      },
+      "imageCaption": "Color family reference — shown in Wisteria. Not an exact swatch for every shade.",
+      "product": "wisteria-organza-strapless-sweetheart-ball-gown",
+      "imageStatus": "family-reference"
+    },
+    {
+      "name": "Marigold",
+      "hex": "#D49A06",
+      "family": "Yellow",
+      "source": {
+        "color": "#D49A06",
+        "color_taxonomy_reference": [
+          "gid://shopify/TaxonomyValue/14"
+        ],
+        "label": "Marigold",
+        "pattern_taxonomy_reference": "gid://shopify/TaxonomyValue/2874"
+      },
+      "description": "A rich golden-yellow reference with a warm amber character.",
+      "image": {
+        "file": "tamira-yellow-strapless-chiffon-ruffled-a-line-long-prom-dresses-with-appliques6_ae190c6c-aa94-4016-9620-040b72a6c9e1.webp",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/tamira-yellow-strapless-chiffon-ruffled-a-line-long-prom-dresses-with-appliques6_ae190c6c-aa94-4016-9620-040b72a6c9e1.webp?v=1794995301",
+        "width": 800,
+        "height": 1200
+      },
+      "imageCaption": "Color family reference — shown in Yellow. Not an exact swatch for every shade.",
+      "product": "yellow-strapless-lace-corset-prom-dress-missvella",
+      "imageStatus": "family-reference"
+    },
+    {
+      "name": "Mauve",
+      "hex": "#9289bc",
+      "family": "Purple",
+      "source": {
+        "color": "#9289bc",
+        "color_taxonomy_reference": [
+          "gid://shopify/TaxonomyValue/12"
+        ],
+        "label": "Mauve",
+        "pattern_taxonomy_reference": "gid://shopify/TaxonomyValue/2874"
+      },
+      "description": "A muted purple reference. In our digital palette, this shade has a cool, blue-violet cast.",
+      "image": {
+        "file": "WisteriaOrganzaStraplessSweetheartBallGown_2.jpg",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/WisteriaOrganzaStraplessSweetheartBallGown_2.jpg?v=1795068267",
+        "width": 1548,
+        "height": 2064
+      },
+      "imageCaption": "Color family reference — shown in Wisteria. Not an exact swatch for every shade.",
+      "product": "wisteria-organza-strapless-sweetheart-ball-gown",
+      "imageStatus": "family-reference"
+    },
+    {
+      "name": "Mint Green",
+      "hex": "#a1d2b4",
+      "family": "Green",
+      "source": {
+        "color": "#a1d2b4",
+        "color_taxonomy_reference": [
+          "gid://shopify/TaxonomyValue/9"
+        ],
+        "label": "Mint Green",
+        "pattern_taxonomy_reference": "gid://shopify/TaxonomyValue/2874"
+      },
+      "description": "A light green reference with a fresh, cool cast.",
+      "image": {
+        "file": "eosinia-gray-green-off-the-shoulder-tulle-prom-dress-with-appliquesf_2b2b8730-1151-4806-b72d-01eb1cda7f18.webp",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/eosinia-gray-green-off-the-shoulder-tulle-prom-dress-with-appliquesf_2b2b8730-1151-4806-b72d-01eb1cda7f18.webp?v=1794996294",
+        "width": 800,
+        "height": 1200
+      },
+      "imageCaption": "Color family reference — shown in Sage Green. Not an exact swatch for every shade.",
+      "product": "sage-green-tulle-corset-prom-dress-missvella",
+      "imageStatus": "family-reference"
+    },
+    {
+      "name": "Mist",
+      "hex": "#d6e0ef",
+      "family": "Blue",
+      "source": {
+        "color": "#d6e0ef",
+        "color_taxonomy_reference": [
+          "gid://shopify/TaxonomyValue/2"
+        ],
+        "label": "Mist",
+        "pattern_taxonomy_reference": "gid://shopify/TaxonomyValue/2874"
+      },
+      "description": "A very pale blue reference softened with grey.",
+      "image": {
+        "file": "harlin-sky-blue-halter-mermaid-satin-beaded-long-formal-prom-dresses-with-slit_ec4abdeb-76f5-4a06-8579-11f6c666fae9.webp",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/harlin-sky-blue-halter-mermaid-satin-beaded-long-formal-prom-dresses-with-slit_ec4abdeb-76f5-4a06-8579-11f6c666fae9.webp?v=1794331547",
+        "width": 800,
+        "height": 1200
+      },
+      "imageCaption": "Color family reference — shown in Sky Blue. Not an exact swatch for every shade.",
+      "product": "sky-blue-beaded-halter-mermaid-prom-dress-missvella",
+      "imageStatus": "family-reference"
+    },
+    {
+      "name": "Mocha",
+      "hex": "#3e2a20",
+      "family": "Brown",
+      "source": {
+        "color": "#3e2a20",
+        "color_taxonomy_reference": [
+          "gid://shopify/TaxonomyValue/7"
+        ],
+        "label": "Mocha",
+        "pattern_taxonomy_reference": "gid://shopify/TaxonomyValue/2874"
+      },
+      "description": "A deep brown reference with a warm cocoa character.",
+      "image": {
+        "file": "MochaLaceMermaidV-NeckCapSleeveGown_1.jpg",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/MochaLaceMermaidV-NeckCapSleeveGown_1.jpg?v=1794907529",
+        "width": 1792,
+        "height": 2400
+      },
+      "imageCaption": "Color family reference — shown in Mocha. Not an exact swatch for every shade.",
+      "product": "mocha-lace-mermaid-v-neck-cap-sleeve-gown",
+      "imageStatus": "family-reference"
+    },
+    {
+      "name": "Mulberry",
+      "hex": "#772c54",
+      "family": "Purple",
+      "source": {
+        "color": "#772c54",
+        "color_taxonomy_reference": [
+          "gid://shopify/TaxonomyValue/12"
+        ],
+        "label": "Mulberry",
+        "pattern_taxonomy_reference": "gid://shopify/TaxonomyValue/2874"
+      },
+      "description": "A deep berry-purple reference with a red undertone.",
+      "image": {
+        "file": "WisteriaOrganzaStraplessSweetheartBallGown_2.jpg",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/WisteriaOrganzaStraplessSweetheartBallGown_2.jpg?v=1795068267",
+        "width": 1548,
+        "height": 2064
+      },
+      "imageCaption": "Color family reference — shown in Wisteria. Not an exact swatch for every shade.",
+      "product": "wisteria-organza-strapless-sweetheart-ball-gown",
+      "imageStatus": "family-reference"
+    },
+    {
+      "name": "Navy",
+      "hex": "#282099",
+      "family": "Navy",
+      "source": {
+        "color": "#282099",
+        "color_taxonomy_reference": [
+          "gid://shopify/TaxonomyValue/15"
+        ],
+        "label": "Navy",
+        "pattern_taxonomy_reference": "gid://shopify/TaxonomyValue/2874"
+      },
+      "description": "A blue-family reference. Our stored digital chip has a vivid violet-blue cast; check the selected dress for its appearance.",
+      "image": {
+        "file": "DarkNavySatinTrumpetBateau-NeckSleevelessGown_3.jpg",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/DarkNavySatinTrumpetBateau-NeckSleevelessGown_3.jpg?v=1794882628",
+        "width": 1740,
+        "height": 2320
+      },
+      "imageCaption": "Color family reference — shown in Dark Navy. Not an exact swatch for every shade.",
+      "product": "dark-navy-satin-trumpet-bateau-neck-sleeveless-gown",
+      "imageStatus": "family-reference"
+    },
+    {
+      "name": "Navy Blue",
+      "hex": "#182a55",
+      "family": "Navy",
+      "source": {
+        "color": "#182a55",
+        "color_taxonomy_reference": [
+          "gid://shopify/TaxonomyValue/15"
+        ],
+        "label": "Navy Blue",
+        "pattern_taxonomy_reference": "gid://shopify/TaxonomyValue/2874"
+      },
+      "description": "A deep blue reference with a restrained, cool character.",
+      "image": {
+        "file": "DarkNavySatinTrumpetBateau-NeckSleevelessGown_3.jpg",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/DarkNavySatinTrumpetBateau-NeckSleevelessGown_3.jpg?v=1794882628",
+        "width": 1740,
+        "height": 2320
+      },
+      "imageCaption": "Color family reference — shown in Dark Navy. Not an exact swatch for every shade.",
+      "product": "dark-navy-satin-trumpet-bateau-neck-sleeveless-gown",
+      "imageStatus": "family-reference"
+    },
+    {
+      "name": "Olive Green",
+      "hex": "#556b2f",
+      "family": "Green",
+      "source": {
+        "color": "#556b2f",
+        "color_taxonomy_reference": [
+          "gid://shopify/TaxonomyValue/9"
+        ],
+        "label": "Olive Green",
+        "pattern_taxonomy_reference": "gid://shopify/TaxonomyValue/2874"
+      },
+      "description": "An earthy green reference with a yellow-brown undertone.",
+      "image": {
+        "file": "eosinia-gray-green-off-the-shoulder-tulle-prom-dress-with-appliquesf_2b2b8730-1151-4806-b72d-01eb1cda7f18.webp",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/eosinia-gray-green-off-the-shoulder-tulle-prom-dress-with-appliquesf_2b2b8730-1151-4806-b72d-01eb1cda7f18.webp?v=1794996294",
+        "width": 800,
+        "height": 1200
+      },
+      "imageCaption": "Color family reference — shown in Sage Green. Not an exact swatch for every shade.",
+      "product": "sage-green-tulle-corset-prom-dress-missvella",
+      "imageStatus": "family-reference"
+    },
+    {
+      "name": "Orange",
+      "hex": "#FF8A00",
+      "family": "Orange & Terracotta",
+      "source": {
+        "color": "#FF8A00",
+        "color_taxonomy_reference": [
+          "gid://shopify/TaxonomyValue/10"
+        ],
+        "label": "Orange",
+        "pattern_taxonomy_reference": "gid://shopify/TaxonomyValue/2874"
+      },
+      "description": "A bright, warm orange reference with a clear golden cast.",
+      "image": {
+        "file": "DM_20261109151758_001.jpg",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/DM_20261109151758_001.jpg?v=1794208796",
+        "width": 624,
+        "height": 883
+      },
+      "imageCaption": "Color family reference — shown in Terracotta. Not an exact swatch for every shade.",
+      "product": "terracotta-cowl-neck-satin-prom-dress-with-cascading-ruffle",
+      "imageStatus": "family-reference"
+    },
+    {
+      "name": "Peacock",
+      "hex": "#174d4b",
+      "family": "Green",
+      "source": {
+        "color": "#174d4b",
+        "color_taxonomy_reference": [
+          "gid://shopify/TaxonomyValue/9"
+        ],
+        "label": "Peacock",
+        "pattern_taxonomy_reference": "gid://shopify/TaxonomyValue/2874"
+      },
+      "description": "A deep green reference with blue undertones.",
+      "image": {
+        "file": "eosinia-gray-green-off-the-shoulder-tulle-prom-dress-with-appliquesf_2b2b8730-1151-4806-b72d-01eb1cda7f18.webp",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/eosinia-gray-green-off-the-shoulder-tulle-prom-dress-with-appliquesf_2b2b8730-1151-4806-b72d-01eb1cda7f18.webp?v=1794996294",
+        "width": 800,
+        "height": 1200
+      },
+      "imageCaption": "Color family reference — shown in Sage Green. Not an exact swatch for every shade.",
+      "product": "sage-green-tulle-corset-prom-dress-missvella",
+      "imageStatus": "family-reference"
+    },
+    {
+      "name": "Peacock Blue",
+      "hex": "#33a1c9",
+      "family": "Blue",
+      "source": {
+        "color": "#33a1c9",
+        "color_taxonomy_reference": [
+          "gid://shopify/TaxonomyValue/2"
+        ],
+        "label": "Peacock Blue",
+        "pattern_taxonomy_reference": "gid://shopify/TaxonomyValue/2874"
+      },
+      "description": "A bright blue reference with a turquoise cast. This is a separate shade from Peacock.",
+      "image": {
+        "file": "harlin-sky-blue-halter-mermaid-satin-beaded-long-formal-prom-dresses-with-slit_ec4abdeb-76f5-4a06-8579-11f6c666fae9.webp",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/harlin-sky-blue-halter-mermaid-satin-beaded-long-formal-prom-dresses-with-slit_ec4abdeb-76f5-4a06-8579-11f6c666fae9.webp?v=1794331547",
+        "width": 800,
+        "height": 1200
+      },
+      "imageCaption": "Color family reference — shown in Sky Blue. Not an exact swatch for every shade.",
+      "product": "sky-blue-beaded-halter-mermaid-prom-dress-missvella",
+      "imageStatus": "family-reference"
+    },
+    {
+      "name": "Petal",
+      "hex": "#ffd6db",
+      "family": "Pink",
+      "source": {
+        "color": "#ffd6db",
+        "color_taxonomy_reference": [
+          "gid://shopify/TaxonomyValue/11"
+        ],
+        "label": "Petal",
+        "pattern_taxonomy_reference": "gid://shopify/TaxonomyValue/2874"
+      },
+      "description": "A light, warm pink reference with a delicate rosy cast.",
+      "image": {
+        "file": "vynna-pink-mermaid-v-neck-satin-long-prom-dresses-with-train77_d0b604e1-61f2-40a2-8fc0-7431b4276d44.webp",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/vynna-pink-mermaid-v-neck-satin-long-prom-dresses-with-train77_d0b604e1-61f2-40a2-8fc0-7431b4276d44.webp?v=1794996987",
+        "width": 800,
+        "height": 1200
+      },
+      "imageCaption": "Color family reference — shown in Pink. Not an exact swatch for every shade.",
+      "product": "blush-pink-satin-mermaid-prom-dress-missvella",
+      "imageStatus": "family-reference"
+    },
+    {
+      "name": "Pink",
+      "hex": "#FFC0CB",
+      "family": "Pink",
+      "source": {
+        "color": "#FFC0CB",
+        "color_taxonomy_reference": [
+          "gid://shopify/TaxonomyValue/11"
+        ],
+        "label": "Pink",
+        "pattern_taxonomy_reference": "gid://shopify/TaxonomyValue/2874"
+      },
+      "description": "A light, clear pink direction within the wider pink family.",
+      "image": {
+        "file": "vynna-pink-mermaid-v-neck-satin-long-prom-dresses-with-train77_d0b604e1-61f2-40a2-8fc0-7431b4276d44.webp",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/vynna-pink-mermaid-v-neck-satin-long-prom-dresses-with-train77_d0b604e1-61f2-40a2-8fc0-7431b4276d44.webp?v=1794996987",
+        "width": 800,
+        "height": 1200
+      },
+      "imageCaption": "Color family reference — shown in Pink. Not an exact swatch for every shade.",
+      "product": "blush-pink-satin-mermaid-prom-dress-missvella",
+      "imageStatus": "family-reference"
+    },
+    {
+      "name": "Plum",
+      "hex": "#3d0f42",
+      "family": "Purple",
+      "source": {
+        "color": "#3d0f42",
+        "color_taxonomy_reference": [
+          "gid://shopify/TaxonomyValue/12"
+        ],
+        "label": "Plum",
+        "pattern_taxonomy_reference": "gid://shopify/TaxonomyValue/2874"
+      },
+      "description": "A very deep purple reference with a warm red undertone.",
+      "image": {
+        "file": "WisteriaOrganzaStraplessSweetheartBallGown_2.jpg",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/WisteriaOrganzaStraplessSweetheartBallGown_2.jpg?v=1795068267",
+        "width": 1548,
+        "height": 2064
+      },
+      "imageCaption": "Color family reference — shown in Wisteria. Not an exact swatch for every shade.",
+      "product": "wisteria-organza-strapless-sweetheart-ball-gown",
+      "imageStatus": "family-reference"
+    },
+    {
+      "name": "Purple",
+      "hex": "#A54DCF",
+      "family": "Purple",
+      "source": {
+        "color": "#A54DCF",
+        "color_taxonomy_reference": [
+          "gid://shopify/TaxonomyValue/12"
+        ],
+        "label": "Purple",
+        "pattern_taxonomy_reference": "gid://shopify/TaxonomyValue/2874"
+      },
+      "description": "A vivid purple direction with a clear violet character.",
+      "image": {
+        "file": "WisteriaOrganzaStraplessSweetheartBallGown_2.jpg",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/WisteriaOrganzaStraplessSweetheartBallGown_2.jpg?v=1795068267",
+        "width": 1548,
+        "height": 2064
+      },
+      "imageCaption": "Color family reference — shown in Wisteria. Not an exact swatch for every shade.",
+      "product": "wisteria-organza-strapless-sweetheart-ball-gown",
+      "imageStatus": "family-reference"
+    },
+    {
+      "name": "Rainbow",
+      "hex": "",
+      "family": "Multicolor & Custom",
+      "source": {
+        "color_taxonomy_reference": [
+          "gid://shopify/TaxonomyValue/2865"
+        ],
+        "image": "gid://shopify/MediaImage/46732475039814",
+        "label": "Rainbow",
+        "pattern_taxonomy_reference": "gid://shopify/TaxonomyValue/24509"
+      },
+      "description": "A multicolor option rather than one solid shade. The pattern and balance of colors depend on the selected style.",
+      "image": {
+        "file": "rainbow.jpg",
+        "url": "https://6icwx6-yv.myshopify.com/cdn/shop/files/rainbow.jpg?v=1793756307&width=800"
+      },
+      "imageCaption": "Multicolor reference from the store color entry. Pattern varies by style.",
+      "product": "",
+      "imageStatus": "original-metaobject-image"
+    },
+    {
+      "name": "Red",
+      "hex": "#F61F1F",
+      "family": "Red",
+      "source": {
+        "color": "#F61F1F",
+        "color_taxonomy_reference": [
+          "gid://shopify/TaxonomyValue/13"
+        ],
+        "label": "Red",
+        "pattern_taxonomy_reference": "gid://shopify/TaxonomyValue/2874"
+      },
+      "description": "A bright, clear red reference for a strong color statement.",
+      "image": {
+        "file": "BurgundyLaceBeadedA-LineV-NeckMaxiDress_1.jpg",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/BurgundyLaceBeadedA-LineV-NeckMaxiDress_1.jpg?v=1794907129",
+        "width": 1792,
+        "height": 2400
+      },
+      "imageCaption": "Color family reference — shown in Burgundy. Not an exact swatch for every shade.",
+      "product": "burgundy-lace-beaded-a-line-v-neck-maxi-dress",
+      "imageStatus": "family-reference"
+    },
+    {
+      "name": "Rose Gold",
+      "hex": "#B76E79",
+      "family": "Rose Gold",
+      "source": {
+        "color": "#B76E79",
+        "color_taxonomy_reference": [
+          "gid://shopify/TaxonomyValue/16"
+        ],
+        "label": "Rose Gold",
+        "pattern_taxonomy_reference": "gid://shopify/TaxonomyValue/2874"
+      },
+      "description": "A warm, muted rose reference. The chip represents color only; metallic effects depend on the fabric and finish.",
+      "image": {
+        "file": "RoseGoldSequinA-LineStraplessPleatedFloor-LengthDress_1.jpg",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/RoseGoldSequinA-LineStraplessPleatedFloor-LengthDress_1.jpg?v=1794881038",
+        "width": 1792,
+        "height": 2400
+      },
+      "imageCaption": "Color family reference — shown in Rose Gold. Not an exact swatch for every shade.",
+      "product": "rose-gold-sequin-a-line-strapless-pleated-floor-length-dress",
+      "imageStatus": "family-reference"
+    },
+    {
+      "name": "Royal Blue",
+      "hex": "#0f47a9",
+      "family": "Blue",
+      "source": {
+        "color": "#0f47a9",
+        "color_taxonomy_reference": [
+          "gid://shopify/TaxonomyValue/2"
+        ],
+        "label": "Royal Blue",
+        "pattern_taxonomy_reference": "gid://shopify/TaxonomyValue/2874"
+      },
+      "description": "A rich, clear blue reference with a cool character.",
+      "image": {
+        "file": "harlin-sky-blue-halter-mermaid-satin-beaded-long-formal-prom-dresses-with-slit_ec4abdeb-76f5-4a06-8579-11f6c666fae9.webp",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/harlin-sky-blue-halter-mermaid-satin-beaded-long-formal-prom-dresses-with-slit_ec4abdeb-76f5-4a06-8579-11f6c666fae9.webp?v=1794331547",
+        "width": 800,
+        "height": 1200
+      },
+      "imageCaption": "Color family reference — shown in Sky Blue. Not an exact swatch for every shade.",
+      "product": "sky-blue-beaded-halter-mermaid-prom-dress-missvella",
+      "imageStatus": "family-reference"
+    },
+    {
+      "name": "Rust",
+      "hex": "#90322a",
+      "family": "Red",
+      "source": {
+        "color": "#90322a",
+        "color_taxonomy_reference": [
+          "gid://shopify/TaxonomyValue/13"
+        ],
+        "label": "Rust",
+        "pattern_taxonomy_reference": "gid://shopify/TaxonomyValue/2874"
+      },
+      "description": "A deep, warm red-brown reference with an earthy character.",
+      "image": {
+        "file": "BurgundyLaceBeadedA-LineV-NeckMaxiDress_1.jpg",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/BurgundyLaceBeadedA-LineV-NeckMaxiDress_1.jpg?v=1794907129",
+        "width": 1792,
+        "height": 2400
+      },
+      "imageCaption": "Color family reference — shown in Burgundy. Not an exact swatch for every shade.",
+      "product": "burgundy-lace-beaded-a-line-v-neck-maxi-dress",
+      "imageStatus": "family-reference"
+    },
+    {
+      "name": "Sage Green",
+      "hex": "#8a9a5b",
+      "family": "Green",
+      "source": {
+        "color": "#8a9a5b",
+        "color_taxonomy_reference": [
+          "gid://shopify/TaxonomyValue/9"
+        ],
+        "label": "Sage Green",
+        "pattern_taxonomy_reference": "gid://shopify/TaxonomyValue/2874"
+      },
+      "description": "A muted green reference with a warm olive cast.",
+      "image": {
+        "file": "eosinia-gray-green-off-the-shoulder-tulle-prom-dress-with-appliquesf_2b2b8730-1151-4806-b72d-01eb1cda7f18.webp",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/eosinia-gray-green-off-the-shoulder-tulle-prom-dress-with-appliquesf_2b2b8730-1151-4806-b72d-01eb1cda7f18.webp?v=1794996294",
+        "width": 800,
+        "height": 1200
+      },
+      "imageCaption": "Color family reference — shown in Sage Green. Not an exact swatch for every shade.",
+      "product": "sage-green-tulle-corset-prom-dress-missvella",
+      "imageStatus": "family-reference"
+    },
+    {
+      "name": "Sand",
+      "hex": "#eae3d6",
+      "family": "Beige & Champagne",
+      "source": {
+        "color": "#eae3d6",
+        "color_taxonomy_reference": [
+          "gid://shopify/TaxonomyValue/6"
+        ],
+        "label": "Sand",
+        "pattern_taxonomy_reference": "gid://shopify/TaxonomyValue/2874"
+      },
+      "description": "A light beige reference with a gently warm, neutral cast.",
+      "image": {
+        "file": "ChampagneBeadedTulleA-LineShortSleeveFloor-LengthDress_1.jpg",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/ChampagneBeadedTulleA-LineShortSleeveFloor-LengthDress_1.jpg?v=1794909942",
+        "width": 1792,
+        "height": 2400
+      },
+      "imageCaption": "Color family reference — shown in Champagne. Not an exact swatch for every shade.",
+      "product": "champagne-beaded-tulle-a-line-short-sleeve-floor-length-dress",
+      "imageStatus": "family-reference"
+    },
+    {
+      "name": "Silver",
+      "hex": "#c0c0c0",
+      "family": "Silver",
+      "source": {
+        "color": "#c0c0c0",
+        "color_taxonomy_reference": [
+          "gid://shopify/TaxonomyValue/5"
+        ],
+        "label": "Silver",
+        "pattern_taxonomy_reference": "gid://shopify/TaxonomyValue/2874"
+      },
+      "description": "A light grey reference. The solid chip does not represent metallic shine or embellishment.",
+      "image": {
+        "file": "SilverTulleA-LineSweetheartLace-UpKnee-LengthDress_5.jpg",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/SilverTulleA-LineSweetheartLace-UpKnee-LengthDress_5.jpg?v=1794908768",
+        "width": 1626,
+        "height": 2168
+      },
+      "imageCaption": "Color family reference — shown in Silver. Not an exact swatch for every shade.",
+      "product": "silver-tulle-a-line-sweetheart-lace-up-knee-length-dress",
+      "imageStatus": "family-reference"
+    },
+    {
+      "name": "Sky Blue",
+      "hex": "#cee7f5",
+      "family": "Blue",
+      "source": {
+        "color": "#cee7f5",
+        "color_taxonomy_reference": [
+          "gid://shopify/TaxonomyValue/2"
+        ],
+        "label": "Sky Blue",
+        "pattern_taxonomy_reference": "gid://shopify/TaxonomyValue/2874"
+      },
+      "description": "A very light blue reference with an airy, cool character.",
+      "image": {
+        "file": "harlin-sky-blue-halter-mermaid-satin-beaded-long-formal-prom-dresses-with-slit_ec4abdeb-76f5-4a06-8579-11f6c666fae9.webp",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/harlin-sky-blue-halter-mermaid-satin-beaded-long-formal-prom-dresses-with-slit_ec4abdeb-76f5-4a06-8579-11f6c666fae9.webp?v=1794331547",
+        "width": 800,
+        "height": 1200
+      },
+      "imageCaption": "Color family reference — shown in Sky Blue. Not an exact swatch for every shade.",
+      "product": "sky-blue-beaded-halter-mermaid-prom-dress-missvella",
+      "imageStatus": "family-reference"
+    },
+    {
+      "name": "Slate Blue",
+      "hex": "#6a5acd",
+      "family": "Blue",
+      "source": {
+        "color": "#6a5acd",
+        "color_taxonomy_reference": [
+          "gid://shopify/TaxonomyValue/2"
+        ],
+        "label": "Slate Blue",
+        "pattern_taxonomy_reference": "gid://shopify/TaxonomyValue/2874"
+      },
+      "description": "A blue-family reference with a pronounced violet cast in our stored digital palette.",
+      "image": {
+        "file": "harlin-sky-blue-halter-mermaid-satin-beaded-long-formal-prom-dresses-with-slit_ec4abdeb-76f5-4a06-8579-11f6c666fae9.webp",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/harlin-sky-blue-halter-mermaid-satin-beaded-long-formal-prom-dresses-with-slit_ec4abdeb-76f5-4a06-8579-11f6c666fae9.webp?v=1794331547",
+        "width": 800,
+        "height": 1200
+      },
+      "imageCaption": "Color family reference — shown in Sky Blue. Not an exact swatch for every shade.",
+      "product": "sky-blue-beaded-halter-mermaid-prom-dress-missvella",
+      "imageStatus": "family-reference"
+    },
+    {
+      "name": "Steel Blue",
+      "hex": "#4682b4",
+      "family": "Blue",
+      "source": {
+        "color": "#4682b4",
+        "color_taxonomy_reference": [
+          "gid://shopify/TaxonomyValue/2"
+        ],
+        "label": "Steel Blue",
+        "pattern_taxonomy_reference": "gid://shopify/TaxonomyValue/2874"
+      },
+      "description": "A medium blue reference with a cool, slightly muted character.",
+      "image": {
+        "file": "harlin-sky-blue-halter-mermaid-satin-beaded-long-formal-prom-dresses-with-slit_ec4abdeb-76f5-4a06-8579-11f6c666fae9.webp",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/harlin-sky-blue-halter-mermaid-satin-beaded-long-formal-prom-dresses-with-slit_ec4abdeb-76f5-4a06-8579-11f6c666fae9.webp?v=1794331547",
+        "width": 800,
+        "height": 1200
+      },
+      "imageCaption": "Color family reference — shown in Sky Blue. Not an exact swatch for every shade.",
+      "product": "sky-blue-beaded-halter-mermaid-prom-dress-missvella",
+      "imageStatus": "family-reference"
+    },
+    {
+      "name": "Stormy",
+      "hex": "#4f5d75",
+      "family": "Blue",
+      "source": {
+        "color": "#4f5d75",
+        "color_taxonomy_reference": [
+          "gid://shopify/TaxonomyValue/2"
+        ],
+        "label": "Stormy",
+        "pattern_taxonomy_reference": "gid://shopify/TaxonomyValue/2874"
+      },
+      "description": "A deep, muted blue-grey reference.",
+      "image": {
+        "file": "harlin-sky-blue-halter-mermaid-satin-beaded-long-formal-prom-dresses-with-slit_ec4abdeb-76f5-4a06-8579-11f6c666fae9.webp",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/harlin-sky-blue-halter-mermaid-satin-beaded-long-formal-prom-dresses-with-slit_ec4abdeb-76f5-4a06-8579-11f6c666fae9.webp?v=1794331547",
+        "width": 800,
+        "height": 1200
+      },
+      "imageCaption": "Color family reference — shown in Sky Blue. Not an exact swatch for every shade.",
+      "product": "sky-blue-beaded-halter-mermaid-prom-dress-missvella",
+      "imageStatus": "family-reference"
+    },
+    {
+      "name": "Teal",
+      "hex": "#014a5f",
+      "family": "Blue",
+      "source": {
+        "color": "#014a5f",
+        "color_taxonomy_reference": [
+          "gid://shopify/TaxonomyValue/2"
+        ],
+        "label": "Teal",
+        "pattern_taxonomy_reference": "gid://shopify/TaxonomyValue/2874"
+      },
+      "description": "A deep blue reference with green undertones.",
+      "image": {
+        "file": "harlin-sky-blue-halter-mermaid-satin-beaded-long-formal-prom-dresses-with-slit_ec4abdeb-76f5-4a06-8579-11f6c666fae9.webp",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/harlin-sky-blue-halter-mermaid-satin-beaded-long-formal-prom-dresses-with-slit_ec4abdeb-76f5-4a06-8579-11f6c666fae9.webp?v=1794331547",
+        "width": 800,
+        "height": 1200
+      },
+      "imageCaption": "Color family reference — shown in Sky Blue. Not an exact swatch for every shade.",
+      "product": "sky-blue-beaded-halter-mermaid-prom-dress-missvella",
+      "imageStatus": "family-reference"
+    },
+    {
+      "name": "Terracotta",
+      "hex": "#874329",
+      "family": "Orange & Terracotta",
+      "source": {
+        "color": "#874329",
+        "color_taxonomy_reference": [
+          "gid://shopify/TaxonomyValue/10"
+        ],
+        "label": "Terracotta",
+        "pattern_taxonomy_reference": "gid://shopify/TaxonomyValue/2874"
+      },
+      "description": "A warm, earthy orange-brown reference.",
+      "image": {
+        "file": "DM_20261109151758_001.jpg",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/DM_20261109151758_001.jpg?v=1794208796",
+        "width": 624,
+        "height": 883
+      },
+      "imageCaption": "Color family reference — shown in Terracotta. Not an exact swatch for every shade.",
+      "product": "terracotta-cowl-neck-satin-prom-dress-with-cascading-ruffle",
+      "imageStatus": "family-reference"
+    },
+    {
+      "name": "White",
+      "hex": "#fafafa",
+      "family": "White & Ivory",
+      "source": {
+        "color": "#fafafa",
+        "color_taxonomy_reference": [
+          "gid://shopify/TaxonomyValue/3"
+        ],
+        "label": "White",
+        "pattern_taxonomy_reference": "gid://shopify/TaxonomyValue/2874"
+      },
+      "description": "A clean, near-white reference. Compare with Ivory for a warmer alternative.",
+      "image": {
+        "file": "WhiteSatinOff-the-ShoulderDrapedMermaidMaxiDress_3.jpg",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/WhiteSatinOff-the-ShoulderDrapedMermaidMaxiDress_3.jpg?v=1794979546",
+        "width": 1792,
+        "height": 2400
+      },
+      "imageCaption": "Color family reference — shown in White. Not an exact swatch for every shade.",
+      "product": "white-satin-off-the-shoulder-draped-mermaid-maxi-dress",
+      "imageStatus": "family-reference"
+    },
+    {
+      "name": "Wisteria",
+      "hex": "#c9a0dc",
+      "family": "Purple",
+      "source": {
+        "color": "#c9a0dc",
+        "color_taxonomy_reference": [
+          "gid://shopify/TaxonomyValue/12"
+        ],
+        "label": "Wisteria",
+        "pattern_taxonomy_reference": "gid://shopify/TaxonomyValue/2874"
+      },
+      "description": "A light purple reference with a soft pink cast.",
+      "image": {
+        "file": "WisteriaOrganzaStraplessSweetheartBallGown_2.jpg",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/WisteriaOrganzaStraplessSweetheartBallGown_2.jpg?v=1795068267",
+        "width": 1548,
+        "height": 2064
+      },
+      "imageCaption": "Color family reference — shown in Wisteria. Not an exact swatch for every shade.",
+      "product": "wisteria-organza-strapless-sweetheart-ball-gown",
+      "imageStatus": "family-reference"
+    },
+    {
+      "name": "Yellow",
+      "hex": "#FFE500",
+      "family": "Yellow",
+      "source": {
+        "color": "#FFE500",
+        "color_taxonomy_reference": [
+          "gid://shopify/TaxonomyValue/14"
+        ],
+        "label": "Yellow",
+        "pattern_taxonomy_reference": "gid://shopify/TaxonomyValue/2874"
+      },
+      "description": "A bright, clear yellow direction within the wider yellow family.",
+      "image": {
+        "file": "tamira-yellow-strapless-chiffon-ruffled-a-line-long-prom-dresses-with-appliques6_ae190c6c-aa94-4016-9620-040b72a6c9e1.webp",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/tamira-yellow-strapless-chiffon-ruffled-a-line-long-prom-dresses-with-appliques6_ae190c6c-aa94-4016-9620-040b72a6c9e1.webp?v=1794995301",
+        "width": 800,
+        "height": 1200
+      },
+      "imageCaption": "Color family reference — shown in Yellow. Not an exact swatch for every shade.",
+      "product": "yellow-strapless-lace-corset-prom-dress-missvella",
+      "imageStatus": "family-reference"
+    }
+  ],
+  "fabrics": [
+    {
+      "name": "Satin",
+      "source": {
+        "aliases": "Silk Like Satin\nSilk-like Satin",
+        "label_zh": "缎面",
+        "sort_order": 1,
+        "title": "Satin"
+      },
+      "description": "A smooth, light-catching surface for clean lines and fluid folds. Satin describes a fabric construction, not a promise of silk content.",
+      "finish": "Smooth; typically lustrous",
+      "drape": "Fluid to structured, depending on weight",
+      "feel": "Smooth surface; weight varies",
+      "image": {
+        "file": "sophianne-yellow-spaghetti-straps-mermaid-satin-formal-prom-dressF8A_cf5d6f63-4c43-4af7-ad06-24d859d79680.webp",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/sophianne-yellow-spaghetti-straps-mermaid-satin-formal-prom-dressF8A_cf5d6f63-4c43-4af7-ad06-24d859d79680.webp?v=1794997685",
+        "width": 800,
+        "height": 1200
+      },
+      "imageCaption": "Satin dress with a cascading ruffle.",
+      "product": "butter-yellow-satin-mermaid-prom-dress-missvella",
+      "imageStatus": "product-metafield-verified",
+      "notes": "Fabric characteristics are general guidance. Refer to the selected dress for composition, lining, stretch and care.",
+      "sourceConflict": "",
+      "detailPosition": "50% 65%"
+    },
+    {
+      "name": "Stretch Satin",
+      "source": {
+        "aliases": "Elastic Satin\nSpandex Satin",
+        "label_zh": "弹力缎",
+        "sort_order": 2,
+        "title": "Stretch Satin"
+      },
+      "description": "The sheen of satin with stretch in the fabric. Check the individual dress for stretch level, support and fit.",
+      "finish": "Smooth; typically lustrous",
+      "drape": "Follows the silhouette; varies by construction",
+      "feel": "Stretch level varies by style",
+      "image": null,
+      "imageCaption": "",
+      "product": "",
+      "imageStatus": "pending-source-conflict",
+      "notes": "Ask us about the fabric and finish of your chosen dress before ordering.",
+      "sourceConflict": "Available product titles name this fabric, but the corresponding dress.fabric values are Satin or empty. No image assigned.",
+      "detailPosition": "50% 50%"
+    },
+    {
+      "name": "Chiffon",
+      "source": {
+        "label_zh": "雪纺",
+        "sort_order": 3,
+        "title": "Chiffon"
+      },
+      "description": "A light, sheer fabric often used in floating layers and soft ruffles. Lining and the number of layers determine coverage.",
+      "finish": "Fine, sheer surface",
+      "drape": "Light, flowing layers",
+      "feel": "Lightweight; lining varies",
+      "image": {
+        "file": "jazzy-v-neck-a-line-blue-printed-chiffon-slit-prom-dress3_788dda41-9271-404d-912b-93508d20ab01.webp",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/jazzy-v-neck-a-line-blue-printed-chiffon-slit-prom-dress3_788dda41-9271-404d-912b-93508d20ab01.webp?v=1794995897",
+        "width": 800,
+        "height": 1200
+      },
+      "imageCaption": "Printed chiffon layers and ruffles.",
+      "product": "blue-floral-chiffon-ruffle-prom-dress-missvella",
+      "imageStatus": "product-metafield-verified",
+      "notes": "Fabric characteristics are general guidance. Refer to the selected dress for composition, lining, stretch and care.",
+      "sourceConflict": "",
+      "detailPosition": "50% 68%"
+    },
+    {
+      "name": "Tulle",
+      "source": {
+        "label_zh": "薄纱",
+        "sort_order": 4,
+        "title": "Tulle"
+      },
+      "description": "A fine net used for layered volume, overlays and airy skirts. Different weights and layers create different levels of fullness.",
+      "finish": "Fine, open net",
+      "drape": "Airy volume; softness varies",
+      "feel": "Fine net; lining varies",
+      "image": {
+        "file": "azurena-ball-gown-sweetheart-sage-green-tulle-long-prom-dresses-with-appliques_2.webp",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/azurena-ball-gown-sweetheart-sage-green-tulle-long-prom-dresses-with-appliques_2.webp?v=1794996644",
+        "width": 1200,
+        "height": 1800
+      },
+      "imageCaption": "Tulle skirt with a separate lace bodice.",
+      "product": "sage-green-tulle-ball-gown-prom-dress-missvella",
+      "imageStatus": "product-metafield-verified",
+      "notes": "Fabric characteristics are general guidance. Refer to the selected dress for composition, lining, stretch and care.",
+      "sourceConflict": "",
+      "detailPosition": "50% 70%"
+    },
+    {
+      "name": "Mesh",
+      "source": {
+        "label_zh": "网纱",
+        "sort_order": 5,
+        "title": "Mesh"
+      },
+      "description": "An open-net fabric used for sheer panels, overlays and embellished surfaces. Mesh does not by itself tell you how much a dress stretches.",
+      "finish": "Open-net surface",
+      "drape": "Varies with net structure and layers",
+      "feel": "Texture and stretch vary",
+      "image": {
+        "file": "BlackMeshHalterFit_FlareMiniDress_1.jpg",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/BlackMeshHalterFit_FlareMiniDress_1.jpg?v=1794988366",
+        "width": 1792,
+        "height": 2400
+      },
+      "imageCaption": "Layered mesh dress.",
+      "product": "black-mesh-halter-fit-flare-mini-dress",
+      "imageStatus": "product-metafield-verified",
+      "notes": "Fabric characteristics are general guidance. Refer to the selected dress for composition, lining, stretch and care.",
+      "sourceConflict": "",
+      "detailPosition": "50% 65%"
+    },
+    {
+      "name": "Lace",
+      "source": {
+        "label_zh": "蕾丝",
+        "sort_order": 6,
+        "title": "Lace"
+      },
+      "description": "A patterned, openwork fabric that brings detail to a bodice, sleeve or overlay. Motif, lining and placement vary by dress.",
+      "finish": "Patterned openwork",
+      "drape": "Varies with pattern and backing",
+      "feel": "Textured surface; lining varies",
+      "image": {
+        "file": "tamira-yellow-strapless-chiffon-ruffled-a-line-long-prom-dresses-with-appliques6_ae190c6c-aa94-4016-9620-040b72a6c9e1.webp",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/tamira-yellow-strapless-chiffon-ruffled-a-line-long-prom-dresses-with-appliques6_ae190c6c-aa94-4016-9620-040b72a6c9e1.webp?v=1794995301",
+        "width": 800,
+        "height": 1200
+      },
+      "imageCaption": "Lace corset bodice; the skirt is a different material.",
+      "product": "yellow-strapless-lace-corset-prom-dress-missvella",
+      "imageStatus": "product-metafield-verified",
+      "notes": "Fabric characteristics are general guidance. Refer to the selected dress for composition, lining, stretch and care.",
+      "sourceConflict": "",
+      "detailPosition": "50% 30%"
+    },
+    {
+      "name": "Organza",
+      "source": {
+        "label_zh": "欧根纱",
+        "sort_order": 7,
+        "title": "Organza"
+      },
+      "description": "A sheer fabric with more body than a softly flowing layer. Often used for defined folds and lightweight volume.",
+      "finish": "Sheer; often subtly lustrous",
+      "drape": "Holds volume and defined folds",
+      "feel": "Typically crisp; weight varies",
+      "image": {
+        "file": "WisteriaOrganzaStraplessSweetheartBallGown_2.jpg",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/WisteriaOrganzaStraplessSweetheartBallGown_2.jpg?v=1795068267",
+        "width": 1548,
+        "height": 2064
+      },
+      "imageCaption": "Organza skirt with a separate satin bodice.",
+      "product": "wisteria-organza-strapless-sweetheart-ball-gown",
+      "imageStatus": "product-metafield-verified",
+      "notes": "Fabric characteristics are general guidance. Refer to the selected dress for composition, lining, stretch and care.",
+      "sourceConflict": "",
+      "detailPosition": "50% 70%"
+    },
+    {
+      "name": "Taffeta",
+      "source": {
+        "label_zh": "塔夫绸",
+        "sort_order": 8,
+        "title": "Taffeta"
+      },
+      "description": "A close-woven fabric known for its crisp hand and shaped folds. Its structured character can give skirts a defined silhouette.",
+      "finish": "Smooth; sheen varies",
+      "drape": "Crisp, defined folds",
+      "feel": "Typically crisp; weight varies",
+      "image": null,
+      "imageCaption": "",
+      "product": "",
+      "imageStatus": "pending-source-conflict",
+      "notes": "Ask us about the fabric and finish of your chosen dress before ordering.",
+      "sourceConflict": "Available product titles name this fabric, but the corresponding dress.fabric values are Satin or empty. No image assigned.",
+      "detailPosition": "50% 50%"
+    },
+    {
+      "name": "Crepe",
+      "source": {
+        "label_zh": "绉纱",
+        "sort_order": 9,
+        "title": "Crepe"
+      },
+      "description": "A fabric with a subtly textured surface, often chosen for a quieter finish and clean lines. Weight and drape vary by construction.",
+      "finish": "Fine, textured surface",
+      "drape": "Fluid to structured; weight dependent",
+      "feel": "Texture and thickness vary",
+      "image": {
+        "file": "BlackLaceCrepeFit_FlareIllusionHigh-SlitGown_4.jpg",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/BlackLaceCrepeFit_FlareIllusionHigh-SlitGown_4.jpg?v=1794966922",
+        "width": 1792,
+        "height": 2400
+      },
+      "imageCaption": "Crepe skirt with a separate lace bodice.",
+      "product": "black-lace-crepe-fit-flare-illusion-high-slit-gown",
+      "imageStatus": "product-metafield-verified",
+      "notes": "Fabric characteristics are general guidance. Refer to the selected dress for composition, lining, stretch and care.",
+      "sourceConflict": "",
+      "detailPosition": "55% 65%"
+    },
+    {
+      "name": "Stretch Crepe",
+      "source": {
+        "label_zh": "弹力绉",
+        "sort_order": 10,
+        "title": "Stretch Crepe"
+      },
+      "description": "Crepe texture with stretch in the fabric. The degree of stretch and the finished fit depend on the particular dress.",
+      "finish": "Fine, textured surface",
+      "drape": "Follows the silhouette; weight dependent",
+      "feel": "Stretch level varies by style",
+      "image": {
+        "file": "2018111541111465955.jpg",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/2018111541111465955.jpg?v=1794622757",
+        "width": 624,
+        "height": 884
+      },
+      "imageCaption": "Stretch crepe dress showing the back and train.",
+      "product": "coral-stretch-crepe-mermaid-v-back-floor-length-gown",
+      "imageStatus": "product-metafield-verified",
+      "notes": "Fabric characteristics are general guidance. Refer to the selected dress for composition, lining, stretch and care.",
+      "sourceConflict": "",
+      "detailPosition": "50% 65%"
+    },
+    {
+      "name": "Knit",
+      "source": {
+        "label_zh": "针织面料",
+        "sort_order": 11,
+        "title": "Knit"
+      },
+      "description": "A loop-constructed fabric used for a range of surfaces and silhouettes. Knit describes construction; fiber content and stretch still vary.",
+      "finish": "Varies with the knit structure",
+      "drape": "Soft to structured; style dependent",
+      "feel": "Texture and stretch vary",
+      "image": {
+        "file": "2019040253042993124.jpg",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/2019040253042993124.jpg?v=1794461485",
+        "width": 624,
+        "height": 884
+      },
+      "imageCaption": "Knit halter dress.",
+      "product": "peacock-blue-knit-halter-trumpet-floor-length-dress",
+      "imageStatus": "product-metafield-verified",
+      "notes": "Fabric characteristics are general guidance. Refer to the selected dress for composition, lining, stretch and care.",
+      "sourceConflict": "",
+      "detailPosition": "50% 65%"
+    },
+    {
+      "name": "Velvet",
+      "source": {
+        "label_zh": "丝绒",
+        "sort_order": 12,
+        "title": "Velvet"
+      },
+      "description": "A short-pile fabric whose tone changes as the surface catches the light. Compare images from more than one angle when choosing a shade.",
+      "finish": "Soft pile; directional sheen",
+      "drape": "Weight dependent",
+      "feel": "Pile surface; composition varies",
+      "image": {
+        "file": "CabernetVelvetSatinPlungingV-NeckLongSleeveSlitMaxiDress_2.jpg",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/CabernetVelvetSatinPlungingV-NeckLongSleeveSlitMaxiDress_2.jpg?v=1794992022",
+        "width": 1792,
+        "height": 2400
+      },
+      "imageCaption": "Velvet bodice with a separate satin skirt.",
+      "product": "cabernet-velvet-satin-plunging-v-neck-long-sleeve-slit-maxi-dress",
+      "imageStatus": "product-metafield-verified",
+      "notes": "Fabric characteristics are general guidance. Refer to the selected dress for composition, lining, stretch and care.",
+      "sourceConflict": "",
+      "detailPosition": "50% 28%"
+    },
+    {
+      "name": "Sequin Fabric",
+      "source": {
+        "aliases": "Sequin\nSequins\nSequined Fabric\nSequin Cloth\nPaillette Fabric\n亮片布",
+        "label_zh": "亮片面料",
+        "sort_order": 13,
+        "title": "Sequin Fabric"
+      },
+      "description": "Fabric covered with sequins for a light-catching surface. This category refers to sequin fabric, rather than a few decorative sequins on another material.",
+      "finish": "Reflective sequin surface",
+      "drape": "Depends on the base fabric",
+      "feel": "Textured surface; lining varies",
+      "image": {
+        "file": "darya-sparkly-halter-mermaid-sequins-prom-dress-with-split_1_b87d39c4-144b-4882-abf3-484744e1f01e.webp",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/darya-sparkly-halter-mermaid-sequins-prom-dress-with-split_1_b87d39c4-144b-4882-abf3-484744e1f01e.webp?v=1794994711",
+        "width": 800,
+        "height": 1200
+      },
+      "imageCaption": "Gold mosaic sequin dress.",
+      "product": "gold-mosaic-sequin-halter-mermaid-prom-dress-with-high-slit",
+      "imageStatus": "product-metafield-verified",
+      "notes": "Fabric characteristics are general guidance. Refer to the selected dress for composition, lining, stretch and care.",
+      "sourceConflict": "",
+      "detailPosition": "50% 55%"
+    }
+  ],
+  "references": [
+    "https://www.moodfabrics.com/pages/fabric-dictionary",
+    "https://www.dressandtextilespecialists.org.uk/wp-content/uploads/2025/08/Identifying-Fibres-and-Fabrics.pdf"
+  ]
+}

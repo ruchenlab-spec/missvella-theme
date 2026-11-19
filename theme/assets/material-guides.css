@@ -172,6 +172,33 @@
   object-fit: contain;
 }
 
+.color-guide__photo {
+  margin: 0;
+}
+
+.color-guide__photo figcaption {
+  margin-block-start: 12px;
+  font-size: 0.75rem;
+  line-height: 1.5;
+}
+
+.color-guide__custom {
+  align-self: center;
+  padding: 20px;
+  text-align: center;
+  font-size: 0.8125rem;
+}
+
+.color-guide__chip {
+  display: inline-block;
+  width: 24px;
+  height: 24px;
+  margin-inline-end: 10px;
+  vertical-align: middle;
+  background: var(--guide-swatch);
+  border: 1px solid rgb(var(--color-foreground-rgb) / 0.18);
+}
+
 .material-guide__copy {
   min-width: 0;
   max-width: 65ch;
@@ -238,6 +265,17 @@
   margin-block-start: 8px;
   font-size: 0.75rem;
   line-height: 1.5;
+}
+
+.fabric-guide__crop {
+  overflow: hidden;
+  aspect-ratio: 4 / 5;
+}
+
+.fabric-guide__crop img {
+  object-fit: cover;
+  transform: scale(2.2);
+  transform-origin: var(--guide-detail-origin, 50% 50%);
 }
 
 .fabric-guide__facts {

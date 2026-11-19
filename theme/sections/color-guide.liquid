@@ -25,6 +25,9 @@
     </div>
 
     <ul class="color-guide__swatches" role="list">
+      {% if section.settings.use_store_catalog %}
+        {% render 'guide-color-catalog', section: section, mode: 'swatch' %}
+      {% else %}
       {% for block in section.blocks %}
         {% if block.settings.name != blank or request.design_mode %}
           {% liquid
@@ -47,9 +50,13 @@
           </li>
         {% endif %}
       {% endfor %}
+      {% endif %}
     </ul>
 
     <div class="color-guide__details">
+      {% if section.settings.use_store_catalog %}
+        {% render 'guide-color-catalog', section: section, mode: 'detail' %}
+      {% else %}
       {% for block in section.blocks %}
         {% if block.settings.name != blank or request.design_mode %}
           {% liquid
@@ -73,6 +80,7 @@
           </article>
         {% endif %}
       {% endfor %}
+      {% endif %}
     </div>
     {% if section.settings.note != blank %}<div class="material-guide__note rte">{{ section.settings.note }}</div>{% endif %}
   </color-guide>
@@ -83,8 +91,9 @@
   "name": "Color Guide",
   "class": "section-wrapper",
   "disabled_on": { "groups": ["header", "footer"] },
-  "max_blocks": 40,
+  "max_blocks": 50,
   "settings": [
+    { "type": "checkbox", "id": "use_store_catalog", "label": "Use store color catalog", "default": false, "info": "58 original colors, original digital chips and labeled color-family photographs. Add a block with an exact catalog name to override its content. Unmatched blocks are used only when this is off." },
     { "type": "paragraph", "content": "Add real color names and photographs. Blank, unnamed blocks appear only in the editor. Color families create a filter automatically. Solid colors are navigation references, not fabric photographs." },
     { "type": "text", "id": "heading", "label": "Heading", "default": "Explore Colors" },
     { "type": "richtext", "id": "intro", "label": "Introduction" },
@@ -105,6 +114,8 @@
       "name": "Color",
       "settings": [
         { "type": "text", "id": "name", "label": "Color name" },
+        { "type": "checkbox", "id": "hide_in_catalog", "label": "Hide this catalog entry", "default": false },
+        { "type": "checkbox", "id": "suppress_catalog_image", "label": "Remove built-in catalog photograph", "default": false, "info": "Your uploaded images still take priority." },
         { "type": "text", "id": "family", "label": "Color family", "info": "Use the same family name to group related colors." },
         { "type": "image_picker", "id": "swatch_image", "label": "Swatch photograph" },
         { "type": "color", "id": "swatch_color", "label": "Fallback navigation color", "info": "Used only when no photograph is configured." },
@@ -116,6 +127,9 @@
       ]
     }
   ],
-  "presets": [{ "name": "Color Guide", "category": "t:categories.text", "blocks": { "color_1": { "type": "color" }, "color_2": { "type": "color" }, "color_3": { "type": "color" }, "color_4": { "type": "color" } }, "block_order": ["color_1", "color_2", "color_3", "color_4"] }]
+  "presets": [
+    { "name": "Color Guide", "category": "t:categories.text", "blocks": { "color_1": { "type": "color" }, "color_2": { "type": "color" }, "color_3": { "type": "color" }, "color_4": { "type": "color" } }, "block_order": ["color_1", "color_2", "color_3", "color_4"] },
+    { "name": "Color Guide — Catalog", "category": "t:categories.text", "settings": { "use_store_catalog": true, "intro": "<p>Explore our color palette, then compare the look of each color family on a dress. Digital chips are a guide; fabric and lighting affect the finished appearance.</p>" } }
+  ]
 }
 {% endschema %}
