@@ -101,6 +101,14 @@ Shopify 官方 [模板类型清单](https://shopify.dev/docs/storefronts/themes/
 
 ## 检查、发布及 Git
 
+### 独立 Delivery timeline section · 2026-11-19
+
+- 商家要求新增「下单 → 生产 2–5 天 → 开始运输 → 运输 5–12 天 → 抵达」进度说明组件。新增 `theme/sections/delivery-timeline.liquid` 和 `theme/assets/delivery-timeline.css`；这是预计流程示意，不读取实际订单状态，也不显示虚假的完成进度。
+- 在主题编辑器的页面主体选择 **Add section → Delivery timeline**。可添加到普通页面、首页或商品模板主体，不允许放入 header/footer。沿用全局字体、配色和 `contrast-override`；提供背景／文字颜色与上下间距设置。
+- 英文默认标题 `From order to arrival`；节点 `Order placed` → `Dispatched` → `Arrival`，阶段 `Production / 2–5 days`、`In transit / 5–12 days`。标题、导语、三个节点、两段阶段名称／时长及底部说明均可编辑。桌面横向细线和三个空心圆点，时长置于线段上方；599px 及以下纵排，避免手机挤压。语义使用有序列表，装饰线／点不作为实际状态朗读，无新增 JS 或动画。
+- 数字依据为本次商家给出的组件需求，**不自动更新正式运输政策、现有 Shipping guide 或 FAQ**。`days` 没有擅自改成 `business days`；现有公开政策中处理为 2–5 工作日，标准运输 4–10 工作日，加急 3–5 工作日。新组件的运输 5–12 天及“生产”口径与原政策不同，商家在添加实例前需统一适用服务及日历日／工作日定义。底部默认 `Estimated timeframes only. Arrival dates are not guaranteed.`，不计算或承诺具体抵达日期。
+- schema 与设置引用校验通过；一次 Theme Check 新增文件零错误／警告，现有基线仍为 32 个翻译错误、21 个警告。确认主题 `167137378374` 为 live 后，仅对两个新文件使用精确 `--only` 和 `--nodelete`，Shopify CLI 已返回上传成功。未修改内容文件或页面模板实例，未做浏览器／截图验证；由商家添加并检查前台。
+
 代码及预设完成；schema/预设校验通过，一次 Theme Check 对新增文件零错误／警告（现有文件 32 个翻译错误、21 个警告）。未进行视觉回归。
 
 2026-11-18 已恢复 CLI 权限：在交互 PTY 中执行 `shopify auth login` 并选择已有授权的 `ruchenlab@gmail.com` 会话；主题列表确认 `167137378374` 仍为 live。随后仅通过两个精确 `--only` 路径及 `--nodelete` 上传 `sections/processing-shipping.liquid` 与 `assets/processing-shipping.css`，收到 Shopify CLI 成功回执，**代码已上线**。未推送内容 JSON。Page、模板关联与菜单仍由商家配置，完整页面尚待商家装配；结账实测待办不变。实现提交 `81d04c8` 已同步 Git，发布记录另以文档提交同步。完整交接记录于 `docs/footer-page-optimization.md` 第 1 项。

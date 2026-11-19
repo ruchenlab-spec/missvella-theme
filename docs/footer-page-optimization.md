@@ -66,6 +66,8 @@
 
 ### 第 1 项交接 · 2026-11-18
 
+- **2026-11-19 新增配送时间轴**：独立 **Delivery timeline** section 已精确上传当前 live，编辑器中 Add section 即可添加。默认 `Order placed → Production 2–5 days → Dispatched → In transit 5–12 days → Arrival`，全部标签／时长可编辑；桌面横向，手机纵向，沿用极简细线风格。该数字来自本次组件需求，与原政策运输口径不同，不视为政策或 FAQ 数字已更新；商家装配时统一天数单位及适用服务。实现、检查及配置说明见[交接文档](shipping-page-handoff-2026-11-18.md)。仅新增代码上传，未代改模板或实例内容。
+
 - [英文大纲、政策核对、FAQ 口径及商家配置步骤](shipping-page-handoff-2026-11-18.md)已完成。主来源为本次浏览器实际读取的公开 Shipping Policy §1–11，历史 FAQ 仅作对照，核心数字一致。
 - 口径：处理均 2–5 工作日；标准运输 4–10、总计 6–15、$15 USD；加急运输 3–5、总计 5–10、$30 USD；折后、运费前商品小计 ≥ $180 USD 自动免标准运费，促销另有说明除外加急仍 $30。保留目的地／结账条件和非保证日期说明。
 - 新增代码：`theme/sections/processing-shipping.liquid`、`theme/assets/processing-shipping.css`。主题编辑器预设 **Processing & Shipping**：可编辑表头、2 个运输方式块、8 个详情折叠块、免邮条件、客服／政策入口、H1/H2、颜色和间距；字体与颜色继承主题，详情复用原生 accordion 组件，无新增 JS。

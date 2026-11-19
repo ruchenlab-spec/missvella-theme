@@ -1,0 +1,164 @@
+.delivery-timeline {
+  width: 100%;
+  max-width: 56rem;
+  min-width: 0;
+  margin-inline: auto;
+  color: var(--color-foreground);
+  font-family: var(--font-paragraph--family);
+  font-style: var(--font-paragraph--style);
+  font-weight: var(--font-paragraph--weight);
+  line-height: 1.6;
+  text-transform: none;
+  overflow-wrap: anywhere;
+}
+
+.delivery-timeline__header {
+  margin-block-end: 28px;
+  text-align: center;
+}
+
+.delivery-timeline .delivery-timeline__heading {
+  margin: 0;
+  font-family: var(--font-h2--family);
+  font-style: var(--font-h2--style);
+  font-weight: var(--font-h2--weight);
+  font-size: clamp(1.375rem, 2.5vw, 1.875rem);
+  line-height: 1.3;
+  letter-spacing: 0.015em;
+  text-transform: none;
+  text-wrap: balance;
+}
+
+.delivery-timeline__intro {
+  max-width: 60ch;
+  margin: 12px auto 0;
+  font-size: 0.9375rem;
+}
+
+.delivery-timeline .rte > :first-child {
+  margin-block-start: 0;
+}
+
+.delivery-timeline .rte > :last-child {
+  margin-block-end: 0;
+}
+
+.delivery-timeline__steps {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.delivery-timeline__step {
+  position: relative;
+  min-width: 0;
+  text-align: center;
+}
+
+.delivery-timeline__step:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  inset-block-start: 67px;
+  inset-inline-start: calc(50% + 12px);
+  width: calc(100% - 24px);
+  height: 1px;
+  background: rgb(var(--color-foreground-rgb) / 0.3);
+}
+
+.delivery-timeline__marker {
+  display: block;
+  width: 7px;
+  height: 7px;
+  margin: 64px auto 16px;
+  border: 1px solid currentColor;
+  border-radius: 50%;
+  background: var(--color-background);
+}
+
+.delivery-timeline__milestone {
+  display: block;
+  padding-inline: 12px;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  line-height: 1.5;
+}
+
+.delivery-timeline__stage {
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-start: 50%;
+  width: 100%;
+  padding-inline: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.delivery-timeline__stage-label {
+  font-size: 0.75rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.delivery-timeline__duration {
+  font-size: 1.125rem;
+  font-weight: 500;
+  line-height: 1.5;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+.delivery-timeline__note {
+  max-width: 70ch;
+  margin: 28px auto 0;
+  font-size: 0.8125rem;
+  line-height: 1.7;
+  text-align: center;
+}
+
+@media screen and (max-width: 599px) {
+  .delivery-timeline__steps {
+    grid-template-columns: minmax(0, 1fr);
+    max-width: 26rem;
+    margin-inline: auto;
+  }
+
+  .delivery-timeline__step {
+    display: grid;
+    grid-template-columns: 9px minmax(0, 1fr);
+    column-gap: 20px;
+    text-align: start;
+  }
+
+  .delivery-timeline__step:not(:last-child)::after {
+    inset-block: 21px -1px;
+    inset-inline-start: 3px;
+    width: 1px;
+    height: auto;
+  }
+
+  .delivery-timeline__marker {
+    grid-column: 1;
+    grid-row: 1;
+    margin: 8px 0 0;
+  }
+
+  .delivery-timeline__milestone {
+    grid-column: 2;
+    grid-row: 1;
+    padding: 0;
+  }
+
+  .delivery-timeline__stage {
+    position: static;
+    grid-column: 2;
+    width: auto;
+    padding: 12px 0 28px;
+    gap: 2px;
+  }
+
+  .delivery-timeline__duration {
+    font-size: 1rem;
+  }
+}
