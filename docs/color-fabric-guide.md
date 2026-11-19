@@ -39,9 +39,9 @@
 
 独立页面模板、Page 关联、唯一 H1 和菜单由商家配置。页内入口默认 `#colors`、`#fabrics`；重复 section 使用不同 anchor。若页脚仍指向 `/`，需在后台改为 `/pages/color-fabric-guide`。
 
-颜色保留筛选、详情切换、深链接、编辑器区块联动及无 JS 降级。2026-11-19 按商家反馈改为紧凑色系分组：JavaScript 按最终 Color family（含区块覆盖）合并同色系卡片，显示色系标题；分组及组内顺序按首次出现顺序。桌面两列分组、手机单列，每组色卡自动换行。未填色系的卡片放在无标题的一组。
+颜色保留筛选、详情切换、深链接、编辑器区块联动及无 JS 降级。2026-11-19 按商家反馈改为紧凑色系行：JavaScript 按最终 Color family（含区块覆盖）合并同色系卡片；分组及组内顺序按首次出现顺序。每个色系独占一行，名称固定在左侧（桌面 132px、手机 88px），右侧色卡单行横排；较多色卡在本行横向滚动，不撑宽页面。未填色系的卡片保留空名称列，色卡与其他组对齐。
 
-色块默认 48px，可通过 **Color chip size** 调至 32–72px；取代旧的桌面／手机列数设置。名称为 12px，色卡间距 12px／16px，保留至少 44px 可点击宽高。缩略图采用最高 144px 的响应式图片。筛选时同时隐藏空组，深链接和编辑器选择可恢复对应组。没有 JavaScript 时仍显示紧凑平铺列表及全部详情，不输出分组标题。
+色块默认 48px，可通过 **Color chip size** 调至 32–72px；取代旧的桌面／手机列数设置。名称为 12px，同行色卡间距 10px，每组上下各 6px（手机 4px），组间不额外留白。色卡可点击宽高至少 44px；滚动区内留 8px，容纳选中边框与键盘焦点。缩略图采用最高 144px 的响应式图片。筛选时同时隐藏空组，深链接和编辑器选择可恢复对应组。没有 JavaScript 时仍显示紧凑平铺列表及全部详情，不输出分组标题。
 
 面料按商家后续要求改为紧凑横向条目：桌面两张 88px 宽缩略图（4:5），图间距 8px，右侧面料名与说明并排；Finish / Drape / Feel 使用紧凑行内排列，空间不够时自然换行。图片说明移至文字区，局部裁切与面料部位提示继续保留。名称 16px、正文 14px、辅助说明 12px；正文块间距 6px，条目上下各 14px。
 
@@ -69,3 +69,5 @@
 紧凑分组后续调整：一次 JS 语法、schema JSON／设置引用与 diff 静态检查通过。确认 live 后，仅用 `--only` 精确推送 Color Guide section、颜色条目 snippet、共享 CSS 和颜色 JS，CLI 返回 `was pushed successfully`。未启动浏览器或新增渲染测试，未推送内容 JSON。代码及本说明提交并同步 origin/main。
 
 面料紧凑布局后续调整：一次 Theme Check 对改动文件零问题，原有 32 个翻译错误、21 个警告未增加，`git diff --check` 通过。确认当前 live 后，用 `--only` 与 `--nodelete` 仅推送 Fabric Guide section、面料条目 snippet、共享 CSS，CLI 已返回 `was pushed successfully`。未改内容数据或实例设置；文档及代码提交并同步 origin/main。按快速交付规范未做浏览器或截图回归。
+
+颜色单行布局后续调整：仅修改共享 CSS 中颜色分组的布局规则，不改 JavaScript、数据或实例设置。CSS 括号结构、diff 空白检查及规则审阅通过；确认 live 后仅用 `--only assets/material-guides.css` 和 `--nodelete` 精确上传，CLI 已返回 `was pushed successfully`。未启动浏览器或截图回归；代码和文档提交并同步 origin/main。
