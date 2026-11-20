@@ -53,12 +53,15 @@ Finish / Drape / Feel、图片部位说明及补充提示收进原生 **Fabric d
 - `scripts/build-material-guide-catalog.cjs`：生成两个资料库调用文件，并验证重名和 Liquid 参数。
 - `theme/snippets/guide-color-catalog.liquid`、`guide-fabric-catalog.liquid`：自动生成的内容代码。
 - `theme/snippets/guide-color-entry.liquid`、`guide-fabric-entry.liquid`：渲染及同名区块覆盖。
+- `theme/snippets/guide-custom-color-contact.liquid`：Custom Color 专属英文客服引导，提示提供裙装链接与目标颜色，订购前咨询 `hello@missvella.com`；可点击邮件链接预填主题 Custom Color Inquiry。资料库和手动模式共用，仅匹配 Custom Color（忽略大小写及首尾空格），不代发邮件。
 - `theme/sections/color-guide.liquid`、`fabric-guide.liquid`：开关、schema、预设。
 - `theme/assets/material-guides.css`：共用样式；`color-guide.js`：色系分组、筛选、详情与编辑器联动。
 
 资料库是 2026-11-19 的核对快照，不是元对象实时同步。源条目、图片或商品 URL 变化时，更新数据文件，运行 `node scripts/build-material-guide-catalog.cjs`，精确推送修改代码；不要改写实例 JSON。
 
 ## 检查与交付
+
+2026-11-20 Custom Color 联系入口：新增共用客服引导 snippet 并接入两种颜色展示模式，不覆盖商家文案或配置。邮件地址、mailto 主题、双模式接入与 diff 静态检查通过，确认 live 后仅精确推送 Color Guide section、颜色条目 snippet 和客服引导 snippet，CLI 返回 `was pushed successfully`。代码及文档提交并同步 origin/main，未启动浏览器或截图回归。
 
 2026-11-20 居中修复：依据商家截图，将颜色详情图片改为等比自适应尺寸、水平居中；图注文字与详情标题居中。保留图片最大高度、完整显示及正文可读性，只改 `assets/material-guides.css`，不改任何实例内容。CSS 结构和 diff 检查通过，确认 live 后通过 `--only assets/material-guides.css --nodelete` 精确推送，CLI 返回 `was pushed successfully`。文档及代码提交并同步 origin/main，未启动浏览器或截图回归。
 

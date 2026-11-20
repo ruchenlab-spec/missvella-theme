@@ -1,0 +1,5 @@
+{% assign contact_color_name = color_name | strip | downcase %}
+{% if contact_color_name == 'custom color' %}
+  <p class="material-guide__note">For a custom color, email our team with the dress link and your preferred shade. Please contact us to confirm availability before ordering.</p>
+  <a class="material-guide__link" href="mailto:hello@missvella.com?subject=Custom%20Color%20Inquiry">hello@missvella.com</a>
+{% endif %}

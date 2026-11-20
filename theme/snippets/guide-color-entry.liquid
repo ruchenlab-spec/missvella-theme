@@ -59,6 +59,7 @@
         {% if hex != blank %}<p class="material-guide__meta"><span class="color-guide__chip" style="--guide-swatch: {{ hex | escape }};" aria-hidden="true"></span>Digital color reference</p>{% endif %}
         {% if override.settings.fabric != blank %}<p class="material-guide__meta">{{ override.settings.fabric | escape }}</p>{% endif %}
         {% if override.settings.description != blank %}<div class="rte">{{ override.settings.description }}</div>{% else %}<p>{{ description | escape }}</p>{% endif %}
+        {% render 'guide-custom-color-contact', color_name: name %}
         <p class="material-guide__note">Screen settings, lighting and fabric finish can change how a color appears. Check the chosen dress for its color options.</p>
         {% if link != blank and link_label != blank %}<a class="material-guide__link" href="{{ link | escape }}">{{ link_label | escape }}</a>{% endif %}
       </div>

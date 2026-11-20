@@ -77,6 +77,7 @@
               <h3 class="material-guide__item-heading" tabindex="-1" data-color-title>{{ color_name | escape }}</h3>
               {% if block.settings.fabric != blank %}<p class="material-guide__meta">{{ block.settings.fabric | escape }}</p>{% endif %}
               {% if block.settings.description != blank %}<div class="rte">{{ block.settings.description }}</div>{% endif %}
+              {% render 'guide-custom-color-contact', color_name: color_name %}
               {% if block.settings.link != blank and block.settings.link_label != blank %}<a class="material-guide__link" href="{{ block.settings.link | escape }}">{{ block.settings.link_label | escape }}</a>{% endif %}
             </div>
           </article>
