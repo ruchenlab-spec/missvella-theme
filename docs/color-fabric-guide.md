@@ -60,6 +60,8 @@ Finish / Drape / Feel、图片部位说明及补充提示收进原生 **Fabric d
 
 ## 检查与交付
 
+2026-11-20 居中修复：依据商家截图，将颜色详情图片改为等比自适应尺寸、水平居中；图注文字与详情标题居中。保留图片最大高度、完整显示及正文可读性，只改 `assets/material-guides.css`，不改任何实例内容。CSS 结构和 diff 检查通过，确认 live 后通过 `--only assets/material-guides.css --nodelete` 精确推送，CLI 返回 `was pushed successfully`。文档及代码提交并同步 origin/main，未启动浏览器或截图回归。
+
 本轮一次 Theme Check：改动文件零问题；原有 32 个 MatchingTranslations 错误、21 个警告未增加。验证了 58 色／13 面料、全部名称和 HEX、26 张图片解析、两个 schema 及默认开关／预设。局部放大增量另检查 Liquid 分支和 `git diff --check`，未重复全主题扫描。
 
 未运行浏览器或截图回归，商家启用资料库后检查前台。发布范围仅两个 section、四个 snippet、一个 CSS；不含模板、section group 或 settings_data JSON，不改变原元对象、商品字段、菜单或线上实例。

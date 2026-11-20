@@ -216,20 +216,31 @@
 
 .color-guide__photo img {
   display: block;
-  width: 100%;
+  width: auto;
+  max-width: 100%;
   height: auto;
   max-height: 40rem;
+  margin-inline: auto;
   object-fit: contain;
+  object-position: center;
 }
 
 .color-guide__photo {
+  min-width: 0;
+  width: 100%;
   margin: 0;
+  text-align: center;
 }
 
 .color-guide__photo figcaption {
   margin-block-start: 12px;
   font-size: 0.75rem;
   line-height: 1.5;
+  text-align: center;
+}
+
+.color-guide__detail .material-guide__item-heading {
+  text-align: center;
 }
 
 .color-guide__custom {
