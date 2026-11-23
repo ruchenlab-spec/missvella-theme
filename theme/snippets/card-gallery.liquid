@@ -107,7 +107,21 @@
 
         assign featured_media_loading = 'lazy'
         assign featured_media_sizes = 'auto, ' | append: image_sizes
-        if section.index == null or section.index < 5
+        # Only the main collection grid has this pagination setting on collection pages.
+        if request.page_type == 'collection' and section.settings.enable_infinite_scroll != nil
+          # Later pages fetched by the infinite scroller are already below the fold.
+          unless section.settings.enable_infinite_scroll and section.index == nil and current_page > 1
+            for leading_product in collection.products limit: 4
+              if leading_product.id == product.id
+                assign eager_image = true
+                break
+              endif
+            endfor
+          endunless
+        elsif section.index == null or section.index < 5
+          assign eager_image = true
+        endif
+        if eager_image
           assign featured_media_loading = 'eager'
           assign featured_media_sizes = image_sizes
         endif

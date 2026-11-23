@@ -237,3 +237,4 @@ live 主题更新 → 编辑器刷新可见 → 前台即时生效
 - 色板条依赖链：`filters.liquid` → `cf-colour-bar.liquid` → `cf2-item.liquid` → `color-facet-swatch.liquid`；`cf-colour-bar` 内的色板项又依赖 `list-filter.liquid` 传下来的 `builtin_pairs`。
 - **`cf-colour-bar.liquid` 内没有 `block` 作用域**：snippet 只能拿到显式 `render` 传入的参数，涉及 `block.settings` 的取值必须在 `filters.liquid` 侧取出后传入（见 `swatch_texture` / `enable_sorting` / `enable_grid_density` / `section_id`）。
 - `collection-wrapper-styles.liquid` 承载全部 `cf-*` 样式与集合页布局，它由 `sections/main-collection.liquid` 渲染，色板条样式依赖它先被渲染。
+- 集合页商品网格由 `snippets/card-gallery.liquid` 根据当前排序、筛选和分页后的商品顺序决定首图加载方式。每个独立分页的前 4 张卡使用 `eager`，从第 5 张起使用原生 `lazy`。开启无限滚动时，追加页的首图均使用 `lazy`。
