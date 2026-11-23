@@ -331,7 +331,7 @@
     </button>
     <div class="slide-dots" id="dots-{{ section.id }}">
       {%- for block in section.blocks -%}
-        <button class="slide-dot" aria-label="Slide {{ forloop.index }}" data-index="{{ forloop.index0 }}"></button>
+        <button class="slide-dot{% if forloop.first %} is-active{% endif %}" aria-label="Slide {{ forloop.index }}" data-index="{{ forloop.index0 }}"></button>
       {%- endfor -%}
     </div>
   {%- endif -%}
@@ -378,17 +378,6 @@
 
   function next() { stopTimer(); goTo(current + 1); startTimer(); }
   function prev() { stopTimer(); goTo(current - 1); startTimer(); }
-
-  // 初始化
-  (function init() {
-    var s = slides(), d = dots();
-    s.forEach(function(item) { item.classList.remove('is-active'); });
-    d.forEach(function(dot) { dot.classList.remove('is-active'); });
-    current = 0;
-    if (s[0]) s[0].classList.add('is-active');
-    if (d[0]) d[0].classList.add('is-active');
-    if (transition === 'slide') track.style.transform = 'translateX(0%)';
-  })();
 
   startTimer();
 

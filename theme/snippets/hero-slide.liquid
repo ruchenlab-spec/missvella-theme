@@ -51,7 +51,7 @@
 -%}
 
 <div
-  class="slide-item"
+  class="slide-item{% if is_first %} is-active{% endif %}"
   {{ block.shopify_attributes }}
 >
   {%- if desktop_image == blank -%}
