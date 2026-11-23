@@ -4,7 +4,6 @@
   Renders product media gallery for the closest product.
 
   @param {string} media_presentation - Either 'grid' or 'carousel'
-  @param {boolean} [preload_first_image] - Mark the product information gallery's first image for the page head.
   @param {object} block_settings - Block settings object
   @param {string} block_id - Block ID for unique element IDs
   @param {string} block_shopify_attributes - Block shopify attributes
@@ -377,12 +376,6 @@
       {% for media in sorted_media %}
         {% capture children %}
           {%- liquid
-              # The grid uses the same first image and sizes as this slideshow.
-              # Register the main gallery preload here once, never in the zoom dialog.
-              assign preload_image = false
-              if forloop.first and preload_first_image and request.page_type == 'product'
-                assign preload_image = true
-              endif
               if needs_both_sizes and forloop.first
                 assign media_sizes = sizes_single
               else
@@ -392,10 +385,10 @@
           {% if block_settings.aspect_ratio != 'adapt' and block_settings.constrain_to_viewport %}
             <div
               class="product-media-constraint-wrapper">
-              {%- render 'product-media', media: media, sizes: media_sizes, is_main_product_media: forloop.first, preload_image: preload_image -%}
+              {%- render 'product-media', media: media, sizes: media_sizes, is_main_product_media: forloop.first -%}
             </div>
           {% else %}
-            {%- render 'product-media', media: media, sizes: media_sizes, is_main_product_media: forloop.first, preload_image: preload_image -%}
+            {%- render 'product-media', media: media, sizes: media_sizes, is_main_product_media: forloop.first -%}
           {% endif %}
         {% endcapture %}
         {% capture class %}

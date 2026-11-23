@@ -18,19 +18,6 @@
     {%- render 'view-transition-opt-in' -%}
 
     {%- render 'meta-tags' -%}
-    {%- if request.page_type == 'product' -%}
-      {%- liquid
-        # Read the tagged gallery image from Shopify's rendered page so the preload
-        # follows the selected variant, image width candidates, and merchant layout.
-        assign gallery_parts = content_for_layout | split: '<!--mv-main-product-image-->'
-        assign main_image_tag = gallery_parts[1]
-      -%}
-      {%- if main_image_tag contains ' srcset="' and main_image_tag contains ' sizes="' -%}
-        {%- assign main_srcset = main_image_tag | split: ' srcset="' | last | split: '"' | first -%}
-        {%- assign main_sizes = main_image_tag | split: ' sizes="' | last | split: '"' | first -%}
-        <link rel="preload" as="image" fetchpriority="high" imagesrcset="{{ main_srcset }}" imagesizes="{{ main_sizes }}">
-      {%- endif -%}
-    {%- endif -%}
     {%- render 'stylesheets' -%}
     {%- render 'card-hover-effect-styles' -%}
     {%- render 'fonts' -%}

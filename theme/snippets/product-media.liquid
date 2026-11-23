@@ -10,7 +10,6 @@
   @param {object} [selected_product] - The currently selected product.
   @param {boolean} [first_3d_model] - Indicates if this is the first 3D model.
   @param {boolean} [is_main_product_media] - Indicates if this is the main product image.
-  @param {boolean} [preload_image] - Expose this exact image tag to the product page's head preload.
   @param {string} [image_ref] - Optional ref attribute for the image element.
 
   @example
@@ -38,7 +37,6 @@
     endif
     assign focal_point_style = '--focal-point: ' | append: media.presentation.focal_point | append: ';'
   %}
-  {%- if preload_image -%}<!--mv-main-product-image-->{%- endif -%}
   {{
     media.preview_image
     | image_url: width: 3840
@@ -54,7 +52,6 @@
       style: focal_point_style,
       ref: image_ref
   }}
-  {%- if preload_image -%}<!--mv-main-product-image-->{%- endif -%}
 
   {% unless preview_image_only %}
     {%- case media.media_type -%}
