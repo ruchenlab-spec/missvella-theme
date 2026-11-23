@@ -238,3 +238,4 @@ live 主题更新 → 编辑器刷新可见 → 前台即时生效
 - **`cf-colour-bar.liquid` 内没有 `block` 作用域**：snippet 只能拿到显式 `render` 传入的参数，涉及 `block.settings` 的取值必须在 `filters.liquid` 侧取出后传入（见 `swatch_texture` / `enable_sorting` / `enable_grid_density` / `section_id`）。
 - `collection-wrapper-styles.liquid` 承载全部 `cf-*` 样式与集合页布局，它由 `sections/main-collection.liquid` 渲染，色板条样式依赖它先被渲染。
 - 集合页商品网格由 `snippets/card-gallery.liquid` 根据当前排序、筛选和分页后的商品顺序决定首图加载方式。每个独立分页的前 4 张卡使用 `eager`，从第 5 张起使用原生 `lazy`。开启无限滚动时，追加页的首图均使用 `lazy`。
+- 商品详情页的主图库在排好变体媒体顺序后，用一对 `<!--mv-main-product-image-->` 标记第一张预览图。`layout/theme.liquid` 在 viewport 声明之后，从这张图直接读取 Shopify 生成的 `srcset` 和 `sizes`，输出一个高优先级的响应式图片预加载。调整图库布局或切换到带 `?variant=` 的商品链接时，预加载会沿用首图的实际选择。缩略图和放大弹窗均不参与该标记。
