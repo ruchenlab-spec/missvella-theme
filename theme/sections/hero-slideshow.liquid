@@ -107,48 +107,45 @@
   }
 
   /* ── Images ── */
-  #slideshow-{{ section.id }} .slide-img-desktop,
-  #slideshow-{{ section.id }} .slide-img-mobile {
+  #slideshow-{{ section.id }} .slide-picture,
+  #slideshow-{{ section.id }} .slide-img {
     width: 100%;
     display: block;
+    height: {% if section_height == 'auto' %}auto{% else %}100%{% endif %};
   }
 
-  #slideshow-{{ section.id }} .slide-img-mobile { display: none; }
+  #slideshow-{{ section.id }} .slide-picture--mobile-only { display: none; }
+
+  #slideshow-{{ section.id }} .slide-placeholder {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    background: #e8e8e8;
+  }
 
   {%- if section_height != 'auto' -%}
-    #slideshow-{{ section.id }} .slide-img-desktop {
-      height: 100%;
+    #slideshow-{{ section.id }} .slide-img {
       object-fit: cover;
-    }
-  {%- else -%}
-    #slideshow-{{ section.id }} .slide-img-desktop {
-      height: auto;
     }
   {%- endif -%}
 
   @media (max-width: 768px) {
-    #slideshow-{{ section.id }} .slide-item {
-      {%- if section_height_mobile == 'auto' -%}
-        height: auto;
-      {%- else -%}
-        height: 100%;
-      {%- endif -%}
+    #slideshow-{{ section.id }} .slide-item,
+    #slideshow-{{ section.id }} .slide-picture,
+    #slideshow-{{ section.id }} .slide-img {
+      height: {% if section_height_mobile == 'auto' %}auto{% else %}100%{% endif %};
     }
 
-    #slideshow-{{ section.id }} .slide-img-desktop { display: none; }
-    #slideshow-{{ section.id }} .slide-img-mobile { display: block; }
+    #slideshow-{{ section.id }} .slide-placeholder--desktop { display: none; }
+    #slideshow-{{ section.id }} .slide-picture--mobile-only { display: block; }
 
-    {%- if section_height_mobile != 'auto' -%}
-      #slideshow-{{ section.id }} .slide-img-mobile {
-        height: 100%;
-        object-fit: cover;
-      }
-    {%- else -%}
-      #slideshow-{{ section.id }} .slide-img-mobile {
-        height: auto;
-        object-fit: initial;
-      }
-    {%- endif -%}
+    #slideshow-{{ section.id }} .slide-img {
+      object-fit: {% if section_height_mobile == 'auto' %}initial{% else %}cover{% endif %};
+      /* Override the desktop focal point added inline by Shopify's image_tag. */
+      object-position: var(--slide-mobile-focus) !important;
+    }
   }
 
   /* ── Overlay ── */

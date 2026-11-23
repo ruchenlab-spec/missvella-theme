@@ -39,13 +39,14 @@
       assign inner_align_mobile = 'center'
   endcase
 
-  # Only the first visible slide may delay LCP: load it eagerly with a high
-  # fetch priority; every other slide stays lazy.
+  assign desktop_image = block.settings.image
+  assign mobile_image = block.settings.image_mobile | default: desktop_image
+  assign mobile_widths = '375,550,750,1000,1200' | split: ','
   assign hero_loading = 'lazy'
-  assign hero_preload = false
-  if is_first
+  assign hero_priority = 'auto'
+  if is_first and section.index == 1
     assign hero_loading = 'eager'
-    assign hero_preload = true
+    assign hero_priority = 'high'
   endif
 -%}
 
@@ -53,48 +54,46 @@
   class="slide-item"
   {{ block.shopify_attributes }}
 >
-  {%- if block.settings.image != blank -%}
-    {{
-      block.settings.image
-      | image_url: width: 3840
-      | image_tag:
-        class: 'slide-img slide-img-desktop',
-        loading: hero_loading,
-        preload: hero_preload,
-        widths: '750, 1100, 1500, 1780, 2000, 3000, 3840',
-        sizes: '100vw',
-        alt: block.settings.title
-    }}
-  {%- else -%}
-    <div class="slide-img-desktop" style="width:100%;height:100%;background:#e8e8e8;display:flex;align-items:center;justify-content:center;">
+  {%- if desktop_image == blank -%}
+    <div class="slide-placeholder{% if mobile_image != blank %} slide-placeholder--desktop{% endif %}">
       {{ 'lifestyle-1' | placeholder_svg_tag: 'placeholder-svg' }}
     </div>
   {%- endif -%}
-
-  {%- if block.settings.image_mobile != blank -%}
-    {{
-      block.settings.image_mobile
-      | image_url: width: 1200
-      | image_tag:
-        class: 'slide-img slide-img-mobile',
-        loading: hero_loading,
-        preload: hero_preload,
-        widths: '375, 550, 750, 1000, 1200',
-        sizes: '100vw',
-        alt: block.settings.title
-    }}
-  {%- elsif block.settings.image != blank -%}
-    {{
-      block.settings.image
-      | image_url: width: 1200
-      | image_tag:
-        class: 'slide-img slide-img-mobile',
-        loading: hero_loading,
-        preload: hero_preload,
-        widths: '375, 550, 750, 1000, 1200',
-        sizes: '100vw',
-        alt: block.settings.title
-    }}
+  {%- if mobile_image != blank -%}
+    <picture
+      class="slide-picture{% if desktop_image == blank %} slide-picture--mobile-only{% endif %}"
+      style="--slide-mobile-focus: {{ mobile_image.presentation.focal_point | default: '50% 50%' }};"
+    >
+      <source
+        media="(max-width: 768px)"
+        width="{{ mobile_image.width }}"
+        height="{{ mobile_image.height }}"
+        sizes="100vw"
+        srcset="
+          {%- for candidate in mobile_widths -%}
+            {%- assign image_width = candidate | plus: 0 | at_most: mobile_image.width -%}
+            {{ mobile_image | image_url: width: image_width | escape }} {{ image_width }}w
+            {%- if image_width == mobile_image.width or forloop.last %}{% break %}{% endif -%},
+          {%- endfor -%}
+        "
+      >
+      {%- if desktop_image != blank -%}
+        {{
+          desktop_image
+          | image_url: width: 3840
+          | image_tag:
+            class: 'slide-img',
+            loading: hero_loading,
+            fetchpriority: hero_priority,
+            widths: '750, 1100, 1500, 1780, 2000, 3000, 3840',
+            sizes: '100vw',
+            alt: block.settings.title
+        }}
+      {%- else -%}
+        {% comment %}The desktop placeholder is separate. Keep the mobile-only fallback local.{% endcomment %}
+        <img class="slide-img" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" width="{{ mobile_image.width }}" height="{{ mobile_image.height }}" loading="{{ hero_loading }}" fetchpriority="{{ hero_priority }}" alt="{{ block.settings.title | escape }}">
+      {%- endif -%}
+    </picture>
   {%- endif -%}
 
   <div

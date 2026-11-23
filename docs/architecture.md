@@ -150,7 +150,7 @@ section.main-collection
 | 文件 | 说明 |
 |---|---|
 | `snippets/fonts.liquid` | 字体引入（在 `theme.liquid` 中 render） |
-| `snippets/hero-slide.liquid` | Hero 单个 slide 渲染 |
+| `snippets/hero-slide.liquid` | 首页轮播的单张幻灯片。通过 `<picture>` 按视口选图，≤768px 优先使用手机图，未配置时回退到桌面图。仅模板第一个分区的首张轮播图使用 `loading="eager"` 和 `fetchpriority="high"`，其余轮播图懒加载。 |
 
 ### 定制资源
 
