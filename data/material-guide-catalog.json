@@ -416,6 +416,30 @@
       "imageStatus": "family-reference"
     },
     {
+      "name": "Fuchsia",
+      "hex": "#E6007E",
+      "family": "Red",
+      "source": {
+        "color": "#E6007E",
+        "color_taxonomy_reference": [
+          "gid://shopify/TaxonomyValue/13",
+          "gid://shopify/TaxonomyValue/11"
+        ],
+        "label": "Fuchsia",
+        "pattern_taxonomy_reference": "gid://shopify/TaxonomyValue/2874"
+      },
+      "description": "A vivid red-pink shade with a cool cast. Compare the digital chip with the dress in your chosen fabric.",
+      "image": {
+        "file": "BurgundyLaceBeadedA-LineV-NeckMaxiDress_1.jpg",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/BurgundyLaceBeadedA-LineV-NeckMaxiDress_1.jpg?v=1794907129",
+        "width": 1792,
+        "height": 2400
+      },
+      "imageCaption": "Color family reference — shown in Burgundy. Not an exact swatch for every shade.",
+      "product": "burgundy-lace-beaded-a-line-v-neck-maxi-dress",
+      "imageStatus": "family-reference"
+    },
+    {
       "name": "Gold",
       "hex": "#efcc93",
       "family": "Gold",
@@ -804,6 +828,29 @@
       },
       "imageCaption": "Color family reference — shown in Terracotta. Not an exact swatch for every shade.",
       "product": "terracotta-cowl-neck-satin-prom-dress-with-cascading-ruffle",
+      "imageStatus": "family-reference"
+    },
+    {
+      "name": "Peach",
+      "hex": "#F8C3AF",
+      "family": "Pink",
+      "source": {
+        "color": "#F8C3AF",
+        "color_taxonomy_reference": [
+          "gid://shopify/TaxonomyValue/11"
+        ],
+        "label": "Peach",
+        "pattern_taxonomy_reference": "gid://shopify/TaxonomyValue/2874"
+      },
+      "description": "A soft, warm pink with an apricot tint. The family photograph shows a related pink shade.",
+      "image": {
+        "file": "vynna-pink-mermaid-v-neck-satin-long-prom-dresses-with-train77_d0b604e1-61f2-40a2-8fc0-7431b4276d44.webp",
+        "url": "https://cdn.shopify.com/s/files/1/0755/6766/1126/files/vynna-pink-mermaid-v-neck-satin-long-prom-dresses-with-train77_d0b604e1-61f2-40a2-8fc0-7431b4276d44.webp?v=1794996987",
+        "width": 800,
+        "height": 1200
+      },
+      "imageCaption": "Color family reference — shown in Pink. Not an exact swatch for every shade.",
+      "product": "blush-pink-satin-mermaid-prom-dress-missvella",
       "imageStatus": "family-reference"
     },
     {
@@ -1654,5 +1701,6 @@
     "Crepe",
     "Velvet",
     "Sequin Fabric"
-  ]
+  ],
+  "colorUpdated": "2026-11-24"
 }

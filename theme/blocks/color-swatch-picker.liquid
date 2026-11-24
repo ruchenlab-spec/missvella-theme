@@ -60,70 +60,6 @@
 
 -%}
 
-<script>
-(function() {
-  var palette = window.MV_CUSTOM_COLOR_PALETTE || {};
-  var canonical = [
-    'Black#000000','Navy Blue#182a55','Dusty Rose#d3b6b6','Sage Green#8a9a5b','Sky Blue#cee7f5','Burgundy#751e15','Emerald#134c36','Champagne#f1e9d2',
-    'Mint Green#a1d2b4','Dusty Sage#a3bf9f','Green#05AA3D','Olive Green#556b2f','Peacock#174d4b','Forest Green#12392e',
-    'Peacock Blue#33a1c9','Dusty Blue#8397a6','Steel Blue#4682b4','Slate Blue#6a5acd','Blue#005BD3','Stormy#4f5d75','Royal Blue#0f47a9','Teal#014a5f',
-    'Blushing Pink#fde9e9','Petal#ffd6db','Pink#FFC0CB','Dusty Rose#d3b6b6','Coral#ff777f','Rose Gold#B76E79','Red#F61F1F','Cabernet#722f37','Burgundy#751e15',
-    'Lemon#fff27b','Daffodil#ffe9a1','Butter#fcddae','Yellow#FFE500','Marigold#D49A06',
-    'Orange#FF8A00','Cinnamon#c35d32','Terracotta#874329','Rust#90322a',
-    'Lilac#e5d6df','Wisteria#c9a0dc','Lavender#b59eb0','Mauve#9289bc','Mulberry#772c54','Plum#3d0f42',
-    'White#fafafa','Ivory#f6f5f0','Champagne#f1e9d2','Sand#eae3d6','Gold#efcc93','Silver#c0c0c0','Grey#adaca9',
-    'Espresso#52443b','Mocha#3e2a20','Dark Navy#000046'
-  ];
-  var raw = [
-    {{ block.settings.colors_popular | json }},
-    {{ block.settings.colors_greens | json }},
-    {{ block.settings.colors_blues | json }},
-    {{ block.settings.colors_pinks | json }},
-    {{ block.settings.colors_yellow | json }},
-    {{ block.settings.colors_orange | json }},
-    {{ block.settings.colors_purples | json }},
-    {{ block.settings.colors_neutrals | json }},
-    {{ block.settings.colors_darks | json }}
-  ];
-  canonical.forEach(function(line) {
-    var i = line.lastIndexOf('#');
-    if (i < 1) return;
-    var name = line.slice(0, i).trim();
-    palette[name.toLowerCase()] = { name: name, hex: '#' + line.slice(i + 1).trim() };
-  });
-  // Respect theme-editor customizations. Legacy default lists are intentionally
-  // ignored because the drawer itself migrates those lists to the canonical Missvella palette.
-  var legacy = [
-    'Sage Green#A3BF9F\nDusty Rose#DCAE96\nBlush#FFB6C1\nLemon#fff27b',
-    'Sage Green#A3BF9F\nMint#98FF98\nEmerald#50C878\nForest#228B22\nOlive#808000\nMoss#8A9A5B',
-    'Powder Blue#B0E0E6\nSky Blue#87CEEB\nCobalt#0047AB\nNavy#000080\nTeal#008080\nSeafoam#AFE4DE',
-    'Blush#FFB6C1\nDusty Rose#DCAE96\nMauve#E0B0B0\nCoral#FF7F6E\nRed#CC0000\nBurgundy#800020\nTerracotta#C66B3D\nFlamingo#FC8EAC',
-    'Lemon#fff27b\nDaffodil#ffe9a1\nButter#fcddae',
-    'Tangerine#F28500\nPeach#FFCBA4\nApricot#FBCEB1\nCoral Orange#FF6347\nRust#B7410E\nPumpkin#FF7518',
-    'Lilac#C8A2C8\nLavender#B57EDC\nPlum#8E4585\nWisteria#C9A0DC\nMulberry#C54B8C\nIndigo#4B0082',
-    'Ivory#FFFFF0\nChampagne#F7E7CE\nNude#E8C9A0\nSand#C2B280\nTaupe#8B7D6B\nSilver#C0C0C0\nGold#D4AF6A\nPearl#EAE0C8',
-    'Rich Wine Red#441729\nEspresso#3E2723\nCharcoal#36454F\nBlack#1a1a1a\nChocolate#7B3F00\nSlate#708090'
-  ];
-  var hasCustomSettings = raw.some(function(list, index) {
-    return String(list || '').trim() && String(list || '').trim() !== String(legacy[index] || '').trim();
-  });
-  if (hasCustomSettings) {
-    raw.forEach(function(list, index) {
-      if (String(list || '').trim() === String(legacy[index] || '').trim()) return;
-      String(list || '').split('\n').forEach(function(line) {
-        line = line.trim();
-        var i = line.lastIndexOf('#');
-        if (i < 1) return;
-        var name = line.slice(0, i).trim();
-        var hex = line.slice(i + 1).trim();
-        if (name && hex.length >= 3) palette[name.toLowerCase()] = { name: name, hex: '#' + hex };
-      });
-    });
-  }
-  window.MV_CUSTOM_COLOR_PALETTE = palette;
-})();
-</script>
-
 {%- if has_custom_color -%}
 {% style %}
 .cpv3-{{ cp_id }} {
@@ -520,11 +456,104 @@
   </div>
 </div>
 
+{%- endif -%}
+
 <script>
 (function() {
+  function parseColors(raw) {
+    if (!raw) return [];
+    return raw.split('\n').map(function(line) {
+      line = line.trim();
+      if (!line) return null;
+      var idx = line.lastIndexOf('#');
+      if (idx < 1) return null;
+      var name = line.substring(0, idx).trim();
+      var hex  = '#' + line.substring(idx + 1).trim();
+      return (name && hex.length >= 4) ? { name: name, hex: hex, native: false } : null;
+    }).filter(Boolean);
+  }
+
+  var catalogPalette = {% render 'color-catalog', format: 'picker' %};
+  // Match both generations of unedited theme defaults before applying the catalog.
+  var previousDefaults = {
+    "popular": ["Black#000000", "Navy Blue#182a55", "Dusty Rose#d3b6b6", "Sage Green#8a9a5b", "Sky Blue#cee7f5", "Burgundy#751e15", "Emerald#134c36", "Champagne#f1e9d2"].join('\n'),
+    "greens": ["Mint Green#a1d2b4", "Dusty Sage#a3bf9f", "Sage Green#8a9a5b", "Green#05AA3D", "Olive Green#556b2f", "Peacock#174d4b", "Emerald#134c36", "Forest Green#12392e"].join('\n'),
+    "blues": ["Sky Blue#cee7f5", "Mist#d6e0ef", "Peacock Blue#33a1c9", "Dusty Blue#8397a6", "Steel Blue#4682b4", "Slate Blue#6a5acd", "Blue#005BD3", "Stormy#4f5d75", "Royal Blue#0f47a9", "Teal#014a5f"].join('\n'),
+    "pinks": ["Blushing Pink#fde9e9", "Petal#ffd6db", "Pink#FFC0CB", "Dusty Rose#d3b6b6", "Coral#ff777f", "Rose Gold#B76E79", "Red#F61F1F", "Cabernet#722f37", "Burgundy#751e15"].join('\n'),
+    "yellow": ["Lemon#fff27b", "Daffodil#ffe9a1", "Butter#fcddae", "Yellow#FFE500", "Marigold#D49A06"].join('\n'),
+    "orange": ["Orange#FF8A00", "Cinnamon#c35d32", "Terracotta#874329", "Rust#90322a"].join('\n'),
+    "purples": ["Lilac#e5d6df", "Wisteria#c9a0dc", "Lavender#b59eb0", "Mauve#9289bc", "Mulberry#772c54", "Plum#3d0f42"].join('\n'),
+    "neutrals": ["White#fafafa", "Ivory#f6f5f0", "Champagne#f1e9d2", "Sand#eae3d6", "Gold#efcc93", "Silver#c0c0c0", "Grey#adaca9"].join('\n'),
+    "darks": ["Espresso#52443b", "Mocha#3e2a20", "Navy Blue#182a55", "Dark Navy#000046", "Black#000000"].join('\n')
+  };
+  var LEGACY_PALETTE_DEFAULTS = {
+    "popular": ["Sage Green#A3BF9F", "Dusty Rose#DCAE96", "Blush#FFB6C1", "Lemon#fff27b"].join('\n'),
+    "greens": ["Sage Green#A3BF9F", "Mint#98FF98", "Emerald#50C878", "Forest#228B22", "Olive#808000", "Moss#8A9A5B"].join('\n'),
+    "blues": ["Powder Blue#B0E0E6", "Sky Blue#87CEEB", "Cobalt#0047AB", "Navy#000080", "Teal#008080", "Seafoam#AFE4DE"].join('\n'),
+    "pinks": ["Blush#FFB6C1", "Dusty Rose#DCAE96", "Mauve#E0B0B0", "Coral#FF7F6E", "Red#CC0000", "Burgundy#800020", "Terracotta#C66B3D", "Flamingo#FC8EAC"].join('\n'),
+    "yellow": ["Lemon#fff27b", "Daffodil#ffe9a1", "Butter#fcddae"].join('\n'),
+    "orange": ["Tangerine#F28500", "Peach#FFCBA4", "Apricot#FBCEB1", "Coral Orange#FF6347", "Rust#B7410E", "Pumpkin#FF7518"].join('\n'),
+    "purples": ["Lilac#C8A2C8", "Lavender#B57EDC", "Plum#8E4585", "Wisteria#C9A0DC", "Mulberry#C54B8C", "Indigo#4B0082"].join('\n'),
+    "neutrals": ["Ivory#FFFFF0", "Champagne#F7E7CE", "Nude#E8C9A0", "Sand#C2B280", "Taupe#8B7D6B", "Silver#C0C0C0", "Gold#D4AF6A", "Pearl#EAE0C8"].join('\n'),
+    "darks": ["Rich Wine Red#441729", "Espresso#3E2723", "Charcoal#36454F", "Black#1a1a1a", "Chocolate#7B3F00", "Slate#708090"].join('\n')
+  };
+
+  function paletteSource(raw, key) {
+    var normalized = (raw || '').replace(/\r\n/g, '\n').trim();
+    if (!normalized || normalized === 'Store catalog' || normalized === previousDefaults[key] || normalized === LEGACY_PALETTE_DEFAULTS[key]) {
+      return catalogPalette[key];
+    }
+    return normalized;
+  }
+
+  var popularColors = parseColors(paletteSource({{ block.settings.colors_popular | json }}, 'popular'));
+
+  var groups = [
+    { name: 'Greens',       colors: parseColors(paletteSource({{ block.settings.colors_greens | json }}, 'greens')) },
+    { name: 'Blues',        colors: parseColors(paletteSource({{ block.settings.colors_blues | json }}, 'blues')) },
+    { name: 'Pinks & Reds', colors: parseColors(paletteSource({{ block.settings.colors_pinks | json }}, 'pinks')) },
+    { name: 'Yellow',       colors: parseColors(paletteSource({{ block.settings.colors_yellow | json }}, 'yellow')) },
+    { name: 'Orange',       colors: parseColors(paletteSource({{ block.settings.colors_orange | json }}, 'orange')) },
+    { name: 'Purples',      colors: parseColors(paletteSource({{ block.settings.colors_purples | json }}, 'purples')) },
+    { name: 'Neutrals',     colors: parseColors(paletteSource({{ block.settings.colors_neutrals | json }}, 'neutrals')) },
+    { name: 'Darks',        colors: parseColors(paletteSource({{ block.settings.colors_darks | json }}, 'darks')) }
+  ];
+  var activeGroups = groups.filter(function(g) { return g.colors.length > 0; });
+
+  // All N Colors 的 N 只统计 Custom Color 色库，保持按钮含义稳定；
+  // 原生 variant 色始终额外显示在按钮前，不会把 50 变成 53/54。
+  var customPaletteSeen = {};
+  var customPaletteColors = [];
+  activeGroups.forEach(function(g) {
+    g.colors.forEach(function(c) {
+      if (!customPaletteSeen[c.name]) {
+        customPaletteSeen[c.name] = true;
+        customPaletteColors.push(c);
+      }
+    });
+  });
+  popularColors.forEach(function(c) {
+    if (!customPaletteSeen[c.name]) {
+      customPaletteSeen[c.name] = true;
+      customPaletteColors.push(c);
+    }
+  });
+
+  // Make the effective block palette available to native swatches.
+  window.MV_CUSTOM_COLOR_PALETTE = window.MV_CUSTOM_COLOR_PALETTE || {};
+  Object.values(catalogPalette).forEach(function(list) {
+    parseColors(list).forEach(rememberColor);
+  });
+  customPaletteColors.forEach(rememberColor);
+
+  function rememberColor(color) {
+    window.MV_CUSTOM_COLOR_PALETTE[color.name.toLowerCase()] = { name: color.name, hex: color.hex };
+  }
+
+  {%- if has_custom_color -%}
   var ID = '{{ cp_id }}';
   var PRODUCT_ID = {{ p.id | json }};
-  var PROPERTY_KEY = '{{ block.settings.label | default: "Custom Color" }}';
+  var PROPERTY_KEY = {{ block.settings.label | default: 'Custom Color' | json }};
   var PLACEHOLDER_VALUE = {{ custom_color_placeholder_value | default: 'Custom Color' | json }};
   var INITIAL_COLOR_NAME = {{ initial_color_name | json }};
 
@@ -564,98 +593,6 @@
       nativeColors.unshift(nativeColors.splice(selectedNativeIndex, 1)[0]);
     }
   }
-
-  function parseColors(raw) {
-    if (!raw) return [];
-    return raw.split('\n').map(function(line) {
-      line = line.trim();
-      if (!line) return null;
-      var idx = line.lastIndexOf('#');
-      if (idx < 1) return null;
-      var name = line.substring(0, idx).trim();
-      var hex  = '#' + line.substring(idx + 1).trim();
-      return (name && hex.length >= 4) ? { name: name, hex: hex, native: false } : null;
-    }).filter(Boolean);
-  }
-
-  // Canonical Missvella 54-color custom palette (Custom Color placeholder is not part of this list).
-  // If an existing block still contains the legacy defaults, migrate it automatically at runtime;
-  // manually customized textarea values continue to override the canonical defaults.
-  var CANONICAL_PALETTE = {
-    "popular": ["Black#000000", "Navy Blue#182a55", "Dusty Rose#d3b6b6", "Sage Green#8a9a5b", "Sky Blue#cee7f5", "Burgundy#751e15", "Emerald#134c36", "Champagne#f1e9d2"].join('\n'),
-    "greens": ["Mint Green#a1d2b4", "Dusty Sage#a3bf9f", "Sage Green#8a9a5b", "Green#05AA3D", "Olive Green#556b2f", "Peacock#174d4b", "Emerald#134c36", "Forest Green#12392e"].join('\n'),
-    "blues": ["Sky Blue#cee7f5", "Mist#d6e0ef", "Peacock Blue#33a1c9", "Dusty Blue#8397a6", "Steel Blue#4682b4", "Slate Blue#6a5acd", "Blue#005BD3", "Stormy#4f5d75", "Royal Blue#0f47a9", "Teal#014a5f"].join('\n'),
-    "pinks": ["Blushing Pink#fde9e9", "Petal#ffd6db", "Pink#FFC0CB", "Dusty Rose#d3b6b6", "Coral#ff777f", "Rose Gold#B76E79", "Red#F61F1F", "Cabernet#722f37", "Burgundy#751e15"].join('\n'),
-    "yellow": ["Lemon#fff27b", "Daffodil#ffe9a1", "Butter#fcddae", "Yellow#FFE500", "Marigold#D49A06"].join('\n'),
-    "orange": ["Orange#FF8A00", "Cinnamon#c35d32", "Terracotta#874329", "Rust#90322a"].join('\n'),
-    "purples": ["Lilac#e5d6df", "Wisteria#c9a0dc", "Lavender#b59eb0", "Mauve#9289bc", "Mulberry#772c54", "Plum#3d0f42"].join('\n'),
-    "neutrals": ["White#fafafa", "Ivory#f6f5f0", "Champagne#f1e9d2", "Sand#eae3d6", "Gold#efcc93", "Silver#c0c0c0", "Grey#adaca9"].join('\n'),
-    "darks": ["Espresso#52443b", "Mocha#3e2a20", "Navy Blue#182a55", "Dark Navy#000046", "Black#000000"].join('\n')
-  };
-  var LEGACY_PALETTE_DEFAULTS = {
-    "popular": ["Sage Green#A3BF9F", "Dusty Rose#DCAE96", "Blush#FFB6C1", "Lemon#fff27b"].join('\n'),
-    "greens": ["Sage Green#A3BF9F", "Mint#98FF98", "Emerald#50C878", "Forest#228B22", "Olive#808000", "Moss#8A9A5B"].join('\n'),
-    "blues": ["Powder Blue#B0E0E6", "Sky Blue#87CEEB", "Cobalt#0047AB", "Navy#000080", "Teal#008080", "Seafoam#AFE4DE"].join('\n'),
-    "pinks": ["Blush#FFB6C1", "Dusty Rose#DCAE96", "Mauve#E0B0B0", "Coral#FF7F6E", "Red#CC0000", "Burgundy#800020", "Terracotta#C66B3D", "Flamingo#FC8EAC"].join('\n'),
-    "yellow": ["Lemon#fff27b", "Daffodil#ffe9a1", "Butter#fcddae"].join('\n'),
-    "orange": ["Tangerine#F28500", "Peach#FFCBA4", "Apricot#FBCEB1", "Coral Orange#FF6347", "Rust#B7410E", "Pumpkin#FF7518"].join('\n'),
-    "purples": ["Lilac#C8A2C8", "Lavender#B57EDC", "Plum#8E4585", "Wisteria#C9A0DC", "Mulberry#C54B8C", "Indigo#4B0082"].join('\n'),
-    "neutrals": ["Ivory#FFFFF0", "Champagne#F7E7CE", "Nude#E8C9A0", "Sand#C2B280", "Taupe#8B7D6B", "Silver#C0C0C0", "Gold#D4AF6A", "Pearl#EAE0C8"].join('\n'),
-    "darks": ["Rich Wine Red#441729", "Espresso#3E2723", "Charcoal#36454F", "Black#1a1a1a", "Chocolate#7B3F00", "Slate#708090"].join('\n')
-  };
-
-  function paletteSource(raw, key) {
-    var normalized = (raw || '').trim();
-    if (!normalized || normalized === LEGACY_PALETTE_DEFAULTS[key].trim()) {
-      return CANONICAL_PALETTE[key];
-    }
-    return normalized;
-  }
-
-  var popularColors = parseColors(paletteSource({{ block.settings.colors_popular | json }}, 'popular'));
-
-  var groups = [
-    { name: 'Greens',       colors: parseColors(paletteSource({{ block.settings.colors_greens | json }}, 'greens')) },
-    { name: 'Blues',        colors: parseColors(paletteSource({{ block.settings.colors_blues | json }}, 'blues')) },
-    { name: 'Pinks & Reds', colors: parseColors(paletteSource({{ block.settings.colors_pinks | json }}, 'pinks')) },
-    { name: 'Yellow',       colors: parseColors(paletteSource({{ block.settings.colors_yellow | json }}, 'yellow')) },
-    { name: 'Orange',       colors: parseColors(paletteSource({{ block.settings.colors_orange | json }}, 'orange')) },
-    { name: 'Purples',      colors: parseColors(paletteSource({{ block.settings.colors_purples | json }}, 'purples')) },
-    { name: 'Neutrals',     colors: parseColors(paletteSource({{ block.settings.colors_neutrals | json }}, 'neutrals')) },
-    { name: 'Darks',        colors: parseColors(paletteSource({{ block.settings.colors_darks | json }}, 'darks')) }
-  ];
-  var activeGroups = groups.filter(function(g) { return g.colors.length > 0; });
-
-  // All N Colors 的 N 只统计 Custom Color 色库，保持按钮含义稳定；
-  // 原生 variant 色始终额外显示在按钮前，不会把 50 变成 53/54。
-  var customPaletteSeen = {};
-  var customPaletteColors = [];
-  activeGroups.forEach(function(g) {
-    g.colors.forEach(function(c) {
-      if (!customPaletteSeen[c.name]) {
-        customPaletteSeen[c.name] = true;
-        customPaletteColors.push(c);
-      }
-    });
-  });
-  popularColors.forEach(function(c) {
-    if (!customPaletteSeen[c.name]) {
-      customPaletteSeen[c.name] = true;
-      customPaletteColors.push(c);
-    }
-  });
-
-  // Publish the runtime palette on `window` so the second script of this block
-  // (native variant swatch rendering) can reuse it. Both scripts render on the
-  // same page but are separate tags, so this global is the bridge.
-  // NOTE: never write a literal script tag inside this block — the LiquidHTML
-  // parser scans raw text and treats it as a nested node, which breaks parsing.
-  window.MV_CUSTOM_COLOR_PALETTE = window.MV_CUSTOM_COLOR_PALETTE || {};
-  customPaletteColors.forEach(function(c) {
-    if (c && c.name && c.hex) {
-      window.MV_CUSTOM_COLOR_PALETTE[c.name.trim().toLowerCase()] = { name: c.name, hex: c.hex };
-    }
-  });
 
   var nativeByName = {};
   nativeColors.forEach(function(c) { nativeByName[c.name] = c; });
@@ -1108,9 +1045,9 @@
 
   // ── 初始化 ──
   if (selectedName) setActiveByName(selectedName);
+  {%- endif -%}
 })();
 </script>
-{%- endif -%}
 
 {% schema %}
 {
@@ -1121,32 +1058,32 @@
     { "type": "text", "id": "label", "label": "Properties 标签(订单中显示)", "default": "Custom Color" },
 
     { "type": "header", "content": "🔥 Popular 热门色(首屏显示)" },
-    { "type": "paragraph", "content": "首屏会先显示产品全部原生变体色，再显示这里配置的 Popular 颜色。若 Popular 与原生变体同名则不重复显示。当前标准色库共 54 个真实颜色；Custom Color 为技术占位，不计入数量。All N Colors 的 N 仅统计自定义色库，不包含原生变体色。" },
-    { "type": "textarea", "id": "colors_popular", "label": "颜色列表(每行:颜色名#十六进制)", "info": "示例:Sage Green#8a9a5b", "default": "Black#000000\nNavy Blue#182a55\nDusty Rose#d3b6b6\nSage Green#8a9a5b\nSky Blue#cee7f5\nBurgundy#751e15\nEmerald#134c36\nChampagne#f1e9d2" },
+    { "type": "paragraph", "content": "首屏会先显示产品全部原生变体色，再显示这里配置的 Popular 颜色。若 Popular 与原生变体同名则不重复显示。分组填写 Store catalog 或留空使用店铺色卡，也可每行填写颜色名#色值。All N Colors 的 N 仅统计自定义色库，不包含原生变体色。" },
+    { "type": "textarea", "id": "colors_popular", "label": "颜色列表(每行:颜色名#十六进制)", "info": "示例:Sage Green#8a9a5b", "default": "Store catalog" },
 
     { "type": "header", "content": "Pinks & Reds 粉红红色" },
-    { "type": "textarea", "id": "colors_pinks", "label": "颜色列表(每行:颜色名#十六进制)", "info": "示例:Blushing Pink#fde9e9", "default": "Blushing Pink#fde9e9\nPetal#ffd6db\nPink#FFC0CB\nDusty Rose#d3b6b6\nCoral#ff777f\nRose Gold#B76E79\nRed#F61F1F\nCabernet#722f37\nBurgundy#751e15" },
+    { "type": "textarea", "id": "colors_pinks", "label": "颜色列表(每行:颜色名#十六进制)", "info": "示例:Blushing Pink#fde9e9", "default": "Store catalog" },
 
     { "type": "header", "content": "Orange 橙色系" },
-    { "type": "textarea", "id": "colors_orange", "label": "颜色列表(每行:颜色名#十六进制)", "info": "示例:Orange#FF8A00", "default": "Orange#FF8A00\nCinnamon#c35d32\nTerracotta#874329\nRust#90322a" },
+    { "type": "textarea", "id": "colors_orange", "label": "颜色列表(每行:颜色名#十六进制)", "info": "示例:Orange#FF8A00", "default": "Store catalog" },
 
     { "type": "header", "content": "Yellow 黄色系" },
-    { "type": "textarea", "id": "colors_yellow", "label": "颜色列表(每行:颜色名#十六进制)", "info": "示例:Lemon#fff27b", "default": "Lemon#fff27b\nDaffodil#ffe9a1\nButter#fcddae\nYellow#FFE500\nMarigold#D49A06" },
+    { "type": "textarea", "id": "colors_yellow", "label": "颜色列表(每行:颜色名#十六进制)", "info": "示例:Lemon#fff27b", "default": "Store catalog" },
 
     { "type": "header", "content": "Blues 蓝色系" },
-    { "type": "textarea", "id": "colors_blues", "label": "颜色列表(每行:颜色名#十六进制)", "info": "示例:Navy Blue#182a55", "default": "Sky Blue#cee7f5\nMist#d6e0ef\nPeacock Blue#33a1c9\nDusty Blue#8397a6\nSteel Blue#4682b4\nSlate Blue#6a5acd\nBlue#005BD3\nStormy#4f5d75\nRoyal Blue#0f47a9\nTeal#014a5f" },
+    { "type": "textarea", "id": "colors_blues", "label": "颜色列表(每行:颜色名#十六进制)", "info": "示例:Navy Blue#182a55", "default": "Store catalog" },
 
     { "type": "header", "content": "Greens 绿色系" },
-    { "type": "textarea", "id": "colors_greens", "label": "颜色列表(每行:颜色名#十六进制)", "info": "示例:Sage Green#8a9a5b", "default": "Mint Green#a1d2b4\nDusty Sage#a3bf9f\nSage Green#8a9a5b\nGreen#05AA3D\nOlive Green#556b2f\nPeacock#174d4b\nEmerald#134c36\nForest Green#12392e" },
+    { "type": "textarea", "id": "colors_greens", "label": "颜色列表(每行:颜色名#十六进制)", "info": "示例:Sage Green#8a9a5b", "default": "Store catalog" },
 
     { "type": "header", "content": "Neutrals 中性色" },
-    { "type": "textarea", "id": "colors_neutrals", "label": "颜色列表(每行:颜色名#十六进制)", "info": "示例:Ivory#f6f5f0", "default": "White#fafafa\nIvory#f6f5f0\nChampagne#f1e9d2\nSand#eae3d6\nGold#efcc93\nSilver#c0c0c0\nGrey#adaca9" },
+    { "type": "textarea", "id": "colors_neutrals", "label": "颜色列表(每行:颜色名#十六进制)", "info": "示例:Ivory#f6f5f0", "default": "Store catalog" },
 
     { "type": "header", "content": "Purples 紫色系" },
-    { "type": "textarea", "id": "colors_purples", "label": "颜色列表(每行:颜色名#十六进制)", "info": "示例:Lavender#b59eb0", "default": "Lilac#e5d6df\nWisteria#c9a0dc\nLavender#b59eb0\nMauve#9289bc\nMulberry#772c54\nPlum#3d0f42" },
+    { "type": "textarea", "id": "colors_purples", "label": "颜色列表(每行:颜色名#十六进制)", "info": "示例:Lavender#b59eb0", "default": "Store catalog" },
 
     { "type": "header", "content": "Darks 深色系" },
-    { "type": "textarea", "id": "colors_darks", "label": "颜色列表(每行:颜色名#十六进制)", "info": "示例:Black#000000", "default": "Espresso#52443b\nMocha#3e2a20\nNavy Blue#182a55\nDark Navy#000046\nBlack#000000" }
+    { "type": "textarea", "id": "colors_darks", "label": "颜色列表(每行:颜色名#十六进制)", "info": "示例:Black#000000", "default": "Store catalog" }
   ],
   "presets": [{ "name": "Color Swatch Picker" }]
 }

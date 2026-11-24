@@ -3,6 +3,7 @@
   the results toolbar (item count, sort, grid density) and the removable
   active-filter chips bar.
 
+  @param {boolean} [allow_partial_groups] - Allow partial names in merchant group maps
   @param {object} colour_filter - The colour filter object
   @param {object} group_lines - Colour group map split into lines, one group per
     line as "Group name:#hex:member, member, member"
@@ -42,6 +43,7 @@
       {%- if cf_assigned contains value_needle -%}{%- continue -%}{%- endif -%}
       {%- for m in members -%}
         {%- assign m_key = m | downcase | strip -%}
+        {%- unless allow_partial_groups or m_key == value_key -%}{%- continue -%}{%- endunless -%}
         {%- if m_key contains value_key or value_key contains m_key -%}
           {%- assign cf_assigned = cf_assigned | append: value_key | append: '|' -%}
           {%- assign cf_entry = '|' | append: cf_group_scan | append: ':' | append: value_key | append: '|' -%}

@@ -1,0 +1,17 @@
+{%- doc -%}
+  Resolve a saved filter grouping against the store palette.
+  @param {string} [setting] - Merchant group map or the original theme default
+{%- enddoc -%}
+{%- capture previous_default -%}Blues:#cee7f5:Sky Blue,Mist,Dusty Blue,Steel Blue,Slate Blue,Royal Blue,Stormy,Navy Blue,Deep Sea,Teal,Peacock Blue
+Greens:#174d4b:Peacock,Mint Green,Seafoam,Dusty Sage,Matcha,Sage Green,Agave,Forest Green,Olive Green,Hunter Green,Emerald,Dark Green
+Purples:#FF00FF:Fuchsia,Mulberry,Lilac,Wisteria,Lavender,Dusty Lavender,Mauve,Plum
+Pinks & Reds:#d87f03:Marigold,Blushing Pink,Petal,Coral,Dusty Rose,orange,Sunset,Rose Gold,Canyon Rose,Cinnamon,Terracotta,Burnt Orange,Rust,Cabernet,Burgundy,Paprika,Wine,Rosewood
+Yellow:#fff27b:Lemon,Daffodil,Butter
+Neutrals:#FAFAFA:White,Ivory,Sand,Champagne,Fog,Gold,Silver,grey,Mocha,Toffee
+Darks:#52443b:Espresso,Dark Navy,Black{%- endcapture -%}
+{%- assign setting = setting | strip -%}
+{%- if setting == blank or setting == previous_default or setting == 'Store catalog' -%}
+  {%- render 'color-catalog', format: 'groups' -%}
+{%- else -%}
+  {{- setting -}}
+{%- endif -%}

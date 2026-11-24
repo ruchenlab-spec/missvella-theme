@@ -1,5 +1,5 @@
 {%- doc -%}
-  Resolves the swatch hex colour for a single filter value.
+  Resolves the CSS swatch background for a single filter value.
 
   Priority: merchant custom map > Shopify swatch > built-in colour-name map.
 
@@ -9,7 +9,7 @@
 {%- enddoc -%}
 
 {% liquid
-  assign swatch_hex = ''
+  assign background = ''
   assign value_key = value.label | downcase | strip
 
   if custom_pairs != blank
@@ -21,25 +21,33 @@
       assign key_part = trimmed | split: ':'
       assign key_name = key_part[0] | downcase | strip
       if key_name == value_key and key_part[1] != blank
-        assign swatch_hex = key_part[1] | strip
+        assign background = key_part[1] | strip
         break
       endif
     endfor
   endif
 
-  if swatch_hex == blank and value.swatch.color != blank
-    assign swatch_hex = value.swatch.color
+  if background == blank and value.swatch.image != blank
+    assign url = value.swatch.image | image_url: width: 80
+    assign background = 'center / cover no-repeat url(' | append: url | append: ')'
+  endif
+  if background == blank and value.swatch.color != blank
+    assign background = value.swatch.color
   endif
 
-  if swatch_hex == blank
-    for pair in builtin_pairs
-      assign key_part = pair | split: ':'
-      if key_part[0] == value_key
-        assign swatch_hex = key_part[1]
-        break
-      endif
-    endfor
+  if background == blank
+    assign marker = value_key | prepend: ',' | append: ':'
+    assign colors = builtin_pairs | join: ',' | prepend: ','
+    if colors contains marker
+      assign background = colors | split: marker | last | split: ',' | first
+    endif
+  endif
+  if background == blank and value_key == 'rainbow'
+    assign rainbow = metaobjects['shopify--color-pattern']['rainbow'].image.value
+    if rainbow != blank
+      assign url = rainbow | image_url: width: 80
+      assign background = 'center / cover no-repeat url(' | append: url | append: ')'
+    endif
   endif
 -%}
-
-{{ swatch_hex }}
+{{- background -}}

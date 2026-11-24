@@ -10,20 +10,15 @@
   so they stay in sync with the built-in Filters & Sort block and preserve other
   active filters.
 
-  Family grouping is automatic via a built-in colour-name map - no metaobjects
-  required. Custom swatch colours and custom family members can be added through
-  the block settings.
+  Families follow the store color catalog. The block can override swatch colors.
 {%- enddoc -%}
 
 {% liquid
-  # `results` is passed in from main-collection (static content_for 'block') and
-  # carries the full filter set - do NOT rely on closest.collection here, its
-  # filters are incomplete inside nested contexts.
-
   assign color_filter = null
   assign active_color_count = 0
 
-  for filter in closest.collection.filters
+  assign collection_filters = collection.filters | default: closest.collection.filters
+  for filter in collection_filters
     assign param_name_down = filter.param_name | downcase
     # Shopify's taxonomy colour filter is filter.v.t.shopify.color-pattern; custom
     # option filters can be filter.v.option.color / .colour / .颜色
@@ -42,7 +37,7 @@
   assign grouping = block.settings.grouping | default: 'family'
 
   # Built-in colour-name map: "name:#hex" pairs. Matched against the option value
-  # lowercased, so "Rose gold", "rose-gold" and "ROSE GOLD" all match.
+  # lowercased and trimmed.
   capture builtin_map_raw
     render 'color-facet-pairs'
   endcapture
@@ -55,10 +50,31 @@
     assign custom_pairs = block.settings.custom_map | newline_to_br | split: '<br />'
   endif
 
-  # Built-in colour families: "Family:member,member|Family:..." matched against
-  # the option value lowercased. Values that match no family fall into "Other".
-  assign family_map = 'Blue:Navy,Blue,Cobalt,Royal blue,Sky blue,Teal,Turquoise,Denim,Aqua|Pink:Pink,Rose,Rose gold,Blush,Fuchsia,Magenta,Dusty rose|Red:Red,Burgundy,Wine,Maroon,Coral,Cherry|Purple:Purple,Lavender,Lilac,Violet,Plum|Green:Green,Emerald,Sage,Olive,Mint|Yellow:Yellow,Gold,Mustard,Champagne|Orange:Orange,Apricot,Peach,Rust|Brown:Brown,Tan,Khaki,Beige,Chocolate|Neutrals:White,Ivory,Cream,Grey,Gray,Silver|Black:Black|Pattern:Floral,Print,Multi,Striped'
-  assign family_groups = family_map | split: '|'
+  if grouping == 'family' and color_filter
+    capture family_map
+      render 'color-catalog', format: 'groups'
+    endcapture
+    assign family_groups = family_map | strip | newline_to_br | split: '<br />'
+
+    assign catalog_members = '|'
+    for group in family_groups
+      assign fields = group | split: ':'
+      assign names = fields[2] | downcase | replace: ',', '|'
+      assign catalog_members = catalog_members | append: names | append: '|'
+    endfor
+    capture other_names
+      for value in color_filter.values
+        assign key = value.label | downcase | strip | prepend: '|' | append: '|'
+        unless catalog_members contains key
+          echo value.label | append: ','
+        endunless
+      endfor
+    endcapture
+    if other_names != blank
+      assign other_group = other_names | prepend: 'Other:#dddddd:' | split: '<br />'
+      assign family_groups = family_groups | concat: other_group
+    endif
+  endif
 
   assign pad_block_start = block.settings['padding-block-start'] | default: 12
   assign pad_block_end = block.settings['padding-block-end'] | default: 20
@@ -131,10 +147,10 @@
         {%- for group in family_groups -%}
           {%- assign parts = group | split: ':' -%}
           {%- assign fam_name = parts[0] -%}
-          {%- assign fam_members = parts[1] | split: ',' -%}
+          {%- assign fam_members = parts[2] | split: ',' -%}
           {%- assign fam_valid = 0 -%}
           {%- assign fam_active = 0 -%}
-          {%- assign fam_hex = '' -%}
+          {%- assign family_background = '' -%}
           {%- for value in color_filter.values -%}
             {%- assign vkey = value.label | downcase | strip -%}
             {%- for m in fam_members -%}
@@ -144,8 +160,8 @@
                 {%- if value.active -%}
                   {%- assign fam_active = fam_active | plus: 1 -%}
                 {%- endif -%}
-                {%- if fam_hex == blank -%}
-                  {%- capture fam_hex -%}{%- render 'color-facet-swatch', value: value, custom_pairs: custom_pairs, builtin_pairs: builtin_pairs -%}{%- endcapture -%}
+                {%- if family_background == blank -%}
+                  {%- capture family_background -%}{%- render 'color-facet-swatch', value: value, custom_pairs: custom_pairs, builtin_pairs: builtin_pairs -%}{%- endcapture -%}
                 {%- endif -%}
                 {%- break -%}
               {%- endif -%}
@@ -160,7 +176,7 @@
                 aria-expanded="false"
                 aria-haspopup="true"
               >
-                <span class="color-facets__dot" style="background: {{ fam_hex | default: '#ddd' }};" aria-hidden="true"></span>
+                <span class="color-facets__dot" style="background: {{ family_background | default: '#ddd' }};" aria-hidden="true"></span>
                 {% if block.settings.show_label %}
                   <span class="color-facets__label">
                     {{- fam_name -}}
@@ -186,7 +202,7 @@
                     {%- endif -%}
                   {%- endfor -%}
                   {%- if in_family -%}
-                    {%- capture value_hex -%}{%- render 'color-facet-swatch', value: value, custom_pairs: custom_pairs, builtin_pairs: builtin_pairs -%}{%- endcapture -%}
+                    {%- capture swatch_background -%}{%- render 'color-facet-swatch', value: value, custom_pairs: custom_pairs, builtin_pairs: builtin_pairs -%}{%- endcapture -%}
                     {%- liquid
                       assign link_url = value.url_to_add
                       if value.active
@@ -203,7 +219,7 @@
                       aria-label="{{ value.label }}"
                       {% if value.active %}aria-current="true"{% endif %}
                     >
-                      <span class="color-facets__dot" style="background: {{ value_hex | default: '#ddd' }};" aria-hidden="true"></span>
+                      <span class="color-facets__dot" style="background: {{ swatch_background | default: '#ddd' }};" aria-hidden="true"></span>
                       {% if block.settings.show_label %}
                         <span class="color-facets__label">{{ value.label }}</span>
                       {% endif %}
@@ -276,7 +292,7 @@
         {% endif %}
 
         {% for value in color_filter.values %}
-          {% capture value_hex %}{% render 'color-facet-swatch', value: value, custom_pairs: custom_pairs, builtin_pairs: builtin_pairs %}{% endcapture %}
+          {% capture swatch_background %}{% render 'color-facet-swatch', value: value, custom_pairs: custom_pairs, builtin_pairs: builtin_pairs %}{% endcapture %}
           {% liquid
             assign link_url = value.url_to_add
             if value.active
@@ -296,7 +312,7 @@
           >
             <span
               class="color-facets__dot{% if is_floral %} color-facets__dot--pattern{% endif %}"
-              style="{% if value_hex != blank %}background: {{ value_hex }};{% endif %}"
+              style="{% if swatch_background != blank %}background: {{ swatch_background }};{% endif %}"
               aria-hidden="true"
             ></span>
             {% if block.settings.show_label %}

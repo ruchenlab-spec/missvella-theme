@@ -29,17 +29,9 @@
   assign filters = filters | default: results.filters
   assign total_active_values = 0
 -%}
-{%- comment -%} Colour groups: the merchant's 颜色分组 textarea is the source of
-truth. The built-in colour-card standard is only a runtime fallback for block
-instances saved before the default existed (editor textareas show the saved
-value, not schema defaults) - paste the text into the editor to override. {%- endcomment -%}
-{%- capture color_group_map_value -%}{%- if block.settings.color_group_map != blank -%}{{ block.settings.color_group_map }}{%- else -%}Blues:#cee7f5:Sky Blue,Mist,Dusty Blue,Steel Blue,Slate Blue,Royal Blue,Stormy,Navy Blue,Deep Sea,Teal,Peacock Blue
-Greens:#174d4b:Peacock,Mint Green,Seafoam,Dusty Sage,Matcha,Sage Green,Agave,Forest Green,Olive Green,Hunter Green,Emerald,Dark Green
-Purples:#FF00FF:Fuchsia,Mulberry,Lilac,Wisteria,Lavender,Dusty Lavender,Mauve,Plum
-Pinks & Reds:#d87f03:Marigold,Blushing Pink,Petal,Coral,Dusty Rose,orange,Sunset,Rose Gold,Canyon Rose,Cinnamon,Terracotta,Burnt Orange,Rust,Cabernet,Burgundy,Paprika,Wine,Rosewood
-Yellow:#fff27b:Lemon,Daffodil,Butter
-Neutrals:#FAFAFA:White,Ivory,Sand,Champagne,Fog,Gold,Silver,grey,Mocha,Toffee
-Darks:#52443b:Espresso,Dark Navy,Black{%- endif -%}{%- endcapture -%}
+{%- capture color_group_map_value -%}
+  {%- render 'color-filter-groups', setting: block.settings.color_group_map -%}
+{%- endcapture -%}
 {%- liquid
 
   # Calculate facets margin style
@@ -124,7 +116,11 @@ Darks:#52443b:Espresso,Dark Navy,Black{%- endif -%}{%- endcapture -%}
       endif
     endfor
 
-    # Group lines for the colour bar (same built-in default as the setting)
+    assign saved_groups = block.settings.color_group_map | strip
+    assign allow_partial_groups = false
+    if saved_groups != blank and saved_groups == color_group_map_value
+      assign allow_partial_groups = true
+    endif
     assign group_lines = color_group_map_value | newline_to_br | split: '<br />'
 
     # Built-in colour-name fallback map (mirrors the colour facets block)
@@ -139,6 +135,7 @@ Darks:#52443b:Espresso,Dark Navy,Black{%- endif -%}{%- endcapture -%}
     {% render 'cf-colour-bar',
       colour_filter: colour_filter,
       group_lines: group_lines,
+      allow_partial_groups: allow_partial_groups,
       builtin_pairs: builtin_pairs,
       results_url: results_url,
       collection_id_attribute: collection_id_attribute,
@@ -230,7 +227,7 @@ Darks:#52443b:Espresso,Dark Navy,Black{%- endif -%}{%- endcapture -%}
 
                         assign active_value_count = filter.active_values | size
                         assign total_active_values = total_active_values | plus: active_value_count
-                        render 'list-filter', filter: filter, filter_style: 'vertical', active_value_count: active_value_count, should_render_clear: false, show_swatch_label: block_settings.show_swatch_label, sectionId: section.id, color_groups: color_group_map_value, filter_index: sidebar_index
+                        render 'list-filter', filter: filter, filter_style: 'vertical', active_value_count: active_value_count, should_render_clear: false, show_swatch_label: block_settings.show_swatch_label, sectionId: section.id, color_groups: color_group_map_value, allow_partial_groups: allow_partial_groups, filter_index: sidebar_index
                       %}
                   {% endcase %}
                 {%- endfor -%}
@@ -493,7 +490,7 @@ Darks:#52443b:Espresso,Dark Navy,Black{%- endif -%}{%- endcapture -%}
 
                         assign active_value_count = filter.active_values | size
                         assign total_active_values = total_active_values | plus: active_value_count
-                        render 'list-filter', filter: filter, filter_style: 'vertical', active_value_count: active_value_count, should_render_clear: false, in_drawer: true, sectionId: section.id, color_groups: color_group_map_value, filter_index: drawer_index
+                        render 'list-filter', filter: filter, filter_style: 'vertical', active_value_count: active_value_count, should_render_clear: false, in_drawer: true, sectionId: section.id, color_groups: color_group_map_value, allow_partial_groups: allow_partial_groups, filter_index: drawer_index
                       %}
                   {% endcase %}
                 {%- endfor -%}
@@ -1476,8 +1473,8 @@ Darks:#52443b:Espresso,Dark Navy,Black{%- endif -%}{%- endcapture -%}
       "type": "textarea",
       "id": "color_group_map",
       "label": "颜色分组",
-      "default": "Blues:#cee7f5:Sky Blue,Mist,Dusty Blue,Steel Blue,Slate Blue,Royal Blue,Stormy,Navy Blue,Deep Sea,Teal,Peacock Blue\nGreens:#174d4b:Peacock,Mint Green,Seafoam,Dusty Sage,Matcha,Sage Green,Agave,Forest Green,Olive Green,Hunter Green,Emerald,Dark Green\nPurples:#FF00FF:Fuchsia,Mulberry,Lilac,Wisteria,Lavender,Dusty Lavender,Mauve,Plum\nPinks & Reds:#d87f03:Marigold,Blushing Pink,Petal,Coral,Dusty Rose,orange,Sunset,Rose Gold,Canyon Rose,Cinnamon,Terracotta,Burnt Orange,Rust,Cabernet,Burgundy,Paprika,Wine,Rosewood\nYellow:#fff27b:Lemon,Daffodil,Butter\nNeutrals:#FAFAFA:White,Ivory,Sand,Champagne,Fog,Gold,Silver,grey,Mocha,Toffee\nDarks:#52443b:Espresso,Dark Navy,Black",
-      "info": "每行一组，格式：组名:代表色hex:所含色值（逗号分隔）。色值需与筛选值名称一致。清空则平铺不分组。",
+      "default": "Store catalog",
+      "info": "每行一组，格式：组名:代表色hex:所含色值（逗号分隔）。色值需与筛选值名称一致。填写 Store catalog 或留空使用店铺色卡分组。",
       "visible_if": "{{ block.settings.enable_filtering == true }}"
     },
     {

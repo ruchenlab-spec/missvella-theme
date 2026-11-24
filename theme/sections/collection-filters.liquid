@@ -1,6 +1,16 @@
 {%- liquid
   assign texture = section.settings.swatch_texture | default: "linen"
-  assign groups_raw = section.settings.color_group_map
+  assign saved_groups = section.settings.color_group_map | strip
+  assign groups_raw = saved_groups
+  if groups_raw != blank
+    capture groups_raw
+      render 'color-filter-groups', setting: groups_raw
+    endcapture
+  endif
+  assign allow_partial_groups = false
+  if saved_groups != blank and groups_raw == saved_groups
+    assign allow_partial_groups = true
+  endif
   assign group_lines = groups_raw | newline_to_br | split: "<br />"
   capture builtin_pairs_raw
     render "color-facet-pairs"
@@ -172,6 +182,7 @@
             {%- assign vk = value.label | downcase | strip -%}
             {%- for m in gmembers -%}
               {%- assign mk = m | downcase | strip -%}
+              {%- unless allow_partial_groups or mk == vk -%}{%- continue -%}{%- endunless -%}
               {%- if mk contains vk or vk contains mk -%}
                 {%- assign gkids = gkids | plus: 1 -%}
                 {%- if value.active -%}{%- assign gactive = gactive | plus: 1 -%}{%- endif -%}
@@ -201,6 +212,7 @@
             {%- assign gm_members = gm[2] | split: "," -%}
             {%- for m in gm_members -%}
               {%- assign mk = m | downcase | strip -%}
+              {%- unless allow_partial_groups or mk == vk -%}{%- continue -%}{%- endunless -%}
               {%- if mk contains vk or vk contains mk -%}{%- assign in_any = true -%}{%- break -%}{%- endif -%}
             {%- endfor -%}
           {%- endfor -%}
@@ -224,6 +236,7 @@
             {%- assign vk = value.label | downcase | strip -%}
             {%- for m in gmembers -%}
               {%- assign mk = m | downcase | strip -%}
+              {%- unless allow_partial_groups or mk == vk -%}{%- continue -%}{%- endunless -%}
               {%- if mk contains vk or vk contains mk -%}{%- assign gkids = gkids | plus: 1 -%}{%- break -%}{%- endif -%}
             {%- endfor -%}
           {%- endfor -%}
@@ -234,11 +247,12 @@
                   {%- assign vk = value.label | downcase | strip -%}
                   {%- for m in gmembers -%}
                     {%- assign mk = m | downcase | strip -%}
+                    {%- unless allow_partial_groups or mk == vk -%}{%- continue -%}{%- endunless -%}
                     {%- if mk contains vk or vk contains mk -%}
-                      {%- capture sw_hex -%}{%- render "color-facet-swatch", value: value, builtin_pairs: builtin_pairs -%}{%- endcapture -%}
+                      {%- capture swatch_background -%}{%- render "color-facet-swatch", value: value, builtin_pairs: builtin_pairs -%}{%- endcapture -%}
                       <label class="mf-swatch">
                         <input type="checkbox"{% if value.active %} checked{% endif %}{% if value.count == 0 and value.active == false %} disabled{% endif %} data-url-add="{{ value.url_to_add }}" data-url-remove="{{ value.url_to_remove }}">
-                        <span class="mf-swatch__dot" style="background:{{ sw_hex | default: "#D9D9D9" }}"></span>
+                        <span class="mf-swatch__dot" style="background:{{ swatch_background | default: "#D9D9D9" }}"></span>
                         <span class="mf-swatch__name">{{ value.label }}</span>
                       </label>
                       {%- break -%}
@@ -262,14 +276,15 @@
                 {%- assign gm_members = gm[2] | split: "," -%}
                 {%- for m in gm_members -%}
                   {%- assign mk = m | downcase | strip -%}
+                  {%- unless allow_partial_groups or mk == vk -%}{%- continue -%}{%- endunless -%}
                   {%- if mk contains vk or vk contains mk -%}{%- assign in_any = true -%}{%- break -%}{%- endif -%}
                 {%- endfor -%}
               {%- endfor -%}
               {%- unless in_any -%}
-                {%- capture sw_hex -%}{%- render "color-facet-swatch", value: value, builtin_pairs: builtin_pairs -%}{%- endcapture -%}
+                {%- capture swatch_background -%}{%- render "color-facet-swatch", value: value, builtin_pairs: builtin_pairs -%}{%- endcapture -%}
                 <label class="mf-swatch">
                   <input type="checkbox"{% if value.active %} checked{% endif %}{% if value.count == 0 and value.active == false %} disabled{% endif %} data-url-add="{{ value.url_to_add }}" data-url-remove="{{ value.url_to_remove }}">
-                  <span class="mf-swatch__dot" style="background:{{ sw_hex | default: "#D9D9D9" }}"></span>
+                  <span class="mf-swatch__dot" style="background:{{ swatch_background | default: "#D9D9D9" }}"></span>
                   <span class="mf-swatch__name">{{ value.label }}</span>
                 </label>
               {%- endunless -%}
@@ -419,8 +434,8 @@
       "type": "textarea",
       "id": "color_group_map",
       "label": "颜色分组",
-      "info": "每行一组：组名:代表色hex:所含色值（逗号分隔）。清空则色系栏不显示。",
-      "default": "Blues:#cee7f5:Sky Blue,Mist,Dusty Blue,Steel Blue,Slate Blue,Royal Blue,Stormy,Navy Blue,Deep Sea,Teal,Peacock Blue\nGreens:#174d4b:Peacock,Mint Green,Seafoam,Dusty Sage,Matcha,Sage Green,Agave,Forest Green,Olive Green,Hunter Green,Emerald,Dark Green\nPurples:#FF00FF:Fuchsia,Mulberry,Lilac,Wisteria,Lavender,Dusty Lavender,Mauve,Plum\nPinks & Reds:#d87f03:Marigold,Blushing Pink,Petal,Coral,Dusty Rose,orange,Sunset,Rose Gold,Canyon Rose,Cinnamon,Terracotta,Burnt Orange,Rust,Cabernet,Burgundy,Paprika,Wine,Rosewood\nYellow:#fff27b:Lemon,Daffodil,Butter\nNeutrals:#FAFAFA:White,Ivory,Sand,Champagne,Fog,Gold,Silver,grey,Mocha,Toffee\nDarks:#52443b:Espresso,Dark Navy,Black"
+      "info": "每行一组：组名:代表色hex:所含色值（逗号分隔）。填写 Store catalog 使用店铺色卡分组；清空则隐藏色系栏。",
+      "default": "Store catalog"
     },
     {
       "type": "select",

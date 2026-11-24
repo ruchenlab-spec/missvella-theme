@@ -45,7 +45,7 @@
 | 2 | 第三方评价 app 集成 | 原 `product.json` 里的 app 区块、评价片段与对应的请求评价页模板**已全部删除**；若要恢复评价功能，需另选方案并自行在主题编辑器配置 |
 | 3 | 首页圆形集合上传自定义图 | 编辑器 → 圆形集合轮播 → 每个圆形区块上传图片/选集合 |
 | 4 | 旧主题副本清理（可选） | 主题库里 4 个旧 Horizon / 定制包副本未动 |
-| 5 | Filters 颜色分组需商家配置 | `color_group_map` 文本域是颜色分组的**唯一来源**，内置色卡仅作兜底；商家需在编辑器粘贴自己的分组 |
+| 5 | Filters 颜色分组 | 默认采用已核对的店铺色卡；商家可在编辑器粘贴自定义分组 |
 | 6 | 剩余 theme check 告警 | 19 个 warning 全部来自官方 Horizon 文件（`ValidScopedCSSClass` / `UnusedDocParam` 等），未自研代码，可不处理 |
 
 ## 三、决策记录（ADR）
@@ -94,9 +94,9 @@
 - **落地**：`blocks/filters.liquid` + `snippets/cf-colour-bar.liquid`（顶部条）+ `snippets/collection-wrapper-styles.liquid`（布局与样式）+ `snippets/cf2-item.liquid` / `snippets/list-filter.liquid`（筛选项渲染）。
 - **取舍**：顶部条是集合页专用，不影响搜索页（`search.json`）与其他模板。
 
-### D10 · 颜色分组以商家文本域为唯一来源，内置色卡仅作运行时兜底
+### D10 · 店铺目录提供默认颜色分组，商家可在编辑器覆盖
 - **背景**：主题编辑器里文本域显示的是**已保存的值**，不是 schema 默认值。若把内置色卡写成 schema 默认值，商家不主动粘贴就永远看不到内置分组。
-- **结论**：`color_group_map` 文本域为空时，运行时回退到内置色卡标准（`filters.liquid` 顶部的 `color_group_map_value` capture）；一旦商家粘贴自定义分组，即完全以文本域为准。
+- **结论**：Filters 的 `color_group_map` 为空、为 Store catalog 或等于完整旧默认列表时，运行时采用店铺目录；自定义文本仍优先。
 - **附带**：自定义分组用 `组名:#色值:成员1,成员2` 每行一组的格式。
 
 ### D11 · `filters.liquid` 拆分色板条为独立 snippet

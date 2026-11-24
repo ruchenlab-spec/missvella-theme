@@ -1,6 +1,7 @@
 {%- doc -%}
   Renders a list or swatch filter.
 
+  @param {boolean} [allow_partial_groups] - Allow partial names in merchant group maps
   @param {object} filter - The filter to render
   @param {string} filter_style - The filter style ('horizontal' | 'vertical')
   @param {number} active_value_count - The number of active values
@@ -250,6 +251,7 @@
                 {%- assign av_key = av.label | downcase | strip -%}
                 {%- for m in members -%}
                   {%- assign m_key = m | downcase | strip -%}
+                  {%- unless allow_partial_groups or m_key == av_key -%}{%- continue -%}{%- endunless -%}
                   {%- if m_key contains av_key or av_key contains m_key -%}
                     {%- assign group_active = group_active | plus: 1 -%}
                     {%- break -%}
@@ -268,9 +270,11 @@
                   {%- for value in filter.values -%}
                     {%- assign value_key = value.label | downcase | strip -%}
                     {%- assign in_group = false -%}
-                    {%- unless assigned_keys contains value_key -%}
+                    {%- assign needle = value_key | prepend: ';' | append: ';' -%}
+                    {%- unless assigned_keys contains needle -%}
                       {%- for m in members -%}
                         {%- assign m_key = m | downcase | strip -%}
+                        {%- unless allow_partial_groups or m_key == value_key -%}{%- continue -%}{%- endunless -%}
                         {%- if m_key contains value_key or value_key contains m_key -%}
                           {%- assign in_group = true -%}
                           {%- break -%}
@@ -296,24 +300,8 @@
             <div class="cf2-swatches cf2-loose">
               {%- for value in filter.values -%}
                 {%- assign value_key = value.label | downcase | strip -%}
-                {%- assign matched = false -%}
-                {%- if assigned_keys contains value_key -%}
-                  {%- assign matched = true -%}
-                {%- endif -%}
-                {%- for line in group_lines -%}
-                  {%- assign gl2 = line | strip -%}
-                  {%- if gl2 == blank -%}{%- continue -%}{%- endif -%}
-                  {%- assign gm_members = gl2 | split: ':' -%}
-                  {%- assign gm_members = gm_members[2] | split: ',' -%}
-                  {%- for m in gm_members -%}
-                    {%- assign m_key = m | downcase | strip -%}
-                    {%- if m_key contains value_key or value_key contains m_key -%}
-                      {%- assign matched = true -%}
-                      {%- break -%}
-                    {%- endif -%}
-                  {%- endfor -%}
-                {%- endfor -%}
-                {%- unless matched -%}
+                {%- assign needle = value_key | prepend: ';' | append: ';' -%}
+                {%- unless assigned_keys contains needle -%}
                   {%- liquid
                     assign input_id = 'Filter-' | append: filter.param_name | escape | append: '-' | append: value.label | handleize | append: '-' | append: filter_style | append: '-' | append: in_drawer
                     assign is_disabled = false

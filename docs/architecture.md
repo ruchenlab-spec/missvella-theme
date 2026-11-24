@@ -116,8 +116,8 @@ section.main-collection
 ### 颜色分组的三层来源（优先级从高到低）
 
 1. `color_group_map` 文本域（商家在编辑器粘贴）→ `color_group_map_value`
-2. 内置色卡标准（`filters.liquid` 顶部的 capture 兜底）
-3. `color-facet-swatch.liquid` 的内置色值表（`builtin_pairs`，用于单个色板取色）
+2. `color-filter-groups.liquid` 将 Store catalog、完整旧默认分组及 Filters 的空值解析为当期目录分组
+3. `color-facet-swatch.liquid` 优先取区块自定义色或 Shopify 原生图／色，再使用 `color-catalog.liquid` 的目录色值和旧商品名称兜底。目录生成方式见 [颜色与面料指南](color-fabric-guide.md)
 
 ### 关键约束
 

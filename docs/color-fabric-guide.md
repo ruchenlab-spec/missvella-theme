@@ -4,8 +4,10 @@
 
 ## 来源与已补齐内容
 
-- Color：`shopify.color-pattern` → `shopify--color-pattern`，共 58 条。保留 56 个原始 HEX；Custom Color 不虚构色块；Rainbow 使用条目原有 `rainbow.jpg`。
-- 按原 taxonomy 分组，16 个常规色系各选一张店内商品图并逐张核对。图片标注 **Color family reference — shown in …**，不是每个色号的实物色样。58 条英文说明已补齐。
+- 2026-11-24 通过 Shopify Liquid Console 读取 `shopify--color-pattern`，按条目总数和名称核对全部 60 条。58 条有 HEX，Rainbow 使用原图 `rainbow.jpg`，Custom Color 保留咨询入口。
+- 相比 11 月 19 日新增 Fuchsia（`#E6007E`）和 Peach（`#F8C3AF`）。Fuchsia 的分类引用依次为 Red 和 Pink，指南沿用首个分类 Red；Peach 归入 Pink。两色沿用对应色系的示例照片和图注。
+- 集合与搜索筛选、快速颜色筛选、独立 Collection Filters 和商品页 Color Swatch Picker 共用店铺色表。筛选只展示 Shopify 返回的筛选值；商品定制色抽屉默认采用 58 个单色色号。商家自定义列表继续生效，原版完整默认列表和 `Store catalog` 使用当前资料库。独立 Collection Filters 仍可清空字段来关闭色系栏。
+- 按原 taxonomy 分组，16 个常规色系各选一张店内商品图并逐张核对。图片标注 **Color family reference — shown in …**，不是每个色号的实物色样。60 条英文说明已补齐。
 - Fabric：来源 `dress.fabric` → `dress_std_fabric`，原 13 类型保留在数据档案。按商家最新要求，当前仅展示 **Satin、Chiffon、Tulle、Mesh、Lace、Crepe、Velvet、Sequin Fabric**，严格按该顺序生成资料库。8 类均有与商品元字段一致的店内图片、说明及商品链接。
 - 面料双图为商品局部放大＋完整裙装，局部标注 **Garment detail**，不是独立面料实拍。拼接款注明具体部位：蕾丝上身、绉纱裙摆、欧根纱裙摆、丝绒上身等。没有生成、购买或上传外部素材。
 - 初始资料库核验过 26 张店内图片；当前颜色＋8 类面料实际引用 24 张不同图片，均来自已核验来源。使用 Shopify 响应式图片和懒加载，不依赖 `all_products` 对象数量限制。
@@ -35,7 +37,7 @@
 4. Fabric 自填 Fabric close-up 替换默认放大图；自填 Dress photograph 后停止使用原图局部，避免误认为同一套图。
 5. 不匹配名称的区块在资料库模式下不输出。颜色关闭资料库后可自行增补和重排。面料在资料库和手动模式下均只允许上述 8 种（忽略首尾空格与大小写）；其余已保存区块保留设置但不输出。手动模式仍按区块顺序展示允许的类型。
 
-58 色超过 Shopify 单 section 50 区块上限，所以完整列表由代码渲染，最多 50 个 Color 区块用于覆盖。Fabric 最多 16 块以保留既有 schema 容量，但仅输出当前允许类型。资料库顺序固定为颜色名称顺序及 `fabricDisplayOrder`，不随覆盖区块重排。
+60 色超过 Shopify 单 section 50 区块上限，所以完整列表由代码渲染，最多 50 个 Color 区块用于覆盖。Fabric 最多 16 块以保留既有 schema 容量，但仅输出当前允许类型。资料库顺序固定为颜色名称顺序及 `fabricDisplayOrder`，不随覆盖区块重排。
 
 独立页面模板、Page 关联、唯一 H1 和菜单由商家配置。页内入口默认 `#colors`、`#fabrics`；重复 section 使用不同 anchor。若页脚仍指向 `/`，需在后台改为 `/pages/color-fabric-guide`。
 
@@ -50,16 +52,18 @@ Finish / Drape / Feel、图片部位说明及补充提示收进原生 **Fabric d
 ## 代码与维护
 
 - `data/material-guide-catalog.json`：原始字段记录、HEX、分类、图片 URL、商品 handle、文案与素材缺口；`fabricDisplayOrder` 指定当前 8 类展示范围和顺序。
-- `scripts/build-material-guide-catalog.cjs`：生成两个资料库调用文件，并验证重名和 Liquid 参数。
+- `scripts/build-material-guide-catalog.cjs`：生成颜色和面料指南，以及筛选与选色器共用的 `color-catalog.liquid`。同时校验名称、HEX、分组及 Liquid 参数。
 - `theme/snippets/guide-color-catalog.liquid`、`guide-fabric-catalog.liquid`：自动生成的内容代码。
 - `theme/snippets/guide-color-entry.liquid`、`guide-fabric-entry.liquid`：渲染及同名区块覆盖。
 - `theme/snippets/guide-custom-color-contact.liquid`：Custom Color 专属英文客服引导，提示提供裙装链接与目标颜色，订购前咨询 `hello@missvella.com`；可点击邮件链接预填主题 Custom Color Inquiry。资料库和手动模式共用，仅匹配 Custom Color（忽略大小写及首尾空格），不代发邮件。
 - `theme/sections/color-guide.liquid`、`fabric-guide.liquid`：开关、schema、预设。
 - `theme/assets/material-guides.css`：共用样式；`color-guide.js`：色系分组、筛选、详情与编辑器联动。
 
-资料库是 2026-11-19 的核对快照，不是元对象实时同步。源条目、图片或商品 URL 变化时，更新数据文件，运行 `node scripts/build-material-guide-catalog.cjs`，精确推送修改代码；不要改写实例 JSON。
+颜色资料库记录 2026-11-24 的核对快照，面料沿用 2026-11-19 快照。源条目、图片或商品 URL 变化时，更新数据文件，运行 `node scripts/build-material-guide-catalog.cjs`，精确推送修改代码；不要改写实例 JSON。
 
 ## 检查与交付
+
+2026-11-24 已逐项核对线上 60 条原始记录、指南条目、筛选分组、58 个纯色 HEX 和选色器旧默认值的兼容路径。Theme Check 维持原有 32 项翻译错误及 21 项警告。Shopify CLI 已确认 13 个 Liquid 代码文件精确上传到 live 主题 Missvella Dev（167137378374）。
 
 2026-11-20 Custom Color 联系入口：新增共用客服引导 snippet 并接入两种颜色展示模式，不覆盖商家文案或配置。邮件地址、mailto 主题、双模式接入与 diff 静态检查通过，确认 live 后仅精确推送 Color Guide section、颜色条目 snippet 和客服引导 snippet，CLI 返回 `was pushed successfully`。代码及文档提交并同步 origin/main，未启动浏览器或截图回归。
 
