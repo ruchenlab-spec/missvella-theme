@@ -4,12 +4,13 @@ import { mediaQueryLarge } from '@theme/utilities';
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 const canHover = matchMedia('(hover: hover)');
 
-/** @extends {Component<{ track: HTMLElement, slides?: HTMLElement[] }>} */
+/** @extends {Component<{ track: HTMLElement, slides?: HTMLElement[], signupDialog: HTMLDialogElement, signupEmail: HTMLInputElement }>} */
 export class AnnouncementBar extends Component {
   #current = 0;
   #timer;
   #listeners;
   #editorSlide;
+  #copyTimeout;
   /** @type {Animation[]} */
   #animations = [];
 
@@ -20,6 +21,7 @@ export class AnnouncementBar extends Component {
     mediaQueryLarge.addEventListener('change', this.#syncLayout, options);
     reducedMotion.addEventListener('change', this.#syncLayout, options);
     document.addEventListener('visibilitychange', this.#syncPlayback, options);
+    this.refs.signupDialog.addEventListener('close', this.#syncPlayback, options);
     this.addEventListener('focusin', () => this.refs.track.setAttribute('aria-live', 'polite'), options);
     this.addEventListener('focusout', () => this.refs.track.removeAttribute('aria-live'), options);
     this.addEventListener('shopify:block:select', (event) => {
@@ -33,6 +35,7 @@ export class AnnouncementBar extends Component {
       this.#syncPlayback();
     }, options);
     this.#syncLayout();
+    if (this.refs.signupDialog.querySelector('[data-signup-feedback]')) this.openSignup();
   }
 
   updatedCallback() {
@@ -44,6 +47,7 @@ export class AnnouncementBar extends Component {
     super.disconnectedCallback();
     this.#listeners.abort();
     clearInterval(this.#timer);
+    clearTimeout(this.#copyTimeout);
     this.#cancelAnimations();
     this.#editorSlide = undefined;
   }
@@ -69,7 +73,7 @@ export class AnnouncementBar extends Component {
   #syncPlayback = () => {
     clearInterval(this.#timer);
     const delay = Number(this.getAttribute('autoplay')) * 1000;
-    if (!this.hasAttribute('data-rotating') || reducedMotion.matches || document.hidden || this.#editorSlide || !delay) {
+    if (!this.hasAttribute('data-rotating') || reducedMotion.matches || document.hidden || this.#editorSlide || this.refs.signupDialog.open || !delay) {
       return;
     }
     this.#timer = setInterval(() => {
@@ -84,6 +88,52 @@ export class AnnouncementBar extends Component {
 
   previous() {
     this.#step(-1);
+  }
+
+  async copyCode(event) {
+    const button = event.target.closest('[data-code]');
+    if (!button) return;
+    const code = button.dataset.code;
+    let copied = false;
+    try {
+      await navigator.clipboard.writeText(code);
+      copied = true;
+    } catch {
+      const field = document.createElement('textarea');
+      field.value = code;
+      field.style.position = 'fixed';
+      field.style.opacity = '0';
+      document.body.append(field);
+      field.select();
+      try {
+        copied = document.execCommand('copy');
+      } catch {
+        copied = false;
+      }
+      field.remove();
+    }
+
+    const label = button.querySelector('[data-copy-label]');
+    const status = button.querySelector('[data-copy-status]');
+    label.textContent = copied ? 'Copied!' : 'Copy failed';
+    status.textContent = copied ? `${code} copied to clipboard` : 'Copy failed. Please copy the code manually.';
+    clearTimeout(this.#copyTimeout);
+    this.#copyTimeout = setTimeout(() => {
+      label.textContent = 'Copy code';
+      status.textContent = '';
+    }, 2400);
+  }
+
+  openSignup() {
+    const dialog = this.refs.signupDialog;
+    if (dialog.open) return;
+    dialog.showModal();
+    this.#syncPlayback();
+    this.refs.signupEmail.focus();
+  }
+
+  closeSignup() {
+    this.refs.signupDialog.close();
   }
 
   /** @param {number} direction */

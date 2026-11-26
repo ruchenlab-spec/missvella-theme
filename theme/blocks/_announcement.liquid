@@ -1,6 +1,7 @@
 {% render 'text-block-styles' %}
 
 {%- assign block_settings = block.settings -%}
+{%- assign click_action = block_settings.action | default: 'link' -%}
 {%- assign plain_text = block_settings.text | strip_newlines | strip_html | strip -%}
 
 {%- unless plain_text == '' -%}
@@ -25,11 +26,22 @@
     "
     {{ block.shopify_attributes }}
   >
-    <p class="announcement-bar__text">
-      {{ block.settings.text }}
-    </p>
+    {% if click_action == 'copy' and block_settings.copy_code != blank %}
+      <button class="announcement-bar__action" type="button" data-code="{{ block_settings.copy_code | escape }}" on:click="/copyCode">
+        <span>{{ block_settings.text }}</span>
+        <span class="announcement-bar__action-label" data-copy-label aria-hidden="true">Copy code</span>
+        <span class="visually-hidden" role="status" data-copy-status></span>
+      </button>
+    {% elsif click_action == 'subscribe' %}
+      <button class="announcement-bar__action" type="button" on:click="/openSignup">
+        <span>{{ block_settings.text }}</span>
+        <span class="announcement-bar__action-label" aria-hidden="true">Sign up</span>
+      </button>
+    {% else %}
+      <p class="announcement-bar__text">{{ block.settings.text }}</p>
+    {% endif %}
 
-    {% if block_settings.link != blank %}
+    {% if click_action == 'link' and block_settings.link != blank %}
       <a
         class="announcement-bar__link"
         href="{{ block_settings.link }}"
@@ -56,7 +68,25 @@
     {
       "type": "url",
       "id": "link",
-      "label": "t:settings.link"
+      "label": "t:settings.link",
+      "visible_if": "{{ block.settings.action == 'link' }}"
+    },
+    {
+      "type": "select",
+      "id": "action",
+      "label": "Click action",
+      "options": [
+        { "value": "link", "label": "Open link" },
+        { "value": "copy", "label": "Copy discount code" },
+        { "value": "subscribe", "label": "Open email signup" }
+      ],
+      "default": "link"
+    },
+    {
+      "type": "text",
+      "id": "copy_code",
+      "label": "Discount code to copy",
+      "visible_if": "{{ block.settings.action == 'copy' }}"
     },
     {
       "type": "header",
