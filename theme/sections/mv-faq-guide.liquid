@@ -1,0 +1,440 @@
+{%- liquid
+  assign config = section.settings
+  assign topics = section.blocks | where: 'type', 'topic'
+  assign topic_tag = 'h2'
+  if config.heading_level == 'h2' and config.heading != blank
+    assign topic_tag = 'h3'
+  endif
+-%}
+
+<div class="section page-width-normal">
+  <div class="mv-faq spacing-style" style="{% render 'spacing-style', settings: config %}" itemscope itemtype="https://schema.org/FAQPage">
+    {% if config.heading != blank %}
+      <{{ config.heading_level }} class="mv-faq__title h2" itemprop="name">{{ config.heading | escape }}</{{ config.heading_level }}>
+    {% endif %}
+    {% if config.intro != blank %}
+      <p class="mv-faq__intro">{{ config.intro | escape }}</p>
+    {% endif %}
+    {% if topics.size > 1 %}
+      <nav class="mv-faq__topics" aria-label="FAQ topics">
+        {% for topic in topics %}
+          {% if topic.settings.heading != blank %}
+            <a href="#FaqTopic-{{ section.id }}-{{ topic.id }}">{{ topic.settings.heading | escape }}</a>
+          {% endif %}
+        {% endfor %}
+      </nav>
+    {% endif %}
+
+    {% for block in section.blocks %}
+      {% case block.type %}
+        {% when 'topic' %}
+          {% if block.settings.heading != blank %}
+            <{{ topic_tag }} class="mv-faq__topic h3" id="FaqTopic-{{ section.id }}-{{ block.id }}" {{ block.shopify_attributes }}>
+              {{- block.settings.heading | escape -}}
+            </{{ topic_tag }}>
+          {% endif %}
+        {% when 'question' %}
+          {% if block.settings.heading != blank and block.settings.answer != blank %}
+            {% capture faq_row %}
+              <details itemprop="mainEntity" itemscope itemtype="https://schema.org/Question" {{ block.shopify_attributes }}>
+                <summary>
+                  <span itemprop="name">{{ block.settings.heading | escape }}</span>
+                  <span class="svg-wrapper icon-plus" aria-hidden="true">{{- 'icon-plus.svg' | inline_asset_content -}}</span>
+                </summary>
+                <div class="details-content" itemprop="acceptedAnswer" itemscope itemtype="https://schema.org/Answer">
+                  <div class="rte" itemprop="text">{{ block.settings.answer }}</div>
+                </div>
+              </details>
+            {% endcapture %}
+            {% render 'accordion-custom-component', children: faq_row, class: 'mv-faq__row' %}
+          {% endif %}
+      {% endcase %}
+    {% endfor %}
+  </div>
+</div>
+
+{% stylesheet %}
+  .mv-faq {
+    width: 100%;
+    max-width: 56rem;
+    margin-inline: auto;
+    --faq-rule: rgb(var(--color-foreground-rgb) / 0.2);
+  }
+  .mv-faq__title { margin: 0; }
+  .mv-faq__intro { max-width: 65ch; margin: 0.75rem 0 0; }
+  .mv-faq__topics {
+    display: flex;
+    flex-wrap: wrap;
+    column-gap: 1.5rem;
+    margin-block-start: 1.25rem;
+    border-block-end: 1px solid var(--faq-rule);
+  }
+  .mv-faq__topics a {
+    display: inline-flex;
+    align-items: center;
+    min-height: var(--minimum-touch-target);
+    text-decoration: underline;
+    text-underline-offset: 0.22em;
+  }
+  .mv-faq__topic {
+    scroll-margin-block-start: calc(var(--header-height, 5rem) + 1rem);
+    margin-block: clamp(2rem, 5vw, 3.5rem) 1rem;
+  }
+  .mv-faq__row {
+    display: block;
+    border-block-end: 1px solid var(--faq-rule);
+  }
+  .mv-faq__row summary {
+    gap: 1rem;
+    min-height: var(--minimum-touch-target);
+    padding-block: 1rem;
+  }
+  .mv-faq__row .icon-plus { flex-shrink: 0; }
+  .mv-faq__row .rte { max-width: 70ch; padding-block-end: 1.25rem; overflow-wrap: anywhere; }
+  .mv-faq__row .rte > :first-child { margin-block-start: 0; }
+  .mv-faq__row .rte > :last-child { margin-block-end: 0; }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Customer FAQs",
+  "class": "section-wrapper",
+  "limit": 1,
+  "enabled_on": { "templates": ["page"] },
+  "max_blocks": 50,
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Frequently Asked Questions" },
+    { "type": "select", "id": "heading_level", "label": "Heading level", "options": [{ "value": "h1", "label": "H1" }, { "value": "h2", "label": "H2" }], "default": "h1" },
+    { "type": "textarea", "id": "intro", "label": "Introduction", "default": "Find out when your dress will arrive, how to choose your size and what to do if you need a return or a refund." },
+    { "type": "range", "id": "padding-block-start", "label": "Top spacing", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 40 },
+    { "type": "range", "id": "padding-block-end", "label": "Bottom spacing", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 64 }
+  ],
+  "blocks": [
+    {
+      "type": "topic", "name": "Topic",
+      "settings": [{ "type": "text", "id": "heading", "label": "Topic heading", "default": "New topic" }]
+    },
+    {
+      "type": "question", "name": "Question",
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Question" },
+        { "type": "richtext", "id": "answer", "label": "Answer" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Customer FAQs",
+      "blocks": [
+        { "type": "topic", "settings": { "heading": "Shipping & delivery" } },
+        {
+          "type": "question",
+          "settings": {
+            "heading": "How long does Missvella take to make and ship my dress?",
+            "answer": "<p>Allow <strong>2–5 business days for processing</strong> once your order is confirmed and paid. Missvella processes orders Monday through Saturday. This includes making the dress, checking it and packing it. The shipping estimate starts when the parcel is dispatched.</p>"
+          }
+        },
+        {
+          "type": "question",
+          "settings": {
+            "heading": "How do I estimate when my dress will arrive?",
+            "answer": "<p>Add processing time to the transit estimate for your destination. For example, Standard Shipping after dispatch is <strong>5–10 days</strong> to eligible street addresses in the contiguous US, <strong>6–10 days</strong> to the UK and <strong>10–15 days</strong> to Canada. Look up <a href=\"/pages/processing-shipping\">shipping times by destination</a> for your country and check available services at checkout.</p>"
+          }
+        },
+        {
+          "type": "question",
+          "settings": {
+            "heading": "How much is shipping, and when is Standard Shipping free?",
+            "answer": "<p>Standard Shipping costs <strong>US$15</strong>. It becomes free automatically when your merchandise subtotal reaches <strong>US$180 after discounts</strong>, before shipping fees. Express Shipping costs <strong>US$30</strong> and takes an estimated <strong>3–5 days after dispatch</strong>. Enter your full address at checkout to see which methods are available.</p>"
+          }
+        },
+        {
+          "type": "question",
+          "settings": {
+            "heading": "Does Missvella ship to my country or US address?",
+            "answer": "<p>Enter your full delivery address at checkout to see available services. In the US, Standard Shipping covers eligible street addresses in the contiguous states. Alaska, Hawaii, US territories (including Puerto Rico and Guam), PO boxes and APO/FPO addresses are excluded from US Standard Shipping. Check the <a href=\"/policies/shipping-policy\">Shipping Policy</a> for destination estimates and restrictions.</p>"
+          }
+        },
+        {
+          "type": "question",
+          "settings": {
+            "heading": "Can my dress arrive before my wedding, prom or event?",
+            "answer": "<p>If your event is close, email <a href=\"mailto:hello@missvella.com\">hello@missvella.com</a> before ordering with your event date and delivery location. Include the dress link so we can check your options. Allow time for processing, transit, a fitting and any alterations. Delivery dates are estimates, including with Express Shipping.</p>"
+          }
+        },
+        {
+          "type": "question",
+          "settings": {
+            "heading": "Where can I track my Missvella order?",
+            "answer": "<p>Open your shipping confirmation email or use <a href=\"/apps/ordertracker\">Track your order</a> after dispatch. The first scan can take time to appear once the carrier receives the parcel. If tracking stops updating, send your order number and any tracking number to <a href=\"mailto:hello@missvella.com\">hello@missvella.com</a>.</p>"
+          }
+        },
+        {
+          "type": "question",
+          "settings": {
+            "heading": "Will I need to pay import duties or local taxes?",
+            "answer": "<p>You are responsible for import duties or local taxes unless checkout states otherwise. Customs clearance can also affect delivery time. See the <a href=\"/policies/shipping-policy\">Shipping Policy</a> for details.</p>"
+          }
+        },
+        {
+          "type": "question",
+          "settings": {
+            "heading": "What should I do if my order is delayed?",
+            "answer": "<p>Before dispatch, Missvella will contact you if processing is expected to take longer, with a revised estimate and your options, including cancellation and a refund where applicable. After dispatch, email <a href=\"mailto:hello@missvella.com\">hello@missvella.com</a> if the estimated transit window has passed or tracking has stopped updating. Include your order number and any tracking number so we can check with the carrier.</p>"
+          }
+        },
+        {
+          "type": "question",
+          "settings": {
+            "heading": "What if my parcel is returned because the address was wrong?",
+            "answer": "<p>Email <a href=\"mailto:hello@missvella.com\">hello@missvella.com</a> with your order number and corrected address, including the postal code and apartment or unit number. Once the parcel is back with Missvella, we’ll confirm the available shipping options and any reshipping fee with you before sending it again.</p>"
+          }
+        },
+        {
+          "type": "question",
+          "settings": {
+            "heading": "What if my parcel is lost, damaged or marked delivered but missing?",
+            "answer": "<p>You can choose a replacement shipment or a refund. Email <a href=\"mailto:hello@missvella.com\">hello@missvella.com</a> with your preference, order number, tracking number if available, and a brief description. Include photos if the parcel or dress arrived damaged.</p>"
+          }
+        },
+        { "type": "topic", "settings": { "heading": "Returns & refunds" } },
+        {
+          "type": "question",
+          "settings": {
+            "heading": "How long do I have to return a Missvella dress?",
+            "answer": "<p>Request a return within <strong>15 calendar days of delivery</strong>, counting from the delivery date recorded by the carrier. Eligible reasons include fit, color, style preference and a change of mind. Email <a href=\"mailto:hello@missvella.com\">hello@missvella.com</a> before shipping anything back. See the <a href=\"/policies/refund-policy\">Return &amp; Refund Policy</a> for eligibility and costs.</p>"
+          }
+        },
+        {
+          "type": "question",
+          "settings": {
+            "heading": "Can I try on a dress and still return it?",
+            "answer": "<p>Yes. A careful fitting is allowed. For a standard return, the dress must be in its original condition, unworn beyond that fitting, unwashed and unaltered, with original and security tags intact. Include all accessories. Stains, makeup, perfume, odors, pet hair or wear from an event or photoshoot can make an item ineligible.</p>"
+          }
+        },
+        {
+          "type": "question",
+          "settings": {
+            "heading": "Can I return a sale or promotional item?",
+            "answer": "<p>Yes. Sale and promotional purchases follow the same standard return conditions. Request the return within 15 calendar days of delivery and keep the item and its tags in returnable condition.</p>"
+          }
+        },
+        {
+          "type": "question",
+          "settings": {
+            "heading": "Can I return dresses I ordered to compare at home?",
+            "answer": "<p>Yes, if each item meets the standard return conditions. Ordering several styles to compare counts as a preference return. You arrange and pay for shipping the eligible items back to the designated warehouse in China.</p>"
+          }
+        },
+        {
+          "type": "question",
+          "settings": {
+            "heading": "How do I start a return?",
+            "answer": "<p>Email <a href=\"mailto:hello@missvella.com\">hello@missvella.com</a> with the subject <strong>Return Request — Order #[your order number]</strong>. Include your order number, item name or SKU, reason for returning it and preferred contact details. Include photos for damage, a defect or a wrong item. For a standard return, we may ask for photos of the dress and tags. Wait for return instructions before mailing it.</p>"
+          }
+        },
+        {
+          "type": "question",
+          "settings": {
+            "heading": "How soon do I need to mail my approved return?",
+            "answer": "<p>Send it within <strong>14 calendar days after receiving return instructions</strong>. Put your order number or return reference inside, keep the shipping receipt and email the tracking details to <a href=\"mailto:hello@missvella.com\">hello@missvella.com</a>. The earlier 15-day deadline is for requesting the return.</p>"
+          }
+        },
+        {
+          "type": "question",
+          "settings": {
+            "heading": "Where do I send my return?",
+            "answer": "<p>Use the designated Missvella warehouse in <strong>Lu’an, Anhui, China</strong> after you receive return instructions. Address it to <strong>Missvella</strong>. The full warehouse address is in the <a href=\"/policies/refund-policy\">Return &amp; Refund Policy</a>. The business contact address and the sender address on the parcel are unsuitable for standard returns.</p>"
+          }
+        },
+        {
+          "type": "question",
+          "settings": {
+            "heading": "Who pays for return shipping and the original delivery fee?",
+            "answer": "<p>For a fit, style or change-of-mind return, you pay return postage to China. The original shipping fee is non-refundable unless applicable law requires otherwise. If the item is damaged, defective, has a quality issue or was supplied in error, Missvella covers return shipping and refunds the original shipping fee.</p>"
+          }
+        },
+        {
+          "type": "question",
+          "settings": {
+            "heading": "Does Missvella charge a restocking fee?",
+            "answer": "<p>No. Missvella charges no restocking or additional return handling fee on eligible merchandise refunds. An approved standard return covers the eligible purchase price and any refundable taxes. Return postage and the original delivery fee follow the <a href=\"/policies/refund-policy\">Return &amp; Refund Policy</a>.</p>"
+          }
+        },
+        {
+          "type": "question",
+          "settings": {
+            "heading": "Can I exchange my dress for another size, color or style?",
+            "answer": "<p>Missvella does not offer direct size, color or style exchanges. To get a different dress, request a return for your eligible item within 15 calendar days of delivery and place a separate order for the one you want. If we sent the wrong item, contact us for a replacement or a full refund.</p>"
+          }
+        },
+        {
+          "type": "question",
+          "settings": {
+            "heading": "When will I receive my refund, and where will it go?",
+            "answer": "<p>Missvella processes approved refunds to the <strong>original payment method within 48 hours after receiving and inspecting the returned items</strong>, subject to any earlier legal deadline. Your bank, card issuer or payment provider may take additional time to post the funds.</p>"
+          }
+        },
+        {
+          "type": "question",
+          "settings": {
+            "heading": "What if my dress arrives damaged, defective or different from what I ordered?",
+            "answer": "<p>You may choose a replacement or a full refund. Email <a href=\"mailto:hello@missvella.com\">hello@missvella.com</a> as soon as possible with your order number, a description, clear photos of the item and photos of the packaging if relevant. If you return it for a quality issue, damage, a defect or a fulfillment error, Missvella covers return shipping and refunds the original shipping fee.</p>"
+          }
+        },
+        { "type": "topic", "settings": { "heading": "Sizing & dress details" } },
+        {
+          "type": "question",
+          "settings": {
+            "heading": "How do I choose the right dress size?",
+            "answer": "<p>Start with the size chart on the dress’s product page. Compare your bust, waist and hip measurements with that chart. The <a href=\"/pages/size-guide\">Size Guide</a> shows how to take your measurements. If you need a second opinion, send us the dress link and your measurements.</p>"
+          }
+        },
+        {
+          "type": "question",
+          "settings": {
+            "heading": "How should I measure myself for a dress?",
+            "answer": "<p>Measure your bust at the fullest point, your waist at the natural waistline and your hips at their widest point. Keep the tape level and comfortably close to the body. Stand straight and barefoot for height and hollow-to-floor measurements. Use the diagrams in our <a href=\"/pages/size-guide\">Size Guide</a>.</p>"
+          }
+        },
+        {
+          "type": "question",
+          "settings": {
+            "heading": "What if my bust, waist and hip measurements fall into different sizes?",
+            "answer": "<p>Email <a href=\"mailto:hello@missvella.com\">hello@missvella.com</a> with all three measurements and the dress link before ordering. The silhouette, fabric and cut matter when choosing between sizes, so tell us which part of the fit concerns you.</p>"
+          }
+        },
+        {
+          "type": "question",
+          "settings": {
+            "heading": "Which dresses come in my size?",
+            "answer": "<p>Check the size selector and size chart for each dress. Available sizes vary by style. If the size you need is missing, <a href=\"/pages/contact\">contact Missvella</a> with the dress link and your measurements so we can check the options.</p>"
+          }
+        },
+        {
+          "type": "question",
+          "settings": {
+            "heading": "Can I request custom measurements or a design change?",
+            "answer": "<p>Ask before ordering. Send the dress link, your measurements and the change you’d like to <a href=\"mailto:hello@missvella.com\">hello@missvella.com</a>. We’ll check availability and whether the request affects price or timing. Wait for confirmation before relying on a custom detail for your event.</p>"
+          }
+        },
+        {
+          "type": "question",
+          "settings": {
+            "heading": "Will my dress look the same color as the product photos?",
+            "answer": "<p>Lighting, screen settings and fabric finish can change how a shade appears. Review the product photos and selected color before ordering. If you receive the color you ordered but prefer another, the standard return conditions apply. If we sent a different color, contact us about the incorrect item.</p>"
+          }
+        },
+        {
+          "type": "question",
+          "settings": {
+            "heading": "Where can I check fabric, lining, stretch or built-in support?",
+            "answer": "<p>Look in the product description for that dress. If the detail you need is missing, send us the product link and your question before ordering. Two dresses with a similar shape can have different lining or support.</p>"
+          }
+        },
+        {
+          "type": "question",
+          "settings": {
+            "heading": "How should I care for my dress or remove creases?",
+            "answer": "<p>Follow the garment’s care label. Heat and steam can affect fabrics and embellishments differently. If you’re unsure which method is suitable, email <a href=\"mailto:hello@missvella.com\">hello@missvella.com</a> with the dress link or order number before treating it.</p>"
+          }
+        },
+        { "type": "topic", "settings": { "heading": "Orders & changes" } },
+        {
+          "type": "question",
+          "settings": {
+            "heading": "How do I place a dress order?",
+            "answer": "<p>Select your size, color and available options on the product page, then add the dress to your cart. At checkout, check your contact details, delivery address, shipping method and final total before paying.</p>"
+          }
+        },
+        {
+          "type": "question",
+          "settings": {
+            "heading": "What if I haven’t received my order confirmation?",
+            "answer": "<p>Check the inbox and spam folder for the email address you entered at checkout. If you still can’t find the confirmation, email <a href=\"mailto:hello@missvella.com\">hello@missvella.com</a> with the name and email used for the order and any payment reference.</p>"
+          }
+        },
+        {
+          "type": "question",
+          "settings": {
+            "heading": "Can I change my delivery address, size or color after ordering?",
+            "answer": "<p>Email <a href=\"mailto:hello@missvella.com\">hello@missvella.com</a> promptly with your order number and the exact correction. An address update may be possible before dispatch. For size or color changes, ask us to check the order status and confirm what can still be changed.</p>"
+          }
+        },
+        {
+          "type": "question",
+          "settings": {
+            "heading": "Can I cancel an order before it ships?",
+            "answer": "<p>Email <a href=\"mailto:hello@missvella.com\">hello@missvella.com</a> as soon as possible with your order number and cancellation request. If the order has not shipped and cancellation is still possible, Missvella will cancel it and issue a full refund to the original payment method.</p>"
+          }
+        },
+        {
+          "type": "question",
+          "settings": {
+            "heading": "What if I need to cancel after my order has shipped?",
+            "answer": "<p>Contact us with your order number. Once a parcel has shipped, we may be unable to stop it. After delivery, you can request a return of eligible items within 15 calendar days under the <a href=\"/policies/refund-policy\">Return &amp; Refund Policy</a>.</p>"
+          }
+        },
+        { "type": "topic", "settings": { "heading": "Payments & checkout" } },
+        {
+          "type": "question",
+          "settings": {
+            "heading": "Which payment methods does Missvella accept?",
+            "answer": "<p>Missvella accepts credit cards and PayPal. The payment options available for your order appear at checkout before you pay.</p>"
+          }
+        },
+        {
+          "type": "question",
+          "settings": {
+            "heading": "What should I do if my payment is declined?",
+            "answer": "<p>Check your billing details and complete any verification requested by your bank or PayPal. If you see a charge but have no order confirmation, email <a href=\"mailto:hello@missvella.com\">hello@missvella.com</a> before placing a second order. Keep full card numbers, passwords and security codes private.</p>"
+          }
+        },
+        {
+          "type": "question",
+          "settings": {
+            "heading": "Where can I see the currency and final order total?",
+            "answer": "<p>Review the currency, shipping charge, discounts and any taxes collected at checkout before paying. The shipping fees quoted in these FAQs are in US dollars. Your payment provider may apply a conversion rate or fee if your account uses another currency.</p>"
+          }
+        },
+        {
+          "type": "question",
+          "settings": {
+            "heading": "How do I apply a discount code?",
+            "answer": "<p>Enter the code at checkout and check the updated merchandise subtotal before paying. Minimum spends, expiry dates and whether offers can be combined depend on the promotion. The free Standard Shipping threshold uses the merchandise subtotal after discounts.</p>"
+          }
+        },
+        {
+          "type": "question",
+          "settings": {
+            "heading": "How can I check whether a payment request is genuine?",
+            "answer": "<p>Start from the Missvella store and use the payment options shown at checkout. If you receive an unexpected payment request, email <a href=\"mailto:hello@missvella.com\">hello@missvella.com</a> before acting on it. Never send a card security code, password or one-time verification code by email.</p>"
+          }
+        },
+        { "type": "topic", "settings": { "heading": "Contact & help" } },
+        {
+          "type": "question",
+          "settings": {
+            "heading": "How can I contact Missvella about a dress or an order?",
+            "answer": "<p>Email <a href=\"mailto:hello@missvella.com\">hello@missvella.com</a> or use our <a href=\"/pages/contact\">contact form</a>. For an existing order, include the order number. For help choosing a dress, send the product link and the question you’d like us to check.</p>"
+          }
+        },
+        {
+          "type": "question",
+          "settings": {
+            "heading": "What details will help customer support answer my question?",
+            "answer": "<p>For a delivery question, include your destination, event date and any order or tracking number. For sizing, send the dress link and measurements. For an item issue, describe the problem and attach photos of the dress and packaging where relevant.</p>"
+          }
+        },
+        {
+          "type": "question",
+          "settings": {
+            "heading": "Where can I read Missvella’s full shipping and return policies?",
+            "answer": "<p>Read the <a href=\"/policies/shipping-policy\">Shipping Policy</a> for processing, delivery, tracking and parcel problems. The <a href=\"/policies/refund-policy\">Return &amp; Refund Policy</a> covers return eligibility, postage, refunds, cancellations and exchanges. For a country-specific delivery estimate, use the <a href=\"/pages/processing-shipping\">Processing &amp; Shipping guide</a>.</p>"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

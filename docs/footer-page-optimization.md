@@ -10,7 +10,7 @@
 |---|---|---|---|---|
 | 1 | Processing & Shipping | [现有导读页](https://missvella.com/pages/processing-shipping)＋[正式运输政策](https://missvella.com/policies/shipping-policy) | 当前线上运输政策 | 现有模板直接读取正式政策，提供国家查询及页内运输 FAQ |
 | 2 | Returns & Refunds | [退货与退款政策](https://missvella.com/policies/refund-policy) | 当前线上退款政策 | 2026-11-26 已发布顶部速查表、仓库收件人和 48 小时退款处理时限 |
-| 3 | FAQs | [FAQ](https://missvella.com/pages/faqs) | 第 1、2 项的最终政策口径和现有英文草案 | 43 问草案已完成，待核对和制作预设 |
+| 3 | FAQs | [FAQ](https://missvella.com/pages/faqs) | 正式运输与退款政策 | 2026-11-26 已上传 Customer FAQs，含六类 43 问；商家在现有模板添加预设并隐藏三个旧分区后生效 |
 | 4 | Size Guide | [尺码指南](https://missvella.com/pages/size-guide) | 当前尺码表和商品页入口 | 待开始 |
 | 5 | How to Measure | [尺码指南里的测量标签](https://missvella.com/pages/size-guide) | 第 4 项确认的尺码页结构，待接入直达链接 | 待开始 |
 | 6 | Our Story | [About Us](https://missvella.com/pages/about-us) | 已有内容方案与实际商品图 | 方案已完成，待确认素材和落地 |
@@ -41,6 +41,13 @@
 > 读取 `docs/footer-page-optimization.md`、`docs/faq-content-2026-11-07.json` 和 `docs/faq-content-plan-2026-11-07.html`，本对话只做第 3 项。根据第 1、2 项最终确认的政策更新 6 类、43 个英文问答。支付使用信用卡和 PayPal，邮箱用 hello@missvella.com。按已有方案准备可在编辑器中添加的分类预设、高频入口及折叠问答，提供新模板创建、分区添加和页面关联步骤。先核对正式政策链接，再记录编辑器中的待办。
 
 验收时，问答与政策页的数字和条件一致，手机端可以找到高频问题并展开答案。页面关联完成后，页脚连到 `/pages/faqs`。 [英文稿与页面方案](faq-content-plan-2026-11-07.html) · [结构化内容](faq-content-2026-11-07.json)
+
+**2026-11-26 交付。** 通过 Storefront API 核对两份当前政策，并读取现有 FAQ 页面。旧问答仍写统一标准运输时效、周末不处理和 7 个工作日退款。新版英文问答在 `theme/sections/mv-faq-guide.liquid` 的 Customer FAQs 预设中。11 月 7 日的两份稿件保留作历史参考。
+
+- 运输答复区分含制作的 2–5 个处理工作日（周一至周六处理）与发货后按目的地计算的运输天数。退货答复区分签收后 15 个自然日内申请、收到指引后 14 个自然日内寄回，以及收到并检查退件后 48 小时内处理已批准的退款。运费承担、原始运费退款、补发与直接换码分别按两份正式政策表述。[运输政策](https://missvella.com/policies/shipping-policy) · [退款政策](https://missvella.com/policies/refund-policy)
+- 六类问题共用原生折叠组件。分类锚点、问题、答案和政策链接随 HTML 输出；FAQPage、Question 与 Answer 微数据直接标在可见内容上。英文 FAQ 页未单设搜索标题或描述时，主题提供专用默认值。已校验 43 个唯一问题、主要政策数字、三个目的地示例与七个链接目标；Shopify 已确认两个主题代码文件上传至当前线上主题。
+- **启用。** 打开[现有 FAQs 模板](https://6icwx6-yv.myshopify.com/admin/themes/167137378374/editor?previewPath=%2Fpages%2Ffaqs)，选择 Add section → Customer FAQs，隐藏原有 Shipping & Delivery、Sizing & Dress Details 和 Returns & Refunds 三个分区，然后一起保存。当前页面缺少主标题，预设默认输出 H1。如日后另加页面主标题，可在分区中把 Heading level 调为 H2。
+- 分类名、问题、答案及内链均可在编辑器修改。正式政策后续如有变更，商家需同步已保存的 FAQ 问答值。页面的搜索标题和描述也可在 Shopify 页面后台自行设置。
 
 ### 4 Size Guide
 
