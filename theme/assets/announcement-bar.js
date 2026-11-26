@@ -1,128 +1,122 @@
 import { Component } from '@theme/component';
+import { mediaQueryLarge } from '@theme/utilities';
 
-/**
- * Announcement banner custom element that allows fading between content.
- * Based on the Slideshow component.
- *
- * @typedef {object} Refs
- * @property {HTMLElement} slideshowContainer
- * @property {HTMLElement[]} [slides]
- * @property {HTMLButtonElement} [previous]
- * @property {HTMLButtonElement} [next]
- *
- * @extends {Component<Refs>}
- */
+const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+const canHover = matchMedia('(hover: hover)');
+
+/** @extends {Component<{ track: HTMLElement, slides?: HTMLElement[] }>} */
 export class AnnouncementBar extends Component {
   #current = 0;
-
-  /**
-   * The interval ID for automatic playback.
-   * @type {number|undefined}
-   */
-  #interval = undefined;
+  #timer;
+  #listeners;
+  #editorSlide;
+  /** @type {Animation[]} */
+  #animations = [];
 
   connectedCallback() {
     super.connectedCallback();
-
-    this.addEventListener('mouseenter', this.suspend);
-    this.addEventListener('mouseleave', this.resume);
-    document.addEventListener('visibilitychange', this.#handleVisibilityChange);
-
-    this.play();
+    this.#listeners = new AbortController();
+    const options = { signal: this.#listeners.signal };
+    mediaQueryLarge.addEventListener('change', this.#syncLayout, options);
+    reducedMotion.addEventListener('change', this.#syncLayout, options);
+    document.addEventListener('visibilitychange', this.#syncPlayback, options);
+    this.addEventListener('focusin', () => this.refs.track.setAttribute('aria-live', 'polite'), options);
+    this.addEventListener('focusout', () => this.refs.track.removeAttribute('aria-live'), options);
+    this.addEventListener('shopify:block:select', (event) => {
+      const slide = event.target instanceof Element && event.target.closest('.announcement-bar__slide');
+      if (!slide) return;
+      this.#editorSlide = slide;
+      this.#syncLayout();
+    }, options);
+    this.addEventListener('shopify:block:deselect', () => {
+      this.#editorSlide = undefined;
+      this.#syncPlayback();
+    }, options);
+    this.#syncLayout();
   }
 
+  updatedCallback() {
+    super.updatedCallback();
+    this.#syncLayout();
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    this.#listeners.abort();
+    clearInterval(this.#timer);
+    this.#cancelAnimations();
+    this.#editorSlide = undefined;
+  }
+
+  #syncLayout = () => {
+    const slides = this.refs.slides ?? [];
+    const rotating = !mediaQueryLarge.matches && slides.length > 1;
+    this.toggleAttribute('data-rotating', rotating);
+    this.#cancelAnimations();
+
+    if (!slides.includes(this.#editorSlide)) this.#editorSlide = undefined;
+    const selected = this.#editorSlide ?? document.activeElement;
+    const selectedIndex = slides.findIndex((slide) => slide.contains(selected));
+    this.#current = selectedIndex >= 0 ? selectedIndex : Math.min(this.#current, Math.max(0, slides.length - 1));
+    slides.forEach((slide, index) => {
+      slide.inert = rotating && index !== this.#current;
+      if (rotating) slide.setAttribute('aria-hidden', String(slide.inert));
+      else slide.removeAttribute('aria-hidden');
+    });
+    this.#syncPlayback();
+  };
+
+  #syncPlayback = () => {
+    clearInterval(this.#timer);
+    const delay = Number(this.getAttribute('autoplay')) * 1000;
+    if (!this.hasAttribute('data-rotating') || reducedMotion.matches || document.hidden || this.#editorSlide || !delay) {
+      return;
+    }
+    this.#timer = setInterval(() => {
+      if (this.matches(':focus-within') || (canHover.matches && this.matches(':hover'))) return;
+      this.next();
+    }, delay);
+  };
+
   next() {
-    this.current += 1;
+    this.#step(1);
   }
 
   previous() {
-    this.current -= 1;
+    this.#step(-1);
   }
 
-  /**
-   * Starts automatic slide playback.
-   * @param {number} [interval] - The time interval in seconds between slides.
-   */
-  play(interval = this.autoplayInterval) {
-    if (!this.autoplay) return;
+  /** @param {number} direction */
+  #step(direction) {
+    const slides = this.refs.slides;
+    if (!this.hasAttribute('data-rotating') || !slides || slides.length < 2) return;
+    const outgoing = slides[this.#current];
+    this.#current = (this.#current + direction + slides.length) % slides.length;
+    const incoming = slides[this.#current];
+    this.#cancelAnimations();
+    outgoing.inert = true;
+    outgoing.setAttribute('aria-hidden', 'true');
+    incoming.inert = false;
+    incoming.setAttribute('aria-hidden', 'false');
+    if (reducedMotion.matches) return;
 
-    this.paused = false;
-
-    this.#interval = setInterval(() => {
-      if (this.matches(':hover') || document.hidden) return;
-
-      this.next();
-    }, interval);
+    // Keep the outgoing line painted only for its exit. Its links are already inert.
+    this.#animations = [
+      outgoing.animate([
+        { transform: 'translateY(0)', opacity: 1, visibility: 'visible' },
+        { transform: `translateY(${-direction * 85}%)`, opacity: 0, visibility: 'visible' },
+      ], { duration: 280, easing: 'cubic-bezier(.45, 0, .8, .45)' }),
+      incoming.animate([
+        { transform: `translateY(${direction * 100}%)`, opacity: 0 },
+        { transform: 'translateY(0)', opacity: 1 },
+      ], { duration: 480, delay: 80, fill: 'backwards', easing: 'cubic-bezier(.22, 1, .36, 1)' }),
+    ];
   }
 
-  /**
-   * Pauses automatic slide playback.
-   */
-  pause() {
-    this.paused = true;
-    this.suspend();
+  #cancelAnimations() {
+    this.#animations.forEach((animation) => animation.cancel());
+    this.#animations = [];
   }
-
-  get paused() {
-    return this.hasAttribute('paused');
-  }
-
-  set paused(paused) {
-    this.toggleAttribute('paused', paused);
-  }
-
-  /**
-   * Suspends automatic slide playback.
-   */
-  suspend() {
-    clearInterval(this.#interval);
-    this.#interval = undefined;
-  }
-
-  /**
-   * Resumes automatic slide playback if autoplay is enabled.
-   */
-  resume() {
-    if (!this.autoplay || this.paused) return;
-
-    this.pause();
-    this.play();
-  }
-
-  get autoplay() {
-    return Boolean(this.autoplayInterval);
-  }
-
-  get autoplayInterval() {
-    const interval = this.getAttribute('autoplay');
-    const value = parseInt(`${interval}`, 10);
-
-    if (Number.isNaN(value)) return undefined;
-
-    return value * 1000;
-  }
-
-  get current() {
-    return this.#current;
-  }
-
-  set current(current) {
-    this.#current = current;
-
-    let relativeIndex = current % (this.refs.slides ?? []).length;
-    if (relativeIndex < 0) {
-      relativeIndex += (this.refs.slides ?? []).length;
-    }
-
-    this.refs.slides?.forEach((slide, index) => {
-      slide.setAttribute('aria-hidden', `${index !== relativeIndex}`);
-    });
-  }
-
-  /**
-   * Pause the slideshow when the page is hidden.
-   */
-  #handleVisibilityChange = () => (document.hidden ? this.pause() : this.resume());
 }
 
 if (!customElements.get('announcement-bar-component')) {
