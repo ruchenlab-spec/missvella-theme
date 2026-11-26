@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Size Guide Layouts · Missvella</title>
+  <link rel="stylesheet" href="size-guide-concepts.css">
+</head>
+<body>
+  <div class="preview-bar" lang="zh-CN" hidden>
+    <div class="preview-bar-inner" role="group" aria-label="切换设计方案">
+      <button type="button" data-concept="chart" aria-pressed="true"><span>A</span> 尺码表优先</button>
+      <button type="button" data-concept="image" aria-pressed="false"><span>B</span> 量体图优先</button>
+      <button type="button" data-concept="tabs" aria-pressed="false"><span>C</span> 分页切换</button>
+    </div>
+  </div>
+  <header class="masthead"><span>Missvella</span></header>
+  <main class="guide" data-layout="chart">
+    <header class="intro">
+      <h1>Size <em>guide</em></h1>
+      <p>Measure your bust, waist and hips, then compare your measurements with our size chart.</p>
+      <nav class="jump-links" aria-label="Size guide sections">
+        <a href="#chart">Size chart <span aria-hidden="true">↓</span></a>
+        <a href="#measure">How to measure <span aria-hidden="true">↓</span></a>
+      </nav>
+      <div class="section-switch" role="group" aria-label="Size guide sections" hidden>
+        <button type="button" data-section="chart" aria-controls="chart" aria-pressed="true">Size chart</button>
+        <button type="button" data-section="measure" aria-controls="measure" aria-pressed="false">How to measure</button>
+      </div>
+    </header>
+
+    <section class="chart" id="chart" aria-labelledby="chart-title" tabindex="-1">
+      <div class="chart-heading">
+        <div>
+          <h2 id="chart-title">Adult size chart</h2>
+          <p id="unit-copy" aria-live="polite">Measurements in inches</p>
+        </div>
+        <div class="units" role="group" aria-label="Measurement unit">
+          <button type="button" data-unit="in" aria-label="IN (inches)" aria-pressed="true">IN</button>
+          <button type="button" data-unit="cm" aria-label="CM (centimeters)" aria-pressed="false">CM</button>
+        </div>
+      </div>
+      <table aria-labelledby="chart-title" aria-describedby="unit-copy">
+        <thead>
+          <tr>
+            <th scope="col">Size</th>
+            <th scope="col">Bust</th>
+            <th scope="col">Waist</th>
+            <th scope="col">Hips</th>
+            <th scope="col">Hollow to hem</th>
+          </tr>
+        </thead>
+        <tbody>
+          <!-- Sizes from theme/snippets/size-chart-rows.liquid. -->
+          <tr><th scope="row">00</th><td data-cm="79">31.1</td><td data-cm="61">24</td><td data-cm="88.5">34.8</td><td data-cm="145">57.1</td></tr>
+          <tr><th scope="row">02</th><td data-cm="84">33.1</td><td data-cm="66">26</td><td data-cm="93.5">36.8</td><td data-cm="147">57.9</td></tr>
+          <tr><th scope="row">04</th><td data-cm="86.5">34.1</td><td data-cm="68.5">27</td><td data-cm="96">37.8</td><td data-cm="147">57.9</td></tr>
+          <tr><th scope="row">06</th><td data-cm="89">35</td><td data-cm="71">28</td><td data-cm="98.5">38.8</td><td data-cm="150">59.1</td></tr>
+          <tr><th scope="row">08</th><td data-cm="91.5">36</td><td data-cm="73.5">28.9</td><td data-cm="101">39.8</td><td data-cm="150">59.1</td></tr>
+          <tr><th scope="row">10</th><td data-cm="94">37</td><td data-cm="76">29.9</td><td data-cm="104">40.9</td><td data-cm="152">59.8</td></tr>
+          <tr><th scope="row">12</th><td data-cm="96.5">38</td><td data-cm="80">31.5</td><td data-cm="108">42.5</td><td data-cm="152">59.8</td></tr>
+          <tr><th scope="row">14</th><td data-cm="100.5">39.6</td><td data-cm="84">33.1</td><td data-cm="112">44.1</td><td data-cm="155">61</td></tr>
+          <tr><th scope="row">16</th><td data-cm="104">40.9</td><td data-cm="87.5">34.4</td><td data-cm="116">45.7</td><td data-cm="155">61</td></tr>
+          <tr><th scope="row">18</th><td data-cm="116">45.7</td><td data-cm="99">39</td><td data-cm="125">49.2</td><td data-cm="155">61</td></tr>
+          <tr><th scope="row">20</th><td data-cm="121">47.6</td><td data-cm="105">41.3</td><td data-cm="130">51.2</td><td data-cm="155">61</td></tr>
+          <tr><th scope="row">22</th><td data-cm="126">49.6</td><td data-cm="111">43.7</td><td data-cm="135">53.1</td><td data-cm="155">61</td></tr>
+          <tr><th scope="row">24</th><td data-cm="131">51.6</td><td data-cm="117">46.1</td><td data-cm="140">55.1</td><td data-cm="155">61</td></tr>
+          <tr><th scope="row">26</th><td data-cm="136">53.5</td><td data-cm="123">48.4</td><td data-cm="145">57.1</td><td data-cm="155">61</td></tr>
+          <tr><th scope="row">28</th><td data-cm="141">55.5</td><td data-cm="128">50.4</td><td data-cm="150">59.1</td><td data-cm="155">61</td></tr>
+          <tr><th scope="row">30</th><td data-cm="147.5">58.1</td><td data-cm="135">53.1</td><td data-cm="157">61.8</td><td data-cm="155">61</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="measure" id="measure" aria-labelledby="measure-title" tabindex="-1">
+      <h2 id="measure-title">How to measure</h2>
+      <figure>
+        <img src="size-guide-assets/how-to-measure.png"
+          alt="Measurement diagram showing bust, waist, hips, hollow to floor and height."
+          width="1086" height="1448">
+        <figcaption>Take measurements over underwear. For best results, have someone help you measure.</figcaption>
+      </figure>
+    </section>
+  </main>
+  <script>
+    const guide = document.querySelector('.guide');
+    const previewBar = document.querySelector('.preview-bar');
+    const conceptButtons = document.querySelectorAll('[data-concept]');
+    const sectionButtons = document.querySelectorAll('[data-section]');
+    const jumpLinks = document.querySelector('.jump-links');
+    const sectionSwitch = document.querySelector('.section-switch');
+    const chart = document.getElementById('chart');
+    const measure = document.getElementById('measure');
+    let selectedSection = 'chart';
+
+    function updateSections() {
+      const useSwitch = guide.dataset.layout === 'tabs';
+      jumpLinks.hidden = useSwitch;
+      sectionSwitch.hidden = !useSwitch;
+      chart.hidden = useSwitch && selectedSection !== 'chart';
+      measure.hidden = useSwitch && selectedSection !== 'measure';
+      for (const button of sectionButtons) {
+        button.setAttribute('aria-pressed', String(button.dataset.section === selectedSection));
+      }
+    }
+
+    for (const button of conceptButtons) {
+      button.addEventListener('click', () => {
+        guide.dataset.layout = button.dataset.concept;
+        if (guide.dataset.layout === 'image') chart.before(measure);
+        else measure.before(chart);
+        for (const concept of conceptButtons) {
+          concept.setAttribute('aria-pressed', String(concept === button));
+        }
+        updateSections();
+        window.scrollTo(0, 0);
+      });
+    }
+    for (const button of sectionButtons) {
+      button.addEventListener('click', () => {
+        selectedSection = button.dataset.section;
+        updateSections();
+      });
+    }
+    previewBar.hidden = false;
+
+    const unitButtons = document.querySelectorAll('[data-unit]');
+    const cells = document.querySelectorAll('[data-cm]');
+    const unitCopy = document.getElementById('unit-copy');
+    for (const button of unitButtons) {
+      button.addEventListener('click', () => {
+        const inches = button.dataset.unit === 'in';
+        for (const cell of cells) {
+          const cm = cell.dataset.cm;
+          cell.textContent = inches ? (Number(cm) / 2.54).toFixed(1).replace(/\.0$/, '') : cm;
+        }
+        for (const unit of unitButtons) unit.setAttribute('aria-pressed', String(unit === button));
+        unitCopy.textContent = inches ? 'Measurements in inches' : 'Measurements in centimeters';
+      });
+    }
+  </script>
+</body>
+</html>
