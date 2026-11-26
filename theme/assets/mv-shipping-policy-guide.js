@@ -122,14 +122,10 @@ const faqQuestions = new Map([
 ]);
 
 function addAnswer(faq, question, nodes) {
-  const disclosure = document.createElement('details');
-  const summary = document.createElement('summary');
-  summary.textContent = question;
-  const body = document.createElement('div');
-  body.className = 'shipping-policy-guide__answer';
-  body.append(...nodes);
-  disclosure.append(summary, body);
-  faq.append(disclosure);
+  const row = faq.querySelector('[data-faq-row]').content.cloneNode(true);
+  row.querySelector('[data-question]').textContent = question;
+  row.querySelector('.details-content').append(...nodes);
+  faq.append(row);
 }
 
 function enableShippingFaq(guide, copy) {

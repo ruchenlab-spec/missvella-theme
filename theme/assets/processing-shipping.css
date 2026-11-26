@@ -144,6 +144,7 @@
 }
 
 .shipping-guide__detail {
+  display: block;
   border-block-start: 1px solid var(--shipping-rule);
 }
 
@@ -167,8 +168,6 @@
 
 .shipping-guide__detail summary .svg-wrapper {
   flex-shrink: 0;
-  width: 12px;
-  height: 12px;
 }
 
 .shipping-guide__detail .details-content {
@@ -236,6 +235,11 @@
   display: block;
   min-width: 0;
   --shipping-tint: color-mix(in srgb, var(--color-foreground) 3%, var(--color-background));
+}
+
+.shipping-policy-guide__tabs,
+.shipping-policy-guide__action,
+.shipping-policy-guide__input {
   --icon-stroke-width: 1.3px;
 }
 
@@ -418,7 +422,7 @@
 
 .shipping-policy-guide tbody th { font-weight: 500; }
 .shipping-policy-guide__search,
-.shipping-policy-guide__faq h2 { scroll-margin-block-start: calc(var(--header-height, 5rem) + 1rem); }
+.shipping-policy-guide [data-faq-panel] h2 { scroll-margin-block-start: calc(var(--header-height, 5rem) + 1rem); }
 .shipping-policy-guide__search label { display: block; margin-block-end: 0.375rem; font-weight: 500; }
 .shipping-policy-guide__input {
   display: flex;
@@ -428,7 +432,8 @@
 }
 .shipping-policy-guide__input > svg { margin-inline-start: 0.875rem; }
 
-.shipping-policy-guide__input:focus-within { outline: 2px solid currentColor; }
+.shipping-policy-guide__input:focus-within { border-color: currentColor; }
+.shipping-policy-guide__input input:focus { outline: none; }
 .shipping-policy-guide__input input {
   flex: 1 1 auto;
   width: 100%;
@@ -460,30 +465,6 @@
 
 .shipping-policy-guide__scroll thead th { position: sticky; top: 0; z-index: 1; }
 .shipping-policy-guide__scroll :is(th, td):last-child { text-align: end; }
-.shipping-policy-guide__faq details { border-block-start: 1px solid var(--shipping-rule); }
-.shipping-policy-guide__faq details:last-child { border-block-end: 1px solid var(--shipping-rule); }
-.shipping-policy-guide__faq summary {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  min-height: 3.5rem;
-  padding-block: 0.875rem;
-  font-weight: 500;
-}
-
-.shipping-policy-guide__faq summary::after {
-  content: '+';
-  display: grid;
-  place-items: center;
-  flex: none;
-  width: 1.75rem;
-  height: 1.75rem;
-  border: 1px solid var(--shipping-rule);
-  border-radius: 50%;
-}
-.shipping-policy-guide__faq details[open] > summary::after { transform: rotate(45deg); }
-.shipping-policy-guide__faq details > :last-child:not(summary) { margin-block-end: 1.25rem; }
 
 .shipping-policy-guide [hidden] { display: none !important; }
 
@@ -508,10 +489,8 @@
 @media (prefers-reduced-motion: no-preference) {
   .shipping-policy-guide__tabs [role="tab"],
   .shipping-policy-guide__action,
-  .shipping-policy-guide__action svg,
-  .shipping-policy-guide__faq summary::after { transition: background-color 160ms ease, color 160ms ease, border-color 160ms ease, transform 160ms ease; }
-  .shipping-policy-guide [role="tabpanel"]:not([hidden]),
-  .shipping-policy-guide__faq details[open] > .shipping-policy-guide__answer { animation: shipping-panel-in 180ms ease-out; }
+  .shipping-policy-guide__action svg { transition: background-color 160ms ease, color 160ms ease, border-color 160ms ease, transform 160ms ease; }
+  .shipping-policy-guide [role="tabpanel"]:not([hidden]) { animation: shipping-panel-in 180ms ease-out; }
 }
 @keyframes shipping-panel-in {
   from { opacity: 0; transform: translateY(4px); }

@@ -28,8 +28,21 @@
           </a>
         </div>
         <section id="ShippingCountries-{{ section_id }}" data-country-panel hidden></section>
-        <section id="ShippingFaq-{{ section_id }}" class="shipping-policy-guide__faq" data-faq-panel hidden>
+        <section id="ShippingFaq-{{ section_id }}" class="shipping-guide__accordion accordion accordion--plus" data-faq-panel hidden>
           <h2>Shipping FAQs</h2>
+          <template data-faq-row>
+            {% capture faq_content %}
+              <details class="details">
+                <summary class="details__header">
+                  <span data-question></span>
+                  <span class="svg-wrapper icon-plus" aria-hidden="true">{{- 'icon-plus.svg' | inline_asset_content -}}</span>
+                </summary>
+                <div class="details-content"></div>
+              </details>
+            {% endcapture %}
+            {% render 'accordion-custom-component', class: 'shipping-guide__detail', children: faq_content %}
+          </template>
+          {% render 'accordion-styles' %}
         </section>
       </div>
       <a class="shipping-policy-guide__action shipping-policy-guide__track" data-track-action hidden>

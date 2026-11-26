@@ -10,6 +10,8 @@
 - 已用正式政策正文验证 25 行时效、简称与部分名称查询、无匹配、清空以及 6 个页内问答。Theme Check 对本次文件零问题。Shopify CLI 已确认在当前 live 主题 `167137378374` 精确上传分区、政策视图片段、CSS 与 JS 四个代码文件。
 - **页面交互更新。** Overview、Destinations、FAQs 使用图标标签。桌面采用左侧导航、右侧内容；窄屏使用横向标签，运费卡片按空间排列。国家查询入口可从 Standard 卡片和 FAQ 直接打开；追踪按钮取正式政策中的物流链接。切换保留搜索与已展开的问题，支持键盘方向键、Home／End、浏览器返回和直接链接。面板与折叠答案带短促淡入动效，并跟随系统减少动态效果偏好。已验证这批交互、两个运费金额、25 行国家表及 6 个答复；三个相关代码文件已精确上传 live。
 
+- 目的地搜索框获得焦点时仅加深现有细边框。Shipping FAQs 复用主题的 `accordion-custom-component`、`icon-plus.svg` 和展开动效，收起为加号，展开为减号。该页底部以客服邮箱和政策链接结束，两种显示模式均省略原先的政策摘要段落。本次四个主题代码文件经 Theme Check 检查无新增问题，已精确上传线上主题。
+
 ## 完整英文运输政策 · 2026-11-26
 
 [完整英文 Shipping Policy 正文（含内联样式及逐国表格）](shipping-policy-country-transit.html)。在 Shopify 后台 **Settings → Policies → Shipping policy** 的 HTML 模式中，用完整源码替换现有正文并保存。页面标题由 Shopify 提供。当前交付为商家发布稿。
