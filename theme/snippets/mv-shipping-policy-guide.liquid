@@ -7,25 +7,45 @@
 {% if policy.body != blank %}
   <script src="{{ 'mv-shipping-policy-guide.js' | asset_url }}" type="module"></script>
   <mv-shipping-policy-guide class="shipping-policy-guide">
-    <nav class="shipping-policy-guide__jumps" aria-label="On this page" hidden>
-      <a href="#ShippingCountries-{{ section_id }}" data-country-jump hidden>Find my shipping time</a>
-      <a href="#ShippingFaq-{{ section_id }}" data-faq-jump hidden>Shipping FAQs</a>
-    </nav>
-    <div class="shipping-policy-guide__copy" data-policy-copy>{{ policy.body }}</div>
+    <div class="shipping-policy-guide__intro" data-guide-intro hidden></div>
+    <div class="shipping-policy-guide__layout">
+      <div class="shipping-policy-guide__tabs" role="tablist" aria-label="Shipping information" hidden>
+        <button type="button" role="tab" id="OverviewTab-{{ section_id }}" aria-controls="ShippingOverview-{{ section_id }}" aria-selected="true">
+          <svg aria-hidden="true" focusable="false" viewBox="0 0 20 20">{% render 'icon', icon: 'box' %}</svg>Overview
+        </button>
+        <button type="button" role="tab" id="CountryTab-{{ section_id }}" aria-controls="ShippingCountries-{{ section_id }}" aria-selected="false" tabindex="-1" hidden>
+          <svg aria-hidden="true" focusable="false" viewBox="0 0 20 20">{% render 'icon', icon: 'map_pin' %}</svg>Destinations
+        </button>
+        <button type="button" role="tab" id="FaqTab-{{ section_id }}" aria-controls="ShippingFaq-{{ section_id }}" aria-selected="false" tabindex="-1" hidden>
+          <svg aria-hidden="true" focusable="false" viewBox="0 0 20 20">{% render 'icon', icon: 'chat_bubble' %}</svg>FAQs
+        </button>
+      </div>
+      <div class="shipping-policy-guide__panels">
+        <div id="ShippingOverview-{{ section_id }}" data-overview>
+          <div class="shipping-policy-guide__copy" data-policy-copy>{{ policy.body }}</div>
+          <a class="shipping-policy-guide__action" href="#ShippingCountries-{{ section_id }}" data-country-jump hidden>
+            Find my shipping time {{- 'icon-arrow.svg' | inline_asset_content -}}
+          </a>
+        </div>
+        <section id="ShippingCountries-{{ section_id }}" data-country-panel hidden></section>
+        <section id="ShippingFaq-{{ section_id }}" class="shipping-policy-guide__faq" data-faq-panel hidden>
+          <h2>Shipping FAQs</h2>
+        </section>
+      </div>
+      <a class="shipping-policy-guide__action shipping-policy-guide__track" data-track-action hidden>
+        Track my order {{- 'icon-arrow.svg' | inline_asset_content -}}
+      </a>
+    </div>
     <template data-country-search>
-      <div class="shipping-policy-guide__search" id="ShippingCountries-{{ section_id }}">
+      <div class="shipping-policy-guide__search">
         <label for="ShippingSearch-{{ section_id }}">Search by country or region</label>
         <div class="shipping-policy-guide__input">
+          {{- 'icon-search.svg' | inline_asset_content -}}
           <input id="ShippingSearch-{{ section_id }}" type="search" placeholder="Country name or code" autocomplete="off" aria-controls="ShippingRows-{{ section_id }}">
           <button type="button" hidden>Clear</button>
         </div>
         <p data-result-count role="status" aria-live="polite" aria-atomic="true"></p>
       </div>
-    </template>
-    <template data-shipping-faq>
-      <section class="shipping-policy-guide__faq" aria-labelledby="ShippingFaq-{{ section_id }}">
-        <h2 id="ShippingFaq-{{ section_id }}">Shipping FAQs</h2>
-      </section>
     </template>
   </mv-shipping-policy-guide>
 {% else %}
