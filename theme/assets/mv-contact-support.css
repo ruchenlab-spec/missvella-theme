@@ -28,7 +28,6 @@
 
 .mv-contact__header {
   padding-block-start: clamp(1.25rem, 3cqi, 2rem);
-  border-block-start: 1px solid var(--contact-ink);
 }
 
 .mv-contact__title,
@@ -172,8 +171,8 @@
   display: block;
   min-width: 0;
   padding: clamp(1rem, 4cqi, 3rem);
-  border: 1px solid var(--contact-rule);
-  border-block-start-color: var(--contact-ink);
+  border-inline: 1px solid var(--contact-rule);
+  border-block-end: 1px solid var(--contact-rule);
   background: var(--contact-panel);
 }
 
