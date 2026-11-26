@@ -15,14 +15,51 @@
     {% if config.intro != blank %}
       <p class="mv-faq__intro">{{ config.intro | escape }}</p>
     {% endif %}
-    {% if topics.size > 1 %}
-      <nav class="mv-faq__topics" aria-label="FAQ topics">
-        {% for topic in topics %}
-          {% if topic.settings.heading != blank %}
-            <a href="#FaqTopic-{{ section.id }}-{{ topic.id }}">{{ topic.settings.heading | escape }}</a>
-          {% endif %}
-        {% endfor %}
-      </nav>
+    {%- assign topic_count = 0 -%}
+    {% capture topic_links %}
+      {% for topic in topics %}
+        {% if topic.settings.heading == blank %}{% continue %}{% endif %}
+        {% liquid
+          assign topic_count = topic_count | plus: 1
+          assign icon = topic.settings.icon
+          if icon == blank or icon == 'auto'
+            assign topic_name = topic.settings.heading | handleize
+            case topic_name
+              when 'shipping-delivery'
+                assign icon = 'truck'
+              when 'returns-refunds'
+                assign icon = 'return'
+              when 'sizing-dress-details'
+                assign icon = 'ruler'
+              when 'orders-changes'
+                assign icon = 'clipboard'
+              when 'payments-checkout'
+                assign icon = 'card'
+              else
+                assign icon = 'chat_bubble'
+            endcase
+          endif
+        %}
+        <a href="#FaqTopic-{{ section.id }}-{{ topic.id }}">
+          <svg aria-hidden="true" focusable="false" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
+            {% if icon == 'card' %}
+              <g fill="none" stroke="currentColor" stroke-width="1.2" stroke-linecap="round">
+                <rect x="1.25" y="3.75" width="17.5" height="12.5" rx="1.75"/>
+                <path d="M1.75 8h16.5M4.5 12.5h3.25"/>
+              </g>
+            {% else %}
+              {% render 'icon', icon: icon %}
+            {% endif %}
+          </svg>
+          <span>{{ topic.settings.heading | escape }}</span>
+        </a>
+      {% endfor %}
+    {% endcapture %}
+    {% if topic_count > 1 %}
+      <script src="{{ 'mv-faq-navigation.js' | asset_url }}" type="module"></script>
+      <mv-faq-navigation class="mv-faq__navigation">
+        <nav class="mv-faq__topics" aria-label="FAQ topics">{{ topic_links }}</nav>
+      </mv-faq-navigation>
     {% endif %}
 
     {% for block in section.blocks %}
@@ -56,28 +93,83 @@
 {% stylesheet %}
   .mv-faq {
     width: 100%;
+    min-width: 0;
     max-width: 56rem;
     margin-inline: auto;
     --faq-rule: rgb(var(--color-foreground-rgb) / 0.2);
   }
   .mv-faq__title { margin: 0; }
   .mv-faq__intro { max-width: 65ch; margin: 0.75rem 0 0; }
+  #header-group:has(#header-component[sticky='always'], #header-component[sticky='scroll-up'][data-sticky-state='active'])
+    ~ #MainContent .mv-faq { --faq-header-offset: var(--header-height, 0px); }
+  .mv-faq:has(> .mv-faq__navigation) {
+    --faq-nav-height: calc(max(3.75rem, var(--minimum-touch-target)) + 1.125rem + 2px);
+  }
+  .mv-faq__navigation {
+    display: block;
+    position: sticky;
+    top: var(--faq-header-offset, 0px);
+    z-index: var(--layer-sticky);
+    margin-block-start: 1.5rem;
+    padding-block: 0.375rem;
+    background: var(--color-background);
+  }
   .mv-faq__topics {
-    display: flex;
-    flex-wrap: wrap;
-    column-gap: 1.5rem;
-    margin-block-start: 1.25rem;
-    border-block-end: 1px solid var(--faq-rule);
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(7.5rem, 1fr);
+    gap: 0.1875rem;
+    padding: 0.1875rem;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: thin;
+    border: 1px solid var(--faq-rule);
   }
   .mv-faq__topics a {
-    display: inline-flex;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
     align-items: center;
-    min-height: var(--minimum-touch-target);
-    text-decoration: underline;
-    text-underline-offset: 0.22em;
+    gap: 0.375rem;
+    min-height: max(3.75rem, var(--minimum-touch-target));
+    padding: 0.45rem 0.375rem;
+    color: var(--color-foreground);
+    text-align: center;
+    text-decoration: none;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    line-height: 1.25;
+    overflow-wrap: anywhere;
+  }
+  .mv-faq__topics svg { width: 1.125rem; height: 1.125rem; flex: none; }
+  @media (hover: hover) {
+    .mv-faq__topics a:hover { background: rgb(var(--color-foreground-rgb) / 0.06); }
+  }
+  .mv-faq__topics a[aria-current='location'] {
+    color: var(--color-background);
+    background: var(--color-foreground);
+  }
+  .mv-faq__topics a:focus-visible { outline: 2px solid currentColor; outline-offset: -3px; }
+  @media (max-width: 749px) {
+    .mv-faq:has(> .mv-faq__navigation) { --faq-nav-height: calc(var(--minimum-touch-target) + 1.125rem + 2px); }
+    .mv-faq__topics { display: flex; }
+    .mv-faq__topics a {
+      flex: 0 0 auto;
+      flex-direction: row;
+      min-height: var(--minimum-touch-target);
+      padding-inline: 0.875rem;
+    }
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .mv-faq__topics a { transition: color 180ms ease, background-color 180ms ease; }
+    .mv-faq__topics svg { transition: transform 180ms ease; }
+    .mv-faq__topics a[aria-current='location'] svg { transform: translateY(-1px); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html:has(.mv-faq__navigation), .page-wrapper:has(.mv-faq__navigation) { scroll-behavior: auto; }
   }
   .mv-faq__topic {
-    scroll-margin-block-start: calc(var(--header-height, 5rem) + 1rem);
+    scroll-margin-block-start: calc(var(--faq-jump-offset, var(--faq-header-offset, 0px)) + var(--faq-nav-height, 0px) + 12px);
     margin-block: clamp(2rem, 5vw, 3.5rem) 1rem;
   }
   .mv-faq__row {
@@ -112,7 +204,15 @@
   "blocks": [
     {
       "type": "topic", "name": "Topic",
-      "settings": [{ "type": "text", "id": "heading", "label": "Topic heading", "default": "New topic" }]
+      "settings": [
+        { "type": "text", "id": "heading", "label": "Topic heading", "default": "New topic" },
+        { "type": "select", "id": "icon", "label": "Navigation icon", "default": "auto", "options": [
+          { "value": "auto", "label": "Automatic" }, { "value": "truck", "label": "Delivery truck" },
+          { "value": "return", "label": "Return arrow" }, { "value": "ruler", "label": "Ruler" },
+          { "value": "clipboard", "label": "Order clipboard" }, { "value": "card", "label": "Payment card" },
+          { "value": "chat_bubble", "label": "Chat bubble" }
+        ] }
+      ]
     },
     {
       "type": "question", "name": "Question",
@@ -126,7 +226,7 @@
     {
       "name": "Customer FAQs",
       "blocks": [
-        { "type": "topic", "settings": { "heading": "Shipping & delivery" } },
+        { "type": "topic", "settings": { "heading": "Shipping & delivery", "icon": "truck" } },
         {
           "type": "question",
           "settings": {
@@ -197,7 +297,7 @@
             "answer": "<p>You can choose a replacement shipment or a refund. Email <a href=\"mailto:hello@missvella.com\">hello@missvella.com</a> with your preference, order number, tracking number if available, and a brief description. Include photos if the parcel or dress arrived damaged.</p>"
           }
         },
-        { "type": "topic", "settings": { "heading": "Returns & refunds" } },
+        { "type": "topic", "settings": { "heading": "Returns & refunds", "icon": "return" } },
         {
           "type": "question",
           "settings": {
@@ -282,7 +382,7 @@
             "answer": "<p>You may choose a replacement or a full refund. Email <a href=\"mailto:hello@missvella.com\">hello@missvella.com</a> as soon as possible with your order number, a description, clear photos of the item and photos of the packaging if relevant. If you return it for a quality issue, damage, a defect or a fulfillment error, Missvella covers return shipping and refunds the original shipping fee.</p>"
           }
         },
-        { "type": "topic", "settings": { "heading": "Sizing & dress details" } },
+        { "type": "topic", "settings": { "heading": "Sizing & dress details", "icon": "ruler" } },
         {
           "type": "question",
           "settings": {
@@ -339,7 +439,7 @@
             "answer": "<p>Follow the garment’s care label. Heat and steam can affect fabrics and embellishments differently. If you’re unsure which method is suitable, email <a href=\"mailto:hello@missvella.com\">hello@missvella.com</a> with the dress link or order number before treating it.</p>"
           }
         },
-        { "type": "topic", "settings": { "heading": "Orders & changes" } },
+        { "type": "topic", "settings": { "heading": "Orders & changes", "icon": "clipboard" } },
         {
           "type": "question",
           "settings": {
@@ -375,7 +475,7 @@
             "answer": "<p>Contact us with your order number. Once a parcel has shipped, we may be unable to stop it. After delivery, you can request a return of eligible items within 15 calendar days under the <a href=\"/policies/refund-policy\">Return &amp; Refund Policy</a>.</p>"
           }
         },
-        { "type": "topic", "settings": { "heading": "Payments & checkout" } },
+        { "type": "topic", "settings": { "heading": "Payments & checkout", "icon": "card" } },
         {
           "type": "question",
           "settings": {
@@ -411,7 +511,7 @@
             "answer": "<p>Start from the Missvella store and use the payment options shown at checkout. If you receive an unexpected payment request, email <a href=\"mailto:hello@missvella.com\">hello@missvella.com</a> before acting on it. Never send a card security code, password or one-time verification code by email.</p>"
           }
         },
-        { "type": "topic", "settings": { "heading": "Contact & help" } },
+        { "type": "topic", "settings": { "heading": "Contact & help", "icon": "chat_bubble" } },
         {
           "type": "question",
           "settings": {

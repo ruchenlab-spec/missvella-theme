@@ -48,6 +48,7 @@
 - 六类问题共用原生折叠组件。分类锚点、问题、答案和政策链接随 HTML 输出；FAQPage、Question 与 Answer 微数据直接标在可见内容上。英文 FAQ 页未单设搜索标题或描述时，主题提供专用默认值。已校验 43 个唯一问题、主要政策数字、三个目的地示例与七个链接目标；Shopify 已确认两个主题代码文件上传至当前线上主题。
 - **启用。** 打开[现有 FAQs 模板](https://6icwx6-yv.myshopify.com/admin/themes/167137378374/editor?previewPath=%2Fpages%2Ffaqs)，选择 Add section → Customer FAQs，隐藏原有 Shipping & Delivery、Sizing & Dress Details 和 Returns & Refunds 三个分区，然后一起保存。当前页面缺少主标题，预设默认输出 H1。如日后另加页面主标题，可在分区中把 Heading level 调为 H2。
 - 分类名、问题、答案及内链均可在编辑器修改。正式政策后续如有变更，商家需同步已保存的 FAQ 问答值。页面的搜索标题和描述也可在 Shopify 页面后台自行设置。
+- 分类导航在 FAQ 区域内吸顶，跟随店铺页头的显示状态避让。桌面显示图标和标签，手机保持单行并可横滑。点击或滚动到分类时，对应按钮切换为深底浅字。现有六个标准分类按标题匹配图标，自定义分类可在 Topic → Navigation icon 指定图标。已检查桌面与手机滚动容器的选中逻辑、向上跳转的页头避让和减少动态效果设置，两个相关代码文件已精确上传线上主题。
 
 ### 4 Size Guide
 
