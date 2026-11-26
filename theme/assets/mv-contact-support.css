@@ -79,7 +79,26 @@
 
 .mv-contact__primary .mv-contact__email {
   margin-block: 0 0.75rem;
-  font-size: 1.0625rem;
+  max-width: 100%;
+}
+
+:is(.mv-contact__primary, .mv-contact__resources, .mv-contact__business) .mv-contact__entry-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  min-width: 0;
+  color: var(--contact-ink);
+  font-size: 0.9375rem;
+  font-weight: 500;
+  line-height: 1.4;
+}
+
+.mv-contact__entry-label svg {
+  flex: none;
+}
+
+.mv-contact__form .mv-contact__entry-label svg {
+  display: none;
 }
 
 .mv-contact__link,
@@ -119,11 +138,6 @@
 
 .mv-contact__business {
   border-block: 1px solid var(--contact-rule);
-}
-
-.mv-contact__business summary {
-  color: var(--contact-muted);
-  font-size: 0.875rem;
 }
 
 .mv-contact__toggle {

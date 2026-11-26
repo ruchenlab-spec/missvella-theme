@@ -21,17 +21,25 @@
 {%- endcapture -%}
 {%- capture tracking_link -%}
   {%- if config.tracking_label != blank -%}
-    <a class="mv-contact__link" href="{{ tracking_url | escape }}"><span>{{ config.tracking_label | escape }}</span>{{ arrow }}</a>
+    <a class="mv-contact__link" href="{{ tracking_url | escape }}">
+      {% render 'mv-contact-entry-label', icon: 'tracking', label: config.tracking_label %}
+      {{ arrow }}
+    </a>
   {%- endif -%}
 {%- endcapture -%}
 {%- capture returns_link -%}
   {%- if config.returns_label != blank -%}
-    <a class="mv-contact__link" href="{{ returns_url | escape }}"><span>{{ config.returns_label | escape }}</span>{{ arrow }}</a>
+    <a class="mv-contact__link" href="{{ returns_url | escape }}">
+      {% render 'mv-contact-entry-label', icon: 'returns', label: config.returns_label %}
+      {{ arrow }}
+    </a>
   {%- endif -%}
 {%- endcapture -%}
 {%- capture email_link -%}
   {%- if email != blank -%}
-    <a class="mv-contact__email" href="mailto:{{ email | escape }}">{{ email | escape }}</a>
+    <a class="mv-contact__email" href="mailto:{{ email | escape }}">
+      {%- render 'mv-contact-entry-label', icon: 'email', label: email -%}
+    </a>
   {%- endif -%}
 {%- endcapture -%}
 
@@ -143,7 +151,10 @@
       {% if config.shipping_label != blank or returns_link != blank %}
         <div class="mv-contact__resources">
           {% if config.shipping_label != blank %}
-            <a class="mv-contact__link" href="{{ shipping_url | escape }}"><span>{{ config.shipping_label | escape }}</span>{{ arrow }}</a>
+            <a class="mv-contact__link" href="{{ shipping_url | escape }}">
+              {% render 'mv-contact-entry-label', icon: 'shipping', label: config.shipping_label %}
+              {{ arrow }}
+            </a>
           {% endif %}
           {{ returns_link }}
         </div>
@@ -151,7 +162,10 @@
 
       {% if phone != blank or config.address != blank %}
         <details class="mv-contact__business">
-          <summary>{{ config.business_label | escape }} <span class="mv-contact__toggle" aria-hidden="true"></span></summary>
+          <summary>
+            {% render 'mv-contact-entry-label', icon: 'business', label: config.business_label %}
+            <span class="mv-contact__toggle" aria-hidden="true"></span>
+          </summary>
           {% if phone != blank %}
             <a href="tel:{{ phone | remove: ' ' | remove: '(' | remove: ')' | remove: '-' | escape }}">{{ phone | escape }}</a>
           {% endif %}
