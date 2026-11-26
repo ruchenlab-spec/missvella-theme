@@ -7,22 +7,45 @@
   Confirmed mapping: 00 -> 00; 02-16 -> 2-16; 18-30 -> 18W-30W.
   Extra source sizes 0, 16W and 32W are intentionally omitted.
 
-  Single source of truth: edit the measurements HERE only. Both consumers
-  convert cm → inches client-side via the data-cm attributes.
+  Each row is size|bust|waist|hips|hollow-to-hem in centimeters.
+  Pass unit: 'in' for initial inch values, and row_headers: true for row headers.
+  Both consumers use data-cm to switch units without rounding the source values.
 {%- endcomment -%}
-<tr><td>00</td><td data-cm="79">79</td><td data-cm="61">61</td><td data-cm="88.5">88.5</td><td data-cm="145">145</td></tr>
-<tr><td>02</td><td data-cm="84">84</td><td data-cm="66">66</td><td data-cm="93.5">93.5</td><td data-cm="147">147</td></tr>
-<tr><td>04</td><td data-cm="86.5">86.5</td><td data-cm="68.5">68.5</td><td data-cm="96">96</td><td data-cm="147">147</td></tr>
-<tr><td>06</td><td data-cm="89">89</td><td data-cm="71">71</td><td data-cm="98.5">98.5</td><td data-cm="150">150</td></tr>
-<tr><td>08</td><td data-cm="91.5">91.5</td><td data-cm="73.5">73.5</td><td data-cm="101">101</td><td data-cm="150">150</td></tr>
-<tr><td>10</td><td data-cm="94">94</td><td data-cm="76">76</td><td data-cm="104">104</td><td data-cm="152">152</td></tr>
-<tr><td>12</td><td data-cm="96.5">96.5</td><td data-cm="80">80</td><td data-cm="108">108</td><td data-cm="152">152</td></tr>
-<tr><td>14</td><td data-cm="100.5">100.5</td><td data-cm="84">84</td><td data-cm="112">112</td><td data-cm="155">155</td></tr>
-<tr><td>16</td><td data-cm="104">104</td><td data-cm="87.5">87.5</td><td data-cm="116">116</td><td data-cm="155">155</td></tr>
-<tr><td>18</td><td data-cm="116">116</td><td data-cm="99">99</td><td data-cm="125">125</td><td data-cm="155">155</td></tr>
-<tr><td>20</td><td data-cm="121">121</td><td data-cm="105">105</td><td data-cm="130">130</td><td data-cm="155">155</td></tr>
-<tr><td>22</td><td data-cm="126">126</td><td data-cm="111">111</td><td data-cm="135">135</td><td data-cm="155">155</td></tr>
-<tr><td>24</td><td data-cm="131">131</td><td data-cm="117">117</td><td data-cm="140">140</td><td data-cm="155">155</td></tr>
-<tr><td>26</td><td data-cm="136">136</td><td data-cm="123">123</td><td data-cm="145">145</td><td data-cm="155">155</td></tr>
-<tr><td>28</td><td data-cm="141">141</td><td data-cm="128">128</td><td data-cm="150">150</td><td data-cm="155">155</td></tr>
-<tr><td>30</td><td data-cm="147.5">147.5</td><td data-cm="135">135</td><td data-cm="157">157</td><td data-cm="155">155</td></tr>
+{%- capture chart -%}
+00|79|61|88.5|145
+02|84|66|93.5|147
+04|86.5|68.5|96|147
+06|89|71|98.5|150
+08|91.5|73.5|101|150
+10|94|76|104|152
+12|96.5|80|108|152
+14|100.5|84|112|155
+16|104|87.5|116|155
+18|116|99|125|155
+20|121|105|130|155
+22|126|111|135|155
+24|131|117|140|155
+26|136|123|145|155
+28|141|128|150|155
+30|147.5|135|157|155
+{%- endcapture -%}
+{%- assign rows = chart | newline_to_br | split: '<br />' -%}
+{%- for row in rows -%}
+  {%- assign values = row | strip | split: '|' -%}
+  <tr>
+    {%- if row_headers -%}
+      <th scope="row">{{ values.first }}</th>
+    {%- else -%}
+      <td>{{ values.first }}</td>
+    {%- endif -%}
+    {%- for cm in values offset: 1 -%}
+      <td data-cm="{{ cm }}">
+        {%- if unit == 'in' -%}
+          {{- cm | divided_by: 2.54 | round: 1 | append: '' | remove: '.0' -}}
+        {%- else -%}
+          {{- cm -}}
+        {%- endif -%}
+      </td>
+    {%- endfor -%}
+  </tr>
+{%- endfor -%}
