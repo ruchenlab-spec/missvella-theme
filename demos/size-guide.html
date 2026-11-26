@@ -56,21 +56,26 @@
       </section>
       <section id="measure" aria-labelledby="measure-title">
         <div class="section-heading">
-          <div><h2 id="measure-title">How to measure</h2><p>Select a point on the illustration.</p></div>
+          <h2 id="measure-title">How to measure</h2>
         </div>
-        <div class="plate">
-          <div class="figure">
-            <img src="../theme/assets/size-chart-how-to-measure.png" alt="Front view showing where to take each body measurement." width="1122" height="1402">
-            <div id="points" role="group" aria-label="Measurement points"></div>
-          </div>
-        </div>
-        <div class="steps">
-          <details open><summary><span>1</span>Bust</summary><p>Measure around the fullest part of your bust, keeping the tape level around your back.</p></details>
-          <details><summary><span>2</span>Waist</summary><p>Measure around the narrowest part of your natural waistline without pulling the tape tight.</p></details>
-          <details><summary><span>3</span>Hips</summary><p>Measure around the fullest part of your hips, keeping the tape parallel to the floor.</p></details>
-          <details><summary><span>4</span>Hollow to floor</summary><p>Stand barefoot and measure vertically from the hollow between your collarbones to the floor.</p></details>
-          <details><summary><span>5</span>Height</summary><p>Stand straight and barefoot. Measure from the top of your head to the floor.</p></details>
-        </div>
+        <img class="measurement-image" src="size-guide-assets/how-to-measure.png"
+          alt="Dress measurement guide showing bust, waist, hips, hollow to floor and height."
+          width="1086" height="1448">
+        <details class="transcript">
+          <summary>Read measurement instructions</summary>
+          <dl>
+            <dt>Bust</dt>
+            <dd>Measure around the fullest part of your bust, keeping the tape level around your back.</dd>
+            <dt>Waist</dt>
+            <dd>Measure around the narrowest part of your natural waistline without pulling the tape tight.</dd>
+            <dt>Hips</dt>
+            <dd>Measure around the fullest part of your hips, keeping the tape parallel to the floor.</dd>
+            <dt>Hollow to floor</dt>
+            <dd>Stand barefoot and measure vertically from the hollow between your collarbones to the floor.</dd>
+            <dt>Height</dt>
+            <dd>Stand straight and barefoot. Measure from the top of your head to the floor.</dd>
+          </dl>
+        </details>
         <p class="note">Take measurements over underwear. For best results, have someone help you measure.</p>
       </section>
     </div>
@@ -88,26 +93,6 @@
         document.getElementById('unit-copy').textContent = inches ? 'Measurements in inches' : 'Measurements in centimeters';
       });
     }
-
-    // Coordinates follow the native 1122 × 1402 measurement illustration.
-    const positions = [[344,395], [344,526], [344,654], [262,820], [872,692]];
-    const steps = [...document.querySelectorAll('.steps details')];
-    steps.forEach((step, index) => {
-      step.name = 'measurement';
-      step.id = 'measurement-' + (index + 1);
-      const point = document.createElement('button');
-      const label = step.querySelector('summary').lastChild.textContent.trim();
-      point.type = 'button';
-      point.textContent = index + 1;
-      point.setAttribute('aria-label', label);
-      point.setAttribute('aria-controls', step.id);
-      point.setAttribute('aria-expanded', String(step.open));
-      point.style.left = (positions[index][0] / 1122 * 100) + '%';
-      point.style.top = (positions[index][1] / 1402 * 100) + '%';
-      point.addEventListener('click', () => { step.open = true; });
-      step.addEventListener('toggle', () => point.setAttribute('aria-expanded', String(step.open)));
-      document.getElementById('points').append(point);
-    });
   </script>
 </body>
 </html>
