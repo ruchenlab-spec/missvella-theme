@@ -156,6 +156,36 @@ dialog.mv-letter::backdrop { background: rgb(24 19 20 / 58%); }
 .mv-letter :focus-visible { outline: 2px solid var(--mv-wine); outline-offset: 3px; }
 .mv-letter .mv-letter__close:focus-visible { outline-color: white; outline-offset: -4px; }
 .mv-letter [hidden] { display: none; }
+
+@media (max-width: 749px) {
+  dialog.mv-letter {
+    width: min(320px, calc(100% - 40px));
+    max-height: calc(100dvh - 32px);
+  }
+  .mv-letter__scene { padding: 30px 12px 14px; }
+  .mv-letter__paper { padding: 24px 16px 16px; }
+  .mv-letter__tape {
+    min-width: 6.5rem;
+    min-height: 24px;
+    padding: 5px 16px;
+  }
+  .mv-letter__close {
+    top: 0;
+    right: 0;
+    background: radial-gradient(circle, rgb(16 13 14 / 78%) 14px, transparent 15px);
+  }
+  .mv-letter .mv-letter__title { font-size: clamp(34px, 9vw, 38px); }
+  .mv-letter__sub { margin-top: 8px; line-height: 1.4; }
+  .mv-letter__ticket { min-height: 44px; margin-top: 14px; }
+  .mv-letter__offer { padding: 7px 10px; gap: 2px; }
+  .mv-letter__form { margin-top: 12px; }
+  .mv-letter__form, .mv-letter__fields { gap: 6px; }
+  .mv-letter__form input[type=email], .mv-letter__submit {
+    min-height: 44px;
+    padding-block: 7px;
+  }
+}
+
 dialog.mv-letter[open], dialog.mv-letter[open]::backdrop {
   animation: none;
   transition: none;
