@@ -7,7 +7,7 @@
 <div class="section-background color-custom-{{ section.id }}"></div>
 <aside
   class="announcement-bar spacing-style section section--{{ section.settings.section_width }} color-custom-{{ section.id }}"
-  style="{% render 'spacing-padding', settings: section.settings %}; --border-bottom-width: {{ section.settings.divider_width }}px;{% if section.settings.divider_color != blank %} --color-border: {{ section.settings.divider_color }};{% endif %}"
+  style="{% render 'spacing-padding', settings: section.settings %}; --border-bottom-width: {{ section.settings.divider_width }}px; --announcement-separator-color: {{ section.settings.separator_color | default: '#A0A0A0' }};{% if section.settings.divider_color != blank %} --color-border: {{ section.settings.divider_color }};{% endif %}"
 >
   <announcement-bar-component
     class="announcement-bar__slider"
@@ -79,7 +79,7 @@
     inset-inline-start: 0;
     top: 50%;
     height: min(1em, 75%);
-    border-inline-start: 1px solid currentColor;
+    border-inline-start: 1px solid var(--announcement-separator-color);
     transform: translateY(-50%);
   }
 
@@ -306,6 +306,12 @@
       "id": "background_color",
       "label": "t:settings.background_color",
       "placeholder": "t:settings.default"
+    },
+    {
+      "type": "color",
+      "id": "separator_color",
+      "label": "公告之间竖线颜色",
+      "default": "#A0A0A0"
     },
     {
       "type": "range",
