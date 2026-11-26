@@ -8,7 +8,7 @@
 
 | 顺序 | 页脚菜单项 | 目标 | 依赖 | 进度 |
 |---|---|---|---|---|
-| 1 | Processing & Shipping | 导读 Page `/pages/processing-shipping`（待商家创建）＋[正式运输政策](https://missvella.com/policies/shipping-policy) | 当前线上运输政策 | 代码已推送线上，待商家配置 |
+| 1 | Processing & Shipping | [现有导读页](https://missvella.com/pages/processing-shipping)＋[正式运输政策](https://missvella.com/policies/shipping-policy) | 当前线上运输政策 | 现有模板直接读取正式政策，提供国家查询及页内运输 FAQ |
 | 2 | Returns & Refunds | [退货与退款政策](https://missvella.com/policies/refund-policy) | 当前线上退款政策 | 2026-11-26 已发布顶部速查表、仓库收件人和 48 小时退款处理时限 |
 | 3 | FAQs | [FAQ](https://missvella.com/pages/faqs) | 第 1、2 项的最终政策口径和现有英文草案 | 43 问草案已完成，待核对和制作预设 |
 | 4 | Size Guide | [尺码指南](https://missvella.com/pages/size-guide) | 当前尺码表和商品页入口 | 待开始 |

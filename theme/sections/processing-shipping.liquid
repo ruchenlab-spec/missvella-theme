@@ -4,6 +4,10 @@
   assign policy_url = section.settings.policy_url | default: shop.shipping_policy.url | default: '/policies/shipping-policy'
   assign returns_url = section.settings.returns_url | default: shop.refund_policy.url | default: '/policies/refund-policy'
   assign support_email = section.settings.support_email | strip
+  assign policy_guide = false
+  if page.handle == 'processing-shipping' and section.settings.use_published_policy != false
+    assign policy_guide = true
+  endif
   render 'contrast-override', background_color: section.settings.background_color, text_color: section.settings.text_color, section_id: section.id
 -%}
 
@@ -17,80 +21,84 @@
   >
     <header class="shipping-guide__header">
       <{{ section.settings.heading_level }} class="shipping-guide__title h2">{{ section.settings.heading | escape }}</{{ section.settings.heading_level }}>
-      {% if section.settings.intro != blank %}
+      {% if section.settings.intro != blank and policy_guide == false %}
         <div class="rte">{{ section.settings.intro }}</div>
       {% endif %}
     </header>
 
-    {% if shipping_methods.size > 0 %}
-      <table class="shipping-guide__table" aria-describedby="ShippingEstimate-{{ section.id }}">
-        <caption>{{ section.settings.comparison_heading | escape }}</caption>
-        <thead>
-          <tr>
-            <th scope="col">{{ section.settings.detail_label | escape }}</th>
-            {% for block in shipping_methods %}
-              <th scope="col" {{ block.shopify_attributes }}>{{ block.settings.heading | escape }}</th>
-            {% endfor %}
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <th scope="row">{{ section.settings.processing_label | escape }}</th>
-            {% for block in shipping_methods %}<td>{{ block.settings.processing | escape }}</td>{% endfor %}
-          </tr>
-          <tr>
-            <th scope="row">{{ section.settings.transit_label | escape }}</th>
-            {% for block in shipping_methods %}<td>{{ block.settings.transit | escape }}</td>{% endfor %}
-          </tr>
-          <tr class="shipping-guide__total">
-            <th scope="row">{{ section.settings.total_label | escape }}</th>
-            {% for block in shipping_methods %}<td><strong>{{ block.settings.total | escape }}</strong></td>{% endfor %}
-          </tr>
-          <tr>
-            <th scope="row">{{ section.settings.cost_label | escape }}</th>
-            {% for block in shipping_methods %}<td>{{ block.settings.cost | escape }}</td>{% endfor %}
-          </tr>
-        </tbody>
-      </table>
-    {% endif %}
+    {% if policy_guide %}
+      {% render 'mv-shipping-policy-guide', section_id: section.id, policy: shop.shipping_policy %}
+    {% else %}
+      {% if shipping_methods.size > 0 %}
+        <table class="shipping-guide__table" aria-describedby="ShippingEstimate-{{ section.id }}">
+          <caption>{{ section.settings.comparison_heading | escape }}</caption>
+          <thead>
+            <tr>
+              <th scope="col">{{ section.settings.detail_label | escape }}</th>
+              {% for block in shipping_methods %}
+                <th scope="col" {{ block.shopify_attributes }}>{{ block.settings.heading | escape }}</th>
+              {% endfor %}
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <th scope="row">{{ section.settings.processing_label | escape }}</th>
+              {% for block in shipping_methods %}<td>{{ block.settings.processing | escape }}</td>{% endfor %}
+            </tr>
+            <tr>
+              <th scope="row">{{ section.settings.transit_label | escape }}</th>
+              {% for block in shipping_methods %}<td>{{ block.settings.transit | escape }}</td>{% endfor %}
+            </tr>
+            <tr class="shipping-guide__total">
+              <th scope="row">{{ section.settings.total_label | escape }}</th>
+              {% for block in shipping_methods %}<td><strong>{{ block.settings.total | escape }}</strong></td>{% endfor %}
+            </tr>
+            <tr>
+              <th scope="row">{{ section.settings.cost_label | escape }}</th>
+              {% for block in shipping_methods %}<td>{{ block.settings.cost | escape }}</td>{% endfor %}
+            </tr>
+          </tbody>
+        </table>
+      {% endif %}
 
-    <div id="ShippingEstimate-{{ section.id }}" class="shipping-guide__note rte">{{ section.settings.estimate_note }}</div>
+      <div id="ShippingEstimate-{{ section.id }}" class="shipping-guide__note rte">{{ section.settings.estimate_note }}</div>
 
-    <aside class="shipping-guide__notice" aria-labelledby="ShippingFree-{{ section.id }}">
-      <h2 id="ShippingFree-{{ section.id }}" class="shipping-guide__subheading">{{ section.settings.free_heading | escape }}</h2>
-      <div class="shipping-guide__notice-copy">
-        <div class="rte">{{ section.settings.free_text }}</div>
-        <div class="rte">{{ section.settings.destinations_note }}</div>
-      </div>
-    </aside>
-
-    {% if shipping_details.size > 0 %}
-      <div class="shipping-guide__details">
-        <h2 class="shipping-guide__subheading">{{ section.settings.details_heading | escape }}</h2>
-        <div class="shipping-guide__accordion accordion accordion--plus">
-          {% for block in shipping_details %}
-            <div class="shipping-guide__detail" {{ block.shopify_attributes }}>
-              {% capture shipping_detail_content %}
-                <details class="details" {% if block.settings.open_by_default %}open{% endif %}>
-                  <summary class="details__header">
-                    <span>{{ block.settings.heading | escape }}</span>
-                    <span class="svg-wrapper icon-plus" aria-hidden="true">
-                      {{- 'icon-plus.svg' | inline_asset_content -}}
-                    </span>
-                  </summary>
-                  <div class="details-content rte">{{ block.settings.content }}</div>
-                </details>
-              {% endcapture %}
-              {% render 'accordion-custom-component',
-                children: shipping_detail_content,
-                open_by_default_on_desktop: block.settings.open_by_default,
-                open_by_default_on_mobile: block.settings.open_by_default
-              %}
-            </div>
-          {% endfor %}
+      <aside class="shipping-guide__notice" aria-labelledby="ShippingFree-{{ section.id }}">
+        <h2 id="ShippingFree-{{ section.id }}" class="shipping-guide__subheading">{{ section.settings.free_heading | escape }}</h2>
+        <div class="shipping-guide__notice-copy">
+          <div class="rte">{{ section.settings.free_text }}</div>
+          <div class="rte">{{ section.settings.destinations_note }}</div>
         </div>
-      </div>
-      {% render 'accordion-styles' %}
+      </aside>
+
+      {% if shipping_details.size > 0 %}
+        <div class="shipping-guide__details">
+          <h2 class="shipping-guide__subheading">{{ section.settings.details_heading | escape }}</h2>
+          <div class="shipping-guide__accordion accordion accordion--plus">
+            {% for block in shipping_details %}
+              <div class="shipping-guide__detail" {{ block.shopify_attributes }}>
+                {% capture shipping_detail_content %}
+                  <details class="details" {% if block.settings.open_by_default %}open{% endif %}>
+                    <summary class="details__header">
+                      <span>{{ block.settings.heading | escape }}</span>
+                      <span class="svg-wrapper icon-plus" aria-hidden="true">
+                        {{- 'icon-plus.svg' | inline_asset_content -}}
+                      </span>
+                    </summary>
+                    <div class="details-content rte">{{ block.settings.content }}</div>
+                  </details>
+                {% endcapture %}
+                {% render 'accordion-custom-component',
+                  children: shipping_detail_content,
+                  open_by_default_on_desktop: block.settings.open_by_default,
+                  open_by_default_on_mobile: block.settings.open_by_default
+                %}
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+        {% render 'accordion-styles' %}
+      {% endif %}
     {% endif %}
 
     <footer class="shipping-guide__support">
@@ -115,7 +123,7 @@
   "enabled_on": { "templates": ["page"] },
   "max_blocks": 14,
   "settings": [
-    { "type": "paragraph", "content": "Create a dedicated Page template and add this section. Defaults summarize the published Shipping Policy checked on 18 Nov 2026. Keep content aligned with your policy and checkout." },
+    { "type": "checkbox", "id": "use_published_policy", "label": "Use the published Shipping Policy", "default": true, "info": "On the Processing & Shipping page, use Settings → Policies for the introduction, fees, destination table and FAQ answers. Turn off to use the manual comparison and detail blocks below." },
     { "type": "text", "id": "heading", "label": "Heading", "default": "Processing & Shipping" },
     { "type": "select", "id": "heading_level", "label": "Heading level", "options": [{ "value": "h1", "label": "H1 — page title" }, { "value": "h2", "label": "H2 — section title" }], "default": "h1" },
     { "type": "richtext", "id": "intro", "label": "Introduction", "default": "<p>Plan your delivery with processing and shipping times in one place.</p>" },

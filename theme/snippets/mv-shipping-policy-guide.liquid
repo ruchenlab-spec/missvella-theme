@@ -1,0 +1,33 @@
+{% doc %}
+  Displays the current shop policy on the shipping guide. Its tables and paragraphs
+  are readable before the destination filter and FAQ disclosures are initialized.
+  @param {string} section_id - ID of the shipping guide section
+  @param {object} policy - Published Shopify shipping policy
+{% enddoc %}
+{% if policy.body != blank %}
+  <script src="{{ 'mv-shipping-policy-guide.js' | asset_url }}" type="module"></script>
+  <mv-shipping-policy-guide class="shipping-policy-guide">
+    <nav class="shipping-policy-guide__jumps" aria-label="On this page" hidden>
+      <a href="#ShippingCountries-{{ section_id }}" data-country-jump hidden>Find my shipping time</a>
+      <a href="#ShippingFaq-{{ section_id }}" data-faq-jump hidden>Shipping FAQs</a>
+    </nav>
+    <div class="shipping-policy-guide__copy" data-policy-copy>{{ policy.body }}</div>
+    <template data-country-search>
+      <div class="shipping-policy-guide__search" id="ShippingCountries-{{ section_id }}">
+        <label for="ShippingSearch-{{ section_id }}">Search by country or region</label>
+        <div class="shipping-policy-guide__input">
+          <input id="ShippingSearch-{{ section_id }}" type="search" placeholder="Country name or code" autocomplete="off" aria-controls="ShippingRows-{{ section_id }}">
+          <button type="button" hidden>Clear</button>
+        </div>
+        <p data-result-count role="status" aria-live="polite" aria-atomic="true"></p>
+      </div>
+    </template>
+    <template data-shipping-faq>
+      <section class="shipping-policy-guide__faq" aria-labelledby="ShippingFaq-{{ section_id }}">
+        <h2 id="ShippingFaq-{{ section_id }}">Shipping FAQs</h2>
+      </section>
+    </template>
+  </mv-shipping-policy-guide>
+{% else %}
+  <p>Contact us with your delivery address and event date for shipping options.</p>
+{% endif %}

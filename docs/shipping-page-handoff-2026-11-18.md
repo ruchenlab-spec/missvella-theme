@@ -1,5 +1,14 @@
 # Processing & Shipping：内容大纲与实施交接
 
+## 现有 Processing & Shipping 页面 · 2026-11-26
+
+在现有 `processing-shipping` 模板的 **Processing & Shipping** 分区启用正式政策视图。数据来源为店铺 **Settings → Policies → Shipping policy**；发布前已通过 Storefront API 核对实际正文、25 个目的地以及美国地址限制。页面每次渲染取 `shop.shipping_policy.body`，处理时间、费率、免邮条件、收件限制与运输异常说明均来自同一正文。制作包含在周一至周六处理的 2–5 个工作日内；表格里的天数从发货起算。
+
+- **目的地查询**支持国家名、部分拼写和 US／USA、GB／UK、UAE 等简称。清空搜索可回到完整表。不在表内的地址按结账可用方式确定，不推算缺失时效。关闭 JavaScript 时仍可阅读政策及完整表格。
+- **页内 Shipping FAQs** 把政策中的活动日期、追踪、延误、错址退回和丢损包裹说明整理为可展开的问答。若政策标题或结构改变而无法识别，对应正文仍正常展示。独立 `/pages/faqs` 不在此次改动范围。
+- 编辑器 **Use the published Shipping Policy** 默认开启。标题、客服与外观仍可在原分区调整；关闭该开关会显示商家原先手填的比较表与区块，其中的数值需要按政策另行核实。
+- 已用正式政策正文验证 25 行时效、简称与部分名称查询、无匹配、清空以及 6 个页内问答。Theme Check 对本次文件零问题。Shopify CLI 已确认在当前 live 主题 `167137378374` 精确上传分区、政策视图片段、CSS 与 JS 四个代码文件。
+
 ## 完整英文运输政策 · 2026-11-26
 
 [完整英文 Shipping Policy 正文（含内联样式及逐国表格）](shipping-policy-country-transit.html)。在 Shopify 后台 **Settings → Policies → Shipping policy** 的 HTML 模式中，用完整源码替换现有正文并保存。页面标题由 Shopify 提供。当前交付为商家发布稿。
