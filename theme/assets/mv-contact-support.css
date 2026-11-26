@@ -27,7 +27,8 @@
 }
 
 .mv-contact__header {
-  padding-block-start: clamp(1.25rem, 3cqi, 2rem);
+  display: grid;
+  gap: 1rem;
 }
 
 .mv-contact__title,
@@ -48,7 +49,7 @@
 
 .mv-contact__header p {
   max-width: 39ch;
-  margin: 1rem 0 0;
+  margin: 0;
   color: var(--contact-muted);
   line-height: 1.65;
 }
@@ -406,18 +407,58 @@
   .mv-contact .mv-contact__submit { transition: none; }
 }
 
+@container mv-contact (width < 750px) {
+  .mv-contact__primary .mv-contact__email,
+  .mv-contact__primary .mv-contact__link,
+  .mv-contact__resources > .mv-contact__link,
+  .mv-contact__business summary {
+    min-height: 3.5rem;
+    padding-block: 0.75rem;
+    margin-block: 0;
+  }
+
+  .mv-contact__business {
+    border-block-start: 0;
+  }
+
+  .mv-contact__business summary {
+    border-block-start: 1px solid var(--contact-rule);
+  }
+
+  .mv-contact__business-body {
+    display: grid;
+    gap: 0.5rem;
+    padding-block-end: 1rem;
+    padding-inline-start: calc(20px + 0.75rem);
+  }
+
+  .mv-contact__business-body address {
+    margin: 0;
+  }
+
+  .mv-contact__form-area {
+    padding: 1rem;
+  }
+
+  .mv-contact__form,
+  .mv-contact__event {
+    gap: 1rem;
+  }
+}
+
 @container mv-contact (min-width: 750px) {
   .mv-contact__layout {
     grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
-    grid-template-rows: auto auto auto auto 1fr;
+    grid-template-rows: auto auto auto 1fr;
     gap: 0 clamp(2.5rem, 7cqi, 5.5rem);
   }
 
   .mv-contact__header { grid-area: 1 / 1; }
-  .mv-contact__primary { grid-area: 2 / 1; margin-block-start: 1.25rem; }
+  .mv-contact__title { padding-block-start: clamp(1.25rem, 3cqi, 2rem); }
+  .mv-contact__primary { grid-area: 2 / 1; }
+  .mv-contact__header + .mv-contact__primary { margin-block-start: 1.25rem; }
   .mv-contact__resources { grid-area: 3 / 1; }
-  .mv-contact__business { grid-area: 4 / 1; }
-  .mv-contact__form-area { grid-area: 1 / 2 / 6 / 3; }
+  .mv-contact__form-area { grid-area: 1 / 2 / 5 / 3; }
 
   .mv-contact__event { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .mv-contact__dress-link { grid-column: 1 / -1; }

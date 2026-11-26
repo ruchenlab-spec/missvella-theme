@@ -1,5 +1,7 @@
 {%- liquid
   assign config = section.settings
+  assign heading = config.heading | strip
+  assign intro = config.intro | strip
   assign form_id = 'ContactSupport-' | append: section.id
   assign topics = 'dress,event,order,return,other' | split: ','
   assign email = config.support_email | strip
@@ -47,14 +49,20 @@
 <div class="section page-width-normal">
   <div class="mv-contact spacing-style" style="{% render 'spacing-style', settings: config %}">
     <div class="mv-contact__layout">
-      <header class="mv-contact__header">
-        <{{ config.heading_level }} class="mv-contact__title">{{ config.heading | escape }}</{{ config.heading_level }}>
-        {% if config.intro != blank %}<p>{{ config.intro | escape }}</p>{% endif %}
-      </header>
-      <div class="mv-contact__primary">
-        {{ email_link }}
-        {{ tracking_link }}
-      </div>
+      {% if heading != blank or intro != blank %}
+        <header class="mv-contact__header">
+          {% if heading != blank %}
+            <{{ config.heading_level }} class="mv-contact__title">{{ heading | escape }}</{{ config.heading_level }}>
+          {% endif %}
+          {% if intro != blank %}<p>{{ intro | escape }}</p>{% endif %}
+        </header>
+      {% endif %}
+      {% if email_link != blank or tracking_link != blank %}
+        <div class="mv-contact__primary">
+          {{ email_link }}
+          {{ tracking_link }}
+        </div>
+      {% endif %}
 
       <mv-contact-support class="mv-contact__form-area">
         {%- form 'contact', id: form_id, class: 'mv-contact__form' -%}
@@ -135,7 +143,7 @@
                 <label for="{{ form_id }}-order">{{ config.order_label | escape }}</label>
                 <input type="text" id="{{ form_id }}-order" name="contact[Order number]" value="{{ form['Order number'] | escape }}">
               </div>
-              <div data-topics="order" hidden>{{ tracking_link }}</div>
+              {% if tracking_link != blank %}<div data-topics="order" hidden>{{ tracking_link }}</div>{% endif %}
             </fieldset>
 
             <div class="mv-contact__field">
@@ -157,7 +165,7 @@
         {%- endform -%}
       </mv-contact-support>
 
-      {% if config.shipping_label != blank or returns_link != blank %}
+      {% if config.shipping_label != blank or returns_link != blank or phone != blank or config.address != blank %}
         <div class="mv-contact__resources">
           {% if config.shipping_label != blank %}
             <a class="mv-contact__link" href="{{ shipping_url | escape }}">
@@ -166,20 +174,21 @@
             </a>
           {% endif %}
           {{ returns_link }}
-        </div>
-      {% endif %}
-
-      {% if phone != blank or config.address != blank %}
-        <details class="mv-contact__business">
-          <summary>
-            {% render 'mv-contact-entry-label', icon: 'business', label: config.business_label %}
-            <span class="mv-contact__toggle" aria-hidden="true"></span>
-          </summary>
-          {% if phone != blank %}
-            <a href="tel:{{ phone | remove: ' ' | remove: '(' | remove: ')' | remove: '-' | escape }}">{{ phone | escape }}</a>
+          {% if phone != blank or config.address != blank %}
+            <details class="mv-contact__business">
+              <summary>
+                {% render 'mv-contact-entry-label', icon: 'business', label: config.business_label %}
+                <span class="mv-contact__toggle" aria-hidden="true"></span>
+              </summary>
+              <div class="mv-contact__business-body">
+                {% if phone != blank %}
+                  <a href="tel:{{ phone | remove: ' ' | remove: '(' | remove: ')' | remove: '-' | escape }}">{{ phone | escape }}</a>
+                {% endif %}
+                {% if config.address != blank %}<address>{{ config.address | escape | newline_to_br }}</address>{% endif %}
+              </div>
+            </details>
           {% endif %}
-          {% if config.address != blank %}<address>{{ config.address | escape | newline_to_br }}</address>{% endif %}
-        </details>
+        </div>
       {% endif %}
     </div>
   </div>
