@@ -117,6 +117,7 @@
     {%- if form.posted_successfully? and form.id == blank -%}
       <div
         id="Email-signup__message-success-{{ block.id }}"
+        data-newsletter-success
         class="email-signup__message"
         tabindex="-1"
       >

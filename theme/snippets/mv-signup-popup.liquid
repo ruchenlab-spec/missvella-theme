@@ -3,8 +3,10 @@
   the merchant has not added a configured popup to the current page.
   @param {string} instance_id
   @param {object} [config]
+  @param {object} [fallback_rules]
 {% enddoc %}
 {%- liquid
+  assign rules = config | default: fallback_rules
   assign form_id = 'MvEmailSignup-' | append: instance_id
   assign heading = config.heading | default: "You're invited."
   assign button_label = config.button_label | default: 'Sign me up'
@@ -24,7 +26,10 @@
 <script src="{{ 'mv-signup-popup.js' | asset_url }}" type="module"></script>
 {% render 'dialog-styles' %}
 <mv-signup-component
-  {% if config %}data-configured{% if config.auto_open %} data-delay="{{ config.delay_seconds }}"{% endif %}{% endif %}
+  {% if config %}data-configured{% endif %}
+  {% if customer %}data-known-customer{% endif %}
+  {% if rules.auto_open %}data-delay="{{ rules.delay_seconds }}"{% endif %}
+  data-cooldown-days="{{ rules.cooldown_days | default: 7 }}"
   style="--mv-paper: {{ config.background_color | default: '#F5ECD9' }}; --mv-ink: {{ config.text_color | default: '#352D2A' }}; --mv-wine: {{ config.accent_color | default: '#751E2A' }}; --mv-on-wine: {{ config.button_text_color | default: '#FFFFFF' }}; --mv-grain: url('{{ 'mv-signup-paper.png' | asset_url }}'); --mv-photo: url('{% if config.image != blank %}{{ config.image | image_url: width: 1200 }}{% else %}{{ 'mv-signup-satin.jpg' | asset_url }}{% endif %}'); --mv-focal: {{ config.image.presentation.focal_point | default: 'center' }};"
 >
   <dialog class="dialog-modal mv-letter" ref="dialog" scroll-lock aria-labelledby="{{ form_id }}-title">

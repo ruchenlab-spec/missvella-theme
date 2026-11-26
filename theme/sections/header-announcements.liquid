@@ -15,7 +15,7 @@
       {% content_for 'blocks' %}
     </div>
 
-    {% render 'mv-signup-popup', instance_id: section.id %}
+    {% render 'mv-signup-popup', instance_id: section.id, fallback_rules: section.settings %}
   </announcement-bar-component>
 </aside>
 
@@ -223,6 +223,11 @@
       "placeholder": "t:settings.default",
       "visible_if": "{{ section.settings.divider_width > 0 }}"
     },
+    { "type": "header", "content": "邮件弹窗规则" },
+    { "type": "paragraph", "content": "当前页面添加了「Missvella 邮件弹窗」时，以该分区的规则为准。" },
+    { "type": "checkbox", "id": "auto_open", "label": "新访客进站时自动弹出", "default": true },
+    { "type": "range", "id": "delay_seconds", "label": "进站后等待", "min": 0, "max": 30, "step": 1, "unit": "s", "default": 6, "visible_if": "{{ section.settings.auto_open }}" },
+    { "type": "range", "id": "cooldown_days", "label": "关闭后免打扰天数", "min": 1, "max": 90, "step": 1, "unit": "天", "default": 7, "visible_if": "{{ section.settings.auto_open }}" },
     {
       "type": "header",
       "content": "t:content.padding"
