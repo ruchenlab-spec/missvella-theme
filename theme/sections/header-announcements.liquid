@@ -41,8 +41,7 @@
   .announcement-bar__slides {
     display: grid;
     grid-auto-flow: column;
-    grid-auto-columns: minmax(min(100%, 8rem), 1fr);
-    overflow-x: auto;
+    grid-auto-columns: minmax(0, 1fr);
   }
 
   .announcement-bar__slide {
@@ -89,6 +88,8 @@
       grid-auto-columns: 100%;
       scroll-snap-type: x mandatory;
       scrollbar-width: none;
+      overflow-x: auto;
+      overflow-y: hidden;
     }
 
     .announcement-bar__slide {
