@@ -70,6 +70,9 @@
 
 ### Contact Us · 2026-11-26
 
+- **黑白 UI 更新（同日）**：桌面左栏放标题、客服邮箱和帮助链接，右栏使用独立的浅灰表单面板。移动端先提供邮箱与追踪入口，发送按钮占满表单宽度。帮助链接使用整行点击区和线框圆箭头，表单内的辅助链接使用细下划线。键盘焦点有独立描边，系统开启减少动态效果时取消按钮过渡。
+- 编辑器的 **Form → Form heading** 可修改表单小标题，默认 **Write to us**，清空即可隐藏。已添加区块的页面刷新即可使用新版。此次仅精确推送 `sections/mv-contact-support.liquid` 和 `assets/mv-contact-support.css`；CLI 确认当前 live 上传完成，Theme Check 对本次文件零问题，前台视觉由商家复核。
+
 - 打开[联系页主题编辑器](https://6icwx6-yv.myshopify.com/admin/themes/167137378374/editor?previewPath=%2Fpages%2Fcontact)，确认当前为联系页专用模板。选择 **Add section → Forms → Contact support**，隐藏旧联系表单和展示旧标题／地址的区块，再保存。若沿用其他 H1，可将新标题的 **Heading level** 设为 H2。页面地址及原有页脚入口继续使用。
 - 区块设置可编辑标题、导语、五个分类名称与提示、字段标签、按钮及成功文案。已有订单和退货共用订单号字段；活动日期咨询展开款式链接、日期、目的地。除邮箱与留言外均可选填。切换分类保留已输入的值，隐藏字段不参与提交。未启用 JavaScript 时，顾客仍可选择主题并在留言里填写相关信息。
 - **Help links and business details** 可维护邮箱、电话、办公地址及追踪／配送／退货三个链接。退货照片提示和通用邮箱复用同一地址；办公地址在折叠项内。编辑邮箱只更新顾客可点击的地址；表单仍经 Shopify 原生 contact 表单投递。

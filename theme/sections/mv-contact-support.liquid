@@ -7,19 +7,26 @@
   assign tracking_url = config.tracking_url | default: '/apps/ordertracker'
   assign shipping_url = config.shipping_url | default: '/pages/processing-shipping'
   assign returns_url = config.returns_url | default: shop.refund_policy.url | default: '/policies/refund-policy'
+  assign form_heading_tag = 'h2'
+  if config.heading_level == 'h2'
+    assign form_heading_tag = 'h3'
+  endif
 -%}
 
 {{ 'mv-contact-support.css' | asset_url | stylesheet_tag }}
 <script src="{{ 'mv-contact-support.js' | asset_url }}" type="module" fetchpriority="low"></script>
 
+{%- capture arrow -%}
+  <span class="mv-contact__arrow" aria-hidden="true">{{- 'icon-arrow.svg' | inline_asset_content -}}</span>
+{%- endcapture -%}
 {%- capture tracking_link -%}
   {%- if config.tracking_label != blank -%}
-    <a class="mv-contact__link" href="{{ tracking_url | escape }}">{{ config.tracking_label | escape }} <span aria-hidden="true">→</span></a>
+    <a class="mv-contact__link" href="{{ tracking_url | escape }}"><span>{{ config.tracking_label | escape }}</span>{{ arrow }}</a>
   {%- endif -%}
 {%- endcapture -%}
 {%- capture returns_link -%}
   {%- if config.returns_label != blank -%}
-    <a class="mv-contact__link" href="{{ returns_url | escape }}">{{ config.returns_label | escape }} <span aria-hidden="true">→</span></a>
+    <a class="mv-contact__link" href="{{ returns_url | escape }}"><span>{{ config.returns_label | escape }}</span>{{ arrow }}</a>
   {%- endif -%}
 {%- endcapture -%}
 {%- capture email_link -%}
@@ -28,15 +35,14 @@
   {%- endif -%}
 {%- endcapture -%}
 
-<div class="section-background"></div>
+<div class="section-background mv-contact__background"></div>
 <div class="section page-width-normal">
   <div class="mv-contact spacing-style" style="{% render 'spacing-style', settings: config %}">
-    <header class="mv-contact__header">
-      <{{ config.heading_level }} class="mv-contact__title h2">{{ config.heading | escape }}</{{ config.heading_level }}>
-      {% if config.intro != blank %}<p>{{ config.intro | escape }}</p>{% endif %}
-    </header>
-
     <div class="mv-contact__layout">
+      <header class="mv-contact__header">
+        <{{ config.heading_level }} class="mv-contact__title">{{ config.heading | escape }}</{{ config.heading_level }}>
+        {% if config.intro != blank %}<p>{{ config.intro | escape }}</p>{% endif %}
+      </header>
       <div class="mv-contact__primary">
         {{ email_link }}
         {{ tracking_link }}
@@ -54,6 +60,9 @@
           {%- if form.posted_successfully? and form_matches -%}
             <p class="mv-contact__notice" role="status" tabindex="-1" autofocus>{{ config.success_message | escape }}</p>
           {%- else -%}
+            {% if config.form_heading != blank %}
+              <{{ form_heading_tag }} class="mv-contact__form-heading">{{ config.form_heading | escape }}</{{ form_heading_tag }}>
+            {% endif %}
             {% if form.errors and form_matches %}
               <div class="mv-contact__notice" id="{{ form_id }}-errors" role="alert" tabindex="-1" autofocus>
                 {{ form.errors | default_errors }}
@@ -62,19 +71,22 @@
 
             <div class="mv-contact__field">
               <label for="{{ form_id }}-topic">{{ config.topic_label | escape }}</label>
-              <select id="{{ form_id }}-topic" name="contact[Topic]" data-contact-topic>
-                <option value="">{{ config.topic_prompt | escape }}</option>
-                {% for topic in topics %}
-                  {% liquid
-                    assign label_key = 'topic_' | append: topic
-                    assign hint_key = 'hint_' | append: topic
-                    assign topic_label = config[label_key]
-                  %}
-                  {% if topic_label != blank %}
-                    <option value="{{ topic_label | escape }}" data-topic="{{ topic }}" data-hint="{{ config[hint_key] | escape }}"{% if form.Topic == topic_label %} selected{% endif %}>{{ topic_label | escape }}</option>
-                  {% endif %}
-                {% endfor %}
-              </select>
+              <div class="mv-contact__select">
+                <select id="{{ form_id }}-topic" name="contact[Topic]" data-contact-topic>
+                  <option value="">{{ config.topic_prompt | escape }}</option>
+                  {% for topic in topics %}
+                    {% liquid
+                      assign label_key = 'topic_' | append: topic
+                      assign hint_key = 'hint_' | append: topic
+                      assign topic_label = config[label_key]
+                    %}
+                    {% if topic_label != blank %}
+                      <option value="{{ topic_label | escape }}" data-topic="{{ topic }}" data-hint="{{ config[hint_key] | escape }}"{% if form.Topic == topic_label %} selected{% endif %}>{{ topic_label | escape }}</option>
+                    {% endif %}
+                  {% endfor %}
+                </select>
+                {{- 'icon-caret.svg' | inline_asset_content -}}
+              </div>
             </div>
 
             <div class="mv-contact__field">
@@ -123,7 +135,7 @@
               {% if config.return_note != blank %}<p>{{ config.return_note | escape }}</p>{% endif %}
               {{ returns_link }}
             </div>
-            <button type="submit" class="button">{{ config.submit_label | escape }}</button>
+            <button type="submit" class="button mv-contact__submit"><span>{{ config.submit_label | escape }}</span>{{ arrow }}</button>
           {%- endif -%}
         {%- endform -%}
       </mv-contact-support>
@@ -131,7 +143,7 @@
       {% if config.shipping_label != blank or returns_link != blank %}
         <div class="mv-contact__resources">
           {% if config.shipping_label != blank %}
-            <a class="mv-contact__link" href="{{ shipping_url | escape }}">{{ config.shipping_label | escape }} <span aria-hidden="true">→</span></a>
+            <a class="mv-contact__link" href="{{ shipping_url | escape }}"><span>{{ config.shipping_label | escape }}</span>{{ arrow }}</a>
           {% endif %}
           {{ returns_link }}
         </div>
@@ -172,6 +184,7 @@
     { "type": "text", "id": "phone", "label": "Business phone", "default": "+86 153 8593 9408" },
     { "type": "textarea", "id": "address", "label": "Business contact address", "default": "4th Floor, Building 1122\nKangqiao Xiaozhen, Pingqiao Industrial Park\nYu'an District, Lu'an\nAnhui, China" },
     { "type": "header", "content": "Form" },
+    { "type": "text", "id": "form_heading", "label": "Form heading", "default": "Write to us" },
     { "type": "text", "id": "topic_label", "label": "Topic field label", "default": "What can we help you with?" },
     { "type": "text", "id": "topic_prompt", "label": "Topic placeholder", "default": "Choose a topic" },
     { "type": "text", "id": "email_label", "label": "Email field label", "default": "Email address" },
