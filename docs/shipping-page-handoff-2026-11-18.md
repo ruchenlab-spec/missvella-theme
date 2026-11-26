@@ -1,5 +1,15 @@
 # Processing & Shipping：内容大纲与实施交接
 
+## 正式运输政策逐国时效表 · 2026-11-26
+
+[正式政策第 2、3 节英文替换稿（含逐国时效表）](shipping-policy-country-transit.html)。在 Shopify 后台 **Settings → Policies → Shipping policy** 打开正文，将第 2 节 Shipping Methods & Rates 标题起、到第 4 节 Order Confirmation & Tracking 标题前的内容替换为此稿并保存。可以复制打开文件后显示的正文和表格，也可以在 HTML 模式粘贴片段源码。[线上正式政策](https://missvella.com/policies/shipping-policy)待商家发布。
+
+- **国家范围。** Shopify Storefront API 的 `localization.availableCountries` 返回 28 个国家和地区，与[店铺前台](https://missvella.com/)的地区选择器一致。按商家要求，顾客表格仅列出其中有顺丰 CD 时效的 25 个目的地，按前台英文名排序，每地一行。中国香港、以色列和韩国在原表中缺少时效，已从顾客稿省略。具体邮编可选的运输服务由结账决定。
+- **时效来源。** 桌面文件《时效.xlsx》，工作表「国际电商专递-CD」，2026-11-19 生效。按 E 列目的地代码核对 F 列参考时效。澳大利亚四个分区均为 7–10 个工作日，东马与西马均为 4–7 天，各合并为一个目的地。日本、马来西亚、新加坡所在分表的时效列仅标「参考时效」，英文保留 days，工作日口径待确认。其他有数据的目的地按原表写 business days。
+- **政策衔接。** 商家已确认顺丰 CD 对应 Standard Shipping。本次通过 Storefront API 的 `shop.shippingPolicy.body` 核对正式正文。替换稿将第 2 节原有的 Standard 统一 4–10 个工作日改为按目的地查表；第 3 节原有的 Standard 总时长 6–15 个工作日改为处理 2–5 个工作日加对应运输时间，并给出美国 9–17 个工作日的合计示例。加急时效、USD 运费和折后商品小计满 $180 免标准运费继续采用线上政策口径。
+
+## 2026-11-18 导读页交接记录
+
 核对日期：2026-11-18（Asia/Shanghai）。任务范围：页脚优化第 1 项。
 
 ## 来源与核对结果
