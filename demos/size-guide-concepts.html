@@ -9,27 +9,27 @@
 <body>
   <div class="preview-bar" lang="zh-CN" hidden>
     <div class="preview-bar-inner" role="group" aria-label="切换设计方案">
-      <button type="button" data-concept="chart" aria-pressed="true"><span>A</span> 尺码表优先</button>
+      <button type="button" data-concept="chart" aria-pressed="false"><span>A</span> 尺码表优先</button>
       <button type="button" data-concept="image" aria-pressed="false"><span>B</span> 量体图优先</button>
-      <button type="button" data-concept="tabs" aria-pressed="false"><span>C</span> 分页切换</button>
+      <button type="button" data-concept="tabs" aria-pressed="true"><span>C</span> 分页切换</button>
     </div>
   </div>
   <header class="masthead"><span>Missvella</span></header>
-  <main class="guide" data-layout="chart">
+  <main class="guide" data-layout="tabs">
     <header class="intro">
       <h1>Size <em>guide</em></h1>
       <p>Measure your bust, waist and hips, then compare your measurements with our size chart.</p>
-      <nav class="jump-links" aria-label="Size guide sections">
+      <nav class="jump-links" aria-label="Size guide sections" hidden>
         <a href="#chart">Size chart <span aria-hidden="true">↓</span></a>
         <a href="#measure">How to measure <span aria-hidden="true">↓</span></a>
       </nav>
-      <div class="section-switch" role="group" aria-label="Size guide sections" hidden>
-        <button type="button" data-section="chart" aria-controls="chart" aria-pressed="true">Size chart</button>
-        <button type="button" data-section="measure" aria-controls="measure" aria-pressed="false">How to measure</button>
+      <div class="section-switch" role="tablist" aria-label="Size guide sections" aria-orientation="vertical" data-active="chart">
+        <button type="button" id="chart-tab" data-section="chart" role="tab" aria-controls="chart" aria-selected="true">Size chart</button>
+        <button type="button" id="measure-tab" data-section="measure" role="tab" aria-controls="measure" aria-selected="false" tabindex="-1">How to measure</button>
       </div>
     </header>
 
-    <section class="chart" id="chart" aria-labelledby="chart-title" tabindex="-1">
+    <section class="chart" id="chart" role="tabpanel" aria-labelledby="chart-tab" tabindex="0">
       <div class="chart-heading">
         <div>
           <h2 id="chart-title">Adult size chart</h2>
@@ -72,7 +72,7 @@
       </table>
     </section>
 
-    <section class="measure" id="measure" aria-labelledby="measure-title" tabindex="-1">
+    <section class="measure" id="measure" role="tabpanel" aria-labelledby="measure-tab" tabindex="0" hidden>
       <h2 id="measure-title">How to measure</h2>
       <figure>
         <img src="size-guide-assets/how-to-measure.png"
@@ -86,21 +86,31 @@
     const guide = document.querySelector('.guide');
     const previewBar = document.querySelector('.preview-bar');
     const conceptButtons = document.querySelectorAll('[data-concept]');
-    const sectionButtons = document.querySelectorAll('[data-section]');
+    const sectionButtons = [...document.querySelectorAll('[data-section]')];
     const jumpLinks = document.querySelector('.jump-links');
     const sectionSwitch = document.querySelector('.section-switch');
     const chart = document.getElementById('chart');
     const measure = document.getElementById('measure');
-    let selectedSection = 'chart';
+    const panels = { chart, measure };
+    const horizontalTabs = window.matchMedia('(max-width: 740px)');
+    let selectedSection = window.location.hash === '#measure' ? 'measure' : 'chart';
 
     function updateSections() {
       const useSwitch = guide.dataset.layout === 'tabs';
       jumpLinks.hidden = useSwitch;
       sectionSwitch.hidden = !useSwitch;
-      chart.hidden = useSwitch && selectedSection !== 'chart';
-      measure.hidden = useSwitch && selectedSection !== 'measure';
+      sectionSwitch.dataset.active = selectedSection;
       for (const button of sectionButtons) {
-        button.setAttribute('aria-pressed', String(button.dataset.section === selectedSection));
+        const key = button.dataset.section;
+        const active = key === selectedSection;
+        const panel = panels[key];
+        button.setAttribute('aria-selected', String(active));
+        button.tabIndex = active ? 0 : -1;
+        panel.hidden = useSwitch && !active;
+        panel.tabIndex = useSwitch ? 0 : -1;
+        panel.setAttribute('aria-labelledby', useSwitch ? button.id : key + '-title');
+        if (useSwitch) panel.setAttribute('role', 'tabpanel');
+        else panel.removeAttribute('role');
       }
     }
 
@@ -122,6 +132,26 @@
         updateSections();
       });
     }
+    sectionSwitch.addEventListener('keydown', (event) => {
+      const first = sectionButtons[0];
+      const last = sectionButtons[sectionButtons.length - 1];
+      const forward = horizontalTabs.matches ? 'ArrowRight' : 'ArrowDown';
+      const backward = horizontalTabs.matches ? 'ArrowLeft' : 'ArrowUp';
+      let next;
+      if (event.key === 'Home') next = first;
+      else if (event.key === 'End') next = last;
+      else if (event.key === forward || event.key === backward) next = event.target === first ? last : first;
+      else return;
+      event.preventDefault();
+      next.click();
+      next.focus();
+    });
+    function updateTabOrientation() {
+      sectionSwitch.setAttribute('aria-orientation', horizontalTabs.matches ? 'horizontal' : 'vertical');
+    }
+    horizontalTabs.addEventListener('change', updateTabOrientation);
+    updateTabOrientation();
+    updateSections();
     previewBar.hidden = false;
 
     const unitButtons = document.querySelectorAll('[data-unit]');
