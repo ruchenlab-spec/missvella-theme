@@ -215,6 +215,7 @@ live 主题更新 → 编辑器刷新可见 → 前台即时生效
 
 - 页头公告栏由 `sections/header-announcements.liquid`、`blocks/_announcement.liquid` 和 `assets/announcement-bar.js` 实现。桌面端（≥750px）按编辑器顺序单行等宽分列，列间短竖线使用公告栏的「公告之间竖线颜色」独立设置（默认灰色），与文字颜色分离。手机端按「滚动速度」设置逐条上移淡入，不显示翻页箭头。系统开启「减少动态效果」时，手机端可横向滑动切换公告。空文案跳过，单条公告静态居中。
 - 公告区块的「Click action」可选普通链接、点击复制优惠码、打开邮箱订阅弹窗。复制和订阅动作标签前分别显示复制、邮件图标。「Discount code to copy」只影响剪贴板内容。订阅弹窗复用主题的 `dialog-component`、`dialog-modal`、弹窗配色和表单控件变量，提交 Shopify 原生 customer newsletter 表单以保存订阅状态。折扣规则及优惠码发送流程由商家在 Shopify 后台配置，主题代码不会自动发放折扣。现有区块默认保持普通链接模式，实例文案和动作由商家在编辑器设置。
+- `sections/mv-email-signup.liquid` 是可在页面编辑器添加的独立订阅分区。示例预设采用左右分栏、英文字案和无图时的品牌占位画面；商家可选配图、切换桌面图像位置、编辑文案与颜色。手机端图片置顶。表单提交 Shopify customer newsletter，反馈成功或错误；不会自动创建折扣或添加到任何现有页面实例。
 - `sections/footer-utilities.liquid` 的移动端（≤749px）使用两列居中 Grid，让政策和版权按商家区块顺序并排显示，横向间距不超过 16px；社交图标跨两列排到下一行，只有单个区块时跨两列居中。桌面仍保留原有一／二／三块动态网格，政策弹层及区块内容不变。
 - `blocks/social-links.liquid` 的 13 个 URL 设置均无账号默认值；字段说明使用 `your-account` 通用占位示例，空白链接不输出对应图标。示例仅为编辑器提示，不写入预设或链接值。若已有实例仍显示旧品牌地址，属于线上已保存内容，由商家在编辑器清空／替换；不得推送模板或 settings_data 做迁移。2026-11-07 已检查 schema 和渲染范围并精确上传该 block。
 
