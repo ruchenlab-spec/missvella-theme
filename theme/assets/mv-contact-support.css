@@ -211,6 +211,28 @@
   color: var(--contact-muted);
 }
 
+.mv-contact__domains {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.375rem;
+}
+
+.mv-contact__domains button {
+  min-height: var(--minimum-touch-target, 44px);
+  padding: 0.375rem 0.75rem;
+  border: 1px solid var(--contact-rule);
+  border-radius: 0;
+  background: var(--color-background);
+  color: var(--contact-ink);
+  font: inherit;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.mv-contact__domains button:is(:hover, :focus-visible) {
+  border-color: var(--contact-ink);
+}
+
 .mv-contact__field :is(select, input, textarea) {
   box-sizing: border-box;
   width: 100%;

@@ -97,11 +97,20 @@
               </div>
             </div>
 
-            <div class="mv-contact__field">
-              <label for="{{ form_id }}-email">{{ config.email_label | escape }} <span aria-hidden="true">*</span></label>
-              <input type="email" id="{{ form_id }}-email" name="contact[email]" required autocomplete="email" autocapitalize="off" spellcheck="false"
+            <div class="mv-contact__field" data-contact-email>
+              <label id="{{ form_id }}-email-label" for="{{ form_id }}-email">{{ config.email_label | escape }} <span aria-hidden="true">*</span></label>
+              <input type="email" id="{{ form_id }}-email" name="contact[email]" required autocomplete="email" autocapitalize="off" spellcheck="false" aria-controls="{{ form_id }}-domains"
                 value="{{ form.email | default: customer.email | escape }}"
                 {% if form_matches and form.errors contains 'email' %}aria-invalid="true" aria-describedby="{{ form_id }}-errors"{% endif %}>
+              {% assign email_domains = config.email_domains | downcase | split: ',' %}
+              <div class="mv-contact__domains" id="{{ form_id }}-domains" role="group" aria-labelledby="{{ form_id }}-email-label" hidden>
+                {% for entry in email_domains %}
+                  {% assign domain = entry | strip %}
+                  {% if domain != blank %}
+                    <button type="button" value="{{ domain | escape }}" dir="ltr">@{{ domain | escape }}</button>
+                  {% endif %}
+                {% endfor %}
+              </div>
             </div>
 
             <fieldset class="mv-contact__event" data-topics="event" disabled hidden>
@@ -202,6 +211,7 @@
     { "type": "text", "id": "topic_label", "label": "Topic field label", "default": "What can we help you with?" },
     { "type": "text", "id": "topic_prompt", "label": "Topic placeholder", "default": "Choose a topic" },
     { "type": "text", "id": "email_label", "label": "Email field label", "default": "Email address" },
+    { "type": "text", "id": "email_domains", "label": "Suggested email domains", "default": "gmail.com, outlook.com, yahoo.com, hotmail.com, icloud.com, mail.com", "info": "Separate domains with commas and omit the @ sign. Leave blank to turn off suggestions." },
     { "type": "text", "id": "message_label", "label": "Message field label", "default": "Message" },
     { "type": "text", "id": "submit_label", "label": "Send button", "default": "Send message" },
     { "type": "textarea", "id": "success_message", "label": "Confirmation after sending", "default": "Thanks for reaching out. We've received your message and will reply by email." },
