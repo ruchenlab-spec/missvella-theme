@@ -1,6 +1,8 @@
 mv-signup-component, .shopify-section.mv-signup-section { display: contents; }
 
 dialog.mv-letter {
+  --mv-letter-heading-font: "Bodoni MT", Didot, "Times New Roman", serif;
+  --mv-letter-action-size: clamp(22px, 4vw, 28px);
   box-sizing: border-box;
   width: min(31rem, calc(100% - 24px));
   max-width: none;
@@ -81,7 +83,7 @@ dialog.mv-letter::backdrop { background: rgb(24 19 20 / 58%); }
 .mv-letter .mv-letter__title {
   margin: 0;
   color: var(--mv-wine);
-  font: italic 400 clamp(44px, 7vw, 67px)/.99 "Bodoni MT", Didot, "Times New Roman", serif;
+  font: italic 400 clamp(44px, 7vw, 67px)/.99 var(--mv-letter-heading-font);
   letter-spacing: -.055em;
   text-transform: none;
   text-wrap: balance;
@@ -112,7 +114,11 @@ dialog.mv-letter::backdrop { background: rgb(24 19 20 / 58%); }
 .mv-letter__offer, .mv-letter__stub { display: grid; align-content: center; }
 .mv-letter__offer { gap: 4px; padding: 12px clamp(10px, 2.5vw, 18px); }
 .mv-letter__offer-title { font-size: 10px; letter-spacing: .09em; text-transform: uppercase; }
-.mv-letter__offer strong { font: 400 clamp(21px, 4vw, 30px)/1.12 "Bodoni MT", Didot, Georgia, serif; letter-spacing: .045em; }
+.mv-letter__offer strong {
+  font: 400 var(--mv-letter-action-size)/1.12 "Times New Roman", Times, serif;
+  font-variant-numeric: lining-nums;
+  letter-spacing: .045em;
+}
 .mv-letter__stub {
   gap: 4px;
   border-inline-start: 1px dashed currentColor;
@@ -142,7 +148,7 @@ dialog.mv-letter::backdrop { background: rgb(24 19 20 / 58%); }
   border-color: var(--mv-wine);
   background: var(--mv-wine);
   color: var(--mv-on-wine);
-  font-weight: 600;
+  font: italic 400 var(--mv-letter-action-size)/1.12 var(--mv-letter-heading-font);
   cursor: pointer;
 }
 .mv-letter__submit span { position: absolute; inset-inline-end: 15px; }
@@ -150,6 +156,38 @@ dialog.mv-letter::backdrop { background: rgb(24 19 20 / 58%); }
 .mv-letter :focus-visible { outline: 2px solid var(--mv-wine); outline-offset: 3px; }
 .mv-letter .mv-letter__close:focus-visible { outline-color: white; outline-offset: -4px; }
 .mv-letter [hidden] { display: none; }
-@media (prefers-reduced-motion: reduce) {
-  dialog.mv-letter[open], dialog.mv-letter[open]::backdrop { animation: none; transition: none; }
+dialog.mv-letter[open], dialog.mv-letter[open]::backdrop {
+  animation: none;
+  transition: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  dialog.mv-letter[open] {
+    transition: opacity 240ms ease-out, transform 380ms cubic-bezier(.2,.8,.2,1);
+  }
+  dialog.mv-letter[open]::backdrop { transition: opacity 240ms ease-out; }
+  dialog.mv-letter[open] .mv-letter__paper {
+    transform-origin: 50% 0;
+    animation: mv-letter-settle 420ms cubic-bezier(.22,.72,.24,1);
+  }
+  @starting-style {
+    dialog.mv-letter[open] { opacity: 0; transform: translateY(12px) scale(.98); }
+    dialog.mv-letter[open]::backdrop { opacity: 0; }
+  }
+  dialog.mv-letter[open].dialog-closing {
+    opacity: 0;
+    transform: translateY(5px) scale(.99);
+    transition-duration: 160ms;
+    transition-timing-function: ease-in;
+  }
+  dialog.mv-letter[open].dialog-closing::backdrop {
+    opacity: 0;
+    transition-duration: 150ms;
+  }
+}
+
+@keyframes mv-letter-settle {
+  from { transform: translateY(-5px) rotate(-1deg); }
+  72% { transform: translateY(1px) rotate(.15deg); }
+  to { transform: none; }
 }

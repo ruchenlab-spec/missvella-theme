@@ -48,8 +48,16 @@
     popup.showModal();
   }
   launch.onclick = openDemo;
-  popup.querySelector('.mv-letter__close').onclick = () => popup.close();
-  popup.addEventListener('click', event => { if (event.target === popup) popup.close(); });
+  async function closeDemo() {
+    if (!popup.open || popup.classList.contains('dialog-closing')) return;
+    popup.classList.add('dialog-closing');
+    await Promise.allSettled(popup.getAnimations().map(animation => animation.finished));
+    popup.close();
+    popup.classList.remove('dialog-closing');
+  }
+  popup.querySelector('.mv-letter__close').onclick = closeDemo;
+  popup.addEventListener('click', event => { if (event.target === popup) closeDemo(); });
+  popup.addEventListener('cancel', event => { event.preventDefault(); closeDemo(); });
   form.onsubmit = event => { event.preventDefault(); form.querySelector('[role=status]').hidden = false; };
   ticket.onclick = async () => {
     let copied = false;
