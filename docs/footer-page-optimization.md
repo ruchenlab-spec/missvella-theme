@@ -9,7 +9,7 @@
 | 顺序 | 页脚菜单项 | 目标 | 依赖 | 进度 |
 |---|---|---|---|---|
 | 1 | Processing & Shipping | 导读 Page `/pages/processing-shipping`（待商家创建）＋[正式运输政策](https://missvella.com/policies/shipping-policy) | 当前线上运输政策 | 代码已推送线上，待商家配置 |
-| 2 | Returns & Refunds | [退货与退款政策](https://missvella.com/policies/refund-policy) | 当前线上退款政策 | 待开始 |
+| 2 | Returns & Refunds | [退货与退款政策](https://missvella.com/policies/refund-policy) | 当前线上退款政策 | 2026-11-26 已发布顶部速查表、仓库收件人和 48 小时退款处理时限 |
 | 3 | FAQs | [FAQ](https://missvella.com/pages/faqs) | 第 1、2 项的最终政策口径和现有英文草案 | 43 问草案已完成，待核对和制作预设 |
 | 4 | Size Guide | [尺码指南](https://missvella.com/pages/size-guide) | 当前尺码表和商品页入口 | 待开始 |
 | 5 | How to Measure | [尺码指南里的测量标签](https://missvella.com/pages/size-guide) | 第 4 项确认的尺码页结构，待接入直达链接 | 待开始 |
@@ -32,6 +32,8 @@
 > 读取 `docs/footer-page-optimization.md`，本对话只做第 2 项。核对线上退货与退款政策，整理可直接填写的英文稿。把申请期限、收到指引后的寄回期限、商品状态、寄回地点和运费承担方放在前面。分别写清普通退货与瑕疵、破损或错发的处理方式，补齐退款方式、处理时间、换货规则和申请所需资料。保留当前政策中适用的消费者权利说明，并输出供 FAQ 引用的最终口径。
 
 验收时，顾客能区分两个期限，知道何时联系 `hello@missvella.com`、该用哪个退货地址，以及谁承担运费。页脚连到 `/policies/refund-policy`。
+
+2026-11-26 已通过 Shopify Admin API 更新正式退款政策，并通过 Storefront API 回读确认。顶部速查表与正文第 1、3、6 节均写明，收到并检查退件后，已批准的退款在 48 小时内处理，银行或支付机构入账另需时间。收到货后 15 个自然日内可申请退货；因个人喜好退货由买家付寄回运费，原始运费原则上不退。因破损、质量问题、缺陷或错发退货，Missvella 承担寄回运费并退还原始运费。顾客可选补发或全额退款。退货收件人统一为 Missvella。
 
 ### 3 FAQs
 
