@@ -29,13 +29,25 @@
     {% if click_action == 'copy' and block_settings.copy_code != blank %}
       <button class="announcement-bar__action" type="button" data-code="{{ block_settings.copy_code | escape }}" on:click="/copyCode">
         <span>{{ block_settings.text }}</span>
-        <span class="announcement-bar__action-label" data-copy-label aria-hidden="true">Copy code</span>
+        <span class="announcement-bar__action-prompt">
+          <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false">
+            <rect x="7" y="7" width="10" height="10" rx="1.5" stroke="currentColor" stroke-width="1.5"></rect>
+            <path d="M13 7V5a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"></path>
+          </svg>
+          <span class="announcement-bar__action-label" data-copy-label>Copy code</span>
+        </span>
         <span class="visually-hidden" role="status" data-copy-status></span>
       </button>
     {% elsif click_action == 'subscribe' %}
       <button class="announcement-bar__action" type="button" on:click="/openSignup">
         <span>{{ block_settings.text }}</span>
-        <span class="announcement-bar__action-label" aria-hidden="true">Sign up</span>
+        <span class="announcement-bar__action-prompt">
+          <svg viewBox="0 0 20 20" fill="none" aria-hidden="true" focusable="false">
+            <rect x="2.5" y="4.5" width="15" height="11" rx="1.5" stroke="currentColor" stroke-width="1.5"></rect>
+            <path d="m3.5 6 6.5 5 6.5-5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>
+          <span class="announcement-bar__action-label">Sign up</span>
+        </span>
       </button>
     {% else %}
       <p class="announcement-bar__text">{{ block.settings.text }}</p>

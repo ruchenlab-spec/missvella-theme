@@ -54,7 +54,7 @@ export class AnnouncementBar extends Component {
 
   #syncLayout = () => {
     const slides = this.refs.slides ?? [];
-    const rotating = !mediaQueryLarge.matches && slides.length > 1;
+    const rotating = !mediaQueryLarge.matches && !reducedMotion.matches && slides.length > 1;
     this.toggleAttribute('data-rotating', rotating);
     this.#cancelAnimations();
 
@@ -83,11 +83,7 @@ export class AnnouncementBar extends Component {
   };
 
   next() {
-    this.#step(1);
-  }
-
-  previous() {
-    this.#step(-1);
+    this.#step();
   }
 
   async copyCode(event) {
@@ -136,12 +132,11 @@ export class AnnouncementBar extends Component {
     this.refs.signupDialog.close();
   }
 
-  /** @param {number} direction */
-  #step(direction) {
+  #step() {
     const slides = this.refs.slides;
     if (!this.hasAttribute('data-rotating') || !slides || slides.length < 2) return;
     const outgoing = slides[this.#current];
-    this.#current = (this.#current + direction + slides.length) % slides.length;
+    this.#current = (this.#current + 1) % slides.length;
     const incoming = slides[this.#current];
     this.#cancelAnimations();
     outgoing.inert = true;
@@ -154,10 +149,10 @@ export class AnnouncementBar extends Component {
     this.#animations = [
       outgoing.animate([
         { transform: 'translateY(0)', opacity: 1, visibility: 'visible' },
-        { transform: `translateY(${-direction * 85}%)`, opacity: 0, visibility: 'visible' },
+        { transform: 'translateY(-85%)', opacity: 0, visibility: 'visible' },
       ], { duration: 280, easing: 'cubic-bezier(.45, 0, .8, .45)' }),
       incoming.animate([
-        { transform: `translateY(${direction * 100}%)`, opacity: 0 },
+        { transform: 'translateY(100%)', opacity: 0 },
         { transform: 'translateY(0)', opacity: 1 },
       ], { duration: 480, delay: 80, fill: 'backwards', easing: 'cubic-bezier(.22, 1, .36, 1)' }),
     ];

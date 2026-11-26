@@ -11,10 +11,6 @@
     class="announcement-bar__slider"
     autoplay="{{ section.settings.speed }}"
   >
-    {% if section.blocks.size > 1 %}
-      {% render 'slideshow-arrows', icon_style: 'chevron' %}
-    {% endif %}
-
     <div class="announcement-bar__slides" ref="track">
       {% content_for 'blocks' %}
     </div>
@@ -73,7 +69,7 @@
     inset-inline-start: 0;
     top: 50%;
     height: min(1em, 75%);
-    border-inline-start: 1px solid rgb(var(--color-foreground-rgb) / 25%);
+    border-inline-start: 1px solid currentColor;
     transform: translateY(-50%);
   }
 
@@ -110,6 +106,19 @@
   .announcement-bar__action:focus-visible .announcement-bar__action-label {
     text-decoration: underline;
     text-underline-offset: 0.15em;
+  }
+
+  .announcement-bar__action-prompt {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3em;
+    white-space: nowrap;
+  }
+
+  .announcement-bar__action-prompt svg {
+    width: 1em;
+    height: 1em;
+    flex: none;
   }
 
   .announcement-bar__action:focus-visible {
@@ -187,10 +196,6 @@
     margin: 0;
   }
 
-  .announcement-bar__slider slideshow-arrows {
-    display: none;
-  }
-
   @media (width < 750px) {
     .announcement-bar__slider {
       grid-column: 1 / -1;
@@ -214,45 +219,18 @@
 
     .announcement-bar__slider[data-rotating] .announcement-bar__slides {
       grid-template-columns: minmax(0, 1fr);
-      margin-inline: var(--button-size);
       overflow: clip;
     }
 
     .announcement-bar__slider[data-rotating] .announcement-bar__slide {
       grid-area: 1 / 1;
-      padding: 0.15em 0.25rem;
+      padding: 0.15em 1rem;
     }
 
     .announcement-bar__slide[aria-hidden='true'] {
       visibility: hidden;
     }
 
-    .announcement-bar__slider[data-rotating] slideshow-arrows {
-      display: flex;
-      padding: 0;
-      mix-blend-mode: normal;
-    }
-
-    .announcement-bar__slider .slideshow-control {
-      display: grid;
-      place-items: center;
-      width: var(--button-size);
-      height: var(--button-size);
-      padding: 0;
-      color: var(--color-foreground);
-      opacity: 1;
-      animation: none;
-    }
-
-    .announcement-bar__slider .slideshow-control .icon-caret {
-      width: var(--icon-size-xs);
-      height: var(--icon-size-xs);
-      rotate: 0deg;
-    }
-
-    .announcement-bar__slider .slideshow-control--previous .icon-caret {
-      rotate: 180deg;
-    }
   }
 {% endstylesheet %}
 
