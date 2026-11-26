@@ -16,6 +16,7 @@
 | 6 | Our Story | [About Us](https://missvella.com/pages/about-us) | 已有内容方案与实际商品图 | 方案已完成，待确认素材和落地 |
 | 7 | My Account | [Shopify 客户账户入口](https://missvella.com/account) | 验收订单视图时使用已授权的测试账户 | 已确认入口跳转，待配置和验收 |
 | 补充 | Color & Fabric Guide | `/pages/color-fabric-guide`（待商家创建与关联） | 实拍色卡、面料／裙装图及确认后的内容 | Color Guide / Fabric Guide 代码已上线，待商家配置 |
+| 补充 | Contact Us | [联系页](https://missvella.com/pages/contact) | 现有联系页模板、客服邮箱、追踪和政策入口 | 2026-11-26 已上传 Contact support 区块，待商家添加并保存 |
 
 进度表里的链接用于打开当前页面。第 5 项验收通过后，补上可直接打开测量标签的完整地址。
 
@@ -66,6 +67,13 @@
 验收时，页脚能进入店铺账户登录流程。登录及订单视图需使用已授权的测试账户验证，通过后再登记完整验收。页脚使用 `/account`，由 Shopify 处理跳转。
 
 ## 对话交接和上线
+
+### Contact Us · 2026-11-26
+
+- 打开[联系页主题编辑器](https://6icwx6-yv.myshopify.com/admin/themes/167137378374/editor?previewPath=%2Fpages%2Fcontact)，确认当前为联系页专用模板。选择 **Add section → Forms → Contact support**，隐藏旧联系表单和展示旧标题／地址的区块，再保存。若沿用其他 H1，可将新标题的 **Heading level** 设为 H2。页面地址及原有页脚入口继续使用。
+- 区块设置可编辑标题、导语、五个分类名称与提示、字段标签、按钮及成功文案。已有订单和退货共用订单号字段；活动日期咨询展开款式链接、日期、目的地。除邮箱与留言外均可选填。切换分类保留已输入的值，隐藏字段不参与提交。未启用 JavaScript 时，顾客仍可选择主题并在留言里填写相关信息。
+- **Help links and business details** 可维护邮箱、电话、办公地址及追踪／配送／退货三个链接。退货照片提示和通用邮箱复用同一地址；办公地址在折叠项内。编辑邮箱只更新顾客可点击的地址；表单仍经 Shopify 原生 contact 表单投递。
+- 本次使用三个精确的 `--only` 参数和 `--nodelete` 上传 `sections/mv-contact-support.liquid`、`assets/mv-contact-support.css`、`assets/mv-contact-support.js`。Shopify CLI 返回 **Theme upload complete**，目标为 live 主题 `167137378374`。Theme Check 对本次文件零报错、零警告；全主题维持已有 32 个错误、21 个警告。分类切换、隐藏字段的禁用状态与 schema 引用已本地检查。客户收件体验与实际邮件投递尚待商家装配后验收。
 
 ### Color & Fabric Guide 补充项 · 2026-11-19
 

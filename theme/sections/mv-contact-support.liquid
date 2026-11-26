@@ -1,0 +1,209 @@
+{%- liquid
+  assign config = section.settings
+  assign form_id = 'ContactSupport-' | append: section.id
+  assign topics = 'dress,event,order,return,other' | split: ','
+  assign email = config.support_email | strip
+  assign phone = config.phone | strip
+  assign tracking_url = config.tracking_url | default: '/apps/ordertracker'
+  assign shipping_url = config.shipping_url | default: '/pages/processing-shipping'
+  assign returns_url = config.returns_url | default: shop.refund_policy.url | default: '/policies/refund-policy'
+-%}
+
+{{ 'mv-contact-support.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'mv-contact-support.js' | asset_url }}" type="module" fetchpriority="low"></script>
+
+{%- capture tracking_link -%}
+  {%- if config.tracking_label != blank -%}
+    <a class="mv-contact__link" href="{{ tracking_url | escape }}">{{ config.tracking_label | escape }} <span aria-hidden="true">→</span></a>
+  {%- endif -%}
+{%- endcapture -%}
+{%- capture returns_link -%}
+  {%- if config.returns_label != blank -%}
+    <a class="mv-contact__link" href="{{ returns_url | escape }}">{{ config.returns_label | escape }} <span aria-hidden="true">→</span></a>
+  {%- endif -%}
+{%- endcapture -%}
+{%- capture email_link -%}
+  {%- if email != blank -%}
+    <a class="mv-contact__email" href="mailto:{{ email | escape }}">{{ email | escape }}</a>
+  {%- endif -%}
+{%- endcapture -%}
+
+<div class="section-background"></div>
+<div class="section page-width-normal">
+  <div class="mv-contact spacing-style" style="{% render 'spacing-style', settings: config %}">
+    <header class="mv-contact__header">
+      <{{ config.heading_level }} class="mv-contact__title h2">{{ config.heading | escape }}</{{ config.heading_level }}>
+      {% if config.intro != blank %}<p>{{ config.intro | escape }}</p>{% endif %}
+    </header>
+
+    <div class="mv-contact__layout">
+      <div class="mv-contact__primary">
+        {{ email_link }}
+        {{ tracking_link }}
+      </div>
+
+      <mv-contact-support class="mv-contact__form-area">
+        {%- form 'contact', id: form_id, class: 'mv-contact__form' -%}
+          <input type="hidden" name="contact[id]" value="{{ form_id }}">
+          {%- liquid
+            assign form_matches = false
+            if form.id == form_id or form.id == blank
+              assign form_matches = true
+            endif
+          -%}
+          {%- if form.posted_successfully? and form_matches -%}
+            <p class="mv-contact__notice" role="status" tabindex="-1" autofocus>{{ config.success_message | escape }}</p>
+          {%- else -%}
+            {% if form.errors and form_matches %}
+              <div class="mv-contact__notice" id="{{ form_id }}-errors" role="alert" tabindex="-1" autofocus>
+                {{ form.errors | default_errors }}
+              </div>
+            {% endif %}
+
+            <div class="mv-contact__field">
+              <label for="{{ form_id }}-topic">{{ config.topic_label | escape }}</label>
+              <select id="{{ form_id }}-topic" name="contact[Topic]" data-contact-topic>
+                <option value="">{{ config.topic_prompt | escape }}</option>
+                {% for topic in topics %}
+                  {% liquid
+                    assign label_key = 'topic_' | append: topic
+                    assign hint_key = 'hint_' | append: topic
+                    assign topic_label = config[label_key]
+                  %}
+                  {% if topic_label != blank %}
+                    <option value="{{ topic_label | escape }}" data-topic="{{ topic }}" data-hint="{{ config[hint_key] | escape }}"{% if form.Topic == topic_label %} selected{% endif %}>{{ topic_label | escape }}</option>
+                  {% endif %}
+                {% endfor %}
+              </select>
+            </div>
+
+            <div class="mv-contact__field">
+              <label for="{{ form_id }}-email">{{ config.email_label | escape }} <span aria-hidden="true">*</span></label>
+              <input type="email" id="{{ form_id }}-email" name="contact[email]" required autocomplete="email" autocapitalize="off" spellcheck="false"
+                value="{{ form.email | default: customer.email | escape }}"
+                {% if form_matches and form.errors contains 'email' %}aria-invalid="true" aria-describedby="{{ form_id }}-errors"{% endif %}>
+            </div>
+
+            <fieldset class="mv-contact__event" data-topics="event" disabled hidden>
+              <legend class="visually-hidden">{{ config.topic_event | escape }}</legend>
+              <div class="mv-contact__field mv-contact__dress-link">
+                <label for="{{ form_id }}-dress">{{ config.dress_label | escape }}</label>
+                <input type="text" inputmode="url" id="{{ form_id }}-dress" name="contact[Dress link]" value="{{ form['Dress link'] | escape }}">
+              </div>
+              <div class="mv-contact__field">
+                <label for="{{ form_id }}-date">{{ config.date_label | escape }}</label>
+                <input type="date" id="{{ form_id }}-date" name="contact[Event date]" value="{{ form['Event date'] | escape }}">
+              </div>
+              <div class="mv-contact__field">
+                <label for="{{ form_id }}-destination">{{ config.destination_label | escape }}</label>
+                <input type="text" id="{{ form_id }}-destination" name="contact[Delivery destination]" value="{{ form['Delivery destination'] | escape }}">
+              </div>
+            </fieldset>
+
+            <fieldset data-topics="order return" disabled hidden>
+              <legend class="visually-hidden">{{ config.order_label | escape }}</legend>
+              <div class="mv-contact__field">
+                <label for="{{ form_id }}-order">{{ config.order_label | escape }}</label>
+                <input type="text" id="{{ form_id }}-order" name="contact[Order number]" value="{{ form['Order number'] | escape }}">
+              </div>
+              <div data-topics="order" hidden>{{ tracking_link }}</div>
+            </fieldset>
+
+            <div class="mv-contact__field">
+              <label for="{{ form_id }}-message">{{ config.message_label | escape }} <span aria-hidden="true">*</span></label>
+              <p id="{{ form_id }}-hint" class="mv-contact__hint" data-contact-hint aria-live="polite" hidden></p>
+              <noscript><p class="mv-contact__hint">{{ config.noscript_hint | escape }}</p></noscript>
+              <textarea id="{{ form_id }}-message" name="contact[body]" rows="5" required aria-describedby="{{ form_id }}-hint">{{ form.body | escape }}</textarea>
+            </div>
+
+            <div class="mv-contact__return" data-topics="return" hidden>
+              {% if email_link != blank and config.photo_note != blank %}
+                <p>{{ config.photo_note | escape }} {{ email_link }}</p>
+              {% endif %}
+              {% if config.return_note != blank %}<p>{{ config.return_note | escape }}</p>{% endif %}
+              {{ returns_link }}
+            </div>
+            <button type="submit" class="button">{{ config.submit_label | escape }}</button>
+          {%- endif -%}
+        {%- endform -%}
+      </mv-contact-support>
+
+      {% if config.shipping_label != blank or returns_link != blank %}
+        <div class="mv-contact__resources">
+          {% if config.shipping_label != blank %}
+            <a class="mv-contact__link" href="{{ shipping_url | escape }}">{{ config.shipping_label | escape }} <span aria-hidden="true">→</span></a>
+          {% endif %}
+          {{ returns_link }}
+        </div>
+      {% endif %}
+
+      {% if phone != blank or config.address != blank %}
+        <details class="mv-contact__business">
+          <summary>{{ config.business_label | escape }} <span class="mv-contact__toggle" aria-hidden="true"></span></summary>
+          {% if phone != blank %}
+            <a href="tel:{{ phone | remove: ' ' | remove: '(' | remove: ')' | remove: '-' | escape }}">{{ phone | escape }}</a>
+          {% endif %}
+          {% if config.address != blank %}<address>{{ config.address | escape | newline_to_br }}</address>{% endif %}
+        </details>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Contact support",
+  "class": "section-wrapper",
+  "enabled_on": { "templates": ["page"] },
+  "limit": 1,
+  "settings": [
+    { "type": "text", "id": "heading", "label": "Heading", "default": "Contact us" },
+    { "type": "select", "id": "heading_level", "label": "Heading level", "options": [{ "value": "h1", "label": "H1 — page title" }, { "value": "h2", "label": "H2 — section title" }], "default": "h1" },
+    { "type": "textarea", "id": "intro", "label": "Introduction", "default": "Have a question about a dress, your event date, or an order you've placed? We're here to help." },
+    { "type": "header", "content": "Help links and business details" },
+    { "type": "text", "id": "support_email", "label": "Displayed support email", "default": "hello@missvella.com", "info": "Used for email links, including photos. Contact form delivery follows your Shopify store settings." },
+    { "type": "text", "id": "tracking_label", "label": "Tracking link text", "default": "Track my order" },
+    { "type": "url", "id": "tracking_url", "label": "Tracking link", "info": "Defaults to /apps/ordertracker." },
+    { "type": "text", "id": "shipping_label", "label": "Shipping link text", "default": "Processing & shipping" },
+    { "type": "url", "id": "shipping_url", "label": "Shipping link", "info": "Defaults to /pages/processing-shipping." },
+    { "type": "text", "id": "returns_label", "label": "Returns link text", "default": "Returns & refunds" },
+    { "type": "url", "id": "returns_url", "label": "Returns link", "info": "Defaults to the store's refund policy." },
+    { "type": "text", "id": "business_label", "label": "Business details heading", "default": "Business contact details" },
+    { "type": "text", "id": "phone", "label": "Business phone", "default": "+86 153 8593 9408" },
+    { "type": "textarea", "id": "address", "label": "Business contact address", "default": "4th Floor, Building 1122\nKangqiao Xiaozhen, Pingqiao Industrial Park\nYu'an District, Lu'an\nAnhui, China" },
+    { "type": "header", "content": "Form" },
+    { "type": "text", "id": "topic_label", "label": "Topic field label", "default": "What can we help you with?" },
+    { "type": "text", "id": "topic_prompt", "label": "Topic placeholder", "default": "Choose a topic" },
+    { "type": "text", "id": "email_label", "label": "Email field label", "default": "Email address" },
+    { "type": "text", "id": "message_label", "label": "Message field label", "default": "Message" },
+    { "type": "text", "id": "submit_label", "label": "Send button", "default": "Send message" },
+    { "type": "textarea", "id": "success_message", "label": "Confirmation after sending", "default": "Thanks for reaching out. We've received your message and will reply by email." },
+    { "type": "textarea", "id": "noscript_hint", "label": "Message hint when JavaScript is off", "default": "Include any relevant order number, dress link, event date or delivery destination in your message." },
+    { "type": "header", "content": "Dress and sizing inquiries" },
+    { "type": "text", "id": "topic_dress", "label": "Topic name", "default": "Sizing, color or dress details" },
+    { "type": "textarea", "id": "hint_dress", "label": "Message hint", "default": "Which dress are you considering? A product link and the size or color you're looking at will help us advise you." },
+    { "type": "header", "content": "Event delivery inquiries" },
+    { "type": "text", "id": "topic_event", "label": "Topic name", "default": "Delivery before my event" },
+    { "type": "textarea", "id": "hint_event", "label": "Message hint", "default": "Tell us which dress you need and where it will be delivered so we can review the shipping options for your date." },
+    { "type": "text", "id": "dress_label", "label": "Dress link field", "default": "Dress link (optional)" },
+    { "type": "text", "id": "date_label", "label": "Event date field", "default": "Event date (optional)" },
+    { "type": "text", "id": "destination_label", "label": "Destination field", "default": "Delivery country / ZIP code (optional)" },
+    { "type": "header", "content": "Existing order inquiries" },
+    { "type": "text", "id": "topic_order", "label": "Topic name", "default": "An existing order" },
+    { "type": "textarea", "id": "hint_order", "label": "Message hint", "default": "What would you like help with on your order?" },
+    { "type": "text", "id": "order_label", "label": "Order number field for orders and returns", "default": "Order number (optional)" },
+    { "type": "header", "content": "Returns and item issues" },
+    { "type": "text", "id": "topic_return", "label": "Topic name", "default": "A return or an item issue" },
+    { "type": "textarea", "id": "hint_return", "label": "Message hint", "default": "Which item is this about, and what happened?" },
+    { "type": "text", "id": "photo_note", "label": "Text before the photo email link", "default": "To share photos, email us at" },
+    { "type": "textarea", "id": "return_note", "label": "Return instructions", "default": "For a return, please contact us before sending your item back." },
+    { "type": "header", "content": "Other inquiries" },
+    { "type": "text", "id": "topic_other", "label": "Topic name", "default": "Something else" },
+    { "type": "textarea", "id": "hint_other", "label": "Message hint" },
+    { "type": "header", "content": "Spacing" },
+    { "type": "range", "id": "padding-block-start", "label": "Top spacing", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 36 },
+    { "type": "range", "id": "padding-block-end", "label": "Bottom spacing", "min": 0, "max": 100, "step": 4, "unit": "px", "default": 64 }
+  ],
+  "presets": [{ "name": "Contact support", "category": "t:categories.forms" }]
+}
+{% endschema %}
