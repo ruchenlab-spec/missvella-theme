@@ -6,20 +6,21 @@
   <title>Size Guide · Missvella</title>
   <link rel="stylesheet" href="size-guide.css">
 </head>
-<body id="top">
+<body>
   <header class="masthead">
     <span class="wordmark">Missvella</span>
+    <nav aria-label="Size guide sections">
+      <a href="#chart">Size chart</a>
+      <a href="#measure">How to measure</a>
+    </nav>
   </header>
-  <main class="page">
+  <main>
     <header class="intro">
-      <h1>Size <em>guide</em></h1>
       <div class="intro-copy">
+        <h1>Size <em>guide</em></h1>
         <p>Measure your bust, waist and hips, then compare your measurements with the chart below.</p>
-        <nav class="jump-links" aria-label="Size guide sections">
-          <a href="#chart">Size chart <span aria-hidden="true">↓</span></a>
-          <a href="#measure">How to measure <span aria-hidden="true">↓</span></a>
-        </nav>
       </div>
+      <div class="silk" aria-hidden="true"></div>
     </header>
     <div class="guide">
       <section id="chart" aria-labelledby="chart-title">
@@ -33,36 +34,38 @@
             <button type="button" data-unit="cm" aria-label="CM (centimeters)" aria-pressed="false">CM</button>
           </div>
         </div>
-        <table aria-labelledby="chart-title" aria-describedby="unit-copy">
-          <thead>
-            <tr>
-              <th scope="col">Size</th>
-              <th scope="col">Bust</th>
-              <th scope="col">Waist</th>
-              <th scope="col">Hips</th>
-              <th scope="col">Hollow to hem</th>
-            </tr>
-          </thead>
-          <tbody>
-            <!-- Preview snapshot from theme/snippets/size-chart-rows.liquid. -->
-            <tr><th scope="row">00</th><td data-cm="79">31.1</td><td data-cm="61">24</td><td data-cm="88.5">34.8</td><td data-cm="145">57.1</td></tr>
-            <tr><th scope="row">02</th><td data-cm="84">33.1</td><td data-cm="66">26</td><td data-cm="93.5">36.8</td><td data-cm="147">57.9</td></tr>
-            <tr><th scope="row">04</th><td data-cm="86.5">34.1</td><td data-cm="68.5">27</td><td data-cm="96">37.8</td><td data-cm="147">57.9</td></tr>
-            <tr><th scope="row">06</th><td data-cm="89">35</td><td data-cm="71">28</td><td data-cm="98.5">38.8</td><td data-cm="150">59.1</td></tr>
-            <tr><th scope="row">08</th><td data-cm="91.5">36</td><td data-cm="73.5">28.9</td><td data-cm="101">39.8</td><td data-cm="150">59.1</td></tr>
-            <tr><th scope="row">10</th><td data-cm="94">37</td><td data-cm="76">29.9</td><td data-cm="104">40.9</td><td data-cm="152">59.8</td></tr>
-            <tr><th scope="row">12</th><td data-cm="96.5">38</td><td data-cm="80">31.5</td><td data-cm="108">42.5</td><td data-cm="152">59.8</td></tr>
-            <tr><th scope="row">14</th><td data-cm="100.5">39.6</td><td data-cm="84">33.1</td><td data-cm="112">44.1</td><td data-cm="155">61</td></tr>
-            <tr><th scope="row">16</th><td data-cm="104">40.9</td><td data-cm="87.5">34.4</td><td data-cm="116">45.7</td><td data-cm="155">61</td></tr>
-            <tr><th scope="row">18</th><td data-cm="116">45.7</td><td data-cm="99">39</td><td data-cm="125">49.2</td><td data-cm="155">61</td></tr>
-            <tr><th scope="row">20</th><td data-cm="121">47.6</td><td data-cm="105">41.3</td><td data-cm="130">51.2</td><td data-cm="155">61</td></tr>
-            <tr><th scope="row">22</th><td data-cm="126">49.6</td><td data-cm="111">43.7</td><td data-cm="135">53.1</td><td data-cm="155">61</td></tr>
-            <tr><th scope="row">24</th><td data-cm="131">51.6</td><td data-cm="117">46.1</td><td data-cm="140">55.1</td><td data-cm="155">61</td></tr>
-            <tr><th scope="row">26</th><td data-cm="136">53.5</td><td data-cm="123">48.4</td><td data-cm="145">57.1</td><td data-cm="155">61</td></tr>
-            <tr><th scope="row">28</th><td data-cm="141">55.5</td><td data-cm="128">50.4</td><td data-cm="150">59.1</td><td data-cm="155">61</td></tr>
-            <tr><th scope="row">30</th><td data-cm="147.5">58.1</td><td data-cm="135">53.1</td><td data-cm="157">61.8</td><td data-cm="155">61</td></tr>
-          </tbody>
-        </table>
+        <div class="table-window" tabindex="0" role="region" aria-label="Scrollable adult size chart">
+          <table aria-labelledby="chart-title" aria-describedby="unit-copy">
+            <thead>
+              <tr>
+                <th scope="col">Size</th>
+                <th scope="col">Bust</th>
+                <th scope="col">Waist</th>
+                <th scope="col">Hips</th>
+                <th scope="col">Hollow to hem</th>
+              </tr>
+            </thead>
+            <tbody>
+              <!-- Preview snapshot from theme/snippets/size-chart-rows.liquid. -->
+              <tr><th scope="row">00</th><td data-cm="79">31.1</td><td data-cm="61">24</td><td data-cm="88.5">34.8</td><td data-cm="145">57.1</td></tr>
+              <tr><th scope="row">02</th><td data-cm="84">33.1</td><td data-cm="66">26</td><td data-cm="93.5">36.8</td><td data-cm="147">57.9</td></tr>
+              <tr><th scope="row">04</th><td data-cm="86.5">34.1</td><td data-cm="68.5">27</td><td data-cm="96">37.8</td><td data-cm="147">57.9</td></tr>
+              <tr><th scope="row">06</th><td data-cm="89">35</td><td data-cm="71">28</td><td data-cm="98.5">38.8</td><td data-cm="150">59.1</td></tr>
+              <tr><th scope="row">08</th><td data-cm="91.5">36</td><td data-cm="73.5">28.9</td><td data-cm="101">39.8</td><td data-cm="150">59.1</td></tr>
+              <tr><th scope="row">10</th><td data-cm="94">37</td><td data-cm="76">29.9</td><td data-cm="104">40.9</td><td data-cm="152">59.8</td></tr>
+              <tr><th scope="row">12</th><td data-cm="96.5">38</td><td data-cm="80">31.5</td><td data-cm="108">42.5</td><td data-cm="152">59.8</td></tr>
+              <tr><th scope="row">14</th><td data-cm="100.5">39.6</td><td data-cm="84">33.1</td><td data-cm="112">44.1</td><td data-cm="155">61</td></tr>
+              <tr><th scope="row">16</th><td data-cm="104">40.9</td><td data-cm="87.5">34.4</td><td data-cm="116">45.7</td><td data-cm="155">61</td></tr>
+              <tr><th scope="row">18</th><td data-cm="116">45.7</td><td data-cm="99">39</td><td data-cm="125">49.2</td><td data-cm="155">61</td></tr>
+              <tr><th scope="row">20</th><td data-cm="121">47.6</td><td data-cm="105">41.3</td><td data-cm="130">51.2</td><td data-cm="155">61</td></tr>
+              <tr><th scope="row">22</th><td data-cm="126">49.6</td><td data-cm="111">43.7</td><td data-cm="135">53.1</td><td data-cm="155">61</td></tr>
+              <tr><th scope="row">24</th><td data-cm="131">51.6</td><td data-cm="117">46.1</td><td data-cm="140">55.1</td><td data-cm="155">61</td></tr>
+              <tr><th scope="row">26</th><td data-cm="136">53.5</td><td data-cm="123">48.4</td><td data-cm="145">57.1</td><td data-cm="155">61</td></tr>
+              <tr><th scope="row">28</th><td data-cm="141">55.5</td><td data-cm="128">50.4</td><td data-cm="150">59.1</td><td data-cm="155">61</td></tr>
+              <tr><th scope="row">30</th><td data-cm="147.5">58.1</td><td data-cm="135">53.1</td><td data-cm="157">61.8</td><td data-cm="155">61</td></tr>
+            </tbody>
+          </table>
+        </div>
       </section>
       <section id="measure" aria-labelledby="measure-title">
         <div class="section-heading">
@@ -77,9 +80,6 @@
       </section>
     </div>
   </main>
-  <footer class="page footer">
-    <a href="#top">Back to top <span aria-hidden="true">↑</span></a>
-  </footer>
   <script>
     const cells = document.querySelectorAll('[data-cm]');
     const unitButtons = document.querySelectorAll('[data-unit]');
