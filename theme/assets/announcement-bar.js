@@ -4,7 +4,7 @@ import { mediaQueryLarge } from '@theme/utilities';
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 const canHover = matchMedia('(hover: hover)');
 
-/** @extends {Component<{ track: HTMLElement, slides?: HTMLElement[], signupDialog: HTMLElement }>} */
+/** @extends {Component<{ track: HTMLElement, slides?: HTMLElement[] }>} */
 export class AnnouncementBar extends Component {
   #current = 0;
   #timer;
@@ -21,8 +21,8 @@ export class AnnouncementBar extends Component {
     mediaQueryLarge.addEventListener('change', this.#syncLayout, options);
     reducedMotion.addEventListener('change', this.#syncLayout, options);
     document.addEventListener('visibilitychange', this.#syncPlayback, options);
-    this.refs.signupDialog.addEventListener('dialog:open', this.#syncPlayback, options);
-    this.refs.signupDialog.addEventListener('dialog:close', this.#syncPlayback, options);
+    document.addEventListener('dialog:open', this.#syncPlayback, { ...options, capture: true });
+    document.addEventListener('dialog:close', this.#syncPlayback, { ...options, capture: true });
     this.addEventListener('focusin', () => this.refs.track.setAttribute('aria-live', 'polite'), options);
     this.addEventListener('focusout', () => this.refs.track.removeAttribute('aria-live'), options);
     this.addEventListener('shopify:block:select', (event) => {
@@ -36,7 +36,6 @@ export class AnnouncementBar extends Component {
       this.#syncPlayback();
     }, options);
     this.#syncLayout();
-    if (this.refs.signupDialog.querySelector('[data-signup-feedback]')) this.openSignup();
   }
 
   updatedCallback() {
@@ -74,7 +73,7 @@ export class AnnouncementBar extends Component {
   #syncPlayback = () => {
     clearInterval(this.#timer);
     const delay = Number(this.getAttribute('autoplay')) * 1000;
-    if (!this.hasAttribute('data-rotating') || reducedMotion.matches || document.hidden || this.#editorSlide || this.refs.signupDialog.querySelector('dialog[open]') || !delay) {
+    if (!this.hasAttribute('data-rotating') || reducedMotion.matches || document.hidden || this.#editorSlide || document.querySelector('mv-signup-component dialog[open]') || !delay) {
       return;
     }
     this.#timer = setInterval(() => {
@@ -122,10 +121,11 @@ export class AnnouncementBar extends Component {
   }
 
   async openSignup() {
-    await customElements.whenDefined('dialog-component');
+    await customElements.whenDefined('mv-signup-component');
     if (!this.isConnected) return;
     clearInterval(this.#timer);
-    this.refs.signupDialog.showDialog();
+    const popup = document.querySelector('mv-signup-component[data-configured]') ?? this.querySelector('mv-signup-component');
+    popup?.showDialog();
   }
 
   #step() {

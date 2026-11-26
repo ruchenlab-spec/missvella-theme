@@ -1,0 +1,155 @@
+mv-signup-component, .shopify-section.mv-signup-section { display: contents; }
+
+dialog.mv-letter {
+  box-sizing: border-box;
+  width: min(31rem, calc(100% - 24px));
+  max-width: none;
+  height: fit-content;
+  max-height: calc(100dvh - 24px);
+  margin: auto;
+  padding: 0;
+  overflow: auto;
+  overscroll-behavior: contain;
+  border: 0;
+  border-radius: 2px;
+  background: #262422;
+  color: var(--mv-ink);
+  box-shadow: 0 24px 84px #130b0c66;
+  font: 400 16px/1.45 var(--font-body--family, Arial, sans-serif);
+  text-align: center;
+  text-transform: none;
+  letter-spacing: normal;
+}
+dialog.mv-letter::backdrop { background: rgb(24 19 20 / 58%); }
+.mv-letter *, .mv-letter *::before, .mv-letter *::after { box-sizing: border-box; }
+.mv-letter__scene {
+  position: relative;
+  isolation: isolate;
+  padding: clamp(48px, 6vw, 66px) clamp(20px, 6vw, 46px) clamp(26px, 5vw, 44px);
+}
+.mv-letter__scene::before {
+  content: "";
+  z-index: -1;
+  position: absolute;
+  inset: 0;
+  background: var(--mv-photo, url("mv-signup-satin.jpg")) var(--mv-focal, center) / cover no-repeat;
+  filter: grayscale(1) contrast(1.09) brightness(.85);
+}
+.mv-letter__close {
+  position: absolute;
+  z-index: 2;
+  top: 4px;
+  right: 4px;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: rgb(16 13 14 / 70%);
+  color: white;
+  cursor: pointer;
+}
+.mv-letter__close svg { width: 16px; height: 16px; }
+.mv-letter__paper {
+  position: relative;
+  padding: clamp(42px, 7vw, 64px) clamp(20px, 5vw, 42px) clamp(28px, 5vw, 44px);
+  background: var(--mv-paper) var(--mv-grain, url("mv-signup-paper.png")) center / 100% 100%;
+  background-blend-mode: multiply;
+  box-shadow: 1px 5px 8px #10080540, 4px 15px 25px #08030444;
+  overflow-wrap: anywhere;
+}
+.mv-letter__tape {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  transform: translate(-50%, -57%) rotate(-7deg);
+  width: max-content;
+  max-width: 76%;
+  min-width: 8rem;
+  min-height: 32px;
+  padding: 9px 24px;
+  background: #e3d2b3 var(--mv-grain, url("mv-signup-paper.png")) center / 145px 85px;
+  background-blend-mode: multiply;
+  color: #493c30;
+  letter-spacing: .22em;
+  font: 600 10px/1.45 var(--font-body--family, Arial, sans-serif);
+  text-transform: uppercase;
+  clip-path: polygon(1% 2%,98.6% 0,99.5% 13%,98.8% 25%,100% 37%,99% 54%,100% 70%,99% 84%,99.6% 98%,.5% 100%,1% 84%,0 70%,1.4% 54%,.1% 39%,1% 27%,0 13%);
+}
+.mv-letter .mv-letter__title {
+  margin: 0;
+  color: var(--mv-wine);
+  font: italic 400 clamp(44px, 7vw, 67px)/.99 "Bodoni MT", Didot, "Times New Roman", serif;
+  letter-spacing: -.055em;
+  text-transform: none;
+  text-wrap: balance;
+}
+.mv-letter__sub {
+  max-width: 29ch;
+  margin: 14px auto 0;
+  font-size: 14px;
+  line-height: 1.55;
+  text-wrap: pretty;
+}
+.mv-letter__sub p, .mv-letter__form p { margin: 0; color: inherit; font: inherit; }
+.mv-letter__ticket {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(66px, 27%);
+  align-items: stretch;
+  margin: clamp(21px, 5vw, 32px) 0 0;
+  border: 1px solid var(--mv-wine);
+  border-radius: 0;
+  padding: 0;
+  text-align: start;
+  background: rgb(255 251 243 / 38%);
+  color: var(--mv-wine);
+  font: inherit;
+  cursor: pointer;
+}
+.mv-letter__offer, .mv-letter__stub { display: grid; align-content: center; }
+.mv-letter__offer { gap: 4px; padding: 12px clamp(10px, 2.5vw, 18px); }
+.mv-letter__offer-title { font-size: 10px; letter-spacing: .09em; text-transform: uppercase; }
+.mv-letter__offer strong { font: 400 clamp(21px, 4vw, 30px)/1.12 "Bodoni MT", Didot, Georgia, serif; letter-spacing: .045em; }
+.mv-letter__stub {
+  gap: 4px;
+  border-inline-start: 1px dashed currentColor;
+  justify-items: center;
+  text-align: center;
+  font-size: 11px;
+}
+.mv-letter__stub svg { width: 17px; height: 17px; }
+.mv-letter__ticket:hover .mv-letter__stub { background: rgb(114 30 43 / 7%); }
+.mv-letter__form, .mv-letter__fields { display: grid; gap: 8px; }
+.mv-letter__form { margin: 20px 0 0; }
+.mv-letter__form input[type=email], .mv-letter__submit {
+  width: 100%;
+  min-height: 46px;
+  margin: 0;
+  border: 1px solid var(--mv-ink);
+  border-radius: 0;
+  padding: 10px 14px;
+  color: var(--mv-ink);
+  background: rgb(255 255 255 / 36%);
+  font: inherit;
+}
+.mv-letter__form input::placeholder { color: inherit; opacity: .78; }
+.mv-letter__submit {
+  position: relative;
+  padding-inline: 34px;
+  border-color: var(--mv-wine);
+  background: var(--mv-wine);
+  color: var(--mv-on-wine);
+  font-weight: 600;
+  cursor: pointer;
+}
+.mv-letter__submit span { position: absolute; inset-inline-end: 15px; }
+.mv-letter__note { font: inherit; font-size: 11px; margin: 12px 0 0; }
+.mv-letter :focus-visible { outline: 2px solid var(--mv-wine); outline-offset: 3px; }
+.mv-letter .mv-letter__close:focus-visible { outline-color: white; outline-offset: -4px; }
+.mv-letter [hidden] { display: none; }
+@media (prefers-reduced-motion: reduce) {
+  dialog.mv-letter[open], dialog.mv-letter[open]::backdrop { animation: none; transition: none; }
+}

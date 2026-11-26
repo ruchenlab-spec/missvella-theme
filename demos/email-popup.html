@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="en">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Missvella · Email popup preview</title>
+<link rel="stylesheet" href="../theme/assets/mv-signup-popup.css">
+<style>
+  body { margin: 0; background: #efe9e2; font: 16px Arial, sans-serif; color: #282220; }
+  header { display: grid; place-items: center; padding: 1rem; background: #2d2424; }
+  header button { color: white; background: transparent; border: 0; cursor: pointer; font: inherit; text-decoration: underline; }
+  main { display: grid; place-items: center; height: 75vh; font: 6vw Georgia, serif; letter-spacing: .12em; }
+  .visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+  dialog { --mv-paper: #F5ECD9; --mv-ink: #352D2A; --mv-wine: #751E2A; --mv-on-wine: #fff; }
+</style>
+<header><button id="launch" type="button">Sign up for 15% off</button></header>
+<main>MISSVELLA</main>
+<dialog class="mv-letter" aria-labelledby="title">
+  <div class="mv-letter__scene">
+    <button class="mv-letter__close" aria-label="Close" type="button" autofocus>✕</button>
+    <div class="mv-letter__paper">
+      <div class="mv-letter__tape">MISSVELLA</div>
+      <h2 class="mv-letter__title" id="title">You're invited.</h2>
+      <div class="mv-letter__sub"><p>Join our email list for 15% off your first order.</p></div>
+      <button class="mv-letter__ticket" type="button" data-code="BFCM10">
+        <span class="mv-letter__offer"><span class="mv-letter__offer-title">Black Friday · 10% off</span><strong>BFCM10</strong></span>
+        <span class="mv-letter__stub">
+          <svg aria-hidden="true" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="7" y="7" width="10" height="10" rx="1.5"/><path d="M13 7V4a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h3"/></svg>
+          <span data-copy-label aria-live="polite">Copy code</span>
+        </span>
+      </button>
+      <form class="mv-letter__form">
+        <label class="visually-hidden" for="email">Email address</label>
+        <input id="email" placeholder="Email address" type="email" autocomplete="off" required>
+        <button class="mv-letter__submit">Sign me up <span aria-hidden="true">→</span></button>
+        <p role="status" hidden>Demo complete. Your email was not sent.</p>
+      </form>
+    </div>
+  </div>
+</dialog>
+<script>
+  const popup = document.querySelector('dialog');
+  const launch = document.querySelector('#launch');
+  const ticket = popup.querySelector('[data-code]');
+  const form = popup.querySelector('form');
+  function openDemo() {
+    form.reset();
+    form.querySelector('[role=status]').hidden = true;
+    popup.showModal();
+  }
+  launch.onclick = openDemo;
+  popup.querySelector('.mv-letter__close').onclick = () => popup.close();
+  popup.addEventListener('click', event => { if (event.target === popup) popup.close(); });
+  form.onsubmit = event => { event.preventDefault(); form.querySelector('[role=status]').hidden = false; };
+  ticket.onclick = async () => {
+    let copied = false;
+    try { await navigator.clipboard.writeText(ticket.dataset.code); copied = true; } catch {
+      const range = document.createRange();
+      range.selectNodeContents(ticket.querySelector('strong'));
+      const selection = getSelection();
+      selection.removeAllRanges();
+      selection.addRange(range);
+      try { copied = document.execCommand('copy'); } catch {}
+    }
+    const label = ticket.querySelector('[data-copy-label]');
+    label.textContent = copied ? 'Copied!' : 'Select & copy';
+    setTimeout(() => { label.textContent = 'Copy code'; }, 2400);
+  };
+  openDemo();
+</script>
+</html>

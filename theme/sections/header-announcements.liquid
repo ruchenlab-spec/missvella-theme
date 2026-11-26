@@ -1,8 +1,6 @@
 <script src="{{ 'announcement-bar.js' | asset_url }}" type="module" fetchpriority="low"></script>
-<script src="{{ 'dialog.js' | asset_url }}" type="module"></script>
 
 {% render 'contrast-override', background_color: section.settings.background_color, section_id: section.id %}
-{% render 'dialog-styles' %}
 
 <div class="section-background color-custom-{{ section.id }}"></div>
 <aside
@@ -17,32 +15,7 @@
       {% content_for 'blocks' %}
     </div>
 
-    <dialog-component class="announcement-bar__signup-popup" ref="signupDialog">
-      <dialog class="announcement-bar__dialog dialog-modal color-custom-popover" ref="dialog" scroll-lock aria-labelledby="AnnouncementSignupTitle-{{ section.id }}">
-        <button class="button button-unstyled close-button announcement-bar__dialog-close" type="button" aria-label="{{ 'accessibility.close_dialog' | t }}" on:click="/closeDialog">
-          {{ 'icon-close.svg' | inline_asset_content }}
-        </button>
-        <div class="announcement-bar__dialog-content">
-          <h2 id="AnnouncementSignupTitle-{{ section.id }}">Get 15% off your first order</h2>
-          <p>Join our email list for your welcome offer.</p>
-          {% form 'customer', id: 'AnnouncementSignup', class: 'announcement-bar__signup-form email-signup__form' %}
-            <input type="hidden" name="contact[tags]" value="newsletter">
-            <label for="AnnouncementEmail-{{ section.id }}" class="visually-hidden">Email address</label>
-            <div class="announcement-bar__input-group">
-              <input id="AnnouncementEmail-{{ section.id }}" type="email" name="contact[email]" autocomplete="email" required placeholder="Email address" value="{{ form.email | escape }}">
-              <button class="button announcement-bar__submit" type="submit">Subscribe</button>
-            </div>
-            {% if form.errors %}
-              <span data-signup-feedback hidden></span>
-              <div class="announcement-bar__form-message" role="alert">{{ form.errors | default_errors }}</div>
-            {% elsif form.posted_successfully? %}
-              <span data-signup-feedback hidden></span>
-              <p class="announcement-bar__form-message" role="status">Thank you for subscribing.</p>
-            {% endif %}
-          {% endform %}
-        </div>
-      </dialog>
-    </dialog-component>
+    {% render 'mv-signup-popup', instance_id: section.id %}
   </announcement-bar-component>
 </aside>
 
@@ -142,87 +115,7 @@
     white-space: nowrap;
   }
 
-  .announcement-bar__dialog.dialog-modal.color-custom-popover {
-    width: min(480px, calc(100vw - 2rem));
-    height: auto;
-    max-width: calc(100vw - 2rem);
-    max-height: min(90dvh, var(--modal-max-height));
-    margin: auto;
-    border: var(--style-border-popover);
-    border-radius: var(--style-border-radius-popover);
-    padding: clamp(1.5rem, 5vw, 2.5rem);
-    background: var(--color-background);
-    color: var(--color-foreground);
-    box-shadow: var(--shadow-popover);
-  }
-
-  .announcement-bar__dialog-content {
-    display: grid;
-    gap: var(--gap-md);
-  }
-
-  .announcement-bar__dialog h2 {
-    margin: 0 2rem 0 0;
-    font-family: var(--font-heading--family);
-    font-size: clamp(1.5rem, 5vw, 2rem);
-    line-height: 1.15;
-  }
-
-  .announcement-bar__dialog-content > p {
-    margin: 0;
-  }
-
-  .announcement-bar__dialog .announcement-bar__dialog-close {
-    position: absolute;
-    top: var(--margin-2xs);
-    inset-inline-end: var(--margin-2xs);
-  }
-
-  .announcement-bar__signup-form.email-signup__form {
-    display: grid;
-    gap: var(--gap-md);
-  }
-
-  .announcement-bar__input-group {
-    display: flex;
-    align-items: stretch;
-    gap: var(--gap-xs);
-  }
-
-  .announcement-bar__input-group input {
-    flex: 1;
-    min-width: 0;
-    min-height: var(--minimum-touch-target);
-    border: var(--style-border-width-inputs) solid var(--color-input-border);
-    border-radius: var(--style-border-radius-inputs);
-    padding: var(--padding-md);
-    background: var(--color-input-background);
-    color: var(--color-input-text);
-    font: inherit;
-  }
-
-  .announcement-bar__input-group input::placeholder {
-    color: rgb(var(--color-input-text-rgb) / var(--opacity-70));
-  }
-
-  .announcement-bar__input-group .announcement-bar__submit {
-    min-height: var(--minimum-touch-target);
-    padding-inline: var(--padding-xl);
-  }
-
-  .announcement-bar__dialog .announcement-bar__form-message {
-    margin: 0;
-  }
-
   @media (width < 750px) {
-    .announcement-bar__input-group {
-      flex-direction: column;
-    }
-
-    .announcement-bar__input-group .announcement-bar__submit {
-      width: 100%;
-    }
-
     .announcement-bar__slider {
       grid-column: 1 / -1;
     }

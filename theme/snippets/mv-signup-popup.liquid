@@ -1,0 +1,71 @@
+{% doc %}
+  Renders the paper signup dialog. The announcement bar supplies a default when
+  the merchant has not added a configured popup to the current page.
+  @param {string} instance_id
+  @param {object} [config]
+{% enddoc %}
+{%- liquid
+  assign form_id = 'MvEmailSignup-' | append: instance_id
+  assign heading = config.heading | default: "You're invited."
+  assign button_label = config.button_label | default: 'Sign me up'
+  assign email_label = config.email_placeholder | default: 'Email address'
+  assign success_message = config.success_message | default: "You're on the list. Thank you for subscribing."
+  if config
+    assign sticker = config.eyebrow
+    assign coupon_code = config.coupon_code | strip
+    assign coupon_title = config.coupon_title
+  else
+    assign sticker = 'MISSVELLA'
+    assign coupon_code = 'BFCM10'
+    assign coupon_title = 'Black Friday · 10% off'
+  endif
+-%}
+{{ 'mv-signup-popup.css' | asset_url | stylesheet_tag }}
+<script src="{{ 'mv-signup-popup.js' | asset_url }}" type="module"></script>
+{% render 'dialog-styles' %}
+<mv-signup-component
+  {% if config %}data-configured{% if config.auto_open %} data-delay="{{ config.delay_seconds }}"{% endif %}{% endif %}
+  style="--mv-paper: {{ config.background_color | default: '#F5ECD9' }}; --mv-ink: {{ config.text_color | default: '#352D2A' }}; --mv-wine: {{ config.accent_color | default: '#751E2A' }}; --mv-on-wine: {{ config.button_text_color | default: '#FFFFFF' }}; --mv-grain: url('{{ 'mv-signup-paper.png' | asset_url }}'); --mv-photo: url('{% if config.image != blank %}{{ config.image | image_url: width: 1200 }}{% else %}{{ 'mv-signup-satin.jpg' | asset_url }}{% endif %}'); --mv-focal: {{ config.image.presentation.focal_point | default: 'center' }};"
+>
+  <dialog class="dialog-modal mv-letter" ref="dialog" scroll-lock aria-labelledby="{{ form_id }}-title">
+    <div class="mv-letter__scene">
+      <button class="mv-letter__close" type="button" aria-label="{{ 'accessibility.close_dialog' | t }}" on:click="/closeDialog" autofocus>
+        {{ 'icon-close.svg' | inline_asset_content }}
+      </button>
+      <div class="mv-letter__paper">
+        <div class="mv-letter__tape"{% if sticker == blank %} aria-hidden="true"{% endif %}>{{ sticker | escape }}</div>
+        <h2 id="{{ form_id }}-title" class="mv-letter__title">{{ heading | escape }}</h2>
+        {% if config == blank or config.description != blank %}
+          <div class="mv-letter__sub">{% if config %}{{ config.description }}{% else %}<p>Join our email list for 15% off your first order.</p>{% endif %}</div>
+        {% endif %}
+        {% if coupon_code != blank %}
+          <button type="button" class="mv-letter__ticket" data-code="{{ coupon_code | escape }}" on:click="/copyCoupon">
+            <span class="mv-letter__offer">
+              {% if coupon_title != blank %}<span class="mv-letter__offer-title">{{ coupon_title | escape }}</span>{% endif %}
+              <strong>{{ coupon_code | escape }}</strong>
+            </span>
+            <span class="mv-letter__stub">
+              <svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><rect x="7" y="7" width="10" height="10" rx="1.5"/><path d="M13 7V4a1 1 0 0 0-1-1H4a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h3"/></svg>
+              <span data-copy-label>Copy code</span>
+            </span>
+          </button>
+          <span class="visually-hidden" role="status" data-copy-status></span>
+        {% endif %}
+        {% form 'customer', id: form_id, class: 'mv-letter__form' %}
+          <input type="hidden" name="contact[tags]" value="newsletter">
+          <input type="hidden" name="contact[id]" value="{{ form_id }}">
+          {% if form.posted_successfully? %}
+            <p role="status" data-signup-feedback="success" data-owner="{{ form.id | escape }}" hidden>{{ success_message | escape }}</p>
+          {% endif %}
+            {% if form.errors %}<div id="{{ form_id }}-error" role="alert" data-signup-feedback="error" data-owner="{{ form.id | escape }}" hidden>{{ form.errors | default_errors }}</div>{% endif %}
+          <div class="mv-letter__fields" data-fields>
+            <label for="{{ form_id }}-email" class="visually-hidden">{{ email_label | escape }}</label>
+            <input id="{{ form_id }}-email" type="email" name="contact[email]" placeholder="{{ email_label | escape }}" value="{{ form.email | escape }}" autocomplete="email" autocapitalize="off" required>
+            <button type="submit" class="mv-letter__submit">{{ button_label | escape }} <span aria-hidden="true">→</span></button>
+          </div>
+        {% endform %}
+        {% if config.fine_print != blank %}<p class="mv-letter__note">{{ config.fine_print | escape }}</p>{% endif %}
+      </div>
+    </div>
+  </dialog>
+</mv-signup-component>
