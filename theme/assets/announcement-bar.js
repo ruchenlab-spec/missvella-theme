@@ -4,7 +4,7 @@ import { mediaQueryLarge } from '@theme/utilities';
 const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 const canHover = matchMedia('(hover: hover)');
 
-/** @extends {Component<{ track: HTMLElement, slides?: HTMLElement[], signupDialog: HTMLDialogElement, signupEmail: HTMLInputElement }>} */
+/** @extends {Component<{ track: HTMLElement, slides?: HTMLElement[], signupDialog: HTMLElement }>} */
 export class AnnouncementBar extends Component {
   #current = 0;
   #timer;
@@ -21,7 +21,8 @@ export class AnnouncementBar extends Component {
     mediaQueryLarge.addEventListener('change', this.#syncLayout, options);
     reducedMotion.addEventListener('change', this.#syncLayout, options);
     document.addEventListener('visibilitychange', this.#syncPlayback, options);
-    this.refs.signupDialog.addEventListener('close', this.#syncPlayback, options);
+    this.refs.signupDialog.addEventListener('dialog:open', this.#syncPlayback, options);
+    this.refs.signupDialog.addEventListener('dialog:close', this.#syncPlayback, options);
     this.addEventListener('focusin', () => this.refs.track.setAttribute('aria-live', 'polite'), options);
     this.addEventListener('focusout', () => this.refs.track.removeAttribute('aria-live'), options);
     this.addEventListener('shopify:block:select', (event) => {
@@ -73,7 +74,7 @@ export class AnnouncementBar extends Component {
   #syncPlayback = () => {
     clearInterval(this.#timer);
     const delay = Number(this.getAttribute('autoplay')) * 1000;
-    if (!this.hasAttribute('data-rotating') || reducedMotion.matches || document.hidden || this.#editorSlide || this.refs.signupDialog.open || !delay) {
+    if (!this.hasAttribute('data-rotating') || reducedMotion.matches || document.hidden || this.#editorSlide || this.refs.signupDialog.querySelector('dialog[open]') || !delay) {
       return;
     }
     this.#timer = setInterval(() => {
@@ -120,16 +121,11 @@ export class AnnouncementBar extends Component {
     }, 2400);
   }
 
-  openSignup() {
-    const dialog = this.refs.signupDialog;
-    if (dialog.open) return;
-    dialog.showModal();
-    this.#syncPlayback();
-    this.refs.signupEmail.focus();
-  }
-
-  closeSignup() {
-    this.refs.signupDialog.close();
+  async openSignup() {
+    await customElements.whenDefined('dialog-component');
+    if (!this.isConnected) return;
+    clearInterval(this.#timer);
+    this.refs.signupDialog.showDialog();
   }
 
   #step() {
