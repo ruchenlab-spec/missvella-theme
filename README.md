@@ -28,6 +28,10 @@
 └── .gitattributes             # 统一 LF 换行
 ```
 
+## 礼服护理页 Demo
+
+[Dress Care 独立预览](demos/attention-care.html) 可离线打开。首屏沿用 About Us 的缎面概念静物，面料选择器使用目录中的八张礼服图。清洁与熨烫文案沿用店铺 FAQ 的护理标签优先原则。面料举例说明穿着与收纳时的操作，参考加拿大文物保护研究所的[纺织品日常护理](https://www.canada.ca/en/conservation-institute/services/care-objects/textiles-costumes/basic-care-textiles.html)与[纺织品保存指南](https://www.canada.ca/en/conservation-institute/services/preventive-conservation/guidelines-collections/textiles-costumes.html)。
+
 ## 常用命令
 
 ```powershell
