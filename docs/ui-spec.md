@@ -53,6 +53,10 @@
 
 ## 三、组件规范
 
+### 页脚图标
+
+店铺页脚的服务特色、支付方式、社交链接、菜单和订阅表单图标统一以灰度显示。通过图标区块上传的图片也使用同一规则。样式集中在 `theme/assets/base.css`，桌面与手机共用。
+
 ### 轮播（slideshow）
 - 统一使用主题原生 `<slideshow-component>` / `<slideshow-container>` / `<slideshow-slides>` / `<slideshow-slide>`。
 - 翻页一次滚动一屏（scroll-snap + `scrollBy`），非无限循环时边界按钮 `disabled`。

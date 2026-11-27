@@ -594,6 +594,18 @@ p:empty {
   fill: currentColor;
 }
 
+.page-wrapper > footer :is(
+  .icon-features__icon-box,
+  .icon-block__media,
+  .payment-icons__item,
+  .social-icons__icon,
+  .svg-wrapper,
+  .email-signup__button-icon,
+  .icon-error
+) {
+  filter: grayscale(100%);
+}
+
 [data-placeholder='true'] * {
   cursor: default;
 }
