@@ -1,5 +1,17 @@
 # Color & Fabric Guide
 
+## 不等幅色块与浮雕题签 · HTML Demo
+
+[新版独立 HTML](../demos/color-fabric-folio.html) 使用目录中的真实色值拼出桌面七块、手机五块的封面。中央棉纸题签上的标题是可选取的网页文字。点色块会进入相应色系并选中该色号。桌面目录以色样与礼服对开，手机目录以色带展开；商品按色系关联，面料入口保留八种面料的细节、垂感与实款。预览图片已内嵌，可离线打开。
+
+<details><summary>题签素材制作记录</summary>
+
+使用内置 imagegen 生成无字透明底素材，以 WebP 嵌入上述 HTML 的目录数据 `stock` 字段。生成提示词如下。
+
+> Use case: product-mockup. A single blank rectangle of real warm ivory handmade cotton rag stationery, wide landscape proportion 1.55:1, photographed absolutely flat and face-on with no perspective, tightly framed with only 3% transparent space outside all four deckled hand-torn edges. Very fine irregular white paper fibers along the edges, subtly uneven natural thickness; the surface is warm bone white, tactile, quiet, uncreased fine cotton. Delicate fine uninked blind embossing of a slender herb stem with three or four leaves just on the lower left edge and a barely visible petal impression on the upper right edge. One small sprig per corner, NOT an ornate border. Leave the central 80% completely empty for typesetting with HTML. Absolutely no words, writing, numbers, motifs in center, stamps or logos, tape, props. Premium printer's sample photographed for a material archive in soft raking light from upper left. The impression reads by fine highlight and shadow on cream fibres. Transparent background with honest alpha, no tabletop. The whole sheet is visible, no curled corners. Soft contact shadow only.
+
+</details>
+
 ## 纸纹样本卡 HTML Demo
 
 [打开可交互 Demo](../demos/color-fabric-guide.html)。桌面左侧是色系索引，右侧样本板并列展示可选色块，下一行可横向浏览本色系的礼服。手机首张卡默认展开，点击露出的色带可切换卡片；色块和商品各有独立滑轨。Fabric library 以服装局部图、表面特征、垂感和手感展示 8 类面料。
