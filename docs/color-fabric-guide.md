@@ -8,6 +8,8 @@
 
 <details><summary>题签素材制作记录</summary>
 
+题签的深炭褐色衬底用 `#302b28`，四边共用一份 7–10px 的内边距。桌面中央两列的总宽度由卡纸宽度与衬边决定，左右色块平分余宽。手机按整行宽度缩放卡纸，中间行的高度随原图 960 × 620 的比例变化。
+
 使用内置 imagegen 生成无字透明底素材，以 WebP 嵌入上述 HTML 的目录数据 `stock` 字段。生成提示词如下。
 
 > Use case: product-mockup. A single blank rectangle of real warm ivory handmade cotton rag stationery, wide landscape proportion 1.55:1, photographed absolutely flat and face-on with no perspective, tightly framed with only 3% transparent space outside all four deckled hand-torn edges. Very fine irregular white paper fibers along the edges, subtly uneven natural thickness; the surface is warm bone white, tactile, quiet, uncreased fine cotton. Delicate fine uninked blind embossing of a slender herb stem with three or four leaves just on the lower left edge and a barely visible petal impression on the upper right edge. One small sprig per corner, NOT an ornate border. Leave the central 80% completely empty for typesetting with HTML. Absolutely no words, writing, numbers, motifs in center, stamps or logos, tape, props. Premium printer's sample photographed for a material archive in soft raking light from upper left. The impression reads by fine highlight and shadow on cream fibres. Transparent background with honest alpha, no tabletop. The whole sheet is visible, no curled corners. Soft contact shadow only.
