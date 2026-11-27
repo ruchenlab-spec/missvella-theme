@@ -4,6 +4,8 @@
 
 [新版独立 HTML](../demos/color-fabric-folio.html) 使用目录中的真实色值拼出桌面七块、手机五块的封面。中央棉纸题签上的标题是可选取的网页文字。点色块会进入相应色系并选中该色号。桌面目录以色样与礼服对开，手机目录以色带展开；商品按色系关联，面料入口保留八种面料的细节、垂感与实款。预览图片已内嵌，可离线打开。
 
+题签在桌面占用网格正中的独立矩形，在手机上占用色块之间的完整一行。卡纸原比例居中平放，标题两行沿水平基线排版。标题优先使用设备上的 Latter 或 Latter Slant，离线预览内嵌 Pinyon Script 英式圆手花体；字体的 SIL 开放字体许可随 HTML 保存。[Pinyon Script 字体项目](https://github.com/SorkinType/Pinyon)
+
 <details><summary>题签素材制作记录</summary>
 
 使用内置 imagegen 生成无字透明底素材，以 WebP 嵌入上述 HTML 的目录数据 `stock` 字段。生成提示词如下。

@@ -5,6 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Color &amp; Fabric Guide — Missvella</title>
 <style>
+@font-face {
+  font-family: "Pinyon Script";
+  font-style: normal;
+  font-weight: 400;
+  src: url("data:font/woff2;base64,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") format("woff2");
+}
 :root {
   color-scheme: light;
   --page: #f9f7f1; --ink: #282721; --muted: #625f56; --rule: #d4cfc2;
@@ -29,10 +35,10 @@ h1,h2,h3 { font-family: var(--roman); font-weight: 400; }
 .nav a { display:grid; align-items:center; min-height:44px; text-decoration:none; font-size:13px; }
 .nav a[aria-current=true] { text-decoration:underline; text-underline-offset:6px; }
 .plate {
-  isolation:isolate; container-type:size; position:relative; display:grid; overflow:hidden;
-  grid-template-columns:27fr 26fr 23fr 24fr; grid-template-rows:32fr 29fr 39fr;
-  grid-template-areas:"olive sand sand blue" "olive coffee storm blue" "rose coffee storm wine";
-  height:clamp(390px,49vh,555px); background:#e8e2d6;
+  isolation:isolate; position:relative; display:grid; overflow:hidden;
+  grid-template-columns:28fr 19fr 25fr 28fr; grid-template-rows:20fr 58fr 22fr;
+  grid-template-areas:"olive sand sand blue" "olive paper paper blue" "rose coffee storm wine";
+  height:clamp(430px,53vh,595px); background:#e8e2d6;
 }
 .plate::after { content:""; pointer-events:none; position:absolute; inset:0; background-image:var(--grain); opacity:.06; mix-blend-mode:soft-light; }
 .tile { position:relative; display:flex; flex-direction:column; align-items:flex-start; justify-content:flex-end;
@@ -42,14 +48,15 @@ h1,h2,h3 { font-family: var(--roman); font-weight: 400; }
 .tile:hover .tile-name,.tile:focus-visible .tile-name { text-decoration:underline; text-decoration-thickness:1px; text-underline-offset:5px; }
 .tile-name { font:italic 400 clamp(20px,2.4vw,39px)/1.03 var(--roman); letter-spacing:-.035em; }
 .tile-hex { margin-top:5px; font:10px/1.3 var(--sans); letter-spacing:.11em; font-variant-numeric:tabular-nums; }
-.leaf { position:absolute; pointer-events:none; left:50%; top:49%; transform:translate(-50%,-50%) rotate(-2deg);
-  width:clamp(295px,min(34%,94cqh),490px); aspect-ratio:1.55; display:grid; place-items:center; z-index:1; }
-.stock { position:absolute; inset:0; width:100%; height:100%; object-fit:fill;
-  filter:drop-shadow(0 2px 1px #32261930) drop-shadow(1px 7px 6px #271b122a); }
-.impression { position:relative; text-align:center; width:90%; color:#4e3431; }
-.impression h1 { font:400 clamp(29px,3.4vw,51px)/.99 var(--roman); letter-spacing:-.055em; }
-.impression em { display:block; font-weight:400; font-size:1.13em; }
-.impression p { margin-top:14px; font:10px/1.3 var(--sans); letter-spacing:.07em; }
+.leaf { grid-area:paper; display:grid; place-items:center; container-type:size; background:#dfd8c9; }
+.stationery { position:relative; display:grid; place-items:center; container-type:inline-size;
+  width:min(97cqw,152cqh); aspect-ratio:1.55; }
+.stock { position:absolute; inset:0; width:100%; height:100%; object-fit:contain;
+  filter:drop-shadow(0 1px 1px #483c2a26); }
+.impression { position:relative; text-align:center; color:#593a37; }
+.impression h1 { font:400 clamp(28px,14cqw,76px)/1 "Latter", "Latter Slant", "Pinyon Script", cursive; }
+.impression h1 span { display:block; white-space:nowrap; }
+.impression p { margin-top:.9em; color:#574d43; font:clamp(9px,2.6cqw,11px)/1.3 var(--sans); letter-spacing:.07em; }
 .library { margin:clamp(30px,3.7vw,60px) 0 44px; scroll-margin-top:16px; }
 .library-head { display:flex; align-items:baseline; justify-content:space-between; gap:12px; border-bottom:1px solid var(--rule); padding-bottom:14px; }
 .library-head h2 { font:400 clamp(29px,3.1vw,48px)/1.03 var(--roman); letter-spacing:-.045em; }
@@ -96,12 +103,11 @@ h1,h2,h3 { font-family: var(--roman); font-weight: 400; }
 @media (max-width:760px) {
   .frame { width:calc(100% - 32px); }
   .mast { min-height:53px; } .mark { font-size:16px; } .nav { gap:18px; } .nav a { font-size:12px; }
-  .plate { height:clamp(345px,50svh,470px); grid-template-columns:44fr 56fr; grid-template-rows:23fr 25fr 28fr 24fr;
-    grid-template-areas:"olive sand" "olive blue" "coffee blue" "coffee wine"; }
+  .plate { height:clamp(385px,53svh,485px); grid-template-columns:34fr 12fr 23fr 31fr; grid-template-rows:23fr 53fr 24fr;
+    grid-template-areas:"olive olive sand sand" "paper paper paper paper" "coffee blue blue wine"; }
   .tile.rose,.tile.storm { display:none; }
-  .tile { padding:13px; } .tile.olive { justify-content:flex-start; }
+  .tile { min-width:0; padding:clamp(8px,3vw,15px); } .tile.sand { justify-content:flex-end; }
   .tile-name { font-size:clamp(21px,5.7vw,30px); } .tile-hex { font-size:9px; margin-top:3px; }
-  .leaf { width:min(70%,72cqh,310px); top:43%; } .impression h1 { font-size:clamp(24px,7.6vw,38px); } .impression p { font-size:9px; margin-top:9px; }
   .library { margin:26px 0 30px; } .library-head { border:0; padding-bottom:13px; }
   .library-head h2 { font-size:30px; } .picker { display:none; }
   .page { display:block; scroll-margin-top:8px; }
@@ -125,13 +131,116 @@ h1,h2,h3 { font-family: var(--roman); font-weight: 400; }
 }
 @media (prefers-reduced-motion:reduce){ .slide { transition:none; } }
 </style>
+<script type="text/plain" id="pinyon-script-license">
+Copyright 2024 The Pinyon Project Authors (https://github.com/SorkinType/Pinyon)
+
+This Font Software is licensed under the SIL Open Font License, Version 1.1.
+This license is copied below, and is also available with a FAQ at:
+https://openfontlicense.org
+
+
+-----------------------------------------------------------
+SIL OPEN FONT LICENSE Version 1.1 - 26 February 2007
+-----------------------------------------------------------
+
+PREAMBLE
+The goals of the Open Font License (OFL) are to stimulate worldwide
+development of collaborative font projects, to support the font creation
+efforts of academic and linguistic communities, and to provide a free and
+open framework in which fonts may be shared and improved in partnership
+with others.
+
+The OFL allows the licensed fonts to be used, studied, modified and
+redistributed freely as long as they are not sold by themselves. The
+fonts, including any derivative works, can be bundled, embedded,
+redistributed and/or sold with any software provided that any reserved
+names are not used by derivative works. The fonts and derivatives,
+however, cannot be released under any other type of license. The
+requirement for fonts to remain under this license does not apply
+to any document created using the fonts or their derivatives.
+
+DEFINITIONS
+"Font Software" refers to the set of files released by the Copyright
+Holder(s) under this license and clearly marked as such. This may
+include source files, build scripts and documentation.
+
+"Reserved Font Name" refers to any names specified as such after the
+copyright statement(s).
+
+"Original Version" refers to the collection of Font Software components as
+distributed by the Copyright Holder(s).
+
+"Modified Version" refers to any derivative made by adding to, deleting,
+or substituting -- in part or in whole -- any of the components of the
+Original Version, by changing formats or by porting the Font Software to a
+new environment.
+
+"Author" refers to any designer, engineer, programmer, technical
+writer or other person who contributed to the Font Software.
+
+PERMISSION & CONDITIONS
+Permission is hereby granted, free of charge, to any person obtaining
+a copy of the Font Software, to use, study, copy, merge, embed, modify,
+redistribute, and sell modified and unmodified copies of the Font
+Software, subject to the following conditions:
+
+1) Neither the Font Software nor any of its individual components,
+in Original or Modified Versions, may be sold by itself.
+
+2) Original or Modified Versions of the Font Software may be bundled,
+redistributed and/or sold with any software, provided that each copy
+contains the above copyright notice and this license. These can be
+included either as stand-alone text files, human-readable headers or
+in the appropriate machine-readable metadata fields within text or
+binary files as long as those fields can be easily viewed by the user.
+
+3) No Modified Version of the Font Software may use the Reserved Font
+Name(s) unless explicit written permission is granted by the corresponding
+Copyright Holder. This restriction only applies to the primary font name as
+presented to the users.
+
+4) The name(s) of the Copyright Holder(s) or the Author(s) of the Font
+Software shall not be used to promote, endorse or advertise any
+Modified Version, except to acknowledge the contribution(s) of the
+Copyright Holder(s) and the Author(s) or with their explicit written
+permission.
+
+5) The Font Software, modified or unmodified, in part or in whole,
+must be distributed entirely under this license, and must not be
+distributed under any other license. The requirement for fonts to
+remain under this license does not apply to any document created
+using the Font Software.
+
+TERMINATION
+This license becomes null and void if any of the above conditions are
+not met.
+
+DISCLAIMER
+THE FONT SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO ANY WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT
+OF COPYRIGHT, PATENT, TRADEMARK, OR OTHER RIGHT. IN NO EVENT SHALL THE
+COPYRIGHT HOLDER BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+INCLUDING ANY GENERAL, SPECIAL, INDIRECT, INCIDENTAL, OR CONSEQUENTIAL
+DAMAGES, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF THE USE OR INABILITY TO USE THE FONT SOFTWARE OR FROM
+OTHER DEALINGS IN THE FONT SOFTWARE.
+</script>
 </head>
 <body>
 <div class="frame">
 <header class="mast"><span class="mark">MISSVELLA</span><nav class="nav" aria-label="Guide"><a href="#colors" aria-current="true">Colors</a><a href="#fabrics">Fabrics</a></nav></header>
 <main>
   <div class="plate" aria-label="Featured shades">
-    <div class="leaf"><img class="stock" alt=""><div class="impression"><h1>Color &amp; Fabric <em>Guide</em></h1><p>60 colors &nbsp;·&nbsp; 8 fabrics</p></div></div>
+    <div class="leaf">
+      <div class="stationery">
+        <img class="stock" alt="">
+        <div class="impression">
+          <h1><span>Color &amp; Fabric</span> <span>Guide</span></h1>
+          <p>60 colors &nbsp;·&nbsp; 8 fabrics</p>
+        </div>
+      </div>
+    </div>
   </div>
   <section class="library" aria-labelledby="library-title">
     <header class="library-head"><h2 id="library-title">Color library</h2><div class="picker"><label for="choice">Color family</label><select id="choice"></select></div></header>
